@@ -3447,11 +3447,16 @@ function renderDzis(){
   const carried = freshTodos.filter(t=>t.carried&&!t.done);
 
   function renderItem(t){
-    return `<div class="todo-item ${t.done?'done':''}" onclick="toggleTodo('${t.id}')">
-      <div class="todo-cb"></div>
-      <div class="todo-priority prio-${t.prio}"></div>
-      <div>
-        <div class="todo-text">${t.text}</div>
+    const cbStyle = t.done
+      ? 'width:16px;height:16px;border-radius:4px;border:2px solid var(--green);background:var(--green);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;cursor:pointer'
+      : 'width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);background:transparent;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;cursor:pointer';
+    const cbInner = t.done ? '<span style="color:#000;font-size:10px;font-weight:700;line-height:1">✓</span>' : '';
+    const prioColor = t.prio==='red'?'var(--red)':'var(--yellow)';
+    return `<div class="todo-item ${t.done?'done':''}" style="cursor:default;${t.done?'opacity:.5':''}">
+      <div style="${cbStyle}" onclick="event.stopPropagation();toggleTodo('${t.id}')">${cbInner}</div>
+      <div style="width:6px;height:6px;border-radius:50%;background:${prioColor};flex-shrink:0;margin-top:5px"></div>
+      <div style="flex:1;min-width:0">
+        <div class="todo-text" style="${t.done?'text-decoration:line-through;color:var(--text3)':''}">${t.text}</div>
         <div class="todo-acc">${t.acc}</div>
       </div>
       ${t.carried?'<span class="todo-carry">przeniesione</span>':''}
