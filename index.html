@@ -44,7 +44,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .nav-glbl.g-one{color:var(--g-one);}
 .nav-btn{font-family:var(--mono);font-size:10px;font-weight:400;padding:4px 9px;border-radius:5px;border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;line-height:1.4;}
 .nav-btn:hover{background:var(--bg3);color:var(--text);}
-.nav-btn.active{background:rgba(255,255,255,.09);color:var(--text);border:1px solid var(--border2);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset;}
+.nav-btn.active{color:#fff !important;border-width:1px !important;opacity:1;filter:brightness(1.6) saturate(1.4);}
 .nav-btn.entry-btn{color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);}
 .nav-btn.entry-btn.active{background:rgba(255,107,53,.18);border-color:rgba(255,107,53,.4);}
 
@@ -221,9 +221,9 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   position:relative;
 }
 .ac-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.4);}
-.ac-card.status-good{background:linear-gradient(135deg,#0d1f18,var(--bg2));border-color:rgba(45,212,160,.28);}
-.ac-card.status-warn{background:linear-gradient(135deg,#1f1a0d,var(--bg2));border-color:rgba(245,166,35,.38);}
-.ac-card.status-bad {background:linear-gradient(135deg,#1f0d12,var(--bg2));border-color:rgba(255,77,106,.38);}
+.ac-card.status-good{background:linear-gradient(135deg,#0d1f18,var(--bg2));border-color:rgba(45,212,160,.3);border-top:2px solid rgba(45,212,160,.7);}
+.ac-card.status-warn{background:linear-gradient(135deg,#1f1a0d,var(--bg2));border-color:rgba(245,166,35,.3);border-top:2px solid rgba(245,166,35,.7);}
+.ac-card.status-bad {background:linear-gradient(135deg,#1f0d12,var(--bg2));border-color:rgba(255,77,106,.3);border-top:2px solid rgba(255,77,106,.7);}
 .ac-card.status-na  {background:var(--bg2);border-color:var(--border);}
 
 .ac-card-top{display:flex;align-items:center;justify-content:space-between;padding:.6rem .85rem .4rem;}
@@ -1414,8 +1414,7 @@ function renderDashboard(){
         trendHtml = `<div class="ac-card-trend ${tCls}">${dv>=0?'▲':'▼'}${Math.abs(dv).toFixed(0)}%</div>`;
       }
 
-      const grpBorderColor = g.c;
-      return `<div class="${cardCls}" onclick="showView('${k}')" style="border-left:3px solid ${grpBorderColor}">
+      return `<div class="${cardCls}" onclick="showView('${k}')">
         <div class="${barCls}"></div>
         <div class="ac-card-top">
           <div class="ac-card-name">${AC_META[k].name}</div>
@@ -2592,7 +2591,10 @@ let insCurrentFilter = 'all';
 function insSetFilter(f, btn){
   insCurrentFilter = f;
   document.querySelectorAll('.ins-filter').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
+  // Also sync the filter buttons by data-f
+  const match = document.querySelector(`.ins-filter[data-f="${f}"]`);
+  if(match) match.classList.add('active');
   renderInsights();
 }
 
