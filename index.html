@@ -664,11 +664,11 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     </div>
   </div>
 
-  <div class="entry-group-hdr egh-m">MEBLE — MobelKap · Perfekt Cięcie · Meble na Czasie</div>
+  <div class="entry-group-hdr egh-m" style="border-left:3px solid var(--g-meble);padding-left:.6rem">MEBLE — MobelKap · Perfekt Cięcie · Meble na Czasie</div>
   <div id="entryMEBLE"></div>
-  <div class="entry-group-hdr egh-l">LUXSEN — Luxsen · Semmi · BOTAVIT</div>
+  <div class="entry-group-hdr egh-l" style="border-left:3px solid var(--g-luxsen);padding-left:.6rem">LUXSEN — Luxsen · Semmi · BOTAVIT</div>
   <div id="entryLUXSEN"></div>
-  <div class="entry-group-hdr egh-o">ONE — Materazzi · MtzzEU · Ankado24</div>
+  <div class="entry-group-hdr egh-o" style="border-left:3px solid var(--g-one);padding-left:.6rem">ONE — Materazzi · MtzzEU · Ankado24</div>
   <div id="entryONE"></div>
 
   <div class="save-bar">
@@ -2597,25 +2597,23 @@ function insSetFilter(f, btn){
 }
 
 function renderInsights(){
-  // ── Populate date bar ──
+  // ── Date bar ──
   (function(){
-    const now   = new Date();
-    const y     = now.getFullYear();
-    const m     = now.getMonth();
-    const d     = now.getDate();
-    const days  = new Date(y, m+1, 0).getDate();
-    const mName = MONTHS[m];
-    const SHORT = ['STY','LUT','MAR','KWI','MAJ','CZE','LIP','SIE','WRZ','PAŹ','LIS','GRU'];
-    const el = id => document.getElementById(id);
-    if(el('insMonth'))  el('insMonth').textContent  = mName[0].toUpperCase()+mName.slice(1)+' '+y;
-    if(el('insDayNum')) el('insDayNum').textContent = d;
-    if(el('insDayOf'))  el('insDayOf').textContent  = '/'+days;
-    if(el('insProg'))   el('insProg').textContent   = Math.round(d/days*100)+'% (dzień '+d+'/'+days+')';
-    const tl = el('insTL');
+    const now=new Date(),y=now.getFullYear(),m=now.getMonth(),d=now.getDate();
+    const days=new Date(y,m+1,0).getDate();
+    const mName=MONTHS[m];
+    const SHORT=['STY','LUT','MAR','KWI','MAJ','CZE','LIP','SIE','WRZ','PAŹ','LIS','GRU'];
+    const el=id=>document.getElementById(id);
+    if(el('insMonth'))  el('insMonth').textContent=mName[0].toUpperCase()+mName.slice(1)+' '+y;
+    if(el('insDayNum')) el('insDayNum').textContent=d;
+    if(el('insDayOf'))  el('insDayOf').textContent='/'+days;
+    if(el('insProg'))   el('insProg').textContent=Math.round(d/days*100)+'% (dzień '+d+'/'+days+')';
+    const tl=el('insTL');
     if(tl){
       tl.innerHTML='';
+      // i=5 = 5 months ago (LEFT/oldest) → i=0 = current (RIGHT/newest)
       for(let i=5;i>=0;i--){
-        let mi=m-i, yi=y; if(mi<0){mi+=12;yi--;}
+        let mi=m-i,yi=y; if(mi<0){mi+=12;yi--;}
         const isCur=(i===0);
         const hasData=Object.keys(AC_META).some(k=>getData(k).some(dd=>dd.m===MONTHS[mi]));
         const dot=document.createElement('div');
@@ -2630,236 +2628,243 @@ function renderInsights(){
     }
   })();
 
-  const allSignals = [];   // { account, type:'danger'|'chance'|'watch', title, body, metric, value }
+  // ── Build analyses per account ──
+  const analyses=[];
 
   Object.keys(AC_META).forEach(k=>{
-    const D = getData(k);
-    if(!D || D.length < 1) return;
-    const prod = getProd(k);
-    const meta = AC_META[k];
-    const g    = GROUPS[meta.group];
+    const D=getData(k); if(!D||D.length<1) return;
+    const prod=getProd(k);
+    const meta=AC_META[k];
+    const g=GROUPS[meta.group];
+    const last=D[D.length-1];
+    const prev=D.length>=2?D[D.length-2]:null;
+    const prev2=D.length>=3?D[D.length-3]:null;
+    const lC=calc(last,prod);
+    const isPartial=!!(last.dzien);
+    const lEst=estym(last);
+    const pEst=prev?estym(prev):null;
+    const p2Est=prev2?estym(prev2):null;
 
-    // Get last 3 months of data with calculated metrics
-    const recent = D.slice(-3).map(d=>({ d, c: calc(d, prod) }));
-    const last   = recent[recent.length-1];
-    const prev   = recent.length>=2 ? recent[recent.length-2] : null;
-    const prev2  = recent.length>=3 ? recent[recent.length-3] : null;
+    const signals=[];
+    const voice=[];
 
-    const lC = last.c;
-    const lD = last.d;
+    // Score 1-10
+    let score=6;
+    if(lC.mAfter>=20) score+=2; else if(lC.mAfter>=15) score+=1; else if(lC.mAfter<10) score-=2; else if(lC.mAfter<5) score-=4;
+    if(last.roas&&lC.beRoasAds&&last.roas>=lC.beRoasAds*1.2) score+=1;
+    if(last.roas&&lC.beRoasAds&&last.roas<lC.beRoasAds) score-=2;
+    if(pEst&&lEst>pEst*1.1) score+=1;
+    if(pEst&&lEst<pEst*0.9) score-=1;
+    score=Math.max(1,Math.min(10,score));
 
-    // ── ZAGROŻENIA ──────────────────────────────────────────
-
-    // 1. Marża krytyczna < 10%
-    if(lC.mAfter < MARZA_DANGER){
-      allSignals.push({ account:k, group:g, type:'danger',
-        title:'Marża krytyczna',
-        body:`Marża po reklamie wynosi <strong>${lC.mAfter.toFixed(1)}%</strong> — poniżej progu ${MARZA_DANGER}%. Sprawdź koszty Ads i prowizję.`,
-        metric: lC.mAfter, tag:'marza' });
+    // 1. Marża krytyczna
+    if(lC.mAfter<10){
+      signals.push({type:'danger',title:'Marża krytyczna',text:`Marża po reklamie ${lC.mAfter.toFixed(1)}% — poniżej progu 10%.`});
+      voice.push({type:'danger',impact:'wysoki',
+        text:`Marża ${lC.mAfter.toFixed(1)}% to sygnał alarmowy. ${last.roas<(lC.beRoasAds||99)?`ROAS ${last.roas.toFixed(2)} jest poniżej break-even ${lC.beRoasAds?lC.beRoasAds.toFixed(2):'—'} — każda złotówka reklamy generuje stratę. Zmniejsz budżet kampanii o 30–50% i skup się na słowach kluczowych z najwyższą konwersją. Bez tej zmiany marża będzie dalej spadać.`:`Sprawdź prowizję Allegro i koszty dostawy — to one zjadają wynik.`}`,
+        proj:`Poprawa ROAS do ${lC.beRoasAds?(lC.beRoasAds*1.2).toFixed(1):'5.0'} przywróci marżę powyżej 15%.`
+      });
+    } else if(lC.mAfter<15){
+      signals.push({type:'watch',title:'Marża w strefie obserwacji',text:`Marża po reklamie ${lC.mAfter.toFixed(1)}% — blisko progu 10%.`});
+      voice.push({type:'watch',impact:'średni',
+        text:`Marża ${lC.mAfter.toFixed(1)}% — jeszcze bezpiecznie, ale bez buforu. Monitoruj ACOS dziennie.`,
+        proj:`Optymalizacja najdroższych kampanii może poprawić marżę o 3–5 pp.`
+      });
     }
 
-    // 2. ROAS spada 2+ miesiące z rzędu
-    if(prev && prev2){
-      const roasTrend = lD.roas < prev.d.roas && prev.d.roas < prev2.d.roas;
-      if(roasTrend){
-        allSignals.push({ account:k, group:g, type:'danger',
-          title:'ROAS spada 3 miesiące z rzędu',
-          body:`ROAS: <strong>${prev2.d.roas.toFixed(2)}</strong> → <strong>${prev.d.roas.toFixed(2)}</strong> → <strong>${lD.roas.toFixed(2)}</strong>. Konsekwentny spadek efektywności kampanii.`,
-          metric: lD.roas, tag:'roas' });
-      } else if(prev && lD.roas < prev.d.roas){
-        allSignals.push({ account:k, group:g, type:'watch',
-          title:'ROAS spadł miesiąc do miesiąca',
-          body:`ROAS: <strong>${prev.d.roas.toFixed(2)}</strong> → <strong>${lD.roas.toFixed(2)}</strong>. Jeden miesiąc spadku — obserwuj czy to trend.`,
-          metric: lD.roas, tag:'roas' });
+    // 2. ROAS vs BE
+    if(lC.beRoasAds&&last.roas&&last.roas<lC.beRoasAds){
+      signals.push({type:'danger',title:'ROAS poniżej break-even',text:`ROAS ${last.roas.toFixed(2)} przy BE ${lC.beRoasAds.toFixed(2)}`});
+      voice.push({type:'danger',impact:'wysoki',
+        text:`ROAS ${last.roas.toFixed(2)} jest poniżej break-even ${lC.beRoasAds.toFixed(2)}. Kampania Ads kosztuje więcej niż zarabia. Wyłącz lub mocno zredukuj kampanie z najniższym ROAS.`,
+        proj:`Osiągnięcie ROAS ${(lC.beRoasAds*1.2).toFixed(1)} przywróci rentowność i zwiększy marżę o ~${(lC.acosTotal?lC.acosTotal*0.3:3).toFixed(0)} pp.`
+      });
+    }
+
+    // 3. ROAS trend
+    if(prev&&prev2){
+      if(last.roas<prev.roas&&prev.roas<prev2.roas){
+        signals.push({type:'danger',title:'ROAS spada 3 miesiące z rzędu',text:`${prev2.roas.toFixed(2)} → ${prev.roas.toFixed(2)} → ${last.roas.toFixed(2)}`});
+        voice.push({type:'danger',impact:'wysoki',
+          text:`Trzy miesiące konsekwentnego spadku ROAS to poważny sygnał. Kampanie tracą skuteczność. Czas na rewizję struktury — wyklucz frazy z niską konwersją, odśwież kreacje i sprawdź stawki CPC.`,
+          proj:`Stabilizacja ROAS na poziomie ${prev2.roas.toFixed(1)} oznacza odzyskanie ~${Math.abs(Math.round((prev2.roas-last.roas)*last.adsCost/prev2.roas))} zł marży miesięcznie.`
+        });
+      } else if(last.roas<prev.roas){
+        signals.push({type:'watch',title:'ROAS spadł m/m',text:`${prev.roas.toFixed(2)} → ${last.roas.toFixed(2)}`});
+        voice.push({type:'watch',impact:'średni',
+          text:`ROAS spadł z ${prev.roas.toFixed(2)} do ${last.roas.toFixed(2)}. Jeden miesiąc — obserwuj czy to trend.`,proj:null
+        });
       }
     }
 
-    // 3. Sprzedaż spada m/m — ZAWSZE używaj estymacji dla bieżącego miesiąca
-    if(prev){
-      const lEst  = estym(lD);   // estymacja EOM bieżącego miesiąca
-      const pEst  = estym(prev.d); // poprzedni miesiąc (zakończony = jego rzeczywista wartość)
-      const isPartial = !!(lD.dzien); // czy bieżący miesiąc jest w trakcie
-      const spDelta = (lEst - pEst) / pEst * 100;
-      const label   = isPartial
-        ? `Estymacja EOM: <strong>${Math.round(lEst).toLocaleString('pl-PL')} zł</strong> vs poprzedni miesiąc <strong>${Math.round(pEst).toLocaleString('pl-PL')} zł</strong>`
-        : `Sprzedaż: <strong>${Math.round(pEst).toLocaleString('pl-PL')} zł</strong> → <strong>${Math.round(lEst).toLocaleString('pl-PL')} zł</strong>`;
-      const dayNote = isPartial ? ` <span style="color:var(--text3);font-size:10px">(prognoza na podstawie dnia ${lD.dzien})</span>` : '';
-      if(spDelta < -15){
-        allSignals.push({ account:k, group:g, type:'danger',
-          title:'Estymacja sprzedaży znacząco poniżej poprzedniego miesiąca',
-          body:`${label} (<strong>${spDelta.toFixed(0)}%</strong>).${dayNote}`,
-          metric: spDelta, tag:'sprzedaz' });
-      } else if(spDelta < -5){
-        allSignals.push({ account:k, group:g, type:'watch',
-          title:'Estymacja sprzedaży lekko w dół',
-          body:`${label} (${spDelta.toFixed(0)}%).${dayNote}`,
-          metric: spDelta, tag:'sprzedaz' });
+    // 4. Sprzedaż estymacja
+    if(pEst&&pEst>0){
+      const spDelta=(lEst-pEst)/pEst*100;
+      const dayNote=isPartial?` (prognoza dnia ${last.dzien})`:'';
+      if(spDelta<-15){
+        signals.push({type:'danger',title:'Estymacja sprzedaży znacząco w dół',
+          text:`Est. ~${Math.round(lEst).toLocaleString('pl-PL')} zł vs ${Math.round(pEst).toLocaleString('pl-PL')} zł (${spDelta.toFixed(0)}%)${dayNote}`});
+        voice.push({type:'danger',impact:'wysoki',
+          text:`Przy obecnym tempie estymacja końca miesiąca to ${Math.round(lEst).toLocaleString('pl-PL')} zł — o ${Math.abs(spDelta).toFixed(0)}% mniej niż poprzedni miesiąc${dayNote}. Sprawdź widoczność ofert i zwiększ budżet przy dobrym ROAS.`,
+          proj:`Przyspieszenie tempa o 10% dziennie da ~${Math.round(lEst*1.1).toLocaleString('pl-PL')} zł EOM.`
+        });
+      } else if(spDelta<-5){
+        signals.push({type:'watch',title:'Estymacja lekko w dół',
+          text:`Est. ~${Math.round(lEst).toLocaleString('pl-PL')} zł vs ${Math.round(pEst).toLocaleString('pl-PL')} zł (${spDelta.toFixed(0)}%)${dayNote}`});
+        voice.push({type:'watch',impact:'niski',
+          text:`Estymacja ${spDelta.toFixed(0)}% poniżej poprzedniego miesiąca${dayNote}. Na razie obserwuj.`,proj:null
+        });
       }
     }
 
-    // 4. Koszt Ads rośnie szybciej niż sprzedaż — używaj estymacji
-    if(prev && prev.d.sprzedaz > 0 && prev.d.adsCost > 0){
-      const lEst    = estym(lD);
-      const pEst    = estym(prev.d);
-      const adsDelta  = (lD.adsCost  - prev.d.adsCost)  / prev.d.adsCost  * 100;
-      const sprzDelta = (lEst - pEst) / pEst * 100;
-      const isPartial = !!(lD.dzien);
-      const dayNote   = isPartial ? ` (prognoza dnia ${lD.dzien})` : '';
-      if(adsDelta > 10 && adsDelta > sprzDelta + 10){
-        allSignals.push({ account:k, group:g, type:'danger',
-          title:'Ads drożeje szybciej niż sprzedaż',
-          body:`Koszt Ads +<strong>${adsDelta.toFixed(0)}%</strong>, sprzedaż ${sprzDelta>=0?'+':''}${sprzDelta.toFixed(0)}%${dayNote}. Budżet rośnie nieproporcjonalnie do przychodu.`,
-          metric: adsDelta - sprzDelta, tag:'ads' });
+    // 5. Ads drożeje
+    if(prev&&prev.adsCost>0&&pEst){
+      const adsDelta=(last.adsCost-prev.adsCost)/prev.adsCost*100;
+      const spDelta=(lEst-pEst)/pEst*100;
+      if(adsDelta>10&&adsDelta>spDelta+10){
+        signals.push({type:'danger',title:'Koszt Ads rośnie szybciej niż sprzedaż',
+          text:`Ads +${adsDelta.toFixed(0)}%, sprzedaż est. ${spDelta>=0?'+':''}${spDelta.toFixed(0)}%`});
+        voice.push({type:'danger',impact:'wysoki',
+          text:`Budżet Ads wzrósł o ${adsDelta.toFixed(0)}% podczas gdy sprzedaż (est.) o ${spDelta>=0?'+':''}${spDelta.toFixed(0)}%. Reklama przestaje być efektywna. Przejrzyj kampanie i wyłącz te z ROAS poniżej ${lC.beRoasAds?lC.beRoasAds.toFixed(1):'4.0'}.`,
+          proj:`Ograniczenie budżetu o 20% przy utrzymaniu najlepszych kampanii powinno poprawić ROAS o 15–25%.`
+        });
       }
     }
 
-    // ── SZANSE ──────────────────────────────────────────────
-
-    // 5. ROAS wysoki i marża wysoka — można zwiększyć budżet
-    if(lD.roas >= ROAS_GOOD && lC.mAfter >= 20){
-      allSignals.push({ account:k, group:g, type:'chance',
-        title:'Przestrzeń na większy budżet Ads',
-        body:`ROAS <strong>${lD.roas.toFixed(2)}</strong> i marża <strong>${lC.mAfter.toFixed(1)}%</strong> — obydwa wskaźniki silne. Zwiększenie budżetu Ads może proporcjonalnie zwiększyć sprzedaż.`,
-        metric: lD.roas, tag:'roas' });
+    // 6. Szansa: ROAS wysoki + marża dobra
+    if(last.roas>=5&&lC.mAfter>=18&&lC.beRoasAds&&last.roas>lC.beRoasAds*1.3){
+      signals.push({type:'chance',title:'Silny ROAS — przestrzeń na więcej',
+        text:`ROAS ${last.roas.toFixed(2)}, marża ${lC.mAfter.toFixed(1)}% — obydwa silne`});
+      voice.push({type:'chance',impact:'wysoki',
+        text:`ROAS ${last.roas.toFixed(2)} jest ${((last.roas/lC.beRoasAds-1)*100).toFixed(0)}% powyżej break-even, marża ${lC.mAfter.toFixed(1)}% daje dobry bufor. Zwiększ budżet o 30–50% i obserwuj przez 3–5 dni czy ROAS się utrzymuje.`,
+        proj:`Przy wzroście budżetu o 30% i utrzymaniu ROAS estymacja może wzrosnąć do ~${Math.round(lEst*1.25).toLocaleString('pl-PL')} zł.`
+      });
     }
 
-    // 6. Marża wysoka ale Ads niski — niedoinwestowanie
-    const acosTotal = lC.acosTotal||0;
-    if(lC.mAfter >= 20 && acosTotal < 8 && lD.sprzedaz > 5000){
-      allSignals.push({ account:k, group:g, type:'chance',
-        title:'Niska reklama przy dobrej marży',
-        body:`Marża <strong>${lC.mAfter.toFixed(1)}%</strong>, łączny ACOS <strong>${acosTotal.toFixed(1)}%</strong>. Konto może być niedoinwestowane w reklamę — jest przestrzeń.`,
-        metric: lC.mAfter, tag:'marza' });
+    // 7. Niedoinwestowane
+    if(lC.mAfter>=20&&(lC.acosTotal||0)<8&&last.sprzedaz>5000){
+      signals.push({type:'chance',title:'Konto niedoinwestowane w reklamę',
+        text:`Marża ${lC.mAfter.toFixed(1)}%, ACOS ${(lC.acosTotal||0).toFixed(1)}%`});
+      voice.push({type:'chance',impact:'wysoki',
+        text:`Marża ${lC.mAfter.toFixed(1)}% przy ACOS zaledwie ${(lC.acosTotal||0).toFixed(1)}% — konto pracuje poniżej swojego potencjału. Zwiększ budżet stopniowo — 20% co tydzień — i monitoruj ROAS.`,
+        proj:`Podwojenie budżetu Ads przy tej marży może zwiększyć sprzedaż o 40–60% przy zachowaniu rentowności.`
+      });
     }
 
-    // 7. Trend wzrostowy 2+ miesiące — używaj estymacji dla bieżącego
-    if(prev && prev2){
-      const lEst  = estym(lD);
-      const pEst  = estym(prev.d);
-      const p2Est = estym(prev2.d);
-      const r1 = lEst  > pEst;
-      const r2 = pEst  > p2Est;
-      if(r1 && r2){
-        const tot = (lEst - p2Est) / p2Est * 100;
-        const isPartial = !!(lD.dzien);
-        const lastLabel = isPartial
-          ? `~${Math.round(lEst).toLocaleString('pl-PL')} zł (est.)`
-          : `${Math.round(lEst).toLocaleString('pl-PL')} zł`;
-        allSignals.push({ account:k, group:g, type:'chance',
-          title:'Trend wzrostowy 3 miesiące z rzędu',
-          body:`Sprzedaż rośnie konsekwentnie: <strong>${Math.round(p2Est).toLocaleString('pl-PL')}</strong> → <strong>${Math.round(pEst).toLocaleString('pl-PL')}</strong> → <strong>${lastLabel}</strong> (+${tot.toFixed(0)}% łącznie).`,
-          metric: tot, tag:'sprzedaz' });
+    // 8. Trend wzrostowy
+    if(pEst&&p2Est&&lEst>pEst&&pEst>p2Est){
+      const tot=(lEst-p2Est)/p2Est*100;
+      signals.push({type:'chance',title:'Trend wzrostowy 3 miesiące',
+        text:`${Math.round(p2Est).toLocaleString('pl-PL')} → ${Math.round(pEst).toLocaleString('pl-PL')} → ~${Math.round(lEst).toLocaleString('pl-PL')} zł (+${tot.toFixed(0)}%)`});
+      voice.push({type:'chance',impact:'średni',
+        text:`Trzy miesiące wzrostu z rzędu. Nie ruszaj struktury kampanii — skaluj to co przynosi wyniki.`,
+        proj:`Kontynuacja trendu sugeruje ~${Math.round(lEst*(lEst/pEst)).toLocaleString('pl-PL')} zł w następnym miesiącu.`
+      });
+    }
+
+    // 9. Estymacja powyżej poprzedniego
+    if(pEst&&isPartial){
+      const estDelta=(lEst-pEst)/pEst*100;
+      if(estDelta>10&&!signals.find(s=>s.type==='chance'&&s.title.includes('Trend'))){
+        signals.push({type:'chance',title:'Estymacja EOM powyżej poprzedniego miesiąca',
+          text:`~${Math.round(lEst).toLocaleString('pl-PL')} zł vs ${Math.round(pEst).toLocaleString('pl-PL')} zł (+${estDelta.toFixed(0)}%, prognoza dnia ${last.dzien})`});
+        voice.push({type:'chance',impact:'średni',
+          text:`Przy tempie dnia ${last.dzien} estymacja ${Math.round(lEst).toLocaleString('pl-PL')} zł jest o ${estDelta.toFixed(0)}% wyższa niż poprzedni miesiąc. Dobry kurs — utrzymaj tempo i nie wprowadzaj dużych zmian w kampaniach.`,
+          proj:null
+        });
       }
     }
 
-    // 8. Estymacja EOM > poprzedni miesiąc
-    if(prev && lD.dzien){
-      const est = estym(lD);
-      const prevSp = prev.d.sprzedaz;
-      const estDelta = (est - prevSp) / prevSp * 100;
-      if(estDelta > 10){
-        allSignals.push({ account:k, group:g, type:'chance',
-          title:'Estymacja EOM powyżej poprzedniego miesiąca',
-          body:`Przy tempie dnia ${lD.dzien} estymacja wynosi <strong>${Math.round(est).toLocaleString('pl-PL')} zł</strong> vs poprzedni miesiąc <strong>${Math.round(prevSp).toLocaleString('pl-PL')} zł</strong> (+${estDelta.toFixed(0)}%).`,
-          metric: estDelta, tag:'estymacja' });
-      }
-    }
-
-    // 9. Marża obserwacji 10-15%
-    if(lC.mAfter >= MARZA_DANGER && lC.mAfter < MARZA_WATCH){
-      allSignals.push({ account:k, group:g, type:'watch',
-        title:'Marża w strefie obserwacji',
-        body:`Marża po reklamie <strong>${lC.mAfter.toFixed(1)}%</strong> — blisko progu krytycznego ${MARZA_DANGER}%. Monitoruj koszty.`,
-        metric: lC.mAfter, tag:'marza' });
+    if(signals.length>0){
+      analyses.push({k,meta,g,score,signals,voice,last,lC,lEst,pEst,isPartial});
     }
   });
 
-  // ── Render ───────────────────────────────────────────────
-  const filtered = insCurrentFilter==='all' ? analyses :
-    analyses.filter(a=>a.signals.some(s=>s.type===insCurrentFilter));
+  analyses.sort((a,b)=>a.score-b.score);
 
-  const dangers = allSignals.filter(s=>s.type==='danger').length;
-  const chances = allSignals.filter(s=>s.type==='chance').length;
-  const watches = allSignals.filter(s=>s.type==='watch').length;
+  // ── Summary ──
+  const flat=analyses.flatMap(a=>a.signals);
+  const nDanger=flat.filter(s=>s.type==='danger').length;
+  const nChance=flat.filter(s=>s.type==='chance').length;
+  const nWatch=flat.filter(s=>s.type==='watch').length;
 
-  // Summary cards
-  document.getElementById('insightsSummary').innerHTML = `
-    <div style="background:var(--red-bg);border:1px solid var(--red-bd);border-radius:10px;padding:.9rem 1rem;text-align:center">
-      <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--red)">${dangers}</div>
+  const sumEl=document.getElementById('insightsSummary');
+  if(sumEl) sumEl.innerHTML=`
+    <div style="background:var(--red-bg);border:1px solid var(--red-bd);border-radius:10px;padding:.9rem 1rem;text-align:center;cursor:pointer" onclick="insSetFilter('danger',document.querySelector('[data-f=danger]'))">
+      <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--red)">${nDanger}</div>
       <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-top:2px">Zagrożenia</div>
     </div>
-    <div style="background:var(--yellow-bg);border:1px solid var(--yellow-bd);border-radius:10px;padding:.9rem 1rem;text-align:center">
-      <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--yellow)">${watches}</div>
+    <div style="background:var(--yellow-bg);border:1px solid var(--yellow-bd);border-radius:10px;padding:.9rem 1rem;text-align:center;cursor:pointer" onclick="insSetFilter('watch',document.querySelector('[data-f=watch]'))">
+      <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--yellow)">${nWatch}</div>
       <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow);margin-top:2px">Obserwuj</div>
     </div>
-    <div style="background:var(--green-bg);border:1px solid var(--green-bd);border-radius:10px;padding:.9rem 1rem;text-align:center">
-      <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--green)">${chances}</div>
+    <div style="background:var(--green-bg);border:1px solid var(--green-bd);border-radius:10px;padding:.9rem 1rem;text-align:center;cursor:pointer" onclick="insSetFilter('chance',document.querySelector('[data-f=chance]'))">
+      <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--green)">${nChance}</div>
       <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-top:2px">Szanse</div>
     </div>`;
 
-  document.getElementById('insightsTs').textContent =
-    'Analiza: ' + new Date().toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+  const tsEl=document.getElementById('insightsTs');
+  if(tsEl) tsEl.textContent='Analiza: '+new Date().toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+  const subEl=document.getElementById('insightsSub');
+  if(subEl) subEl.textContent=`${flat.length} sygnałów · ${nDanger} zagrożeń · ${nChance} szans · ${nWatch} obserwacji`;
 
-  const sub = `${allSignals.length} sygnałów · ${dangers} zagrożeń · ${chances} szans · ${watches} obserwacji`;
-  document.getElementById('insightsSub').textContent = sub;
+  // ── Filter & render ──
+  const filtered=insCurrentFilter==='all'?analyses:analyses.filter(a=>a.signals.some(s=>s.type===insCurrentFilter));
+  const content=document.getElementById('insightsContent');
+  if(!content) return;
 
-  const content = document.getElementById('insightsContent');
+  if(!analyses.length){
+    content.innerHTML=`<div style="text-align:center;padding:3rem;color:var(--text3);font-family:var(--mono);font-size:12px"><div style="font-size:28px;margin-bottom:.5rem">◌</div>Brak danych — wpisz dane w zakładce Wpisz Dane.</div>`;
+    return;
+  }
   if(!filtered.length){
-    content.innerHTML = `<div style="text-align:center;padding:3rem 1rem;color:var(--text3);font-family:var(--mono);font-size:12px">
-      <div style="font-size:28px;margin-bottom:.5rem">${insCurrentFilter==='chance'?'🟢':insCurrentFilter==='danger'?'🔴':'🟡'}</div>
-      Brak sygnałów w tej kategorii.</div>`;
+    content.innerHTML=`<div style="text-align:center;padding:3rem;color:var(--text3);font-family:var(--mono);font-size:12px">Brak sygnałów w tej kategorii.</div>`;
     return;
   }
 
-  // Group by account
-  const byAccount = {};
-  filtered.forEach(s=>{
-    if(!byAccount[s.account]) byAccount[s.account]=[];
-    byAccount[s.account].push(s);
-  });
+  const iC={danger:'var(--red)',watch:'var(--yellow)',chance:'var(--green)'};
+  const iBg={danger:'var(--red-bg)',watch:'var(--yellow-bg)',chance:'var(--green-bg)'};
+  const iBd={danger:'var(--red-bd)',watch:'var(--yellow-bd)',chance:'var(--green-bd)'};
+  const sC=s=>s<=3?'var(--red)':s<=5?'#ff8c5a':s<=7?'var(--yellow)':'var(--green)';
+  const sL=s=>s<=3?'Krytyczne':s<=5?'Słabe':s<=7?'Przeciętne':s<=8?'Dobre':'Bardzo dobre';
+  const roasC=a=>a.last.roas&&a.lC.beRoasAds?(a.last.roas>=a.lC.beRoasAds?'var(--green)':a.last.roas>=a.lC.beRoasAds*0.85?'var(--yellow)':'var(--red)'):'var(--text)';
+  const marC=a=>a.lC.mAfter>=15?'var(--green)':a.lC.mAfter>=10?'var(--yellow)':'var(--red)';
 
-  // Sort: accounts with dangers first
-  const sortedAccs = Object.keys(byAccount).sort((a,b)=>{
-    const da = byAccount[a].filter(s=>s.type==='danger').length;
-    const db = byAccount[b].filter(s=>s.type==='danger').length;
-    return db - da;
-  });
-
-  const typeIcon = {danger:'🔴', chance:'🟢', watch:'🟡'};
-  const typeLabel = {danger:'Zagrożenie', chance:'Szansa', watch:'Obserwuj'};
-
-  content.innerHTML = sortedAccs.map(k=>{
-    const signals = byAccount[k];
-    const meta = AC_META[k];
-    const g = GROUPS[meta.group];
-    const hasDanger = signals.some(s=>s.type==='danger');
-    const hasChance = signals.some(s=>s.type==='chance');
-    const cardType = hasDanger?'danger':hasChance?'chance':'watch';
-
-    return `<div class="ins-card ${cardType}">
-      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem">
-        <span style="width:8px;height:8px;border-radius:50%;background:${g.c};flex-shrink:0;display:inline-block"></span>
-        <span style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:${g.c}">${g.label}</span>
-        <span style="font-size:13px;font-weight:600;color:var(--text)">${meta.name}</span>
-        <span style="margin-left:auto;display:flex;gap:.3rem">
-          ${signals.map(s=>`<span style="font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;
-            background:${s.type==='danger'?'var(--red-bg)':s.type==='chance'?'var(--green-bg)':'var(--yellow-bg)'};
-            color:${s.type==='danger'?'var(--red)':s.type==='chance'?'var(--green)':'var(--yellow)'};
-            border:1px solid ${s.type==='danger'?'var(--red-bd)':s.type==='chance'?'var(--green-bd)':'var(--yellow-bd)'}">
-            ${typeIcon[s.type]} ${typeLabel[s.type]}</span>`).join('')}
-        </span>
+  content.innerHTML=filtered.map(a=>{
+    const cardBd=a.signals.some(s=>s.type==='danger')?'var(--red)':a.signals.some(s=>s.type==='chance')?'var(--green)':'var(--yellow)';
+    const tags=a.signals.map(s=>`<span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;background:${iBg[s.type]};color:${iC[s.type]};border:1px solid ${iBd[s.type]}">${s.type==='danger'?'↓':s.type==='chance'?'↑':'→'} ${s.title}</span>`).join('');
+    const voiceHtml=a.voice.map(v=>`
+      <div style="border-left:2px solid ${iC[v.type]};padding:.55rem .9rem;margin:.45rem 0;background:${iBg[v.type]};border-radius:0 6px 6px 0">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:${iC[v.type]}">${v.type==='danger'?'↓ zagrożenie':v.type==='chance'?'↑ szansa':'→ obserwuj'}</span>
+          <span style="font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;background:${iBg[v.impact==='wysoki'?'danger':v.impact==='średni'?'watch':'chance']};color:${iC[v.impact==='wysoki'?'danger':v.impact==='średni'?'watch':'chance']};border:1px solid ${iBd[v.impact==='wysoki'?'danger':v.impact==='średni'?'watch':'chance']}">impact: ${v.impact}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text);font-style:italic;line-height:1.6">${v.text}</div>
+        ${v.proj?`<div style="margin-top:.35rem;font-family:var(--mono);font-size:10px;color:var(--text3)">▸ ${v.proj}</div>`:''}
+      </div>`).join('');
+    return`<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid ${cardBd};border-radius:10px;padding:1rem 1.1rem;margin-bottom:.7rem">
+      <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem;flex-wrap:wrap">
+        <span style="width:7px;height:7px;border-radius:50%;background:${a.g.c};display:inline-block;flex-shrink:0"></span>
+        <span style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:${a.g.c}">${a.g.label}</span>
+        <span style="font-size:14px;font-weight:600;color:var(--text)">${a.meta.name}</span>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <div style="width:60px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden"><div style="width:${a.score*10}%;height:100%;background:${sC(a.score)};border-radius:2px"></div></div>
+          <span style="font-family:var(--mono);font-size:10px;color:${sC(a.score)}">${a.score}/10</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">${sL(a.score)}</span>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:.8rem;flex-wrap:wrap">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">ROAS <span style="color:${roasC(a)}">${a.last.roas?a.last.roas.toFixed(2):'—'}</span></span>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">Marża <span style="color:${marC(a)}">${a.lC.mAfter.toFixed(1)}%</span></span>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">Est. <span style="color:var(--text)">${Math.round(a.lEst).toLocaleString('pl-PL')} zł</span>${a.isPartial?` <span style="color:var(--text3)">(d.${a.last.dzien})</span>`:''}</span>
+          ${a.pEst?`<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">vs prev <span style="color:${a.lEst>=a.pEst?'var(--green)':'var(--red)'}">${a.lEst>=a.pEst?'+':''}${((a.lEst-a.pEst)/a.pEst*100).toFixed(0)}%</span></span>`:''}
+        </div>
       </div>
-      ${signals.map(s=>`
-        <div class="ins-signal">
-          <div class="ins-dot ${s.type}"></div>
-          <div>
-            <div style="font-weight:600;color:var(--text);margin-bottom:2px">${s.title}</div>
-            <div style="color:var(--text2)">${s.body}</div>
-          </div>
-        </div>`).join('')}
+      <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.6rem">${tags}</div>
+      ${voiceHtml}
     </div>`;
   }).join('');
 }
+
 
 
 // ═══════════════════════════════════════════════════════════
