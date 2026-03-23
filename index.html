@@ -594,7 +594,6 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   <div class="topbar-inner">
     <div class="brand">MPlace <span>Hub</span></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap;padding-right:10px;border-right:1px solid var(--border2);margin-right:4px"></div>
-    <button class="nav-btn" onclick="showView('dzis')" id="navDzis" style="color:var(--red);background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2)">ToDo</button>
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
     <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
@@ -716,24 +715,6 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <canvas id="dashBubble" height="280"></canvas>
     <div class="bubble-legend" id="dashBubbleLegend"></div>
   </div>
-</div>
-</div>
-
-<!-- ═══ VIEW: DZIŚ ═══ -->
-<div class="view" id="viewDzis">
-<div class="container">
-  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
-    <div>
-      <div class="ph-eyebrow" style="color:var(--red)">▸ Centrum akcji</div>
-      <div class="ph-title">Dziś <span style="color:var(--red)" id="dzisDate"></span></div>
-      <div class="ph-sub">Alerty i zadania powiązane z kontami</div>
-    </div>
-    <div style="display:flex;gap:.4rem">
-      <button class="btn" onclick="clearDoneTasks()" style="font-size:10px">✓ Wyczyść zrobione</button>
-      <button class="btn" onclick="checkAllAlerts()" style="font-size:10px;color:var(--accent)">↺ Odśwież alerty</button>
-    </div>
-  </div>
-  <div id="dzisContent"></div>
 </div>
 </div>
 
@@ -1328,7 +1309,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewDzis','viewBiznes','viewD2d','viewInsights'].forEach(id=>{
+  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -1340,10 +1321,6 @@ function showView(v){
     document.getElementById('viewRozliczenie').classList.add('active');
     document.getElementById('navRozliczenie').classList.add('active');
     renderRozliczenie();
-  } else if(v==='dzis'){
-    document.getElementById('viewDzis').classList.add('active');
-    document.getElementById('navDzis').classList.add('active');
-    renderDzis();
   } else if(v==='biznes'){
     document.getElementById('viewBiznes').classList.add('active');
     document.getElementById('navBiznes').classList.add('active');
@@ -3386,126 +3363,6 @@ function renderRozliczenie(){
 // ═══════════════════════════════════════════════════════════
 // DZIŚ — TODO / ALERTS
 // ═══════════════════════════════════════════════════════════
-const TODO_KEY = 'mplace_todo_v1';
-function getTodos(){ try{ return JSON.parse(localStorage.getItem(TODO_KEY)||'[]'); }catch(e){ return []; } }
-function saveTodos(t){ localStorage.setItem(TODO_KEY, JSON.stringify(t)); }
-
-function renderDzis(){
-  const now = new Date();
-  const today = now.toISOString().slice(0,10);
-  document.getElementById('dzisDate').textContent = '· '+now.toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'long'});
-
-  let todos = getTodos();
-
-  // Mark carried-over items (not done, from previous days)
-  todos = todos.map(t => ({
-    ...t,
-    carried: t.date < today && !t.done
-  }));
-
-  // Auto-generate alerts from accounts
-  const autoAlerts = [];
-  Object.keys(AC_META).forEach(k => {
-    const D = getData(k); if(!D.length) return;
-    const prod = getProd(k);
-    const last = D[D.length-1];
-    const C = calc(last, prod);
-    const name = AC_META[k].name;
-
-    if(C.mAfter < 5)
-      autoAlerts.push({id:'auto_mafterlow_'+k, text:'Marża po reklamie krytyczna: '+pct(C.mAfter), acc:name, prio:'red', auto:true});
-    else if(C.mAfter < 10)
-      autoAlerts.push({id:'auto_mafterwarn_'+k, text:'Marża niska: '+pct(C.mAfter)+' — poniżej 10%', acc:name, prio:'yellow', auto:true});
-
-    if(C.roasAds && C.beRoasAds && C.roasAds < C.beRoasAds)
-      autoAlerts.push({id:'auto_roasbe_'+k, text:'ROAS Ads '+xf(C.roasAds)+' poniżej break-even '+xf(C.beRoasAds), acc:name, prio:'red', auto:true});
-
-    if(D.length>=3){
-      const r3=D.slice(-3).map(d=>calc(d,prod).roasAds).filter(Boolean);
-      if(r3.length===3&&r3[2]<r3[1]&&r3[1]<r3[0])
-        autoAlerts.push({id:'auto_roastrend_'+k, text:'ROAS spada 3 miesiące z rzędu: '+r3.map(xf).join(' → '), acc:name, prio:'yellow', auto:true});
-    }
-  });
-
-  // Filter out already dismissed auto alerts (done today)
-  const dismissedAuto = todos.filter(t=>t.auto&&t.done&&t.date===today).map(t=>t.id);
-  const newAutos = autoAlerts.filter(a=>!dismissedAuto.includes(a.id));
-
-  // Remove stale auto alerts, add fresh ones — preserve done state
-  const manualTodos = todos.filter(t=>!t.auto);
-  const prevAutoStates = {};
-  todos.filter(t=>t.auto).forEach(t=>{ prevAutoStates[t.id]=t.done; });
-  const freshTodos = [...newAutos.map(a=>({
-    ...a, date:today, done: prevAutoStates[a.id]||false, carried:false
-  })), ...manualTodos];
-
-  saveTodos(freshTodos);
-
-  const urgent = freshTodos.filter(t=>t.prio==='red'&&!t.done);
-  const warnings = freshTodos.filter(t=>t.prio==='yellow'&&!t.done);
-  const done = freshTodos.filter(t=>t.done);
-  const carried = freshTodos.filter(t=>t.carried&&!t.done);
-
-  function renderItem(t){
-    const cbStyle = t.done
-      ? 'width:16px;height:16px;border-radius:4px;border:2px solid var(--green);background:var(--green);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;cursor:pointer'
-      : 'width:16px;height:16px;border-radius:4px;border:2px solid var(--border2);background:transparent;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;cursor:pointer';
-    const cbInner = t.done ? '<span style="color:#000;font-size:10px;font-weight:700;line-height:1">✓</span>' : '';
-    const prioColor = t.prio==='red'?'var(--red)':'var(--yellow)';
-    return `<div class="todo-item ${t.done?'done':''}" style="cursor:default;${t.done?'opacity:.5':''}">
-      <div style="${cbStyle}" onclick="event.stopPropagation();toggleTodo('${t.id}')">${cbInner}</div>
-      <div style="width:6px;height:6px;border-radius:50%;background:${prioColor};flex-shrink:0;margin-top:5px"></div>
-      <div style="flex:1;min-width:0">
-        <div class="todo-text" style="${t.done?'text-decoration:line-through;color:var(--text3)':''}">${t.text}</div>
-        <div class="todo-acc">${t.acc}</div>
-      </div>
-      ${t.carried?'<span class="todo-carry">przeniesione</span>':''}
-      <div class="todo-date">${t.date}</div>
-    </div>`;
-  }
-
-  let html = '';
-  if(urgent.length||carried.length){
-    html += `<div class="todo-section">
-      <div class="todo-section-hdr"><span style="color:var(--red)">● Pilne (${urgent.length+carried.length})</span></div>
-      ${[...urgent,...carried].map(renderItem).join('')}
-    </div>`;
-  }
-  if(warnings.length){
-    html += `<div class="todo-section">
-      <div class="todo-section-hdr"><span style="color:var(--yellow)">⚡ Do monitorowania (${warnings.length})</span></div>
-      ${warnings.map(renderItem).join('')}
-    </div>`;
-  }
-  if(!urgent.length&&!warnings.length&&!carried.length){
-    html += `<div style="text-align:center;padding:3rem;color:var(--text3)">
-      <div style="font-size:32px;margin-bottom:.5rem">✅</div>
-      <div style="font-family:var(--mono);font-size:14px">Wszystko pod kontrolą</div>
-      <div style="font-size:12px;margin-top:.3rem">Brak alertów dla żadnego konta</div>
-    </div>`;
-  }
-  if(done.length){
-    html += `<div class="todo-section">
-      <div class="todo-section-hdr"><span>Zrobione dziś (${done.length})</span></div>
-      ${done.map(renderItem).join('')}
-    </div>`;
-  }
-  document.getElementById('dzisContent').innerHTML = html;
-}
-
-function toggleTodo(id){
-  let todos = getTodos();
-  const idx = todos.findIndex(t=>t.id===id);
-  if(idx>=0) todos[idx].done = !todos[idx].done;
-  saveTodos(todos);
-  renderDzis();
-}
-function clearDoneTasks(){
-  let todos = getTodos().filter(t=>!t.done);
-  saveTodos(todos);
-  renderDzis();
-}
-function checkAllAlerts(){ renderDzis(); }
 
 // ═══════════════════════════════════════════════════════════
 // MÓJ BIZNES
