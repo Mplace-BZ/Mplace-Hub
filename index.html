@@ -175,8 +175,6 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .tl-line{flex:1;height:1px;background:var(--border);min-width:10px;}
 
 .entry-group-hdr{display:flex;align-items:center;gap:.6rem;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem;margin-top:1.1rem;}
-.entry-group-hdr::before{content:'';flex:none;width:3px;height:14px;border-radius:2px;background:var(--group-c,var(--accent));}
-.entry-group-hdr::after{content:'';flex:1;height:1px;background:var(--border);}
 .egh-m{--group-c:var(--g-meble);color:var(--g-meble);}
 .egh-l{--group-c:var(--g-luxsen);color:var(--g-luxsen);}
 .egh-o{--group-c:var(--g-one);color:var(--g-one);}
@@ -664,12 +662,18 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     </div>
   </div>
 
-  <div class="entry-group-hdr egh-m" style="border-left:3px solid var(--g-meble);padding-left:.6rem">MEBLE — MobelKap · Perfekt Cięcie · Meble na Czasie</div>
+  <div style="border:1px solid rgba(255,107,53,.35);border-radius:10px;padding:.85rem 1rem;margin-bottom:.85rem">
+  <div class="entry-group-hdr egh-m" style="margin-top:0">MEBLE — MobelKap · Perfekt Cięcie · Meble na Czasie</div>
   <div id="entryMEBLE"></div>
-  <div class="entry-group-hdr egh-l" style="border-left:3px solid var(--g-luxsen);padding-left:.6rem">LUXSEN — Luxsen · Semmi · BOTAVIT</div>
+  </div>
+  <div style="border:1px solid rgba(45,212,160,.35);border-radius:10px;padding:.85rem 1rem;margin-bottom:.85rem">
+  <div class="entry-group-hdr egh-l" style="margin-top:0">LUXSEN — Luxsen · Semmi · BOTAVIT</div>
   <div id="entryLUXSEN"></div>
-  <div class="entry-group-hdr egh-o" style="border-left:3px solid var(--g-one);padding-left:.6rem">ONE — Materazzi · MtzzEU · Ankado24</div>
+  </div>
+  <div style="border:1px solid rgba(180,127,255,.35);border-radius:10px;padding:.85rem 1rem;margin-bottom:.85rem">
+  <div class="entry-group-hdr egh-o" style="margin-top:0">ONE — Materazzi · MtzzEU · Ankado24</div>
   <div id="entryONE"></div>
+  </div>
 
   <div class="save-bar">
     <button class="btn primary" onclick="saveAllWithSync()">▸ Zapisz wszystkie wpisy</button>
@@ -1813,10 +1817,10 @@ function renderEntry(){
   const allM=new Set();
   Object.keys(AC_META).forEach(k=>getData(k).forEach(d=>allM.add(d.m)));
   allM.add(curM);
-  // Sort ascending: oldest LEFT → newest RIGHT (bieżący po prawej)
+  // Sort: newest LEFT (bieżący pierwszy), oldest RIGHT
   const curIdx=MONTHS.indexOf(curM);
   const mAgo=m=>(curIdx-MONTHS.indexOf(m)+12)%12;
-  const sortedM=[...allM].sort((a,b)=>mAgo(b)-mAgo(a));
+  const sortedM=[...allM].sort((a,b)=>mAgo(a)-mAgo(b));
   document.getElementById('globalTL').innerHTML=sortedM.map((m,i)=>{
     const has=Object.keys(AC_META).some(k=>getData(k).some(d=>d.m===m));
     const isCur=m===curM;
@@ -2613,8 +2617,8 @@ function renderInsights(){
     const tl=el('insTL');
     if(tl){
       tl.innerHTML='';
-      // i=5 = 5 months ago (LEFT/oldest) → i=0 = current (RIGHT/newest)
-      for(let i=5;i>=0;i--){
+      // i=0 = current (LEFT/newest) → i=5 = oldest (RIGHT)
+      for(let i=0;i<=5;i++){
         let mi=m-i,yi=y; if(mi<0){mi+=12;yi--;}
         const isCur=(i===0);
         const hasData=Object.keys(AC_META).some(k=>getData(k).some(dd=>dd.m===MONTHS[mi]));
@@ -2625,7 +2629,7 @@ function renderInsights(){
         lbl.style.cssText='font-family:var(--mono);font-size:8px;color:var(--text3);';
         lbl.textContent=SHORT[mi];
         tl.appendChild(dot); tl.appendChild(lbl);
-        if(i>0){const line=document.createElement('div');line.className='tl-line';tl.appendChild(line);}
+        if(i<5){const line=document.createElement('div');line.className='tl-line';tl.appendChild(line);}
       }
     }
   })();
