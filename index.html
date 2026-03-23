@@ -2929,8 +2929,9 @@ function initSim(){
       });
       sel.appendChild(og);
     });
+    // Default to MobelKap
+    sel.value = 'MobelKap';
   }
-  // Build sliders once, results update on change
   buildSimSliders();
   updateSimResults();
 }
@@ -3006,7 +3007,26 @@ function updateSimResults(){
 
   const priceMulti  = 1 + simPriceP/100;
   const simSprzedaz = last.sprzedaz * priceMulti;
-  const simEntry = { ...last, sprzedaz:simSprzedaz, adsCost:simBudget, roas:simRoas, wartoscAds:simBudget*simRoas, commission:simComm };
+  // ROAS logic: changing ROAS = changing how much you spend to get same ad sales
+  // wartoscAds stays ~ same, adsCost = wartoscAds / ROAS
+  const baseWartoscAds = last.wartoscAds || (last.adsCost * (last.roas||1));
+  // If user moved budget slider from base: use budget directly
+  // If user moved ROAS slider: derive new adsCost from wartoscAds/ROAS
+  const budgetChanged = Math.abs(simBudget - (last.adsCost||0)) > 50;
+  const roasChanged   = Math.abs(simRoas - (last.roas||0)) > 0.05;
+  let finalAdsCost, finalWartoscAds;
+  if(budgetChanged){
+    finalAdsCost    = simBudget;
+    finalWartoscAds = simBudget * simRoas;
+  } else if(roasChanged){
+    // Same ad sales value, but achieved with different cost
+    finalWartoscAds = baseWartoscAds;
+    finalAdsCost    = simRoas > 0 ? baseWartoscAds / simRoas : 0;
+  } else {
+    finalAdsCost    = simBudget;
+    finalWartoscAds = simBudget * simRoas;
+  }
+  const simEntry = { ...last, sprzedaz:simSprzedaz, adsCost:finalAdsCost, roas:simRoas, wartoscAds:finalWartoscAds, commission:simComm };
   const simC = calc(simEntry, prod);
   const simEst = last.dzien ? Math.round(simSprzedaz*(DAYS_IN[last.m]||30)/(last.dzien-1||1)) : simSprzedaz;
 
