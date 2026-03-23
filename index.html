@@ -1039,6 +1039,36 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     </div>
   </div>
 
+  <!-- Progress bar -->
+  <div class="entry-date-bar" id="insightsDateBar" style="margin-bottom:.85rem">
+    <div>
+      <div class="edb-lbl">Bieżący miesiąc</div>
+      <div style="display:flex;align-items:center;gap:.55rem;margin-top:2px">
+        <div class="edb-val" id="insMonth">—</div>
+        <span class="month-status ms-active"><span class="ms-pulse"></span>w toku</span>
+      </div>
+    </div>
+    <div class="nav-sep" style="height:26px"></div>
+    <div>
+      <div class="edb-lbl">Dzień miesiąca</div>
+      <div class="day-wrap">
+        <label>dzień</label>
+        <span style="color:var(--accent);font-family:var(--mono);font-size:14px;font-weight:500;padding:3px 8px" id="insDayNum">—</span>
+        <label id="insDayOf">/31</label>
+      </div>
+    </div>
+    <div class="nav-sep" style="height:26px"></div>
+    <div>
+      <div class="edb-lbl">Postęp</div>
+      <div style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent)" id="insProg">—</div>
+    </div>
+    <div class="nav-sep" style="height:26px"></div>
+    <div>
+      <div class="edb-lbl">Historia</div>
+      <div class="tl-bar" id="insTL"></div>
+    </div>
+  </div>
+
   <!-- Summary bar -->
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1.2rem" id="insightsSummary"></div>
 
@@ -2536,6 +2566,39 @@ function insSetFilter(f, btn){
 }
 
 function renderInsights(){
+  // ── Populate date bar ──
+  (function(){
+    const now   = new Date();
+    const y     = now.getFullYear();
+    const m     = now.getMonth();
+    const d     = now.getDate();
+    const days  = new Date(y, m+1, 0).getDate();
+    const mName = MONTHS[m];
+    const SHORT = ['STY','LUT','MAR','KWI','MAJ','CZE','LIP','SIE','WRZ','PAŹ','LIS','GRU'];
+    const el = id => document.getElementById(id);
+    if(el('insMonth'))  el('insMonth').textContent  = mName[0].toUpperCase()+mName.slice(1)+' '+y;
+    if(el('insDayNum')) el('insDayNum').textContent = d;
+    if(el('insDayOf'))  el('insDayOf').textContent  = '/'+days;
+    if(el('insProg'))   el('insProg').textContent   = Math.round(d/days*100)+'% (dzień '+d+'/'+days+')';
+    const tl = el('insTL');
+    if(tl){
+      tl.innerHTML='';
+      for(let i=5;i>=0;i--){
+        let mi=m-i, yi=y; if(mi<0){mi+=12;yi--;}
+        const isCur=(i===0);
+        const hasData=Object.keys(AC_META).some(k=>getData(k).some(dd=>dd.m===MONTHS[mi]));
+        const dot=document.createElement('div');
+        dot.className='tl-dot '+(isCur?'cur':hasData?'has':'none');
+        dot.title=MONTHS[mi]+' '+yi;
+        const lbl=document.createElement('span');
+        lbl.style.cssText='font-family:var(--mono);font-size:8px;color:var(--text3);';
+        lbl.textContent=SHORT[mi];
+        tl.appendChild(dot); tl.appendChild(lbl);
+        if(i>0){const line=document.createElement('div');line.className='tl-line';tl.appendChild(line);}
+      }
+    }
+  })();
+
   const allSignals = [];   // { account, type:'danger'|'chance'|'watch', title, body, metric, value }
 
   Object.keys(AC_META).forEach(k=>{
@@ -2580,30 +2643,41 @@ function renderInsights(){
       }
     }
 
-    // 3. Sprzedaż spada m/m
+    // 3. Sprzedaż spada m/m — ZAWSZE używaj estymacji dla bieżącego miesiąca
     if(prev){
-      const spDelta = (lD.sprzedaz - prev.d.sprzedaz) / prev.d.sprzedaz * 100;
+      const lEst  = estym(lD);   // estymacja EOM bieżącego miesiąca
+      const pEst  = estym(prev.d); // poprzedni miesiąc (zakończony = jego rzeczywista wartość)
+      const isPartial = !!(lD.dzien); // czy bieżący miesiąc jest w trakcie
+      const spDelta = (lEst - pEst) / pEst * 100;
+      const label   = isPartial
+        ? `Estymacja EOM: <strong>${Math.round(lEst).toLocaleString('pl-PL')} zł</strong> vs poprzedni miesiąc <strong>${Math.round(pEst).toLocaleString('pl-PL')} zł</strong>`
+        : `Sprzedaż: <strong>${Math.round(pEst).toLocaleString('pl-PL')} zł</strong> → <strong>${Math.round(lEst).toLocaleString('pl-PL')} zł</strong>`;
+      const dayNote = isPartial ? ` <span style="color:var(--text3);font-size:10px">(prognoza na podstawie dnia ${lD.dzien})</span>` : '';
       if(spDelta < -15){
         allSignals.push({ account:k, group:g, type:'danger',
-          title:'Sprzedaż spadła znacząco',
-          body:`Sprzedaż: <strong>${Math.round(prev.d.sprzedaz).toLocaleString('pl-PL')} zł</strong> → <strong>${Math.round(lD.sprzedaz).toLocaleString('pl-PL')} zł</strong> (<strong>${spDelta.toFixed(0)}%</strong>).`,
+          title:'Estymacja sprzedaży znacząco poniżej poprzedniego miesiąca',
+          body:`${label} (<strong>${spDelta.toFixed(0)}%</strong>).${dayNote}`,
           metric: spDelta, tag:'sprzedaz' });
       } else if(spDelta < -5){
         allSignals.push({ account:k, group:g, type:'watch',
-          title:'Sprzedaż lekko w dół',
-          body:`Sprzedaż spadła o <strong>${Math.abs(spDelta).toFixed(0)}%</strong> vs poprzedni miesiąc (${Math.round(prev.d.sprzedaz).toLocaleString('pl-PL')} → ${Math.round(lD.sprzedaz).toLocaleString('pl-PL')} zł).`,
+          title:'Estymacja sprzedaży lekko w dół',
+          body:`${label} (${spDelta.toFixed(0)}%).${dayNote}`,
           metric: spDelta, tag:'sprzedaz' });
       }
     }
 
-    // 4. Koszt Ads rośnie szybciej niż sprzedaż
+    // 4. Koszt Ads rośnie szybciej niż sprzedaż — używaj estymacji
     if(prev && prev.d.sprzedaz > 0 && prev.d.adsCost > 0){
-      const adsDelta  = (lD.adsCost   - prev.d.adsCost)   / prev.d.adsCost   * 100;
-      const sprzDelta = (lD.sprzedaz  - prev.d.sprzedaz)  / prev.d.sprzedaz  * 100;
+      const lEst    = estym(lD);
+      const pEst    = estym(prev.d);
+      const adsDelta  = (lD.adsCost  - prev.d.adsCost)  / prev.d.adsCost  * 100;
+      const sprzDelta = (lEst - pEst) / pEst * 100;
+      const isPartial = !!(lD.dzien);
+      const dayNote   = isPartial ? ` (prognoza dnia ${lD.dzien})` : '';
       if(adsDelta > 10 && adsDelta > sprzDelta + 10){
         allSignals.push({ account:k, group:g, type:'danger',
           title:'Ads drożeje szybciej niż sprzedaż',
-          body:`Koszt Ads +<strong>${adsDelta.toFixed(0)}%</strong>, sprzedaż ${sprzDelta>=0?'+':''}${sprzDelta.toFixed(0)}%. Budżet rośnie nieproporcjonalnie do przychodu.`,
+          body:`Koszt Ads +<strong>${adsDelta.toFixed(0)}%</strong>, sprzedaż ${sprzDelta>=0?'+':''}${sprzDelta.toFixed(0)}%${dayNote}. Budżet rośnie nieproporcjonalnie do przychodu.`,
           metric: adsDelta - sprzDelta, tag:'ads' });
       }
     }
@@ -2627,15 +2701,22 @@ function renderInsights(){
         metric: lC.mAfter, tag:'marza' });
     }
 
-    // 7. Trend wzrostowy 2+ miesiące
+    // 7. Trend wzrostowy 2+ miesiące — używaj estymacji dla bieżącego
     if(prev && prev2){
-      const r1 = lD.sprzedaz > prev.d.sprzedaz;
-      const r2 = prev.d.sprzedaz > prev2.d.sprzedaz;
+      const lEst  = estym(lD);
+      const pEst  = estym(prev.d);
+      const p2Est = estym(prev2.d);
+      const r1 = lEst  > pEst;
+      const r2 = pEst  > p2Est;
       if(r1 && r2){
-        const tot = (lD.sprzedaz - prev2.d.sprzedaz) / prev2.d.sprzedaz * 100;
+        const tot = (lEst - p2Est) / p2Est * 100;
+        const isPartial = !!(lD.dzien);
+        const lastLabel = isPartial
+          ? `~${Math.round(lEst).toLocaleString('pl-PL')} zł (est.)`
+          : `${Math.round(lEst).toLocaleString('pl-PL')} zł`;
         allSignals.push({ account:k, group:g, type:'chance',
           title:'Trend wzrostowy 3 miesiące z rzędu',
-          body:`Sprzedaż rośnie konsekwentnie: <strong>${Math.round(prev2.d.sprzedaz).toLocaleString('pl-PL')}</strong> → <strong>${Math.round(prev.d.sprzedaz).toLocaleString('pl-PL')}</strong> → <strong>${Math.round(lD.sprzedaz).toLocaleString('pl-PL')} zł</strong> (+${tot.toFixed(0)}% łącznie).`,
+          body:`Sprzedaż rośnie konsekwentnie: <strong>${Math.round(p2Est).toLocaleString('pl-PL')}</strong> → <strong>${Math.round(pEst).toLocaleString('pl-PL')}</strong> → <strong>${lastLabel}</strong> (+${tot.toFixed(0)}% łącznie).`,
           metric: tot, tag:'sprzedaz' });
       }
     }
