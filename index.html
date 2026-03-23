@@ -599,6 +599,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
     <button class="nav-btn" onclick="showView('dashboard')" id="navDashboard" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2)">Dashboard</button>
     <button class="nav-btn" onclick="showView('d2d')" id="navD2d" style="color:#b47fff;background:rgba(180,127,255,.08);border:1px solid rgba(180,127,255,.2)">D2D</button>
+    <button class="nav-btn" onclick="showView('months')" id="navMonths" style="color:#4d9fff;background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Miesiące</button>
     <button class="nav-btn" onclick="showView('insights')" id="navInsights" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Insights</button>
     <button class="nav-btn entry-btn active" onclick="showView('entry')" id="navEntry">Wpisz Dane</button>
     <div class="nav-sep"></div>
@@ -1071,6 +1072,30 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 </div>
 </div>
 
+<!-- ═══ VIEW: MIESIĄCE ═══ -->
+<div class="view" id="viewMonths">
+<div class="container">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+    <div>
+      <div class="ph-eyebrow" style="color:var(--blue)">▸ Trend historyczny</div>
+      <div class="ph-title">Miesiące <span style="color:var(--blue)">obok siebie</span></div>
+      <div class="ph-sub">Wszystkie konta · wszystkie miesiące</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+      <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase">Metryka:</span>
+      <select id="monthsMetric" onchange="renderMonths()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:5px;outline:none">
+        <option value="est">Sprzedaż est. (zł)</option>
+        <option value="marza">Marża po reklamie (%)</option>
+        <option value="roas">ROAS Ads</option>
+        <option value="zysk">Zysk netto (zł)</option>
+        <option value="acos">ACOS łączny (%)</option>
+      </select>
+    </div>
+  </div>
+  <div id="monthsContent"></div>
+</div>
+</div>
+
 <!-- ═══ VIEW: D2D — Day to Day ═══ -->
 <div class="view" id="viewD2d">
 <div class="container">
@@ -1309,7 +1334,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights'].forEach(id=>{
+  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -1333,6 +1358,10 @@ function showView(v){
     document.getElementById('viewDashboard').classList.add('active');
     document.getElementById('navDashboard').classList.add('active');
     renderDashboard();
+  } else if(v==='months'){
+    document.getElementById('viewMonths').classList.add('active');
+    document.getElementById('navMonths').classList.add('active');
+    renderMonths();
   } else if(v==='d2d'){
     document.getElementById('viewD2d').classList.add('active');
     document.getElementById('navD2d').classList.add('active');
@@ -2853,6 +2882,171 @@ function renderInsights(){
 
 
 // ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+// MIESIĄCE — Monthly comparison view
+// ═══════════════════════════════════════════════════════════
+function renderMonths(){
+  const content = document.getElementById('monthsContent');
+  if(!content) return;
+
+  const metric = document.getElementById('monthsMetric')?.value || 'est';
+
+  // Collect all months across all accounts
+  const allMonthsSet = new Set();
+  Object.keys(AC_META).forEach(k => getData(k).forEach(d => allMonthsSet.add(d.m)));
+  // Sort months: newest first
+  const curM = MONTHS[new Date().getMonth()];
+  const curIdx = MONTHS.indexOf(curM);
+  const mAgo = m => (curIdx - MONTHS.indexOf(m) + 12) % 12;
+  const allMonths = [...allMonthsSet].sort((a,b) => mAgo(a) - mAgo(b));
+
+  if(!allMonths.length){
+    content.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text3);font-family:var(--mono);font-size:12px">Brak danych — wpisz dane w zakładce Wpisz Dane.</div>`;
+    return;
+  }
+
+  // Metric helpers
+  function getVal(k, m){
+    const D = getData(k);
+    const d = D.find(x => x.m === m);
+    if(!d) return null;
+    const prod = getProd(k);
+    const C = calc(d, prod);
+    const est = estym(d);
+    if(metric === 'est')   return est;
+    if(metric === 'marza') return C.mAfter;
+    if(metric === 'roas')  return d.roas || null;
+    if(metric === 'zysk')  return C.zysk;
+    if(metric === 'acos')  return C.acosTotal;
+    return null;
+  }
+
+  function fmtVal(v){
+    if(v === null) return '<span style="color:var(--text3)">—</span>';
+    if(metric === 'est' || metric === 'zysk') return Math.round(v).toLocaleString('pl-PL') + ' <span style="color:var(--text3);font-size:9px">zł</span>';
+    if(metric === 'marza' || metric === 'acos') return v.toFixed(1) + '<span style="color:var(--text3);font-size:9px">%</span>';
+    if(metric === 'roas') return v.toFixed(2) + '<span style="color:var(--text3);font-size:9px">x</span>';
+    return v;
+  }
+
+  function valColor(k, v, m){
+    if(v === null) return 'var(--text3)';
+    if(metric === 'marza') return v >= 15 ? 'var(--green)' : v >= 10 ? 'var(--yellow)' : 'var(--red)';
+    if(metric === 'roas'){
+      const D = getData(k); const d = D.find(x=>x.m===m); if(!d) return 'var(--text)';
+      const C = calc(d, getProd(k));
+      return C.beRoasAds ? (v >= C.beRoasAds ? 'var(--green)' : v >= C.beRoasAds*0.85 ? 'var(--yellow)' : 'var(--red)') : 'var(--text)';
+    }
+    if(metric === 'zysk') return v >= 0 ? 'var(--green)' : 'var(--red)';
+    if(metric === 'acos') return v < 15 ? 'var(--green)' : v < 25 ? 'var(--yellow)' : 'var(--red)';
+    return 'var(--text)';
+  }
+
+  function delta(v, prev){
+    if(v === null || prev === null || prev === 0) return null;
+    return (v - prev) / Math.abs(prev) * 100;
+  }
+
+  // Month header — mark current
+  const thMonths = allMonths.map(m => {
+    const isCur = m === curM;
+    return `<th style="padding:8px 10px;text-align:right;font-family:var(--mono);font-size:10px;font-weight:${isCur?'600':'400'};
+      color:${isCur?'var(--accent)':'var(--text2)'};white-space:nowrap;border-bottom:1px solid var(--border2);min-width:90px">
+      ${m.substring(0,3).toUpperCase()}${isCur?` <span style="font-size:8px;color:var(--accent)">est.</span>`:''}
+    </th>`;
+  }).join('');
+
+  // Build rows per group
+  let html = `<div style="overflow-x:auto">
+  <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px">
+  <thead>
+    <tr style="background:var(--bg3)">
+      <th style="padding:8px 12px;text-align:left;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);min-width:130px;white-space:nowrap">Konto</th>
+      ${thMonths}
+    </tr>
+  </thead>
+  <tbody>`;
+
+  Object.entries(GROUPS).forEach(([gKey, g]) => {
+    // Group header row
+    html += `<tr style="background:var(--bg3)">
+      <td colspan="${allMonths.length + 1}" style="padding:5px 12px;font-family:var(--mono);font-size:9px;
+        letter-spacing:.13em;text-transform:uppercase;color:${g.c};border-top:1px solid var(--border)">
+        ${g.label}
+      </td>
+    </tr>`;
+
+    // Account rows
+    g.accs.forEach((k, ai) => {
+      const meta = AC_META[k];
+      const rowBg = ai % 2 === 0 ? 'var(--bg2)' : 'var(--bg)';
+      const cells = allMonths.map((m, mi) => {
+        const v = getVal(k, m);
+        const prevM = allMonths[mi + 1];
+        const prev = prevM ? getVal(k, prevM) : null;
+        const d = delta(v, prev);
+        const color = valColor(k, v, m);
+        const isCur = m === curM;
+        const dHtml = d !== null
+          ? `<div style="font-size:9px;color:${d>=0?'var(--green)':'var(--red)'};margin-top:1px">${d>=0?'▲':'▼'}${Math.abs(d).toFixed(0)}%</div>`
+          : '';
+        return `<td style="padding:7px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);
+          ${isCur?'background:rgba(255,107,53,.04)':''}cursor:pointer"
+          onclick="showView('${k}')">
+          <div style="font-weight:${isCur?'600':'400'};color:${color}">${fmtVal(v)}</div>
+          ${dHtml}
+        </td>`;
+      }).join('');
+
+      html += `<tr style="background:${rowBg}" class="months-row">
+        <td style="padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03);white-space:nowrap;cursor:pointer" onclick="showView('${k}')">
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${g.c};margin-right:6px;vertical-align:middle"></span>
+          <span style="color:var(--text)">${meta.name}</span>
+        </td>
+        ${cells}
+      </tr>`;
+    });
+
+    // Group sum row
+    const sumCells = allMonths.map((m, mi) => {
+      let total = 0, count = 0;
+      g.accs.forEach(k => {
+        const v = getVal(k, m);
+        if(v !== null){ total += v; count++; }
+      });
+      const prevM = allMonths[mi + 1];
+      let prevTotal = 0, prevCount = 0;
+      if(prevM) g.accs.forEach(k => {
+        const v = getVal(k, prevM);
+        if(v !== null){ prevTotal += v; prevCount++; }
+      });
+      const d = prevCount > 0 && prevTotal > 0 ? (total - prevTotal) / Math.abs(prevTotal) * 100 : null;
+      const isCur = m === curM;
+      const dHtml = d !== null
+        ? `<div style="font-size:9px;color:${d>=0?'var(--green)':'var(--red)'};margin-top:1px">${d>=0?'▲':'▼'}${Math.abs(d).toFixed(0)}%</div>`
+        : '';
+      return `<td style="padding:7px 10px;text-align:right;border-top:1px solid var(--border2);${isCur?'background:rgba(255,107,53,.04)':''}">
+        <div style="font-weight:600;color:${g.c}">${count>0?fmtVal(total):'—'}</div>
+        ${dHtml}
+      </td>`;
+    }).join('');
+
+    html += `<tr style="background:var(--bg3)">
+      <td style="padding:7px 12px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:9px;
+        letter-spacing:.1em;text-transform:uppercase;color:${g.c}">Σ ${g.label}</td>
+      ${sumCells}
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>
+  <div style="margin-top:.75rem;font-family:var(--mono);font-size:10px;color:var(--text3)">
+    Kliknij wiersz konta → przejdź do szczegółów · est. = estymacja końca miesiąca · ▲▼ = zmiana vs poprzedni miesiąc
+  </div>`;
+
+  content.innerHTML = html;
+}
+
 // D2D — Day to Day
 // ═══════════════════════════════════════════════════════════
 const SK_D2D = 'adshub3_d2d_snapshots';
