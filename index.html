@@ -2916,7 +2916,6 @@ function renderInsights(){
 // ═══════════════════════════════════════════════════════════
 
 function initSim(){
-  // Populate account selector
   const sel = document.getElementById('simAccount');
   if(!sel) return;
   if(sel.options.length <= 1){
@@ -2925,201 +2924,190 @@ function initSim(){
       og.label = g.label;
       g.accs.forEach(k=>{
         const o = document.createElement('option');
-        o.value = k;
-        o.textContent = AC_META[k].name;
+        o.value = k; o.textContent = AC_META[k].name;
         og.appendChild(o);
       });
       sel.appendChild(og);
     });
   }
-  renderSim();
+  // Build sliders once, results update on change
+  buildSimSliders();
+  updateSimResults();
 }
 
-function renderSim(){
+function buildSimSliders(){
   const k = document.getElementById('simAccount')?.value;
   const content = document.getElementById('simContent');
   if(!content) return;
-
   if(!k){
-    content.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text3);font-family:var(--mono);font-size:12px">Wybierz konto powyżej aby rozpocząć symulację.</div>`;
-    document.getElementById('simBaseInfo').textContent = '';
+    content.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text3);font-family:var(--mono);font-size:12px">Wybierz konto powyżej.</div>`;
     return;
   }
-
-  const D = getData(k);
-  const last = D[D.length-1];
-  if(!last){ content.innerHTML = `<div style="padding:2rem;color:var(--text3);font-family:var(--mono)">Brak danych dla tego konta.</div>`; return; }
+  const D = getData(k); const last = D[D.length-1];
+  if(!last){ content.innerHTML=`<div style="padding:2rem;color:var(--text3)">Brak danych.</div>`; return; }
 
   const prod = getProd(k);
-  const meta = AC_META[k];
-  const g = GROUPS[meta.group];
-  const base = calc(last, prod);
   const est = estym(last);
-
   document.getElementById('simBaseInfo').textContent =
     `Dane: ${last.m[0].toUpperCase()+last.m.slice(1)}${last.dzien?' · dzień '+last.dzien:''} · est. ${Math.round(est).toLocaleString('pl-PL')} zł`;
 
-  // Read slider values (or use base values on first render)
-  const getS = id => { const el=document.getElementById(id); return el?parseFloat(el.value):null; };
+  const maxBudget = Math.max(Math.round((last.adsCost||1000)*3), 10000);
 
-  const simRoas    = getS('simRoas')    ?? last.roas;
-  const simBudget  = getS('simBudget')  ?? last.adsCost;
-  const simComm    = getS('simComm')    ?? last.commission;
-  const simPriceP  = getS('simPriceP')  ?? 0; // price change %
-
-  // Simulate: apply price change to sprzedaz
-  const priceMulti = 1 + simPriceP/100;
-  const simSprzedaz = last.sprzedaz * priceMulti;
-
-  // Simulate: new adsCost from budget slider, recalc wartoscAds from ROAS
-  const simAdsCost = simBudget;
-  const simWartoscAds = simAdsCost * simRoas;
-
-  // Build simulated entry
-  const simEntry = {
-    ...last,
-    sprzedaz: simSprzedaz,
-    adsCost: simAdsCost,
-    roas: simRoas,
-    wartoscAds: simWartoscAds,
-    commission: simComm,
-  };
-
-  const simC = calc(simEntry, prod);
-  const simEst = last.dzien ? Math.round(simSprzedaz * (DAYS_IN[last.m]||30) / (last.dzien-1||1)) : simSprzedaz;
-
-  // Delta helpers
-  const delta = (a,b) => b===0?0:(a-b)/Math.abs(b)*100;
-  const dFmt = (d,unit='') => {
-    const sign = d>=0?'+':'';
-    const col = d>=0.5?'var(--green)':d<=-0.5?'var(--red)':'var(--text3)';
-    return `<span style="color:${col};font-family:var(--mono);font-size:10px">${sign}${d.toFixed(1)}${unit}</span>`;
-  };
-  const dFmtZl = (d) => {
-    const sign = d>=0?'+':'';
-    const col = d>=0?'var(--green)':'var(--red)';
-    return `<span style="color:${col};font-family:var(--mono);font-size:10px">${sign}${Math.round(d).toLocaleString('pl-PL')} zł</span>`;
-  };
-
-  const mC = v => v>=15?'var(--green)':v>=10?'var(--yellow)':'var(--red)';
-  const rC = (v,be) => be?(v>=be?'var(--green)':v>=be*0.85?'var(--yellow)':'var(--red)'):'var(--text)';
-
-  function slider(id, label, min, max, step, val, unit, onchange){
-    const pct = (val-min)/(max-min)*100;
+  function sliderBlock(id, label, min, max, step, val, unit){
+    const decimals = step < 1 ? 2 : (step < 10 ? 1 : 0);
     return `<div style="margin-bottom:1.2rem">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem">
         <span style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">${label}</span>
-        <span style="font-family:var(--mono);font-size:13px;font-weight:500;color:#e879f9" id="${id}Val">${val}${unit}</span>
+        <span style="font-family:var(--mono);font-size:13px;font-weight:500;color:#e879f9" id="${id}Val">${parseFloat(val).toFixed(decimals)}${unit}</span>
       </div>
       <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"
         style="width:100%;accent-color:#e879f9;cursor:pointer"
-        oninput="document.getElementById('${id}Val').textContent=parseFloat(this.value).toFixed(${step<1?2:1})+'${unit}';renderSim()">
+        oninput="document.getElementById('${id}Val').textContent=parseFloat(this.value).toFixed(${decimals})+'${unit}';updateSimResults()">
       <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;color:var(--text3);margin-top:2px">
         <span>${min}${unit}</span><span>${max}${unit}</span>
       </div>
     </div>`;
   }
 
-  function resultRow(label, baseVal, simVal, fmt, colorFn){
-    const d = simVal - baseVal;
-    const dPct = delta(simVal, baseVal);
-    const arrow = dPct>=0.5?'▲':dPct<=-0.5?'▼':'→';
-    const col = dPct>=0.5?'var(--green)':dPct<=-0.5?'var(--red)':'var(--text3)';
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.04)">
+  content.innerHTML = `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.2rem">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#e879f9;margin-bottom:1rem">Parametry symulacji</div>
+      ${sliderBlock('simRoas',   'ROAS Ads',               0.5, 15,        0.1, last.roas||0,        'x')}
+      ${sliderBlock('simBudget', 'Budżet Ads (zł)',         0,  maxBudget, 100, last.adsCost||0,     ' zł')}
+      ${sliderBlock('simComm',   'Prowizja Allegro (%)',    5,  20,        0.1, last.commission||0,  '%')}
+      ${sliderBlock('simPriceP', 'Zmiana ceny produktu',  -30,  50,        1,  0,                   '%')}
+      <button onclick="resetSim('${k}')" style="font-family:var(--mono);font-size:10px;padding:5px 14px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;margin-top:.5rem">↺ Reset</button>
+    </div>
+    <div id="simResults" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.2rem">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3)">Obliczanie...</div>
+    </div>
+  </div>`;
+
+  updateSimResults();
+}
+
+function updateSimResults(){
+  const k = document.getElementById('simAccount')?.value;
+  const results = document.getElementById('simResults');
+  if(!k || !results) return;
+
+  const D = getData(k); const last = D[D.length-1];
+  if(!last) return;
+  const prod = getProd(k);
+  const base = calc(last, prod);
+  const est  = estym(last);
+
+  const getS = id => { const el=document.getElementById(id); return el?parseFloat(el.value):null; };
+  const simRoas   = getS('simRoas')   ?? last.roas;
+  const simBudget = getS('simBudget') ?? last.adsCost;
+  const simComm   = getS('simComm')   ?? last.commission;
+  const simPriceP = getS('simPriceP') ?? 0;
+
+  const priceMulti  = 1 + simPriceP/100;
+  const simSprzedaz = last.sprzedaz * priceMulti;
+  const simEntry = { ...last, sprzedaz:simSprzedaz, adsCost:simBudget, roas:simRoas, wartoscAds:simBudget*simRoas, commission:simComm };
+  const simC = calc(simEntry, prod);
+  const simEst = last.dzien ? Math.round(simSprzedaz*(DAYS_IN[last.m]||30)/(last.dzien-1||1)) : simSprzedaz;
+
+  const dFmt = (d,unit='') => {
+    const s=d>=0?'+':''; const col=d>=0.5?'var(--green)':d<=-0.5?'var(--red)':'var(--text3)';
+    return `<span style="color:${col};font-family:var(--mono);font-size:10px">${s}${d.toFixed(1)}${unit}</span>`;
+  };
+  const dFmtZl = d => {
+    const s=d>=0?'+':''; const col=d>=0?'var(--green)':'var(--red)';
+    return `<span style="color:${col};font-family:var(--mono);font-size:10px">${s}${Math.round(d).toLocaleString('pl-PL')} zł</span>`;
+  };
+  const mC = v => v>=15?'var(--green)':v>=10?'var(--yellow)':'var(--red)';
+  const pln = v => Math.round(v).toLocaleString('pl-PL')+' zł';
+  const pct = v => v.toFixed(1)+'%';
+  const xf  = v => v?v.toFixed(2)+'x':'—';
+  const dPct = (a,b) => b===0?0:(a-b)/Math.abs(b)*100;
+
+  function resultRow(label, bv, sv, fmt, colFn){
+    const d = dPct(sv,bv); const arrow=d>=0.5?'▲':d<=-0.5?'▼':'→';
+    const col=d>=0.5?'var(--green)':d<=-0.5?'var(--red)':'var(--text3)';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04)">
       <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${label}</span>
-      <div style="display:flex;align-items:center;gap:1rem">
-        <span style="font-family:var(--mono);font-size:11px;color:var(--text3);text-decoration:line-through;opacity:.5">${fmt(baseVal)}</span>
-        <span style="font-family:var(--mono);font-size:13px;font-weight:600;color:${colorFn?colorFn(simVal):mC(simVal)}">${fmt(simVal)}</span>
-        <span style="font-family:var(--mono);font-size:10px;color:${col};min-width:52px;text-align:right">${arrow} ${Math.abs(dPct).toFixed(1)}%</span>
+      <div style="display:flex;align-items:center;gap:.8rem">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.4;text-decoration:line-through">${fmt(bv)}</span>
+        <span style="font-family:var(--mono);font-size:12px;font-weight:600;color:${colFn?colFn(sv):'var(--text)'}">${fmt(sv)}</span>
+        <span style="font-family:var(--mono);font-size:10px;color:${col};min-width:48px;text-align:right">${arrow} ${Math.abs(d).toFixed(1)}%</span>
       </div>
     </div>`;
   }
 
-  const pln = v => Math.round(v).toLocaleString('pl-PL')+' zł';
-  const pct = v => v.toFixed(1)+'%';
-  const xf  = v => v?v.toFixed(2)+'x':'—';
+  const verdictBg  = simC.mAfter>base.mAfter+0.5?'var(--green-bg)':simC.mAfter<base.mAfter-0.5?'var(--red-bg)':'var(--yellow-bg)';
+  const verdictBd  = simC.mAfter>base.mAfter+0.5?'var(--green-bd)':simC.mAfter<base.mAfter-0.5?'var(--red-bd)':'var(--yellow-bd)';
+  const verdictCol = simC.mAfter>base.mAfter+0.5?'var(--green)':simC.mAfter<base.mAfter-0.5?'var(--red)':'var(--yellow)';
+  const verdictArrow = simC.mAfter>base.mAfter+0.5?'↑':simC.mAfter<base.mAfter-0.5?'↓':'→';
+  const verdictText = simC.mAfter>=15&&base.mAfter<15
+    ? `Zmiana parametrów przywraca marżę powyżej 15% — konto wychodzi ze strefy obserwacji.`
+    : simC.mAfter<10
+    ? `Uwaga: przy tych parametrach marża spada poniżej 10%. Ryzykowny scenariusz.`
+    : simC.zysk>base.zysk
+    ? `Zysk rośnie o ${Math.round(simC.zysk-base.zysk).toLocaleString('pl-PL')} zł. Scenariusz opłacalny.`
+    : simC.zysk<base.zysk
+    ? `Zysk spada o ${Math.round(base.zysk-simC.zysk).toLocaleString('pl-PL')} zł. Przemyśl tę kombinację.`
+    : `Parametry zbliżone do wartości bazowych.`;
 
-  content.innerHTML = `
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start">
-
-    <!-- LEFT: Sliders -->
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.2rem">
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#e879f9;margin-bottom:1rem">Parametry symulacji</div>
-
-      ${slider('simRoas',   'ROAS Ads',      0.5, 15,  0.1, simRoas,   'x', 'renderSim()')}
-      ${slider('simBudget', 'Budżet Ads (zł)', 0, Math.round(last.adsCost*3), 100, simBudget, ' zł', 'renderSim()')}
-      ${slider('simComm',   'Prowizja Allegro (%)', 5, 20, 0.1, simComm, '%', 'renderSim()')}
-      ${slider('simPriceP', 'Zmiana ceny produktu', -30, 50, 1, simPriceP, '%', 'renderSim()')}
-
-      <button onclick="resetSim('${k}')" style="font-family:var(--mono);font-size:10px;padding:5px 14px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;margin-top:.5rem">↺ Reset do wartości bazowych</button>
-    </div>
-
-    <!-- RIGHT: Results -->
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.2rem">
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#e879f9;margin-bottom:.8rem">Wynik symulacji</div>
-
-      <!-- Big numbers -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1rem">
-        <div style="background:var(--bg3);border-radius:8px;padding:.8rem 1rem;border:1px solid var(--border)">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem">Marża po reklamie</div>
-          <div style="font-family:var(--mono);font-size:22px;font-weight:600;color:${mC(simC.mAfter)}">${simC.mAfter.toFixed(1)}%</div>
-          <div style="font-family:var(--mono);font-size:10px;margin-top:2px">${dFmt(simC.mAfter - base.mAfter, ' pp')}</div>
-        </div>
-        <div style="background:var(--bg3);border-radius:8px;padding:.8rem 1rem;border:1px solid var(--border)">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem">Zysk netto</div>
-          <div style="font-family:var(--mono);font-size:22px;font-weight:600;color:${simC.zysk>=0?'var(--green)':'var(--red)'}">${Math.round(simC.zysk).toLocaleString('pl-PL')} zł</div>
-          <div style="font-family:var(--mono);font-size:10px;margin-top:2px">${dFmtZl(simC.zysk - base.zysk)}</div>
-        </div>
-        <div style="background:var(--bg3);border-radius:8px;padding:.8rem 1rem;border:1px solid var(--border)">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem">Estymacja EOM</div>
-          <div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--accent)">${Math.round(simEst).toLocaleString('pl-PL')} zł</div>
-          <div style="font-family:var(--mono);font-size:10px;margin-top:2px">${dFmtZl(simEst - est)}</div>
-        </div>
-        <div style="background:var(--bg3);border-radius:8px;padding:.8rem 1rem;border:1px solid var(--border)">
-          <div style="font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem">ACOS łączny</div>
-          <div style="font-family:var(--mono);font-size:22px;font-weight:600;color:${simC.acosTotal<15?'var(--green)':simC.acosTotal<25?'var(--yellow)':'var(--red)'}">${(simC.acosTotal||0).toFixed(1)}%</div>
-          <div style="font-family:var(--mono);font-size:10px;margin-top:2px">${dFmt((simC.acosTotal||0)-(base.acosTotal||0), ' pp')}</div>
-        </div>
+  results.innerHTML = `
+    <div style="font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#e879f9;margin-bottom:.8rem">Wynik symulacji</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem">
+      <div style="background:var(--bg3);border-radius:8px;padding:.75rem 1rem;border:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem">Marża po reklamie</div>
+        <div style="font-family:var(--mono);font-size:22px;font-weight:600;color:${mC(simC.mAfter)}">${simC.mAfter.toFixed(1)}%</div>
+        <div style="margin-top:2px">${dFmt(simC.mAfter-base.mAfter,' pp')}</div>
       </div>
-
-      <!-- Detail rows -->
-      <div>
-        ${resultRow('Sprzedaż (est.)', est, simEst, pln, ()=>'var(--text)')}
-        ${resultRow('Marża przed reklamą', base.mBefore, simC.mBefore, pct, mC)}
-        ${resultRow('Marża po reklamie', base.mAfter, simC.mAfter, pct, mC)}
-        ${resultRow('Zysk netto (zł)', base.zysk, simC.zysk, pln, v=>v>=0?'var(--green)':'var(--red)')}
-        ${resultRow('ROAS break-even', base.beRoasAds||0, simC.beRoasAds||0, xf, ()=>'var(--text2)')}
-        ${resultRow('ACOS łączny', base.acosTotal||0, simC.acosTotal||0, pct, v=>v<15?'var(--green)':v<25?'var(--yellow)':'var(--red)')}
+      <div style="background:var(--bg3);border-radius:8px;padding:.75rem 1rem;border:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem">Zysk netto</div>
+        <div style="font-family:var(--mono);font-size:22px;font-weight:600;color:${simC.zysk>=0?'var(--green)':'var(--red)'}">${Math.round(simC.zysk).toLocaleString('pl-PL')} zł</div>
+        <div style="margin-top:2px">${dFmtZl(simC.zysk-base.zysk)}</div>
       </div>
-
-      <!-- Verdict -->
-      <div style="margin-top:1rem;padding:.75rem 1rem;border-radius:8px;background:${simC.mAfter>base.mAfter?'var(--green-bg)':simC.mAfter<base.mAfter-1?'var(--red-bg)':'var(--yellow-bg)'};border:1px solid ${simC.mAfter>base.mAfter?'var(--green-bd)':simC.mAfter<base.mAfter-1?'var(--red-bd)':'var(--yellow-bd)'}">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:${simC.mAfter>base.mAfter?'var(--green)':simC.mAfter<base.mAfter-1?'var(--red)':'var(--yellow)'};margin-bottom:.3rem">
-          ${simC.mAfter>base.mAfter?'↑ Scenariusz lepszy od bazy':simC.mAfter<base.mAfter-1?'↓ Scenariusz gorszy od bazy':'→ Scenariusz podobny do bazy'}
-        </div>
-        <div style="font-size:12px;font-style:italic;color:var(--text);line-height:1.5">
-          ${simC.mAfter>=15&&base.mAfter<15?`Zmiana parametrów przywraca marżę powyżej 15% — konto wychodzi ze strefy obserwacji.`:
-            simC.mAfter<10?`Uwaga: przy tych parametrach marża spada poniżej progu 10%. Ryzykowny scenariusz.`:
-            simC.zysk > base.zysk?`Zysk rośnie o ${Math.round(simC.zysk-base.zysk).toLocaleString('pl-PL')} zł. Scenariusz opłacalny.`:
-            simC.zysk < base.zysk?`Zysk spada o ${Math.round(base.zysk-simC.zysk).toLocaleString('pl-PL')} zł. Przemyśl tę kombinację.`:
-            `Parametry zbliżone do wartości bazowych.`}
-        </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:.75rem 1rem;border:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem">Estymacja EOM</div>
+        <div style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--accent)">${Math.round(simEst).toLocaleString('pl-PL')} zł</div>
+        <div style="margin-top:2px">${dFmtZl(simEst-est)}</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:.75rem 1rem;border:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem">ACOS łączny</div>
+        <div style="font-family:var(--mono);font-size:22px;font-weight:600;color:${(simC.acosTotal||0)<15?'var(--green)':(simC.acosTotal||0)<25?'var(--yellow)':'var(--red)'}">${(simC.acosTotal||0).toFixed(1)}%</div>
+        <div style="margin-top:2px">${dFmt((simC.acosTotal||0)-(base.acosTotal||0),' pp')}</div>
       </div>
     </div>
-  </div>`;
+    <div>
+      ${resultRow('Sprzedaż (est.)', est, simEst, pln, ()=>'var(--text)')}
+      ${resultRow('Marża przed reklamą', base.mBefore, simC.mBefore, pct, mC)}
+      ${resultRow('Marża po reklamie', base.mAfter, simC.mAfter, pct, mC)}
+      ${resultRow('Zysk netto', base.zysk, simC.zysk, pln, v=>v>=0?'var(--green)':'var(--red)')}
+      ${resultRow('ROAS break-even', base.beRoasAds||0, simC.beRoasAds||0, xf, ()=>'var(--text2)')}
+      ${resultRow('ACOS łączny', base.acosTotal||0, simC.acosTotal||0, pct, v=>v<15?'var(--green)':v<25?'var(--yellow)':'var(--red)')}
+    </div>
+    <div style="margin-top:.9rem;padding:.7rem 1rem;border-radius:8px;background:${verdictBg};border:1px solid ${verdictBd}">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:${verdictCol};margin-bottom:.25rem">${verdictArrow} Werdykt</div>
+      <div style="font-size:12px;font-style:italic;color:var(--text);line-height:1.5">${verdictText}</div>
+    </div>`;
 }
 
+function renderSim(){ buildSimSliders(); }
+
 function resetSim(k){
-  const D = getData(k);
-  const last = D[D.length-1];
-  if(!last) return;
-  const set = (id, v) => { const el=document.getElementById(id); if(el){ el.value=v; } };
+  const D=getData(k); const last=D[D.length-1]; if(!last) return;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el){el.value=v;}};
   set('simRoas',   last.roas||0);
   set('simBudget', last.adsCost||0);
   set('simComm',   last.commission||0);
   set('simPriceP', 0);
-  renderSim();
+  // Update displayed values
+  const decimals = {simRoas:2, simBudget:0, simComm:1, simPriceP:1};
+  Object.entries(decimals).forEach(([id,dec])=>{
+    const el=document.getElementById(id+'Val');
+    const sel=document.getElementById(id);
+    if(el&&sel) el.textContent=parseFloat(sel.value).toFixed(dec)+(id==='simBudget'?' zł':id==='simRoas'?'x':'%');
+  });
+  updateSimResults();
 }
+
 
 
 // ═══════════════════════════════════════════════════════════
