@@ -411,6 +411,9 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 
 /* ── MY BUSINESS ── */
 .biz-fee-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.6rem;display:flex;flex-direction:column;}
+.d2d-chip{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.d2d-chip.active{background:rgba(180,127,255,.12);color:#b47fff;border-color:rgba(180,127,255,.4);}
+.d2d-chip:hover{background:var(--bg3);color:var(--text);}
 .biz-fee-row{display:grid;grid-template-columns:1fr 70px 100px 100px 70px;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
 .biz-fee-row:last-child{border-bottom:none;}
 .biz-fee-name{font-size:12px;color:var(--text2);}
@@ -584,6 +587,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
     <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
     <button class="nav-btn" onclick="showView('dashboard')" id="navDashboard" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2)">Dashboard</button>
+    <button class="nav-btn" onclick="showView('d2d')" id="navD2d" style="color:#b47fff;background:rgba(180,127,255,.08);border:1px solid rgba(180,127,255,.2)">D2D</button>
     <button class="nav-btn entry-btn active" onclick="showView('entry')" id="navEntry">Wpisz Dane</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-meble">MEBLE</span>
@@ -656,6 +660,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="btn primary" onclick="saveAllWithSync()">▸ Zapisz wszystkie wpisy</button>
     <button class="btn" onclick="showBackupModal()" style="color:var(--green);border-color:rgba(45,212,160,.3)">🛡 Backup</button>
     <button class="btn" onclick="exportCSV()">↗ Eksport CSV</button>
+    <button class="btn" onclick="saveSnapshotD2D()" style="color:#b47fff;border-color:rgba(180,127,255,.3)">📊 Zapisz do D2D</button>
     <input type="file" id="importFileInput" accept=".json" onchange="importJSON(event)">
     <span class="smsg" id="saveMsg">✓ Zapisano</span>
   </div>
@@ -753,15 +758,15 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     </div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:.85rem;margin-bottom:.85rem">
+  <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:.85rem;margin-bottom:.85rem;align-items:stretch">
     <!-- Fee config — row 1 col 1 -->
-    <div>
+    <div style="display:flex;flex-direction:column;">
       <div class="sec-label">Konfiguracja fee</div>
       <div style="display:grid;grid-template-columns:1fr 70px 100px 100px 70px;gap:.6rem;padding:0 0 .4rem;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">
   <div>Konto / Grupa</div><div>Typ</div><div style="text-align:right">Kwota</div><div style="text-align:right">Moje fee</div>
   <div style="text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:3px">% zysku <span class="tip" data-tip="Twoje fee netto jako % łącznej marży po reklamie tej grupy. Pokazuje ile z zysku klienta zarabiasz. Im wyższy % — tym więcej zarabiasz proporcjonalnie do wyniku kampanii.">?</span></div>
 </div>
-<div class="biz-fee-card">
+<div class="biz-fee-card" style="flex:1;min-height:0;">
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-meble);margin-bottom:.5rem">MEBLE</div>
         <div class="biz-fee-row">
           <div class="biz-fee-name">MobelKap + Perfekt Cięcie + Meble na Czasie</div>
@@ -797,9 +802,9 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     </div>
 
     <!-- Summary -->
-    <div>
+    <div style="display:flex;flex-direction:column;">
       <div class="sec-label">Mój przychód — bieżący miesiąc</div>
-      <div class="biz-total-card" id="bizTotalCard" style="height:100%;box-sizing:border-box"></div>
+      <div class="biz-total-card" id="bizTotalCard" style="flex:1;min-height:0;box-sizing:border-box"></div>
     </div>
     <!-- Chart — row 2 col 1 -->
     <div class="chart-card">
@@ -1005,6 +1010,33 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 </div>
 
 
+<!-- ═══ VIEW: D2D — Day to Day ═══ -->
+<div class="view" id="viewD2d">
+<div class="container">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+    <div>
+      <div class="ph-eyebrow" style="color:#b47fff">▸ Analiza dzienna</div>
+      <div class="ph-title">Day <span style="color:#b47fff">to Day</span></div>
+      <div class="ph-sub">Porównaj sprzedaż wybranych kont dzień po dniu</div>
+    </div>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+      <button class="btn" onclick="clearD2DData()" style="color:var(--red);border-color:rgba(255,77,106,.3);font-size:10px">🗑 Wyczyść D2D</button>
+      <button class="btn" onclick="renderD2D()" style="color:#b47fff;border-color:rgba(180,127,255,.3)">↺ Odśwież</button>
+    </div>
+  </div>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:1rem">
+    <div style="display:flex;align-items:flex-start;gap:1.5rem;flex-wrap:wrap">
+      <div><div class="edb-lbl" style="margin-bottom:.5rem">Konta</div><div style="display:flex;flex-wrap:wrap;gap:.35rem" id="d2dAccFilter"></div></div>
+      <div><div class="edb-lbl" style="margin-bottom:.5rem">Dni tygodnia</div><div style="display:flex;gap:.35rem;flex-wrap:wrap" id="d2dDowFilter"></div></div>
+      <div><div class="edb-lbl" style="margin-bottom:.5rem">Metryka</div><select id="d2dMetric" onchange="renderD2D()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"><option value="sprzedaz">Sprzedaż (zł)</option><option value="adsCost">Koszt Ads (zł)</option><option value="roas">ROAS</option><option value="marza">Marża po reklamie (%)</option></select></div>
+      <div><div class="edb-lbl" style="margin-bottom:.5rem">Miesiąc</div><select id="d2dMonthFilter" onchange="renderD2D()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"><option value="">Wszystkie</option></select></div>
+      <div style="margin-left:auto;align-self:flex-end"><button class="btn" onclick="renderD2D()" style="color:#b47fff;border-color:rgba(180,127,255,.3)">▸ Filtruj</button></div>
+    </div>
+  </div>
+  <div id="d2dEmpty" style="display:none;text-align:center;padding:3rem 1rem;color:var(--text3);font-family:var(--mono);font-size:12px"><div style="font-size:32px;margin-bottom:.75rem">📊</div><div>Brak danych D2D.</div><div style="margin-top:.4rem">Wejdź w <strong style="color:#b47fff">Wpisz Dane</strong> i kliknij <strong style="color:#b47fff">📊 Zapisz do D2D</strong>.</div></div>
+  <div id="d2dTable"></div>
+</div>
+</div>
 <!-- ═══ VIEW: PORÓWNAJ ═══ -->
 <div class="view" id="viewCompare">
 <div class="container">
@@ -1216,7 +1248,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewDzis','viewBiznes'].forEach(id=>{
+  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewDzis','viewBiznes','viewD2d'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -1244,6 +1276,10 @@ function showView(v){
     document.getElementById('viewDashboard').classList.add('active');
     document.getElementById('navDashboard').classList.add('active');
     renderDashboard();
+  } else if(v==='d2d'){
+    document.getElementById('viewD2d').classList.add('active');
+    document.getElementById('navD2d').classList.add('active');
+    initD2D();
   } else {
     document.getElementById('viewAccount').classList.add('active');
     document.getElementById('nav'+v)?.classList.add('active');
@@ -2431,6 +2467,269 @@ function signInWithGoogle(){
 function signOutUser(){
   if(confirm('Wylogować się?')) auth.signOut();
 }
+
+
+// ═══════════════════════════════════════════════════════════
+// D2D — Day to Day
+// ═══════════════════════════════════════════════════════════
+const SK_D2D = 'adshub3_d2d_snapshots';
+
+function getD2DData(){ try{ return JSON.parse(localStorage.getItem(SK_D2D)||'[]'); }catch(e){ return []; } }
+function setD2DData(arr){ localStorage.setItem(SK_D2D, JSON.stringify(arr)); }
+
+// Pobierz wartość metryki z wpisu + producent
+function d2dMetricVal(entry, metric, prod){
+  if(!entry) return null;
+  if(metric==='sprzedaz') return entry.sprzedaz||0;
+  if(metric==='adsCost')  return entry.adsCost||0;
+  if(metric==='roas')     return entry.roas||0;
+  if(metric==='marza'){
+    const c = calc(entry, prod||65);
+    return c.rev>0 ? c.mAfter : null;
+  }
+  return null;
+}
+
+// Zapisz snapshot wszystkich kont z formularza do D2D storage
+function saveSnapshotD2D(){
+  const curM = MONTHS[new Date().getMonth()];
+  const now = new Date();
+  const dzienGlobal = parseInt(document.getElementById('globalDay').value)||now.getDate();
+  const DOW_PL = ['Nd','Pn','Wt','Śr','Cz','Pt','Sb'];
+  const dow = DOW_PL[now.getDay()];
+  const dateStr = now.toLocaleDateString('pl-PL');
+
+  let count = 0;
+  const snapshots = getD2DData();
+
+  Object.keys(AC_META).forEach(k=>{
+    const sp = gN('e_'+k+'_sp');
+    const adsC = gN('e_'+k+'_adsC');
+    if(!sp && !adsC) return;
+    const dzien = gN('e_'+k+'_dzien')||dzienGlobal;
+    const entry = {
+      account: k,
+      m: curM,
+      dzien: dzien,
+      dow: dow,
+      dateStr: dateStr,
+      savedAt: Date.now(),
+      sprzedaz: sp||0,
+      delivery: gN('e_'+k+'_del')||0,
+      commission: gN('e_'+k+'_comm')||0,
+      adsCost: adsC||0,
+      roas: gN('e_'+k+'_roas')||0,
+      wartoscAds: gN('e_'+k+'_wartoscAds')||0,
+      promoC: gN('e_'+k+'_promoC')||0,
+      elasticC: 0,
+      coinsC: gN('e_'+k+'_coinsC')||0,
+    };
+    // Remove duplicate for same account+month+dzien, then push new
+    const idx = snapshots.findIndex(s=>s.account===k && s.m===curM && s.dzien===dzien);
+    if(idx>=0) snapshots[idx]=entry; else snapshots.push(entry);
+    count++;
+  });
+
+  setD2DData(snapshots);
+  const msgEl = document.getElementById('saveMsg');
+  msgEl.textContent = '📊 D2D: zapisano '+count+' kont · dzień '+dzienGlobal;
+  msgEl.classList.add('show');
+  setTimeout(()=>msgEl.classList.remove('show'),4000);
+}
+
+function clearD2DData(){
+  if(confirm('Wyczyścić wszystkie dane D2D? (Dane miesięczne pozostają bez zmian)'))
+    { setD2DData([]); renderD2D(); }
+}
+
+// ── Filtry ──
+const D2D_ACCS = Object.keys(AC_META);
+const D2D_DOW_ALL = ['Pn','Wt','Śr','Cz','Pt','Sb','Nd'];
+let d2dSelAccs = new Set(D2D_ACCS);
+let d2dSelDow  = new Set(['Pn','Wt','Śr','Cz','Pt','Sb','Nd']);
+
+function initD2D(){
+  // Build account filter chips
+  const accEl = document.getElementById('d2dAccFilter');
+  accEl.innerHTML = Object.entries(GROUPS).map(([gk,g])=>
+    g.accs.map(k=>`
+      <button onclick="d2dToggleAcc('${k}',this)" data-key="${k}"
+        class="d2d-chip ${d2dSelAccs.has(k)?'active':''}"
+        style="border-color:${g.c}">${AC_META[k].name}</button>`).join('')
+  ).join('');
+
+  // Build DOW filter chips
+  const dowEl = document.getElementById('d2dDowFilter');
+  dowEl.innerHTML = D2D_DOW_ALL.map(d=>`
+    <button onclick="d2dToggleDow('${d}',this)" data-dow="${d}"
+      class="d2d-chip ${d2dSelDow.has(d)?'active':''}">
+      ${d}</button>`).join('');
+
+  // Build month filter
+  const snapshots = getD2DData();
+  const months = [...new Set(snapshots.map(s=>s.m))];
+  const sel = document.getElementById('d2dMonthFilter');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Wszystkie</option>' +
+    months.map(m=>`<option value="${m}" ${m===cur?'selected':''}>${m[0].toUpperCase()+m.slice(1)}</option>`).join('');
+
+  renderD2D();
+}
+
+function d2dToggleAcc(k, btn){
+  if(d2dSelAccs.has(k)) d2dSelAccs.delete(k); else d2dSelAccs.add(k);
+  btn.classList.toggle('active');
+  renderD2D();
+}
+function d2dToggleDow(d, btn){
+  if(d2dSelDow.has(d)) d2dSelDow.delete(d); else d2dSelDow.add(d);
+  btn.classList.toggle('active');
+  renderD2D();
+}
+
+function renderD2D(){
+  const snapshots = getD2DData();
+  const metric    = document.getElementById('d2dMetric')?.value||'sprzedaz';
+  const monthF    = document.getElementById('d2dMonthFilter')?.value||'';
+
+  const empty = document.getElementById('d2dEmpty');
+  const tableEl = document.getElementById('d2dTable');
+
+  if(!snapshots.length){ empty.style.display='block'; tableEl.innerHTML=''; return; }
+  empty.style.display='none';
+
+  // Filter snapshots
+  const filtered = snapshots.filter(s=>
+    d2dSelAccs.has(s.account) &&
+    d2dSelDow.has(s.dow) &&
+    (!monthF || s.m===monthF)
+  );
+
+  if(!filtered.length){ tableEl.innerHTML=`<div style="text-align:center;padding:2rem;color:var(--text3);font-family:var(--mono);font-size:12px">Brak danych dla wybranych filtrów.</div>`; return; }
+
+  // Group by m+dzien → sorted
+  const dayGroups = {};
+  filtered.forEach(s=>{
+    const key = s.m+'|'+s.dzien;
+    if(!dayGroups[key]) dayGroups[key]={ m:s.m, dzien:s.dzien, dow:s.dow, dateStr:s.dateStr, entries:{} };
+    dayGroups[key].entries[s.account] = s;
+  });
+
+  const sortedDays = Object.values(dayGroups).sort((a,b)=>{
+    const mi = MONTHS.indexOf(a.m)-MONTHS.indexOf(b.m);
+    return mi!==0?mi:a.dzien-b.dzien;
+  });
+
+  const accs = [...d2dSelAccs].filter(k=>filtered.some(s=>s.account===k));
+  const metricLabel = {sprzedaz:'Sprzedaż (zł)',adsCost:'Koszt Ads (zł)',roas:'ROAS',marza:'Marża po rek. (%)'}[metric];
+  const isFloat = metric==='roas'||metric==='marza';
+  const fmt = v=> v==null?'—': isFloat? v.toFixed(2) : Math.round(v).toLocaleString('pl-PL');
+  const pct = v=> v==null?'':Math.round(v)+'%';
+
+  // Build table: columns = days, rows = accounts + sum
+  // Group days into pairs (matching your Excel layout: wknd pairs)
+  // We'll just do flat table day-by-day with % change vs previous day for same account
+
+  let html = `<div style="overflow-x:auto">
+  <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px">
+  <thead>
+    <tr style="background:var(--bg3)">
+      <th style="padding:8px 12px;text-align:left;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);white-space:nowrap;min-width:140px">Konto</th>`;
+
+  sortedDays.forEach((day,i)=>{
+    const label = day.dow+' '+day.dzien+' '+day.m.slice(0,3).toUpperCase();
+    html+=`<th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500;border-bottom:1px solid var(--border2);white-space:nowrap">${label}</th>
+           <th style="padding:8px 6px;text-align:right;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);width:52px">%</th>`;
+  });
+
+  // Razem columns
+  html+=`<th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:600;border-bottom:1px solid var(--border2);border-left:1px solid var(--border2);white-space:nowrap">Razem</th>
+         <th style="padding:8px 6px;text-align:right;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);width:52px">%</th>
+    </tr>
+    <tr style="background:var(--bg3);border-bottom:2px solid var(--border2)">
+      <td style="padding:2px 12px 6px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">${metricLabel}</td>`;
+  sortedDays.forEach(()=>{ html+=`<td colspan="2"></td>`; });
+  html+=`<td colspan="2" style="border-left:1px solid var(--border2)"></td></tr></thead><tbody>`;
+
+  // Per-account rows
+  accs.forEach((k,ai)=>{
+    const meta = AC_META[k];
+    const g = GROUPS[meta.group];
+    const prod = getProd(k);
+    const isLastInGroup = ai===accs.length-1 || GROUPS[AC_META[accs[ai+1]]?.group]!==g;
+    const rowBg = ai%2===0?'var(--bg2)':'var(--bg)';
+
+    html+=`<tr style="background:${rowBg}">
+      <td style="padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03);white-space:nowrap">
+        <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${g.c};margin-right:6px;vertical-align:middle"></span>
+        <span style="color:var(--text)">${meta.name}</span>
+      </td>`;
+
+    let acctTotal = 0, acctCount = 0;
+    sortedDays.forEach((day,di)=>{
+      const entry = day.entries[k];
+      const val = entry? d2dMetricVal(entry, metric, prod) : null;
+      // Find prev day value for same account
+      let prevVal = null;
+      for(let pi=di-1;pi>=0;pi--){
+        const pe = sortedDays[pi].entries[k];
+        if(pe){ prevVal=d2dMetricVal(pe,metric,prod); break; }
+      }
+      const chg = (val!=null&&prevVal!=null&&prevVal!==0)?(val-prevVal)/Math.abs(prevVal)*100:null;
+      const chgColor = chg==null?'var(--text3)':chg>0?'var(--green)':chg<0?'var(--red)':'var(--text3)';
+      const arrow = chg==null?'':chg>0?'▲':chg<0?'▼':'→';
+
+      if(val!=null){ acctTotal+=val; acctCount++; }
+
+      html+=`<td style="padding:7px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text)">${fmt(val)}</td>
+             <td style="padding:7px 6px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);color:${chgColor};font-size:10px">${arrow} ${chg!=null?pct(chg):''}</td>`;
+    });
+
+    // Total for this account across days
+    const totalVal = acctCount>0? acctTotal : null;
+    html+=`<td style="padding:7px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);border-left:1px solid var(--border2);color:var(--accent);font-weight:600">${fmt(totalVal)}</td>
+           <td style="padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.03)"></td>
+    </tr>`;
+  });
+
+  // SUM row
+  html+=`<tr style="background:var(--bg3);border-top:2px solid var(--border2)">
+    <td style="padding:8px 12px;font-weight:600;color:var(--text)">RAZEM</td>`;
+
+  let grandTotal = 0;
+  sortedDays.forEach((day,di)=>{
+    let daySum = 0, dayCount = 0;
+    accs.forEach(k=>{
+      const e = day.entries[k];
+      const v = e?d2dMetricVal(e,metric,getProd(k)):null;
+      if(v!=null){ daySum+=v; dayCount++; }
+    });
+    // prev day sum
+    let prevSum = null;
+    for(let pi=di-1;pi>=0;pi--){
+      let ps=0,pc=0;
+      accs.forEach(k=>{ const e=sortedDays[pi].entries[k]; const v=e?d2dMetricVal(e,metric,getProd(k)):null; if(v!=null){ps+=v;pc++;} });
+      if(pc>0){prevSum=ps;break;}
+    }
+    const chg=(dayCount>0&&prevSum!=null&&prevSum!==0)?(daySum-prevSum)/Math.abs(prevSum)*100:null;
+    const chgColor=chg==null?'var(--text3)':chg>0?'var(--green)':chg<0?'var(--red)':'var(--text3)';
+    const arrow=chg==null?'':chg>0?'▲':chg<0?'▼':'→';
+    if(dayCount>0) grandTotal+=daySum;
+    html+=`<td style="padding:8px 10px;text-align:right;font-weight:600;color:var(--text)">${dayCount>0?fmt(daySum):'—'}</td>
+           <td style="padding:8px 6px;text-align:right;font-size:10px;color:${chgColor}">${arrow} ${chg!=null?pct(chg):''}</td>`;
+  });
+
+  html+=`<td style="padding:8px 10px;text-align:right;font-weight:700;color:var(--accent);border-left:1px solid var(--border2)">${fmt(grandTotal||null)}</td>
+         <td></td></tr>`;
+
+  html+=`</tbody></table></div>
+  <div style="margin-top:.75rem;font-family:var(--mono);font-size:10px;color:var(--text3)">
+    ${snapshots.length} snapshotów D2D w pamięci · % = zmiana vs poprzedni wybrany dzień
+  </div>`;
+
+  tableEl.innerHTML = html;
+}
+
 
 // saveAllWithSync called directly from button onclick
 
