@@ -2834,8 +2834,10 @@ function renderInsights(){
 
   content.innerHTML=filtered.map(a=>{
     const cardBd=a.signals.some(s=>s.type==='danger')?'var(--red)':a.signals.some(s=>s.type==='chance')?'var(--green)':'var(--yellow)';
-    const tags=a.signals.map(s=>`<span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;background:${iBg[s.type]};color:${iC[s.type]};border:1px solid ${iBd[s.type]}">${s.type==='danger'?'↓':s.type==='chance'?'↑':'→'} ${s.title}</span>`).join('');
-    const voiceHtml=a.voice.map(v=>`
+    const tags=tagsFiltered.map(s=>`<span style="font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;background:${iBg[s.type]};color:${iC[s.type]};border:1px solid ${iBd[s.type]}">${s.type==='danger'?'↓':s.type==='chance'?'↑':'→'} ${s.title}</span>`).join('');
+    const voiceFilter=insCurrentFilter==='all'?a.voice:a.voice.filter(v=>v.type===insCurrentFilter);
+    const tagsFiltered=insCurrentFilter==='all'?a.signals:a.signals.filter(s=>s.type===insCurrentFilter);
+    const voiceHtml=voiceFilter.map(v=>`
       <div style="border-left:2px solid ${iC[v.type]};padding:.55rem .9rem;margin:.45rem 0;background:${iBg[v.type]};border-radius:0 6px 6px 0">
         <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
           <span style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:${iC[v.type]}">${v.type==='danger'?'↓ zagrożenie':v.type==='chance'?'↑ szansa':'→ obserwuj'}</span>
