@@ -3008,33 +3008,37 @@ function renderMonths(){
       </tr>`;
     });
 
-    // Group sum row
+    // Group sum row — sum for est/zysk, average for marza/roas/acos
+    const useAvg = ['marza','roas','acos'].includes(metric);
+    const rowLabel = useAvg ? `⌀ ${g.label}` : `Σ ${g.label}`;
     const sumCells = allMonths.map((m, mi) => {
       let total = 0, count = 0;
       g.accs.forEach(k => {
         const v = getVal(k, m);
         if(v !== null){ total += v; count++; }
       });
+      const display = count > 0 ? (useAvg ? total / count : total) : null;
       const prevM = allMonths[mi + 1];
       let prevTotal = 0, prevCount = 0;
       if(prevM) g.accs.forEach(k => {
         const v = getVal(k, prevM);
         if(v !== null){ prevTotal += v; prevCount++; }
       });
-      const d = prevCount > 0 && prevTotal > 0 ? (total - prevTotal) / Math.abs(prevTotal) * 100 : null;
+      const prevDisplay = prevCount > 0 ? (useAvg ? prevTotal / prevCount : prevTotal) : null;
+      const d = prevDisplay && prevDisplay !== 0 ? (display - prevDisplay) / Math.abs(prevDisplay) * 100 : null;
       const isCur = m === curM;
       const dHtml = d !== null
         ? `<div style="font-size:9px;color:${d>=0?'var(--green)':'var(--red)'};margin-top:1px">${d>=0?'▲':'▼'}${Math.abs(d).toFixed(0)}%</div>`
         : '';
       return `<td style="padding:7px 10px;text-align:right;border-top:1px solid var(--border2);${isCur?'background:rgba(255,107,53,.04)':''}">
-        <div style="font-weight:600;color:${g.c}">${count>0?fmtVal(total):'—'}</div>
+        <div style="font-weight:600;color:${g.c}">${display!==null?fmtVal(display):'—'}</div>
         ${dHtml}
       </td>`;
     }).join('');
 
     html += `<tr style="background:var(--bg3)">
       <td style="padding:7px 12px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:9px;
-        letter-spacing:.1em;text-transform:uppercase;color:${g.c}">Σ ${g.label}</td>
+        letter-spacing:.1em;text-transform:uppercase;color:${g.c}">${rowLabel}</td>
       ${sumCells}
     </tr>`;
   });
