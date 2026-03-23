@@ -2970,7 +2970,7 @@ function renderMonths(){
 
   Object.entries(GROUPS).forEach(([gKey, g]) => {
     // Group header row
-    html += `<tr style="background:var(--bg3)">
+    html += `<tr style="background:var(--bg3);border-top:8px solid var(--bg)">
       <td colspan="${allMonths.length + 1}" style="padding:5px 12px;font-family:var(--mono);font-size:9px;
         letter-spacing:.13em;text-transform:uppercase;color:${g.c};border-top:1px solid var(--border)">
         ${g.label}
