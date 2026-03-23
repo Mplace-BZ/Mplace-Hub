@@ -412,6 +412,19 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 /* ── MY BUSINESS ── */
 .biz-fee-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.6rem;display:flex;flex-direction:column;}
 .d2d-chip{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.ins-filter{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.ins-filter.active{background:var(--bg3);color:var(--text);border-color:var(--border2);}
+.ins-filter:hover{background:var(--bg3);color:var(--text);}
+.ins-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.6rem;}
+.ins-card.danger{border-left:3px solid var(--red);}
+.ins-card.chance{border-left:3px solid var(--green);}
+.ins-card.watch{border-left:3px solid var(--yellow);}
+.ins-signal{display:flex;align-items:flex-start;gap:.6rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;line-height:1.5;}
+.ins-signal:last-child{border-bottom:none;}
+.ins-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.ins-dot.danger{background:var(--red);}
+.ins-dot.chance{background:var(--green);}
+.ins-dot.watch{background:var(--yellow);}
 .d2d-chip.active{background:rgba(180,127,255,.12);color:#b47fff;border-color:rgba(180,127,255,.4);}
 .d2d-chip:hover{background:var(--bg3);color:var(--text);}
 .biz-fee-row{display:grid;grid-template-columns:1fr 70px 100px 100px 70px;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
@@ -588,6 +601,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
     <button class="nav-btn" onclick="showView('dashboard')" id="navDashboard" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2)">Dashboard</button>
     <button class="nav-btn" onclick="showView('d2d')" id="navD2d" style="color:#b47fff;background:rgba(180,127,255,.08);border:1px solid rgba(180,127,255,.2)">D2D</button>
+    <button class="nav-btn" onclick="showView('insights')" id="navInsights" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Insights</button>
     <button class="nav-btn entry-btn active" onclick="showView('entry')" id="navEntry">Wpisz Dane</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-meble">MEBLE</span>
@@ -1010,6 +1024,37 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 </div>
 
 
+<!-- ═══ VIEW: INSIGHTS ═══ -->
+<div class="view" id="viewInsights">
+<div class="container">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+    <div>
+      <div class="ph-eyebrow" style="color:var(--yellow)">▸ Inteligentna analiza</div>
+      <div class="ph-title">Insights <span style="color:var(--yellow)">& Sygnały</span></div>
+      <div class="ph-sub" id="insightsSub">Zagrożenia, szanse i obserwacje per konto</div>
+    </div>
+    <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">
+      <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="insightsTs"></span>
+      <button class="btn" onclick="renderInsights()" style="color:var(--yellow);border-color:rgba(245,166,35,.3)">↺ Odśwież</button>
+    </div>
+  </div>
+
+  <!-- Summary bar -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1.2rem" id="insightsSummary"></div>
+
+  <!-- Filters -->
+  <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">
+    <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase">Pokaż:</span>
+    <button class="ins-filter active" data-f="all" onclick="insSetFilter('all',this)">Wszystkie</button>
+    <button class="ins-filter" data-f="danger" onclick="insSetFilter('danger',this)" style="color:var(--red)">🔴 Zagrożenia</button>
+    <button class="ins-filter" data-f="chance" onclick="insSetFilter('chance',this)" style="color:var(--green)">🟢 Szanse</button>
+    <button class="ins-filter" data-f="watch" onclick="insSetFilter('watch',this)" style="color:var(--yellow)">🟡 Obserwuj</button>
+  </div>
+
+  <div id="insightsContent"></div>
+</div>
+</div>
+
 <!-- ═══ VIEW: D2D — Day to Day ═══ -->
 <div class="view" id="viewD2d">
 <div class="container">
@@ -1248,7 +1293,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewDzis','viewBiznes','viewD2d'].forEach(id=>{
+  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewDzis','viewBiznes','viewD2d','viewInsights'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -1280,6 +1325,10 @@ function showView(v){
     document.getElementById('viewD2d').classList.add('active');
     document.getElementById('navD2d').classList.add('active');
     initD2D();
+  } else if(v==='insights'){
+    document.getElementById('viewInsights').classList.add('active');
+    document.getElementById('navInsights').classList.add('active');
+    renderInsights();
   } else {
     document.getElementById('viewAccount').classList.add('active');
     document.getElementById('nav'+v)?.classList.add('active');
@@ -2466,6 +2515,238 @@ function signInWithGoogle(){
 }
 function signOutUser(){
   if(confirm('Wylogować się?')) auth.signOut();
+}
+
+
+
+// ═══════════════════════════════════════════════════════════
+// INSIGHTS — Intelligent signal engine
+// ═══════════════════════════════════════════════════════════
+const MARZA_DANGER = 10;   // % — marża krytyczna
+const MARZA_WATCH  = 15;   // % — marża obserwacji
+const ROAS_GOOD    = 5;    // ROAS powyżej = przestrzeń na gaz
+
+let insCurrentFilter = 'all';
+
+function insSetFilter(f, btn){
+  insCurrentFilter = f;
+  document.querySelectorAll('.ins-filter').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderInsights();
+}
+
+function renderInsights(){
+  const allSignals = [];   // { account, type:'danger'|'chance'|'watch', title, body, metric, value }
+
+  Object.keys(AC_META).forEach(k=>{
+    const D = getData(k);
+    if(!D || D.length < 1) return;
+    const prod = getProd(k);
+    const meta = AC_META[k];
+    const g    = GROUPS[meta.group];
+
+    // Get last 3 months of data with calculated metrics
+    const recent = D.slice(-3).map(d=>({ d, c: calc(d, prod) }));
+    const last   = recent[recent.length-1];
+    const prev   = recent.length>=2 ? recent[recent.length-2] : null;
+    const prev2  = recent.length>=3 ? recent[recent.length-3] : null;
+
+    const lC = last.c;
+    const lD = last.d;
+
+    // ── ZAGROŻENIA ──────────────────────────────────────────
+
+    // 1. Marża krytyczna < 10%
+    if(lC.mAfter < MARZA_DANGER){
+      allSignals.push({ account:k, group:g, type:'danger',
+        title:'Marża krytyczna',
+        body:`Marża po reklamie wynosi <strong>${lC.mAfter.toFixed(1)}%</strong> — poniżej progu ${MARZA_DANGER}%. Sprawdź koszty Ads i prowizję.`,
+        metric: lC.mAfter, tag:'marza' });
+    }
+
+    // 2. ROAS spada 2+ miesiące z rzędu
+    if(prev && prev2){
+      const roasTrend = lD.roas < prev.d.roas && prev.d.roas < prev2.d.roas;
+      if(roasTrend){
+        allSignals.push({ account:k, group:g, type:'danger',
+          title:'ROAS spada 3 miesiące z rzędu',
+          body:`ROAS: <strong>${prev2.d.roas.toFixed(2)}</strong> → <strong>${prev.d.roas.toFixed(2)}</strong> → <strong>${lD.roas.toFixed(2)}</strong>. Konsekwentny spadek efektywności kampanii.`,
+          metric: lD.roas, tag:'roas' });
+      } else if(prev && lD.roas < prev.d.roas){
+        allSignals.push({ account:k, group:g, type:'watch',
+          title:'ROAS spadł miesiąc do miesiąca',
+          body:`ROAS: <strong>${prev.d.roas.toFixed(2)}</strong> → <strong>${lD.roas.toFixed(2)}</strong>. Jeden miesiąc spadku — obserwuj czy to trend.`,
+          metric: lD.roas, tag:'roas' });
+      }
+    }
+
+    // 3. Sprzedaż spada m/m
+    if(prev){
+      const spDelta = (lD.sprzedaz - prev.d.sprzedaz) / prev.d.sprzedaz * 100;
+      if(spDelta < -15){
+        allSignals.push({ account:k, group:g, type:'danger',
+          title:'Sprzedaż spadła znacząco',
+          body:`Sprzedaż: <strong>${Math.round(prev.d.sprzedaz).toLocaleString('pl-PL')} zł</strong> → <strong>${Math.round(lD.sprzedaz).toLocaleString('pl-PL')} zł</strong> (<strong>${spDelta.toFixed(0)}%</strong>).`,
+          metric: spDelta, tag:'sprzedaz' });
+      } else if(spDelta < -5){
+        allSignals.push({ account:k, group:g, type:'watch',
+          title:'Sprzedaż lekko w dół',
+          body:`Sprzedaż spadła o <strong>${Math.abs(spDelta).toFixed(0)}%</strong> vs poprzedni miesiąc (${Math.round(prev.d.sprzedaz).toLocaleString('pl-PL')} → ${Math.round(lD.sprzedaz).toLocaleString('pl-PL')} zł).`,
+          metric: spDelta, tag:'sprzedaz' });
+      }
+    }
+
+    // 4. Koszt Ads rośnie szybciej niż sprzedaż
+    if(prev && prev.d.sprzedaz > 0 && prev.d.adsCost > 0){
+      const adsDelta  = (lD.adsCost   - prev.d.adsCost)   / prev.d.adsCost   * 100;
+      const sprzDelta = (lD.sprzedaz  - prev.d.sprzedaz)  / prev.d.sprzedaz  * 100;
+      if(adsDelta > 10 && adsDelta > sprzDelta + 10){
+        allSignals.push({ account:k, group:g, type:'danger',
+          title:'Ads drożeje szybciej niż sprzedaż',
+          body:`Koszt Ads +<strong>${adsDelta.toFixed(0)}%</strong>, sprzedaż ${sprzDelta>=0?'+':''}${sprzDelta.toFixed(0)}%. Budżet rośnie nieproporcjonalnie do przychodu.`,
+          metric: adsDelta - sprzDelta, tag:'ads' });
+      }
+    }
+
+    // ── SZANSE ──────────────────────────────────────────────
+
+    // 5. ROAS wysoki i marża wysoka — można zwiększyć budżet
+    if(lD.roas >= ROAS_GOOD && lC.mAfter >= 20){
+      allSignals.push({ account:k, group:g, type:'chance',
+        title:'Przestrzeń na większy budżet Ads',
+        body:`ROAS <strong>${lD.roas.toFixed(2)}</strong> i marża <strong>${lC.mAfter.toFixed(1)}%</strong> — obydwa wskaźniki silne. Zwiększenie budżetu Ads może proporcjonalnie zwiększyć sprzedaż.`,
+        metric: lD.roas, tag:'roas' });
+    }
+
+    // 6. Marża wysoka ale Ads niski — niedoinwestowanie
+    const acosTotal = lC.acosTotal||0;
+    if(lC.mAfter >= 20 && acosTotal < 8 && lD.sprzedaz > 5000){
+      allSignals.push({ account:k, group:g, type:'chance',
+        title:'Niska reklama przy dobrej marży',
+        body:`Marża <strong>${lC.mAfter.toFixed(1)}%</strong>, łączny ACOS <strong>${acosTotal.toFixed(1)}%</strong>. Konto może być niedoinwestowane w reklamę — jest przestrzeń.`,
+        metric: lC.mAfter, tag:'marza' });
+    }
+
+    // 7. Trend wzrostowy 2+ miesiące
+    if(prev && prev2){
+      const r1 = lD.sprzedaz > prev.d.sprzedaz;
+      const r2 = prev.d.sprzedaz > prev2.d.sprzedaz;
+      if(r1 && r2){
+        const tot = (lD.sprzedaz - prev2.d.sprzedaz) / prev2.d.sprzedaz * 100;
+        allSignals.push({ account:k, group:g, type:'chance',
+          title:'Trend wzrostowy 3 miesiące z rzędu',
+          body:`Sprzedaż rośnie konsekwentnie: <strong>${Math.round(prev2.d.sprzedaz).toLocaleString('pl-PL')}</strong> → <strong>${Math.round(prev.d.sprzedaz).toLocaleString('pl-PL')}</strong> → <strong>${Math.round(lD.sprzedaz).toLocaleString('pl-PL')} zł</strong> (+${tot.toFixed(0)}% łącznie).`,
+          metric: tot, tag:'sprzedaz' });
+      }
+    }
+
+    // 8. Estymacja EOM > poprzedni miesiąc
+    if(prev && lD.dzien){
+      const est = estym(lD);
+      const prevSp = prev.d.sprzedaz;
+      const estDelta = (est - prevSp) / prevSp * 100;
+      if(estDelta > 10){
+        allSignals.push({ account:k, group:g, type:'chance',
+          title:'Estymacja EOM powyżej poprzedniego miesiąca',
+          body:`Przy tempie dnia ${lD.dzien} estymacja wynosi <strong>${Math.round(est).toLocaleString('pl-PL')} zł</strong> vs poprzedni miesiąc <strong>${Math.round(prevSp).toLocaleString('pl-PL')} zł</strong> (+${estDelta.toFixed(0)}%).`,
+          metric: estDelta, tag:'estymacja' });
+      }
+    }
+
+    // 9. Marża obserwacji 10-15%
+    if(lC.mAfter >= MARZA_DANGER && lC.mAfter < MARZA_WATCH){
+      allSignals.push({ account:k, group:g, type:'watch',
+        title:'Marża w strefie obserwacji',
+        body:`Marża po reklamie <strong>${lC.mAfter.toFixed(1)}%</strong> — blisko progu krytycznego ${MARZA_DANGER}%. Monitoruj koszty.`,
+        metric: lC.mAfter, tag:'marza' });
+    }
+  });
+
+  // ── Render ───────────────────────────────────────────────
+  const filtered = insCurrentFilter==='all' ? allSignals :
+    allSignals.filter(s=>s.type===insCurrentFilter);
+
+  const dangers = allSignals.filter(s=>s.type==='danger').length;
+  const chances = allSignals.filter(s=>s.type==='chance').length;
+  const watches = allSignals.filter(s=>s.type==='watch').length;
+
+  // Summary cards
+  document.getElementById('insightsSummary').innerHTML = `
+    <div style="background:var(--red-bg);border:1px solid var(--red-bd);border-radius:10px;padding:.9rem 1rem;text-align:center">
+      <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--red)">${dangers}</div>
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-top:2px">Zagrożenia</div>
+    </div>
+    <div style="background:var(--yellow-bg);border:1px solid var(--yellow-bd);border-radius:10px;padding:.9rem 1rem;text-align:center">
+      <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--yellow)">${watches}</div>
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow);margin-top:2px">Obserwuj</div>
+    </div>
+    <div style="background:var(--green-bg);border:1px solid var(--green-bd);border-radius:10px;padding:.9rem 1rem;text-align:center">
+      <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:var(--green)">${chances}</div>
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-top:2px">Szanse</div>
+    </div>`;
+
+  document.getElementById('insightsTs').textContent =
+    'Analiza: ' + new Date().toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+
+  const sub = `${allSignals.length} sygnałów · ${dangers} zagrożeń · ${chances} szans · ${watches} obserwacji`;
+  document.getElementById('insightsSub').textContent = sub;
+
+  const content = document.getElementById('insightsContent');
+  if(!filtered.length){
+    content.innerHTML = `<div style="text-align:center;padding:3rem 1rem;color:var(--text3);font-family:var(--mono);font-size:12px">
+      <div style="font-size:28px;margin-bottom:.5rem">${insCurrentFilter==='chance'?'🟢':insCurrentFilter==='danger'?'🔴':'🟡'}</div>
+      Brak sygnałów w tej kategorii.</div>`;
+    return;
+  }
+
+  // Group by account
+  const byAccount = {};
+  filtered.forEach(s=>{
+    if(!byAccount[s.account]) byAccount[s.account]=[];
+    byAccount[s.account].push(s);
+  });
+
+  // Sort: accounts with dangers first
+  const sortedAccs = Object.keys(byAccount).sort((a,b)=>{
+    const da = byAccount[a].filter(s=>s.type==='danger').length;
+    const db = byAccount[b].filter(s=>s.type==='danger').length;
+    return db - da;
+  });
+
+  const typeIcon = {danger:'🔴', chance:'🟢', watch:'🟡'};
+  const typeLabel = {danger:'Zagrożenie', chance:'Szansa', watch:'Obserwuj'};
+
+  content.innerHTML = sortedAccs.map(k=>{
+    const signals = byAccount[k];
+    const meta = AC_META[k];
+    const g = GROUPS[meta.group];
+    const hasDanger = signals.some(s=>s.type==='danger');
+    const hasChance = signals.some(s=>s.type==='chance');
+    const cardType = hasDanger?'danger':hasChance?'chance':'watch';
+
+    return `<div class="ins-card ${cardType}">
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem">
+        <span style="width:8px;height:8px;border-radius:50%;background:${g.c};flex-shrink:0;display:inline-block"></span>
+        <span style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:${g.c}">${g.label}</span>
+        <span style="font-size:13px;font-weight:600;color:var(--text)">${meta.name}</span>
+        <span style="margin-left:auto;display:flex;gap:.3rem">
+          ${signals.map(s=>`<span style="font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;
+            background:${s.type==='danger'?'var(--red-bg)':s.type==='chance'?'var(--green-bg)':'var(--yellow-bg)'};
+            color:${s.type==='danger'?'var(--red)':s.type==='chance'?'var(--green)':'var(--yellow)'};
+            border:1px solid ${s.type==='danger'?'var(--red-bd)':s.type==='chance'?'var(--green-bd)':'var(--yellow-bd)'}">
+            ${typeIcon[s.type]} ${typeLabel[s.type]}</span>`).join('')}
+        </span>
+      </div>
+      ${signals.map(s=>`
+        <div class="ins-signal">
+          <div class="ins-dot ${s.type}"></div>
+          <div>
+            <div style="font-weight:600;color:var(--text);margin-bottom:2px">${s.title}</div>
+            <div style="color:var(--text2)">${s.body}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
 }
 
 
