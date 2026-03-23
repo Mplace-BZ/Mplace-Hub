@@ -582,8 +582,8 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 <div class="topbar">
   <div class="topbar-inner">
     <div class="brand">MPlace <span>Hub</span></div>
-    <button class="nav-btn" onclick="showView('dzis')" id="navDzis" style="color:var(--red);background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2)">Dziś</button>
-    <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Mój Biznes</button>
+    <button class="nav-btn" onclick="showView('dzis')" id="navDzis" style="color:var(--red);background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2)">ToDo</button>
+    <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
     <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
     <button class="nav-btn" onclick="showView('dashboard')" id="navDashboard" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2)">Dashboard</button>
@@ -591,19 +591,19 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn entry-btn active" onclick="showView('entry')" id="navEntry">Wpisz Dane</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-meble">MEBLE</span>
-    <button class="nav-btn" onclick="showView('MobelKap')" id="navMobelKap">MobelKap</button>
-    <button class="nav-btn" onclick="showView('PerfektCiecie')" id="navPerfektCiecie">Perfekt Cięcie</button>
-    <button class="nav-btn" onclick="showView('MeblenaCzasie')" id="navMeblenaCzasie">Meble na Czasie</button>
+    <button class="nav-btn" onclick="showView('MobelKap')" id="navMobelKap">MoK</button>
+    <button class="nav-btn" onclick="showView('PerfektCiecie')" id="navPerfektCiecie">PeC</button>
+    <button class="nav-btn" onclick="showView('MeblenaCzasie')" id="navMeblenaCzasie">MnC</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-luxsen">LUXSEN</span>
-    <button class="nav-btn" onclick="showView('Luxsen')" id="navLuxsen">Luxsen</button>
-    <button class="nav-btn" onclick="showView('Semmi')" id="navSemmi">Semmi</button>
-    <button class="nav-btn" onclick="showView('BOTAVIT')" id="navBOTAVIT">BOTAVIT</button>
+    <button class="nav-btn" onclick="showView('Luxsen')" id="navLuxsen">Lux</button>
+    <button class="nav-btn" onclick="showView('Semmi')" id="navSemmi">Sem</button>
+    <button class="nav-btn" onclick="showView('BOTAVIT')" id="navBOTAVIT">BoV</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-one">ONE</span>
-    <button class="nav-btn" onclick="showView('Materazzi')" id="navMaterazzi">Materazzi</button>
-    <button class="nav-btn" onclick="showView('MtzzEU')" id="navMtzzEU">MtzzEU</button>
-    <button class="nav-btn" onclick="showView('Ankado24')" id="navAnkado24">Ankado24</button>
+    <button class="nav-btn" onclick="showView('Materazzi')" id="navMaterazzi">Mtz</button>
+    <button class="nav-btn" onclick="showView('MtzzEU')" id="navMtzzEU">mEU</button>
+    <button class="nav-btn" onclick="showView('Ankado24')" id="navAnkado24">a24</button>
   </div>
 </div>
 
@@ -792,7 +792,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
           <div class="biz-pct" id="feePctMaterazzis"><span class="tip" data-tip="Twoje stałe fee 3 500 zł netto jako % marży po reklamie Materazzi + MtzzEU.">?</span></div>
         </div>
         <div class="biz-fee-row">
-          <div class="biz-fee-name">Ankado24</div>
+          <div class="biz-fee-name">a24</div>
           <div class="biz-fee-type">stałe netto</div>
           <input class="biz-fee-input" id="feeAnkado" type="number" value="2900" oninput="renderBiznes()">
           <div class="biz-result" id="feeResAnkado">—</div>
