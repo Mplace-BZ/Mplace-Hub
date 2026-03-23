@@ -2963,7 +2963,7 @@ function buildSimSliders(){
       </div>
       <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"
         style="width:100%;accent-color:#e879f9;cursor:pointer"
-        oninput="document.getElementById('${id}Val').textContent=parseFloat(this.value).toFixed(${decimals})+'${unit}';updateSimResults()">
+        oninput="document.getElementById('${id}Val').textContent=parseFloat(this.value).toFixed(${decimals})+'${unit}';window._simLastTouched='${id}';updateSimResults()">
       <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;color:var(--text3);margin-top:2px">
         <span>${min}${unit}</span><span>${max}${unit}</span>
       </div>
@@ -3007,25 +3007,28 @@ function updateSimResults(){
 
   const priceMulti  = 1 + simPriceP/100;
   const simSprzedaz = last.sprzedaz * priceMulti;
-  // ROAS logic: changing ROAS = changing how much you spend to get same ad sales
-  // wartoscAds stays ~ same, adsCost = wartoscAds / ROAS
-  const baseWartoscAds = last.wartoscAds || (last.adsCost * (last.roas||1));
-  // If user moved budget slider from base: use budget directly
-  // If user moved ROAS slider: derive new adsCost from wartoscAds/ROAS
-  const budgetChanged = Math.abs(simBudget - (last.adsCost||0)) > 50;
-  const roasChanged   = Math.abs(simRoas - (last.roas||0)) > 0.05;
-  let finalAdsCost, finalWartoscAds;
-  if(budgetChanged){
-    finalAdsCost    = simBudget;
-    finalWartoscAds = simBudget * simRoas;
-  } else if(roasChanged){
-    // Same ad sales value, but achieved with different cost
-    finalWartoscAds = baseWartoscAds;
-    finalAdsCost    = simRoas > 0 ? baseWartoscAds / simRoas : 0;
-  } else {
-    finalAdsCost    = simBudget;
-    finalWartoscAds = simBudget * simRoas;
-  }
+  // ROAS logic:
+  // - simBudget suwak = adsCost, wartoscAds = adsCost * ROAS
+  // - simRoas suwak = efektywność: ten sam adsCost → więcej sprzedaży z Ads
+  //   czyli: wartoscAds = adsCost * simRoas (zawsze)
+  //   a marża zmienia się bo beRoasAds = f(marza) nie zależy od wartoscAds
+  // Prosty model: adsCost = simBudget, wartoscAds = simBudget * simRoas
+  // Wyższy ROAS przy tym samym budżecie = więcej wartoscAds = wyższy udział Ads w sprzedaży
+  // ale marża liczy się z adsCost (kosztem) nie z wartoscAds - więc marża NIE zmienia się od ROAS
+  // 
+  // Prawdziwy wpływ ROAS na marżę: przy wyższym ROAS można ZMNIEJSZYĆ adsCost
+  // i osiągnąć tę samą sprzedaż. Modelujemy to tak:
+  // docelowy adsCost = (bazowy wartoscAds) / simRoas  [ten sam przychód z Ads, mniejszy koszt]
+  const baseWartoscAds = last.wartoscAds || ((last.adsCost||0) * (last.roas||1));
+  const roasImpliedCost = simRoas > 0 ? baseWartoscAds / simRoas : simBudget;
+  // Łączymy: użytkownik może chcieć zmienić i budżet i ROAS
+  // Bierzemy minimum: jeśli ROAS wzrósł → możemy wydać mniej na te same wyniki
+  // Jeśli budżet wzrósł → więcej wydajemy i więcej zarabiamy z Ads
+  const lastTouched = window._simLastTouched || '';
+  const finalAdsCost = lastTouched === 'simBudget'
+    ? simBudget          // użytkownik ruszył budżet → adsCost = simBudget
+    : roasImpliedCost;   // użytkownik ruszył ROAS (lub coś innego) → skaluj koszt
+  const finalWartoscAds = finalAdsCost * simRoas;
   const simEntry = { ...last, sprzedaz:simSprzedaz, adsCost:finalAdsCost, roas:simRoas, wartoscAds:finalWartoscAds, commission:simComm };
   const simC = calc(simEntry, prod);
   const simEst = last.dzien ? Math.round(simSprzedaz*(DAYS_IN[last.m]||30)/(last.dzien-1||1)) : simSprzedaz;
