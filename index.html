@@ -3748,8 +3748,8 @@ async function agentSend(){
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1024,
         system: systemPrompt,
         messages: [{ role: 'user', content: q }]
       })
@@ -3758,7 +3758,7 @@ async function agentSend(){
     const data = await resp.json();
     console.log('Agent API response:', JSON.stringify(data).slice(0,500));
     // Handle error responses from API
-    if(data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    if(data.error){ responseEl.innerHTML=`<div class="agent-msg" style="border-left-color:var(--red)"><strong>API Error:</strong> ${data.error.message||JSON.stringify(data.error)}</div>`; btn.disabled=false; btn.textContent='▸ Wyślij'; return; }
     const text = data.content?.map(b => b.text||'').join('') || 'Brak odpowiedzi. Dane API: '+JSON.stringify(data).slice(0,200);
 
     // Format response: convert markdown-like to HTML
