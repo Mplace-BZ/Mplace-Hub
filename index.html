@@ -1770,7 +1770,7 @@ function renderCompare(){
     if(row.sep) return `<tr style="background:var(--bg3)"><td colspan="${accs.length+1}" style="padding:5px 12px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)">${row.lbl}</td></tr>`;
     const bestIdx=findBest(row, data);
     return `<tr style="border-bottom:1px solid rgba(255,255,255,.03)">
-      <td style="padding:8px 12px;font-size:12px;color:var(--text2);white-space:nowrap">${row.lbl}</td>
+      <td style="padding:8px 12px;font-size:12px;color:var(--text2)">${row.lbl}</td>
       ${data.map((d,i)=>{
         const val=row.fn(d);
         const color=row.clr(d)||'var(--text)';
@@ -3315,7 +3315,7 @@ function renderGlobalMonthsTable(){
     const up = d > 0;
     const positive = good === 'high' ? up : !up;
     const col = positive ? 'var(--green)' : 'var(--red)';
-    return `<span style="color:${col};font-size:9px;margin-left:4px">${up?'▲':'▼'}${Math.abs(d).toFixed(0)}%</span>`;
+    return ` <span style="color:${col};font-family:var(--mono);font-size:9px">${up?'▲':'▼'}${Math.abs(d).toFixed(0)}%</span>`;
   };
 
   // Columns — no sumaZl
@@ -3331,7 +3331,7 @@ function renderGlobalMonthsTable(){
   // Header row
   const thead = `<thead><tr style="background:var(--bg3)">
     <th style="padding:7px 12px;text-align:left;font-family:var(--mono);font-size:9px;color:var(--text3);font-weight:400;border-bottom:2px solid var(--border2);min-width:150px">Konto / Miesiąc</th>
-    ${COLS.map(col=>`<th style="padding:7px 10px;text-align:right;font-family:var(--mono);font-size:9px;color:var(--text3);font-weight:400;border-bottom:2px solid var(--border2);white-space:nowrap">${col.lbl}</th>`).join('')}
+    ${COLS.map(col=>`<th style="padding:7px 10px;text-align:right;font-family:var(--mono);font-size:9px;color:var(--text3);font-weight:400;border-bottom:2px solid var(--border2)">${col.lbl}</th>`).join('')}
   </tr></thead>`;
 
   // Body: per account block, per month row
@@ -3368,8 +3368,8 @@ function renderGlobalMonthsTable(){
         const pvRaw = prevE ? prevE[col.f] : null;
         const pv = (col.f === 'est' && prevE && prevM !== curM) ? prevE['sprzedaz'] : pvRaw;
         const color = col.accent ? 'var(--accent)' : 'var(--text)';
-        return `<td style="padding:6px 10px;text-align:right;border-bottom:${borderBot};background:${rowBg};white-space:nowrap">
-          <span style="font-family:var(--mono);font-size:11px;color:${v!=null?color:'var(--text3)'}">${col.fmt(v)}</span><span style="display:inline-block;width:42px;text-align:left;font-family:var(--mono);font-size:9px">${dArrow(v, pv, col.good)}</span>
+        return `<td style="padding:6px 10px;text-align:right;border-bottom:${borderBot};background:${rowBg}">
+          <span style="font-family:var(--mono);font-size:11px;color:${v!=null?color:'var(--text3)'}">${col.fmt(v)}</span>${dArrow(v, pv, col.good)}
         </td>`;
       }).join('');
 
@@ -3410,8 +3410,8 @@ function renderGlobalMonthsTable(){
         pv = pvs.length ? (isAvg ? pvs.reduce((a,b)=>a+b,0)/pvs.length : pvs.reduce((a,b)=>a+b,0)) : null;
       }
       const color = col.accent?'var(--accent)':'var(--g-meble)';
-      return `<td style="padding:6px 10px;text-align:right;border-bottom:1px solid var(--border);background:${isCur?'rgba(255,107,53,.06)':'var(--bg3)'};white-space:nowrap">
-        <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:${v!=null?color:'var(--text3)'}">${col.fmt(v)}</span><span style="display:inline-block;width:42px;text-align:left;font-family:var(--mono);font-size:9px">${dArrow(v, pv, col.good)}</span>
+      return `<td style="padding:6px 10px;text-align:right;border-bottom:1px solid var(--border);background:${isCur?'rgba(255,107,53,.06)':'var(--bg3)'}">
+        <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:${v!=null?color:'var(--text3)'}">${col.fmt(v)}</span>${dArrow(v, pv, col.good)}
       </td>`;
     }).join('');
 
@@ -3516,7 +3516,7 @@ function renderMonths(){
   <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px">
   <thead>
     <tr style="background:var(--bg3)">
-      <th style="padding:8px 12px;text-align:left;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);min-width:130px;white-space:nowrap">Konto</th>
+      <th style="padding:8px 12px;text-align:left;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);min-width:130px">Konto</th>
       ${thMonths}
     </tr>
   </thead>
@@ -3773,12 +3773,12 @@ function renderD2D(){
 
   sortedDays.forEach((day,i)=>{
     const label = day.dow+' '+day.dzien+' '+day.m.slice(0,3).toUpperCase();
-    html+=`<th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500;border-bottom:1px solid var(--border2);white-space:nowrap">${label}</th>
+    html+=`<th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500;border-bottom:1px solid var(--border2)">${label}</th>
            <th style="padding:8px 6px;text-align:right;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);width:52px">%</th>`;
   });
 
   // Razem columns
-  html+=`<th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:600;border-bottom:1px solid var(--border2);border-left:1px solid var(--border2);white-space:nowrap">Razem</th>
+  html+=`<th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:600;border-bottom:1px solid var(--border2);border-left:1px solid var(--border2)">Razem</th>
          <th style="padding:8px 6px;text-align:right;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);width:52px">%</th>
     </tr>
     <tr style="background:var(--bg3);border-bottom:2px solid var(--border2)">
@@ -3795,7 +3795,7 @@ function renderD2D(){
     const rowBg = ai%2===0?'var(--bg2)':'var(--bg)';
 
     html+=`<tr style="background:${rowBg}">
-      <td style="padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03);white-space:nowrap">
+      <td style="padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03)">
         <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${g.c};margin-right:6px;vertical-align:middle"></span>
         <span style="color:var(--text)">${meta.name}</span>
       </td>`;
