@@ -3176,18 +3176,21 @@ function renderGlobalEntryForm(){
   const el = document.getElementById('entryGlobal');
   if(!el) return;
   const now = new Date();
-  // Month selector — allow past months
-  const selM = document.getElementById('globalMonthSel')?.value || MONTHS[now.getMonth()];
 
-  el.innerHTML = `
-  <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap">
+  // Preserve month selection across re-renders
+  const prevSel = document.getElementById('globalMonthSel');
+  const selM = prevSel ? prevSel.value : MONTHS[now.getMonth()];
+
+  // Build month selector HTML separately
+  const selHTML = `<div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap">
     <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Miesiąc:</span>
     <select id="globalMonthSel" onchange="renderGlobalEntryForm()"
       style="background:var(--bg3);border:1px solid var(--border2);color:var(--accent);font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:5px;outline:none">
       ${MONTHS.map(m=>`<option value="${m}" ${m===selM?'selected':''}>${m[0].toUpperCase()+m.slice(1)}</option>`).join('')}
     </select>
-  </div>` +
-  GLOBAL_ACCS.map(k => {
+  </div>`;
+
+  const cardsHTML = GLOBAL_ACCS.map(k => {
     const meta = AC_META[k];
     const prev = getGlobalEntry(k, selM) || {};
     const pf = f => prev[f] != null ? prev[f] : '';
@@ -3198,45 +3201,36 @@ function renderGlobalEntryForm(){
         ${prev.savedDay ? `<span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto">ostatni wpis: ${prev.savedDay}</span>` : ''}
       </div>
       <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:.5rem">
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Sprzedaż (zł)</div>
+        <div><div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Sprzedaż (zł)</div>
           <input type="number" id="g_${k}_sprzedaz" placeholder="94817" value="${pf('sprzedaz')}"
             style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"
-            oninput="calcGlobalAuto('${k}')">
-        </div>
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Suma opłat (%)</div>
+            oninput="calcGlobalAuto('${k}')"></div>
+        <div><div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Suma opłat (%)</div>
           <input type="number" id="g_${k}_sumaP" placeholder="24.0" step="0.1" value="${pf('sumaP')}"
             style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--red);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"
-            oninput="calcGlobalAuto('${k}')">
-        </div>
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Obowiązkowe (%)</div>
+            oninput="calcGlobalAuto('${k}')"></div>
+        <div><div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Obowiązkowe (%)</div>
           <input type="number" id="g_${k}_prow" placeholder="11.5" step="0.1" value="${pf('prow')}"
-            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
-        </div>
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Dostawa (%)</div>
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"></div>
+        <div><div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Dostawa (%)</div>
           <input type="number" id="g_${k}_dostawa" placeholder="0.6" step="0.1" value="${pf('dostawa')}"
-            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
-        </div>
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Reklama i prom. (%)</div>
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"></div>
+        <div><div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Reklama i prom. (%)</div>
           <input type="number" id="g_${k}_reklama" placeholder="13.0" step="0.1" value="${pf('reklama')}"
-            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
-        </div>
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Dzień wpisu</div>
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"></div>
+        <div><div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Dzień wpisu</div>
           <input type="number" id="g_${k}_dzien" placeholder="23" min="1" max="31" value="${pf('dzien')||new Date().getDate()}"
-            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--accent);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
-        </div>
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--accent);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"></div>
       </div>
       <div style="margin-top:.4rem;font-family:var(--mono);font-size:9px;color:var(--text3)">
         Suma opłat (zł): <span id="g_${k}_sumaZl" style="color:var(--red)">${prev.sumaZl ? Math.round(prev.sumaZl).toLocaleString('pl-PL')+' zł' : '—'}</span>
       </div>
     </div>`;
   }).join('');
+
+  el.innerHTML = selHTML + cardsHTML;
 }
+
 
 function renderGlobalMonthsTable(){
   const el = document.getElementById('globalMonthsContent');
