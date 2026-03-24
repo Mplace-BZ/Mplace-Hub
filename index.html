@@ -411,6 +411,16 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 /* ── MY BUSINESS ── */
 .biz-fee-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.6rem;display:flex;flex-direction:column;}
 .d2d-chip{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.agent-chip{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid rgba(52,211,153,.25);background:rgba(52,211,153,.05);color:#34d399;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.agent-chip:hover{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.4);}
+.agent-msg{background:var(--bg2);border:1px solid var(--border);border-left:3px solid #34d399;border-radius:10px;padding:1.1rem 1.2rem;margin-bottom:.7rem;font-size:13px;line-height:1.7;color:var(--text);}
+.agent-msg h3{font-size:13px;font-weight:600;color:#34d399;margin:.8rem 0 .3rem;font-family:var(--sans);}
+.agent-msg strong{color:var(--accent);font-weight:600;}
+.agent-msg em{color:var(--text2);font-style:italic;}
+.agent-thinking{display:flex;align-items:center;gap:.5rem;padding:1rem;color:var(--text3);font-family:var(--mono);font-size:11px;}
+.agent-thinking-dot{width:6px;height:6px;border-radius:50%;background:#34d399;animation:mPulse 1s infinite;}
+.agent-thinking-dot:nth-child(2){animation-delay:.2s;}
+.agent-thinking-dot:nth-child(3){animation-delay:.4s;}
 .ins-filter{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;}
 .ins-filter.active{background:var(--bg3);color:var(--text);border-color:var(--border2);}
 .ins-filter:hover{background:var(--bg3);color:var(--text);}
@@ -600,6 +610,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn" onclick="showView('dashboard')" id="navDashboard" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2)">Dashboard</button>
     <button class="nav-btn" onclick="showView('insights')" id="navInsights" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Insights</button>
     <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
+    <button class="nav-btn" onclick="showView('agent')" id="navAgent" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Agent ✦</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-meble">MEBLE</span>
     <button class="nav-btn" onclick="showView('MobelKap')" id="navMobelKap">MoK</button>
@@ -1086,6 +1097,41 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 </div>
 </div>
 
+<!-- ═══ VIEW: AGENT ═══ -->
+<div class="view" id="viewAgent">
+<div class="container">
+  <div style="margin-bottom:1rem">
+    <div class="ph-eyebrow" style="color:#34d399">▸ Wewnętrzny asystent</div>
+    <div class="ph-title">Agent <span style="color:#34d399">✦</span></div>
+    <div class="ph-sub">Zadaj pytanie — agent analizuje Twoje dane i odpowiada</div>
+  </div>
+
+  <!-- Quick questions -->
+  <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem">
+    <button onclick="agentAsk('Na co dziś powinienem zwrócić uwagę? Które konto wymaga działania?')" class="agent-chip">Na co dziś zwrócić uwagę?</button>
+    <button onclick="agentAsk('Co jest teraz najważniejsze do zrobienia? Podaj priorytety.')" class="agent-chip">Co jest najważniejsze?</button>
+    <button onclick="agentAsk('Jak idzie marzec vs luty? Porównaj sprzedaż i marże.')" class="agent-chip">Marzec vs Luty</button>
+    <button onclick="agentAsk('Które konto ma największy potencjał wzrostu i dlaczego?')" class="agent-chip">Największy potencjał?</button>
+    <button onclick="agentAsk('Oceń kondycję każdego konta w skali 1-10 z uzasadnieniem.')" class="agent-chip">Kondycja kont 1-10</button>
+    <button onclick="agentAsk('Gdzie tracę pieniądze? Gdzie są największe wycieki marży?')" class="agent-chip">Gdzie tracę pieniądze?</button>
+  </div>
+
+  <!-- Input -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem">
+    <textarea id="agentInput" placeholder="Zapytaj o swoje konta... np. 'Jeśli podniosę ROAS BOTAVIT do 7 to jaki wynik na koniec miesiąca?'" 
+      style="width:100%;background:transparent;border:none;color:var(--text);font-family:var(--sans);font-size:13px;resize:none;outline:none;line-height:1.6;min-height:70px"
+      onkeydown="if(event.key==='Enter'&&(event.metaKey||event.ctrlKey))agentSend()"></textarea>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem">
+      <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Enter+Cmd/Ctrl = wyślij</span>
+      <button onclick="agentSend()" id="agentSendBtn" style="font-family:var(--mono);font-size:11px;padding:6px 16px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer;transition:all .15s">▸ Wyślij</button>
+    </div>
+  </div>
+
+  <!-- Response -->
+  <div id="agentResponse"></div>
+</div>
+</div>
+
 <!-- ═══ VIEW: SYMULATOR ═══ -->
 <div class="view" id="viewSim">
 <div class="container">
@@ -1379,7 +1425,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim'].forEach(id=>{
+  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -1419,6 +1465,10 @@ function showView(v){
     document.getElementById('viewInsights').classList.add('active');
     document.getElementById('navInsights').classList.add('active');
     renderInsights();
+  } else if(v==='agent'){
+    document.getElementById('viewAgent').classList.add('active');
+    document.getElementById('navAgent').classList.add('active');
+    initAgent();
   } else {
     document.getElementById('viewAccount').classList.add('active');
     document.getElementById('nav'+v)?.classList.add('active');
@@ -3610,6 +3660,137 @@ function renderMonths(){
 
   content.innerHTML = html;
 }
+
+
+// ═══════════════════════════════════════════════════════════
+// AGENT — AI Assistant
+// ═══════════════════════════════════════════════════════════
+
+function initAgent(){
+  const inp = document.getElementById('agentInput');
+  if(inp && !inp.value) inp.focus();
+}
+
+function agentAsk(q){
+  document.getElementById('agentInput').value = q;
+  agentSend();
+}
+
+function buildAgentContext(){
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  let ctx = `Jesteś asystentem analitycznym dla agencji e-commerce zarządzającej kontami Allegro.
+Dzisiaj jest ${now.toLocaleDateString('pl-PL', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.
+Bieżący miesiąc: ${curM}, dzień: ${now.getDate()}/31.
+
+STRUKTURA KONT:
+- Grupa MEBLE (producent 65%): MobelKap, PerfektCiecie, MeblenaCzasie
+- Grupa LUXSEN (producent 60%): Luxsen, Semmi, BOTAVIT
+- Grupa ONE (producent 55%): Materazzi, MtzzEU, Ankado24
+
+WZORY:
+- Marża po reklamie = (sprzedaż × (1-producent%) - prowizja - dostawa - Ads - wyróżnienia) / sprzedaż × 100
+- ROAS Ads = wartość sprzedaży z Ads / koszt Ads
+- Estymacja EOM = sprzedaż × dni_w_miesiącu / (dzień-1)
+- Break-even ROAS = 1 / (marża_przed_reklamą / 100)
+
+DANE HISTORYCZNE PER KONTO:
+`;
+
+  Object.entries(GROUPS).forEach(([gKey, g]) => {
+    ctx += `\n--- ${g.label} ---\n`;
+    g.accs.forEach(k => {
+      const D = getData(k);
+      const prod = getProd(k);
+      const meta = AC_META[k];
+      ctx += `\n${meta.name} (producent ${prod}%):\n`;
+      D.forEach(d => {
+        const C = calc(d, prod);
+        const est = estym(d);
+        const isCur = d.m === curM;
+        ctx += `  ${d.m[0].toUpperCase()+d.m.slice(1)}${isCur?' (bieżący, dzień '+(d.dzien||'?')+')':' (pełny)'}:\n`;
+        ctx += `    Sprzedaż: ${Math.round(d.sprzedaz).toLocaleString('pl-PL')} zł${isCur?' | Estymacja EOM: '+Math.round(est).toLocaleString('pl-PL')+' zł':''}\n`;
+        ctx += `    Ads: koszt ${Math.round(d.adsCost||0).toLocaleString('pl-PL')} zł | ROAS ${(d.roas||0).toFixed(2)} | wartość ${Math.round(d.wartoscAds||0).toLocaleString('pl-PL')} zł\n`;
+        ctx += `    Prowizja: ${(d.commission||0).toFixed(1)}% | Dostawa: ${Math.round(d.delivery||0)} zł | Wyróżnienia: ${Math.round(d.promoC||0)} zł\n`;
+        ctx += `    Marża po reklamie: ${C.mAfter.toFixed(1)}% | ROAS Glob: ${(C.roasGlob||0).toFixed(2)} | ACOS: ${(C.acosTotal||0).toFixed(1)}% | BE ROAS: ${(C.beRoasAds||0).toFixed(2)}\n`;
+        if(d.ss) ctx += `    Super Sprzedawca: ${d.ss} | Qlt: ${d.qlt||'—'}\n`;
+      });
+    });
+  });
+
+  ctx += `\nOdpowiadaj po polsku. Bądź konkretny i stanowczy. Podawaj liczby. Używaj nagłówków dla czytelności. Jeśli sugerujesz działanie — napisz dokładnie co i dlaczego.`;
+  return ctx;
+}
+
+async function agentSend(){
+  const input = document.getElementById('agentInput');
+  const responseEl = document.getElementById('agentResponse');
+  const btn = document.getElementById('agentSendBtn');
+  const q = input.value.trim();
+  if(!q) return;
+
+  // Show thinking
+  responseEl.innerHTML = `<div class="agent-thinking">
+    <div class="agent-thinking-dot"></div>
+    <div class="agent-thinking-dot"></div>
+    <div class="agent-thinking-dot"></div>
+    <span style="margin-left:.3rem">Analizuję Twoje dane...</span>
+  </div>`;
+  btn.disabled = true;
+  btn.textContent = '⟳ Myślę...';
+
+  const systemPrompt = buildAgentContext();
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: q }]
+      })
+    });
+
+    const data = await resp.json();
+    const text = data.content?.map(b => b.text||'').join('') || 'Brak odpowiedzi.';
+
+    // Format response: convert markdown-like to HTML
+    const html = text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^# (.+)$/gm, '<h3>$1</h3>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>');
+
+    // Show question + answer
+    const time = new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'});
+    responseEl.innerHTML = `
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem">
+        <span style="color:#34d399">✦ Agent</span> · ${time}
+        <button onclick="document.getElementById('agentResponse').innerHTML='';document.getElementById('agentInput').value=''" 
+          style="margin-left:auto;font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer">✕ Wyczyść</button>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.75rem;padding:.5rem .75rem;background:var(--bg3);border-radius:6px">
+        Pytanie: ${q}
+      </div>
+      <div class="agent-msg"><p>${html}</p></div>`;
+
+    input.value = '';
+  } catch(err) {
+    responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)">
+      <strong>Błąd połączenia z API.</strong> Sprawdź czy jesteś zalogowany i masz dostęp do internetu.<br>
+      <span style="font-size:11px;color:var(--text3)">${err.message}</span>
+    </div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '▸ Wyślij';
+}
+
 
 // D2D — Day to Day
 // ═══════════════════════════════════════════════════════════
