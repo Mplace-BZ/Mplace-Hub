@@ -3368,9 +3368,8 @@ function renderGlobalMonthsTable(){
         const pvRaw = prevE ? prevE[col.f] : null;
         const pv = (col.f === 'est' && prevE && prevM !== curM) ? prevE['sprzedaz'] : pvRaw;
         const color = col.accent ? 'var(--accent)' : 'var(--text)';
-        return `<td style="padding:6px 10px;text-align:right;border-bottom:${borderBot};background:${rowBg}">
-          <span style="font-family:var(--mono);font-size:11px;color:${v!=null?color:'var(--text3)'}">${col.fmt(v)}</span>
-          ${dArrow(v, pv, col.good)}
+        return `<td style="padding:6px 10px;text-align:right;border-bottom:${borderBot};background:${rowBg};white-space:nowrap">
+          <span style="font-family:var(--mono);font-size:11px;color:${v!=null?color:'var(--text3)'}">${col.fmt(v)}</span><span style="display:inline-block;width:42px;text-align:left;font-family:var(--mono);font-size:9px">${dArrow(v, pv, col.good)}</span>
         </td>`;
       }).join('');
 
@@ -3411,9 +3410,8 @@ function renderGlobalMonthsTable(){
         pv = pvs.length ? (isAvg ? pvs.reduce((a,b)=>a+b,0)/pvs.length : pvs.reduce((a,b)=>a+b,0)) : null;
       }
       const color = col.accent?'var(--accent)':'var(--g-meble)';
-      return `<td style="padding:6px 10px;text-align:right;border-bottom:1px solid var(--border);background:${isCur?'rgba(255,107,53,.06)':'var(--bg3)'}">
-        <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:${v!=null?color:'var(--text3)'}">${col.fmt(v)}</span>
-        ${dArrow(v, pv, col.good)}
+      return `<td style="padding:6px 10px;text-align:right;border-bottom:1px solid var(--border);background:${isCur?'rgba(255,107,53,.06)':'var(--bg3)'};white-space:nowrap">
+        <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:${v!=null?color:'var(--text3)'}">${col.fmt(v)}</span><span style="display:inline-block;width:42px;text-align:left;font-family:var(--mono);font-size:9px">${dArrow(v, pv, col.good)}</span>
       </td>`;
     }).join('');
 
