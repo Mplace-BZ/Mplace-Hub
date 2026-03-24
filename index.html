@@ -595,15 +595,11 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   <div class="topbar-inner">
     <div class="brand">MPlace <span>Hub</span></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap;padding-right:10px;border-right:1px solid var(--border2);margin-right:4px"></div>
-    <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
-    <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
-    <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
+    <button class="nav-btn entry-btn active" onclick="showView('entry')" id="navEntry">Data</button>
+    <button class="nav-btn" onclick="showView('months')" id="navMonths" style="color:#4d9fff;background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Trend</button>
     <button class="nav-btn" onclick="showView('dashboard')" id="navDashboard" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2)">Dashboard</button>
-    <button class="nav-btn" onclick="showView('d2d')" id="navD2d" style="color:#b47fff;background:rgba(180,127,255,.08);border:1px solid rgba(180,127,255,.2)">D2D</button>
-    <button class="nav-btn" onclick="showView('months')" id="navMonths" style="color:#4d9fff;background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Miesiące</button>
-    <button class="nav-btn" onclick="showView('sim')" id="navSim" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Symulator</button>
     <button class="nav-btn" onclick="showView('insights')" id="navInsights" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Insights</button>
-    <button class="nav-btn entry-btn active" onclick="showView('entry')" id="navEntry">Wpisz Dane</button>
+    <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-meble">MEBLE</span>
     <button class="nav-btn" onclick="showView('MobelKap')" id="navMobelKap">MoK</button>
@@ -619,6 +615,11 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn" onclick="showView('Materazzi')" id="navMaterazzi">Mtz</button>
     <button class="nav-btn" onclick="showView('MtzzEU')" id="navMtzzEU">mEU</button>
     <button class="nav-btn" onclick="showView('Ankado24')" id="navAnkado24">a24</button>
+    <div class="nav-sep"></div>
+    <button class="nav-btn" onclick="showView('d2d')" id="navD2d" style="color:#b47fff;background:rgba(180,127,255,.08);border:1px solid rgba(180,127,255,.2)">D2D</button>
+    <button class="nav-btn" onclick="showView('sim')" id="navSim" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Symulator</button>
+    <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
+    <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
   </div>
 </div>
 
@@ -1163,7 +1164,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
       <div style="margin-left:auto;align-self:flex-end"><button class="btn" onclick="renderD2D()" style="color:#b47fff;border-color:rgba(180,127,255,.3)">▸ Filtruj</button></div>
     </div>
   </div>
-  <div id="d2dEmpty" style="display:none;text-align:center;padding:3rem 1rem;color:var(--text3);font-family:var(--mono);font-size:12px"><div style="font-size:32px;margin-bottom:.75rem">📊</div><div>Brak danych D2D.</div><div style="margin-top:.4rem">Wejdź w <strong style="color:#b47fff">Wpisz Dane</strong> i kliknij <strong style="color:#b47fff">📊 Zapisz do D2D</strong>.</div></div>
+  <div id="d2dEmpty" style="display:none;text-align:center;padding:3rem 1rem;color:var(--text3);font-family:var(--mono);font-size:12px"><div style="font-size:32px;margin-bottom:.75rem">📊</div><div>Brak danych D2D.</div><div style="margin-top:.4rem">Wejdź w <strong style="color:#b47fff">Data</strong> i kliknij <strong style="color:#b47fff">📊 Zapisz do D2D</strong>.</div></div>
   <div id="d2dTable"></div>
 </div>
 </div>
@@ -3296,7 +3297,7 @@ function renderGlobalMonthsTable(){
 
   if(!allM.size){
     el.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:.75rem 0">
-      Brak danych globalnych. Wejdź w <strong style="color:var(--g-meble)">Wpisz Dane</strong> → sekcja MEBLE Rynki globalne.</div>`;
+      Brak danych globalnych. Wejdź w <strong style="color:var(--g-meble)">Data</strong> → sekcja MEBLE Rynki globalne.</div>`;
     return;
   }
 
