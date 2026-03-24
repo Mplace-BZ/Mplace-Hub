@@ -676,6 +676,17 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   <div id="entryONE"></div>
   </div>
 
+  <!-- MEBLE GLOBAL -->
+  <div style="border:1px solid rgba(255,107,53,.22);border-radius:10px;padding:.85rem 1rem;margin-bottom:.85rem;background:rgba(255,107,53,.03)">
+    <div class="entry-group-hdr egh-m" style="margin-top:0">🌍 MEBLE — Rynki globalne (Centrum Finansów)</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:.75rem;letter-spacing:.05em">Wpisz dane per konto z zakładki Centrum Finansów → Podsumowanie opłat (wszystkie rynki łącznie)</div>
+    <div id="entryGlobal"></div>
+    <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem">
+      <button class="btn" onclick="saveGlobal()" style="color:var(--g-meble);border-color:rgba(255,107,53,.3)">▸ Zapisz globalne</button>
+      <span class="smsg" id="globalMsg"></span>
+    </div>
+  </div>
+
   <div class="save-bar">
     <button class="btn primary" onclick="saveAllWithSync()">▸ Zapisz wszystkie wpisy</button>
     <button class="btn" onclick="showBackupModal()" style="color:var(--green);border-color:rgba(45,212,160,.3)">🛡 Backup</button>
@@ -1116,6 +1127,15 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     </div>
   </div>
   <div id="monthsContent"></div>
+
+  <!-- MEBLE Global section -->
+  <div style="margin-top:1.5rem">
+    <div style="font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--g-meble);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem">
+      <span>🌍 MEBLE — Rynki globalne</span>
+      <span style="color:var(--text3);font-size:8px">(wszystkie rynki: PL + CZ + SK + HU)</span>
+    </div>
+    <div id="globalMonthsContent"></div>
+  </div>
 </div>
 </div>
 
@@ -1868,6 +1888,7 @@ function renderEntry(){
       g.accs.map(k=>renderEntryCard(k,g.c,curM)).join('');
   });
   Object.keys(AC_META).forEach(k=>updateAuto(k));
+  renderGlobalEntryForm();
 }
 
 function renderEntryCard(k,dotColor,curM){
@@ -3132,6 +3153,210 @@ function resetSim(k){
 }
 
 
+
+
+// ═══════════════════════════════════════════════════════════
+// MEBLE GLOBAL — Rynki globalne
+// ═══════════════════════════════════════════════════════════
+const SK_GLOBAL = 'adshub3_global_v1';
+const GLOBAL_ACCS = ['MobelKap','PerfektCiecie','MeblenaCzasie'];
+
+function getGlobalData(){ try{ return JSON.parse(localStorage.getItem(SK_GLOBAL)||'{}'); }catch(e){ return {}; } }
+function setGlobalData(d){ localStorage.setItem(SK_GLOBAL, JSON.stringify(d)); }
+
+// key: accountKey_month e.g. "MobelKap_marzec"
+function getGlobalEntry(k, m){ return getGlobalData()[k+'_'+m] || null; }
+function setGlobalEntry(k, m, entry){
+  const d = getGlobalData();
+  d[k+'_'+m] = entry;
+  setGlobalData(d);
+}
+
+function renderGlobalEntryForm(){
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const el = document.getElementById('entryGlobal');
+  if(!el) return;
+
+  const gN = id => { const e=document.getElementById(id); return e?parseFloat(e.value)||0:0; };
+
+  el.innerHTML = GLOBAL_ACCS.map(k => {
+    const meta = AC_META[k];
+    const prev = getGlobalEntry(k, curM) || {};
+    const pf = f => prev[f] != null ? prev[f] : '';
+    return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;margin-bottom:.5rem">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--g-meble);display:inline-block"></span>
+        <span style="font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text)">${meta.name}</span>
+        ${prev.savedDay ? `<span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto">ostatni wpis: ${prev.savedDay}</span>` : ''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem">
+        <div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Sprzedaż glob. (zł)</div>
+          <input type="number" id="g_${k}_sprzedaz" placeholder="129820" value="${pf('sprzedaz')}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Obowiązkowe (%)</div>
+          <input type="number" id="g_${k}_prow" placeholder="11.2" step="0.1" value="${pf('prow')}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Dostawa (zł)</div>
+          <input type="number" id="g_${k}_dostawa" placeholder="4558" value="${pf('dostawa')}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Reklama (zł)</div>
+          <input type="number" id="g_${k}_reklama" placeholder="10588" value="${pf('reklama')}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Estymacja EOM (zł)</div>
+          <input type="number" id="g_${k}_est" placeholder="138154" value="${pf('est')}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--accent);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function saveGlobal(){
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const gN = (id) => { const e=document.getElementById(id); return e&&e.value!==''?parseFloat(e.value):null; };
+  let saved = 0;
+  GLOBAL_ACCS.forEach(k => {
+    const sprzedaz = gN(`g_${k}_sprzedaz`);
+    if(!sprzedaz) return;
+    setGlobalEntry(k, curM, {
+      m: curM,
+      sprzedaz: sprzedaz,
+      prow:    gN(`g_${k}_prow`),
+      dostawa: gN(`g_${k}_dostawa`),
+      reklama: gN(`g_${k}_reklama`),
+      est:     gN(`g_${k}_est`),
+      savedAt: Date.now(),
+      savedDay: now.toLocaleDateString('pl-PL'),
+    });
+    saved++;
+  });
+  const msg = document.getElementById('globalMsg');
+  if(msg){ msg.textContent = `✓ Zapisano ${saved} kont · ${curM}`; msg.classList.add('show'); setTimeout(()=>msg.classList.remove('show'),3000); }
+  renderGlobalMonthsTable();
+}
+
+function renderGlobalMonthsTable(){
+  const el = document.getElementById('globalMonthsContent');
+  if(!el) return;
+
+  const data = getGlobalData();
+  // Collect all months with any global data
+  const allM = new Set();
+  Object.keys(data).forEach(key => { const m = key.split('_').slice(1).join('_'); if(m) allM.add(m); });
+
+  if(!allM.size){
+    el.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:.75rem 0">
+      Brak danych globalnych. Wejdź w <strong style="color:var(--g-meble)">Wpisz Dane</strong> → sekcja MEBLE Rynki globalne i wprowadź dane z Centrum Finansów.</div>`;
+    return;
+  }
+
+  // Sort months newest first
+  const curM = MONTHS[new Date().getMonth()];
+  const curIdx = MONTHS.indexOf(curM);
+  const mAgo = m => (curIdx - MONTHS.indexOf(m) + 12) % 12;
+  const sortedM = [...allM].sort((a,b) => mAgo(a) - mAgo(b));
+
+  const pln = v => v != null ? Math.round(v).toLocaleString('pl-PL')+' zł' : '—';
+  const pct = v => v != null ? v.toFixed(1)+'%' : '—';
+
+  const thMonths = sortedM.map(m => {
+    const isCur = m === curM;
+    return `<th style="padding:7px 10px;text-align:right;font-family:var(--mono);font-size:10px;
+      color:${isCur?'var(--accent)':'var(--text2)'};font-weight:${isCur?'600':'400'};
+      border-bottom:1px solid var(--border2);white-space:nowrap;min-width:110px">
+      ${m.substring(0,3).toUpperCase()}${isCur?' <span style="font-size:8px">est.</span>':''}
+    </th>`;
+  }).join('');
+
+  const cols = [
+    { lbl:'Sprzedaż glob.', f:'sprzedaz', fmt:pln, sum:true },
+    { lbl:'Obowiązkowe',    f:'prow',     fmt:pct, sum:false },
+    { lbl:'Dostawa',        f:'dostawa',  fmt:pln, sum:true },
+    { lbl:'Reklama',        f:'reklama',  fmt:pln, sum:true },
+    { lbl:'Estymacja',      f:'est',      fmt:pln, sum:true, accent:true },
+  ];
+
+  // Account rows
+  const accountRows = GLOBAL_ACCS.map((k,ai) => {
+    const meta = AC_META[k];
+    const rowBg = ai%2===0?'var(--bg2)':'var(--bg)';
+    const cells = sortedM.map(m => {
+      const entry = getGlobalEntry(k, m);
+      const isCur = m === curM;
+      return `<td style="padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.03);${isCur?'background:rgba(255,107,53,.04)':''}">
+        ${cols.map(col => {
+          const v = entry ? entry[col.f] : null;
+          const color = col.accent ? 'var(--accent)' : col.f==='prow' ? (v&&v>12?'var(--yellow)':'var(--green)') : 'var(--text)';
+          return `<div style="font-family:var(--mono);font-size:10px;color:${v!=null?color:'var(--text3)'};text-align:right">${col.fmt(v)}</div>`;
+        }).join('')}
+      </td>`;
+    }).join('');
+
+    return `<tr style="background:${rowBg}">
+      <td style="padding:6px 12px;border-bottom:1px solid rgba(255,255,255,.03);white-space:nowrap">
+        <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--g-meble);margin-right:6px;vertical-align:middle"></span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text)">${meta.name}</span>
+      </td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  // Sum row
+  const sumCells = sortedM.map(m => {
+    const isCur = m === curM;
+    return `<td style="padding:6px 10px;border-top:1px solid var(--border2);${isCur?'background:rgba(255,107,53,.06)':''}">
+      ${cols.map(col => {
+        if(!col.sum){
+          // Average for % fields
+          const vals = GLOBAL_ACCS.map(k=>{ const e=getGlobalEntry(k,m); return e?e[col.f]:null; }).filter(v=>v!=null);
+          const avg = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+          return `<div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--g-meble);text-align:right">${col.fmt(avg)}</div>`;
+        }
+        const total = GLOBAL_ACCS.reduce((sum,k)=>{ const e=getGlobalEntry(k,m); return sum+(e&&e[col.f]!=null?e[col.f]:0); },0);
+        const hasAny = GLOBAL_ACCS.some(k=>{ const e=getGlobalEntry(k,m); return e&&e[col.f]!=null; });
+        const color = col.accent ? 'var(--accent)' : 'var(--g-meble)';
+        return `<div style="font-family:var(--mono);font-size:10px;font-weight:600;color:${color};text-align:right">${hasAny?col.fmt(total):'—'}</div>`;
+      }).join('')}
+    </td>`;
+  }).join('');
+
+  // Column sub-headers
+  const subHeaders = sortedM.map(m => `<th style="padding:2px 10px 6px;border-bottom:2px solid var(--border2)">
+    ${cols.map(col=>`<div style="font-family:var(--mono);font-size:7px;color:var(--text3);text-align:right;white-space:nowrap">${col.lbl}</div>`).join('')}
+  </th>`).join('');
+
+  el.innerHTML = `<div style="overflow-x:auto">
+  <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px">
+  <thead>
+    <tr style="background:var(--bg3)">
+      <th style="padding:7px 12px;text-align:left;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);min-width:130px">Konto</th>
+      ${thMonths}
+    </tr>
+    <tr style="background:var(--bg3)">
+      <th style="padding:2px 12px 6px;border-bottom:2px solid var(--border2)"></th>
+      ${subHeaders}
+    </tr>
+  </thead>
+  <tbody>
+    ${accountRows}
+    <tr style="background:var(--bg3)">
+      <td style="padding:6px 12px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-meble)">Σ MEBLE Global</td>
+      ${sumCells}
+    </tr>
+  </tbody>
+  </table></div>`;
+}
 
 // ═══════════════════════════════════════════════════════════
 // MIESIĄCE — Monthly comparison view
