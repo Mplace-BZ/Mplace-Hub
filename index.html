@@ -3742,11 +3742,10 @@ async function agentSend(){
   const systemPrompt = buildAgentContext();
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
