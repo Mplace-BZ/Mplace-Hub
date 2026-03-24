@@ -3207,13 +3207,13 @@ function renderGlobalEntryForm(){
             style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
         </div>
         <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Reklama (zł)</div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Reklama i promowanie (zł)</div>
           <input type="number" id="g_${k}_reklama" placeholder="10588" value="${pf('reklama')}"
             style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
         </div>
         <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Estymacja EOM (zł)</div>
-          <input type="number" id="g_${k}_est" placeholder="138154" value="${pf('est')}"
+          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Dzień wpisu</div>
+          <input type="number" id="g_${k}_dzien" placeholder="23" min="1" max="31" value="${pf('dzien')||new Date().getDate()}"
             style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--accent);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none">
         </div>
       </div>
@@ -3229,13 +3229,18 @@ function saveGlobal(){
   GLOBAL_ACCS.forEach(k => {
     const sprzedaz = gN(`g_${k}_sprzedaz`);
     if(!sprzedaz) return;
+    const dzien = gN(`g_${k}_dzien`) || now.getDate();
+    const daysInM = DAYS_IN[curM] || 30;
+    const effDzien = dzien > 1 ? dzien - 1 : 1;
+    const est = Math.round(sprzedaz * daysInM / effDzien);
     setGlobalEntry(k, curM, {
       m: curM,
       sprzedaz: sprzedaz,
       prow:    gN(`g_${k}_prow`),
       dostawa: gN(`g_${k}_dostawa`),
       reklama: gN(`g_${k}_reklama`),
-      est:     gN(`g_${k}_est`),
+      dzien:   dzien,
+      est:     est,
       savedAt: Date.now(),
       savedDay: now.toLocaleDateString('pl-PL'),
     });
@@ -3283,8 +3288,9 @@ function renderGlobalMonthsTable(){
     { lbl:'Sprzedaż glob.', f:'sprzedaz', fmt:pln, sum:true },
     { lbl:'Obowiązkowe',    f:'prow',     fmt:pct, sum:false },
     { lbl:'Dostawa',        f:'dostawa',  fmt:pln, sum:true },
-    { lbl:'Reklama',        f:'reklama',  fmt:pln, sum:true },
-    { lbl:'Estymacja',      f:'est',      fmt:pln, sum:true, accent:true },
+    { lbl:'Reklama i prom.', f:'reklama', fmt:pln, sum:true },
+    { lbl:'Suma opłat',     f:'_sumaoplat', fmt:pln, sum:true, computed:true },
+    { lbl:'Estymacja EOM',  f:'est',      fmt:pln, sum:true, accent:true },
   ];
 
   // Account rows
@@ -3296,8 +3302,12 @@ function renderGlobalMonthsTable(){
       const isCur = m === curM;
       return `<td style="padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.03);${isCur?'background:rgba(255,107,53,.04)':''}">
         ${cols.map(col => {
-          const v = entry ? entry[col.f] : null;
-          const color = col.accent ? 'var(--accent)' : col.f==='prow' ? (v&&v>12?'var(--yellow)':'var(--green)') : 'var(--text)';
+          let v = entry ? entry[col.f] : null;
+          if(col.computed && col.f==='_sumaoplat' && entry){
+            const prow_zl = entry.sprzedaz && entry.prow ? entry.sprzedaz * entry.prow/100 : 0;
+            v = prow_zl + (entry.dostawa||0) + (entry.reklama||0);
+          }
+          const color = col.accent ? 'var(--accent)' : col.f==='prow' ? (v&&v>12?'var(--yellow)':'var(--green)') : col.f==='_sumaoplat' ? 'var(--red)' : 'var(--text)';
           return `<div style="font-family:var(--mono);font-size:10px;color:${v!=null?color:'var(--text3)'};text-align:right">${col.fmt(v)}</div>`;
         }).join('')}
       </td>`;
@@ -3317,6 +3327,16 @@ function renderGlobalMonthsTable(){
     const isCur = m === curM;
     return `<td style="padding:6px 10px;border-top:1px solid var(--border2);${isCur?'background:rgba(255,107,53,.06)':''}">
       ${cols.map(col => {
+        if(col.computed && col.f==='_sumaoplat'){
+          const total = GLOBAL_ACCS.reduce((sum,k)=>{
+            const e=getGlobalEntry(k,m);
+            if(!e) return sum;
+            const prow_zl = e.sprzedaz && e.prow ? e.sprzedaz * e.prow/100 : 0;
+            return sum + prow_zl + (e.dostawa||0) + (e.reklama||0);
+          },0);
+          const hasAny = GLOBAL_ACCS.some(k=>getGlobalEntry(k,m));
+          return `<div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--red);text-align:right">${hasAny?pln(total):'—'}</div>`;
+        }
         if(!col.sum){
           // Average for % fields
           const vals = GLOBAL_ACCS.map(k=>{ const e=getGlobalEntry(k,m); return e?e[col.f]:null; }).filter(v=>v!=null);
