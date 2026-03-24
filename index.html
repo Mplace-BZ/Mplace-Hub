@@ -3193,7 +3193,8 @@ function saveGlobal(){
     const dzien   = gN('g_'+k+'_dzien') || now.getDate();
     const daysInM = DAYS_IN[curM] || 30;
     const effD    = dzien > 1 ? dzien - 1 : 1;
-    const est     = Math.round(sprzedaz * daysInM / effD);
+    const isCurMonth = curM === MONTHS[now.getMonth()];
+    const est = isCurMonth ? Math.round(sprzedaz * daysInM / effD) : sprzedaz;
     const sumaP   = gN('g_'+k+'_sumaP');
     const sumaZl  = sumaP ? Math.round(sprzedaz * sumaP / 100) : null;
     setGlobalEntry(k, curM, {
