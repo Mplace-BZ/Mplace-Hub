@@ -3302,22 +3302,11 @@ function renderGlobalMonthsTable(){
   const curM = MONTHS[new Date().getMonth()];
   const curIdx = MONTHS.indexOf(curM);
   const mAgo = m => (curIdx - MONTHS.indexOf(m) + 12) % 12;
+  // Sort: newest first
   const sortedM = [...allM].sort((a,b) => mAgo(a) - mAgo(b));
 
   const pln = v => v != null ? Math.round(v).toLocaleString('pl-PL')+' zł' : '—';
   const pct = v => v != null ? v.toFixed(1)+'%' : '—';
-
-  // Each col is a separate column
-  const isCurM = m => m === curM;
-  const COLS = [
-    { lbl:'Sprzedaż',      f:'sprzedaz', fmt:pln,  sum:true,  good:'high' },
-    { lbl:'Suma opłat %',  f:'sumaP',    fmt:pct,  sum:false, good:'low'  },
-    { lbl:'Suma opłat zł', f:'sumaZl',   fmt:pln,  sum:true,  good:'low', red:true },
-    { lbl:'Obow. %',       f:'prow',     fmt:pct,  sum:false, good:'low'  },
-    { lbl:'Dostawa %',     f:'dostawa',  fmt:pct,  sum:false, good:'low'  },
-    { lbl:'Reklama %',     f:'reklama',  fmt:pct,  sum:false, good:'low'  },
-    { lbl:'Est. EOM',      f:'est',      fmt:pln,  sum:true,  good:'high', accent:true },
-  ];
 
   const dArrow = (v, prev, good) => {
     if(v == null || prev == null || prev === 0) return '';
@@ -3326,105 +3315,128 @@ function renderGlobalMonthsTable(){
     const up = d > 0;
     const positive = good === 'high' ? up : !up;
     const col = positive ? 'var(--green)' : 'var(--red)';
-    return `<span style="color:${col};font-size:9px;margin-left:3px">${up?'▲':'▼'}${Math.abs(d).toFixed(0)}%</span>`;
+    return `<span style="color:${col};font-size:9px;margin-left:4px">${up?'▲':'▼'}${Math.abs(d).toFixed(0)}%</span>`;
   };
 
-  // Build header: konto col + one col per metric per month
-  let thRow = `<th style="padding:7px 12px;text-align:left;font-family:var(--mono);font-size:10px;color:var(--text3);font-weight:400;border-bottom:2px solid var(--border2);white-space:nowrap;min-width:130px">Konto</th>`;
-  sortedM.forEach(m => {
-    const isCur = m === curM;
-    const mLabel = m.substring(0,3).toUpperCase() + (isCur?' <span style="font-size:8px;color:var(--accent)">est.</span>':'');
-    thRow += `<th colspan="${COLS.length}" style="padding:7px 10px;text-align:center;font-family:var(--mono);font-size:10px;
-      color:${isCur?'var(--accent)':'var(--text2)'};font-weight:${isCur?'600':'400'};
-      border-bottom:1px solid var(--border2);border-left:1px solid var(--border2);white-space:nowrap">${mLabel}</th>`;
-  });
+  // Columns — no sumaZl
+  const COLS = [
+    { lbl:'Sprzedaż',     f:'sprzedaz', fmt:pln,  good:'high' },
+    { lbl:'Suma opłat %', f:'sumaP',    fmt:pct,  good:'low'  },
+    { lbl:'Obow. %',      f:'prow',     fmt:pct,  good:'low'  },
+    { lbl:'Dostawa %',    f:'dostawa',  fmt:pct,  good:'low'  },
+    { lbl:'Reklama %',    f:'reklama',  fmt:pct,  good:'low'  },
+    { lbl:'Est. EOM',     f:'est',      fmt:pln,  good:'high', accent:true },
+  ];
 
-  // Sub-header: metric labels
-  let subRow = `<th style="border-bottom:2px solid var(--border2)"></th>`;
-  sortedM.forEach(m => {
-    const isCur = m === curM;
-    subRow += COLS.map((col,ci) =>
-      `<th style="padding:2px 8px 5px;font-family:var(--mono);font-size:8px;color:var(--text3);text-align:right;
-        border-bottom:2px solid var(--border2);white-space:nowrap;${ci===0?'border-left:1px solid var(--border2)':''}
-        ${isCur&&ci===0?'background:rgba(255,107,53,.04)':''}">${col.lbl}</th>`
-    ).join('');
-  });
+  // Header row
+  const thead = `<thead><tr style="background:var(--bg3)">
+    <th style="padding:7px 12px;text-align:left;font-family:var(--mono);font-size:9px;color:var(--text3);font-weight:400;border-bottom:2px solid var(--border2);min-width:150px">Konto / Miesiąc</th>
+    ${COLS.map(col=>`<th style="padding:7px 10px;text-align:right;font-family:var(--mono);font-size:9px;color:var(--text3);font-weight:400;border-bottom:2px solid var(--border2);white-space:nowrap">${col.lbl}</th>`).join('')}
+  </tr></thead>`;
 
-  // Account rows
-  const accRows = GLOBAL_ACCS.map((k,ai) => {
+  // Body: per account block, per month row
+  let tbody = '<tbody>';
+
+  GLOBAL_ACCS.forEach((k, ai) => {
     const meta = AC_META[k];
-    const bg = ai%2===0?'var(--bg2)':'var(--bg)';
-    let cells = `<td style="padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03);white-space:nowrap;background:${bg}">
-      <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--g-meble);margin-right:6px;vertical-align:middle"></span>
-      <span style="font-family:var(--mono);font-size:11px;color:var(--text)">${meta.name}</span>
-    </td>`;
-    sortedM.forEach((m,mi) => {
-      const entry = getGlobalEntry(k, m);
-      const prevM = sortedM[mi+1];
-      const prevEntry = prevM ? getGlobalEntry(k, prevM) : null;
-      const isCur = m === curM;
-      COLS.forEach((col,ci) => {
-        const v = entry ? entry[col.f] : null;
-        // For est column: compare current est vs previous sprzedaz (actual) for fair comparison
-        const pvRaw = prevEntry ? prevEntry[col.f] : null;
-        const pv = (col.f==='est' && prevEntry && !isCurM(prevM)) ? prevEntry['sprzedaz'] : pvRaw;
-        const color = col.accent?'var(--accent)':col.red?'var(--red)':'var(--text)';
-        cells += `<td style="padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.03);text-align:right;
-          background:${isCur?'rgba(255,107,53,.04)':bg};${ci===0?'border-left:1px solid var(--border2)':''}">
-          <span style="font-family:var(--mono);font-size:11px;color:${v!=null?color:'var(--text3)'}">${col.fmt(v)}</span>
-          ${dArrow(v,pv,col.good)}
-        </td>`;
-      });
-    });
-    return `<tr>${cells}</tr>`;
-  }).join('');
 
-  // Sum row
-  let sumCells = `<td style="padding:7px 12px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-meble)">Σ MEBLE</td>`;
-  sortedM.forEach((m,mi) => {
+    sortedM.forEach((m, mi) => {
+      const entry  = getGlobalEntry(k, m);
+      const prevM  = sortedM[mi + 1];
+      const prevE  = prevM ? getGlobalEntry(k, prevM) : null;
+      const isCur  = m === curM;
+      const isFirst = mi === 0; // newest = first row for this account
+      const isLast  = mi === sortedM.length - 1;
+      const isLastAcc = ai === GLOBAL_ACCS.length - 1;
+
+      // Account name cell: only on first month row, spans all month rows
+      const nameTd = isFirst
+        ? `<td rowspan="${sortedM.length}" style="padding:8px 12px;vertical-align:top;border-bottom:${isLastAcc?'0':'1px solid var(--border2)'};border-top:${ai>0?'2px solid var(--border)':'0'};background:var(--bg2)">
+            <div style="display:flex;align-items:center;gap:.5rem">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--g-meble);flex-shrink:0;display:inline-block"></span>
+              <span style="font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text)">${meta.name}</span>
+            </div>
+          </td>`
+        : '';
+
+      const rowBg = isCur ? 'rgba(255,107,53,.04)' : (isFirst ? 'var(--bg2)' : 'var(--bg)');
+      const borderBot = (isLast && !isLastAcc) ? '2px solid var(--border)' : '1px solid rgba(255,255,255,.04)';
+
+      const cells = COLS.map(col => {
+        const v  = entry ? entry[col.f] : null;
+        // For est: compare vs sprzedaz of previous complete month
+        const pvRaw = prevE ? prevE[col.f] : null;
+        const pv = (col.f === 'est' && prevE && prevM !== curM) ? prevE['sprzedaz'] : pvRaw;
+        const color = col.accent ? 'var(--accent)' : 'var(--text)';
+        return `<td style="padding:6px 10px;text-align:right;border-bottom:${borderBot};background:${rowBg}">
+          <span style="font-family:var(--mono);font-size:11px;color:${v!=null?color:'var(--text3)'}">${col.fmt(v)}</span>
+          ${dArrow(v, pv, col.good)}
+        </td>`;
+      }).join('');
+
+      const mLabel = m[0].toUpperCase() + m.slice(1,3);
+      const mBadge = isCur
+        ? `<span style="font-family:var(--mono);font-size:9px;color:var(--accent)">${mLabel} <span style="font-size:8px">est.</span></span>`
+        : `<span style="font-family:var(--mono);font-size:9px;color:var(--text3)">${mLabel}</span>`;
+
+      tbody += `<tr>
+        ${nameTd}
+        <td style="padding:6px 10px 6px 18px;border-bottom:${borderBot};background:${rowBg}">${mBadge}</td>
+        ${cells}
+      </tr>`;
+    });
+  });
+
+  // Sum rows per month
+  sortedM.forEach((m, mi) => {
     const prevM = sortedM[mi+1];
     const isCur = m === curM;
-    COLS.forEach((col,ci) => {
-      let v = null, pv = null;
-      if(col.sum){
-        const vals = GLOBAL_ACCS.map(k=>{ const e=getGlobalEntry(k,m); return e&&e[col.f]!=null?e[col.f]:null; }).filter(x=>x!=null);
-        if(vals.length) v = vals.reduce((a,b)=>a+b,0);
-        if(prevM){
-          const pvs = GLOBAL_ACCS.map(k=>{ const e=getGlobalEntry(k,prevM); return e&&e[col.f]!=null?e[col.f]:null; }).filter(x=>x!=null);
-          if(pvs.length) pv = pvs.reduce((a,b)=>a+b,0);
-        }
-      } else {
-        const vals = GLOBAL_ACCS.map(k=>{ const e=getGlobalEntry(k,m); return e&&e[col.f]!=null?e[col.f]:null; }).filter(x=>x!=null);
-        if(vals.length) v = vals.reduce((a,b)=>a+b,0)/vals.length;
-        if(prevM){
-          const pvs = GLOBAL_ACCS.map(k=>{ const e=getGlobalEntry(k,prevM); return e&&e[col.f]!=null?e[col.f]:null; }).filter(x=>x!=null);
-          if(pvs.length) pv = pvs.reduce((a,b)=>a+b,0)/pvs.length;
-        }
+    const isFirst = mi === 0;
+    const mLabel = m[0].toUpperCase() + m.slice(1,3);
+
+    const sumNameTd = isFirst
+      ? `<td rowspan="${sortedM.length}" style="padding:8px 12px;vertical-align:top;background:var(--bg3);border-top:2px solid var(--border2)">
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-meble)">Σ MEBLE</span>
+        </td>`
+      : '';
+
+    const cells = COLS.map(col => {
+      const isAvg = ['sumaP','prow','dostawa','reklama'].includes(col.f);
+      const vals = GLOBAL_ACCS.map(k=>{ const e=getGlobalEntry(k,m); return e&&e[col.f]!=null?e[col.f]:null; }).filter(x=>x!=null);
+      const v = vals.length ? (isAvg ? vals.reduce((a,b)=>a+b,0)/vals.length : vals.reduce((a,b)=>a+b,0)) : null;
+      let pv = null;
+      if(prevM){
+        const pvField = (col.f==='est' && prevM!==curM) ? 'sprzedaz' : col.f;
+        const pvs = GLOBAL_ACCS.map(k=>{ const e=getGlobalEntry(k,prevM); return e&&e[pvField]!=null?e[pvField]:null; }).filter(x=>x!=null);
+        pv = pvs.length ? (isAvg ? pvs.reduce((a,b)=>a+b,0)/pvs.length : pvs.reduce((a,b)=>a+b,0)) : null;
       }
-      const color = col.accent?'var(--accent)':col.red?'var(--red)':'var(--g-meble)';
-      sumCells += `<td style="padding:7px 8px;border-top:1px solid var(--border2);text-align:right;
-        ${isCur?'background:rgba(255,107,53,.06)':''};${ci===0?'border-left:1px solid var(--border2)':''}">
+      const color = col.accent?'var(--accent)':'var(--g-meble)';
+      return `<td style="padding:6px 10px;text-align:right;border-bottom:1px solid var(--border);background:${isCur?'rgba(255,107,53,.06)':'var(--bg3)'}">
         <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:${v!=null?color:'var(--text3)'}">${col.fmt(v)}</span>
-        ${dArrow(v,pv,col.good)}
+        ${dArrow(v, pv, col.good)}
       </td>`;
-    });
+    }).join('');
+
+    const mBadge = isCur
+      ? `<span style="font-family:var(--mono);font-size:9px;color:var(--accent)">${mLabel} <span style="font-size:8px">est.</span></span>`
+      : `<span style="font-family:var(--mono);font-size:9px;color:var(--text3)">${mLabel}</span>`;
+
+    tbody += `<tr>
+      ${sumNameTd}
+      <td style="padding:6px 10px 6px 18px;background:${isCur?'rgba(255,107,53,.06)':'var(--bg3)'};border-bottom:1px solid var(--border);border-top:${isFirst?'2px solid var(--border2)':'0'}">${mBadge}</td>
+      ${cells}
+    </tr>`;
   });
 
+  tbody += '</tbody>';
+
   el.innerHTML = `<div style="overflow-x:auto">
-  <table style="width:100%;border-collapse:collapse">
-  <thead>
-    <tr style="background:var(--bg3)">${thRow}</tr>
-    <tr style="background:var(--bg3)">${subRow}</tr>
-  </thead>
-  <tbody>
-    ${accRows}
-    <tr style="background:var(--bg3)">${sumCells}</tr>
-  </tbody>
-  </table></div>
+  <table style="width:100%;border-collapse:collapse">${thead}${tbody}</table></div>
   <div style="margin-top:.6rem;font-family:var(--mono);font-size:10px;color:var(--text3)">
-    ▲▼ = zmiana vs poprzedni miesiąc · Suma opłat = Obowiązkowe + Dostawa + Reklama
+    ▲▼ = zmiana vs poprzedni miesiąc · Est. EOM porównana z rzeczywistą sprzedażą poprzedniego miesiąca
   </div>`;
 }
+
 
 
 // ═══════════════════════════════════════════════════════════
