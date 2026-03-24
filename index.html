@@ -3308,6 +3308,7 @@ function renderGlobalMonthsTable(){
   const pct = v => v != null ? v.toFixed(1)+'%' : '—';
 
   // Each col is a separate column
+  const isCurM = m => m === curM;
   const COLS = [
     { lbl:'Sprzedaż',      f:'sprzedaz', fmt:pln,  sum:true,  good:'high' },
     { lbl:'Suma opłat %',  f:'sumaP',    fmt:pct,  sum:false, good:'low'  },
@@ -3315,7 +3316,7 @@ function renderGlobalMonthsTable(){
     { lbl:'Obow. %',       f:'prow',     fmt:pct,  sum:false, good:'low'  },
     { lbl:'Dostawa %',     f:'dostawa',  fmt:pct,  sum:false, good:'low'  },
     { lbl:'Reklama %',     f:'reklama',  fmt:pct,  sum:false, good:'low'  },
-    { lbl:'Estymacja',     f:'est',      fmt:pln,  sum:true,  good:'high', accent:true },
+    { lbl:'Est. EOM',      f:'est',      fmt:pln,  sum:true,  good:'high', accent:true },
   ];
 
   const dArrow = (v, prev, good) => {
@@ -3364,7 +3365,9 @@ function renderGlobalMonthsTable(){
       const isCur = m === curM;
       COLS.forEach((col,ci) => {
         const v = entry ? entry[col.f] : null;
-        const pv = prevEntry ? prevEntry[col.f] : null;
+        // For est column: compare current est vs previous sprzedaz (actual) for fair comparison
+        const pvRaw = prevEntry ? prevEntry[col.f] : null;
+        const pv = (col.f==='est' && prevEntry && !isCurM(prevM)) ? prevEntry['sprzedaz'] : pvRaw;
         const color = col.accent?'var(--accent)':col.red?'var(--red)':'var(--text)';
         cells += `<td style="padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.03);text-align:right;
           background:${isCur?'rgba(255,107,53,.04)':bg};${ci===0?'border-left:1px solid var(--border2)':''}">
