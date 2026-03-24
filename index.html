@@ -3173,6 +3173,54 @@ function setGlobalEntry(k, m, entry){
   setGlobalData(d);
 }
 
+
+function calcGlobalAuto(k){
+  const sp = parseFloat(document.getElementById('g_'+k+'_sprzedaz')?.value)||0;
+  const sP = parseFloat(document.getElementById('g_'+k+'_sumaP')?.value)||0;
+  const el = document.getElementById('g_'+k+'_sumaZl');
+  if(el && sp && sP) el.textContent = Math.round(sp*sP/100).toLocaleString('pl-PL')+' zł';
+  else if(el) el.textContent = '—';
+}
+
+function saveGlobal(){
+  const now = new Date();
+  const curM = document.getElementById('globalMonthSel')?.value || MONTHS[now.getMonth()];
+  const gN = id => { const e=document.getElementById(id); return e&&e.value!==''?parseFloat(e.value):null; };
+  let saved = 0;
+  GLOBAL_ACCS.forEach(k => {
+    const sprzedaz = gN('g_'+k+'_sprzedaz');
+    if(!sprzedaz) return;
+    const dzien   = gN('g_'+k+'_dzien') || now.getDate();
+    const daysInM = DAYS_IN[curM] || 30;
+    const effD    = dzien > 1 ? dzien - 1 : 1;
+    const est     = Math.round(sprzedaz * daysInM / effD);
+    const sumaP   = gN('g_'+k+'_sumaP');
+    const sumaZl  = sumaP ? Math.round(sprzedaz * sumaP / 100) : null;
+    setGlobalEntry(k, curM, {
+      m:        curM,
+      sprzedaz: sprzedaz,
+      sumaP:    sumaP,
+      sumaZl:   sumaZl,
+      prow:     gN('g_'+k+'_prow'),
+      dostawa:  gN('g_'+k+'_dostawa'),
+      reklama:  gN('g_'+k+'_reklama'),
+      dzien:    dzien,
+      est:      est,
+      savedAt:  Date.now(),
+      savedDay: now.toLocaleDateString('pl-PL'),
+    });
+    saved++;
+  });
+  const msg = document.getElementById('globalMsg');
+  if(msg){
+    msg.textContent = saved ? `✓ Zapisano ${saved} kont · ${curM}` : '✗ Brak danych do zapisania';
+    msg.classList.add('show');
+    setTimeout(()=>msg.classList.remove('show'), 4000);
+  }
+  renderGlobalMonthsTable();
+  renderGlobalEntryForm(); // refresh to show savedDay
+}
+
 function renderGlobalEntryForm(){
   const el = document.getElementById('entryGlobal');
   if(!el) return;
