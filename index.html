@@ -549,9 +549,9 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .pdfs-item:hover{border-color:rgba(77,159,255,.3);background:rgba(77,159,255,.06);}
 .pdfs-item-icon{font-size:16px;flex-shrink:0;}
 /* Import Ads */
-.ads-map-row{display:flex;align-items:center;gap:.75rem;padding:.5rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);}
-.ads-map-file{font-family:var(--mono);font-size:10px;color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ads-map-select{font-family:var(--mono);font-size:10px;padding:4px 8px;border-radius:5px;border:1px solid rgba(244,114,182,.3);background:var(--bg2);color:#f472b6;cursor:pointer;}
+.ads-map-row{display:flex;align-items:center;gap:.75rem;padding:.6rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);}
+.ads-map-file{font-family:var(--mono);font-size:10px;color:var(--text2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ads-map-select{font-family:var(--mono);font-size:10px;padding:5px 10px;border-radius:5px;border:1px solid rgba(244,114,182,.3);background:var(--bg2);color:#f472b6;cursor:pointer;flex-shrink:0;min-width:160px;}
 .ads-map-status{font-family:var(--mono);font-size:9px;color:var(--text3);}
 .ads-history-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s;}
 .ads-history-item:hover{border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.05);}
@@ -4962,13 +4962,11 @@ function renderAdsMappingArea() {
   area.style.display='block';
   list.innerHTML = adsPendingFiles.map((p,i)=>`
     <div class="ads-map-row">
-      <span style="color:#f472b6;font-size:13px">📄</span>
       <span class="ads-map-file">${p.file.name}</span>
-      <select class="ads-map-select" onchange="adsPendingFiles[${i}].accountKey=this.value">
+      <select class="ads-map-select" onchange="adsPendingFiles[${i}].accountKey=this.value;renderAdsMappingArea()">
         <option value="">— wybierz konto —</option>
         ${ADS_ACCOUNT_KEYS.map(k=>`<option value="${k}" ${p.accountKey===k?'selected':''}>${ADS_ACCOUNT_NAMES[k]}</option>`).join('')}
       </select>
-      <span class="ads-map-status">${p.accountKey?'✅':' '}</span>
       <span style="cursor:pointer;color:var(--text3);font-size:12px;padding:2px 6px" onclick="adsPendingFiles.splice(${i},1);renderAdsMappingArea()">✕</span>
     </div>
   `).join('');
