@@ -1255,7 +1255,21 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
       <div class="wk-cat zasady" onclick="selectWkCat('zasady',this)">· Zasady</div>
       <div class="wk-cat inne" onclick="selectWkCat('inne',this)">· Inne</div>
     </div>
-    <textarea id="wkContent" placeholder="Wklej treść — tekst, słownik, dane, artykuł, notatki. Agent przeczyta to przed każdą odpowiedzią."></textarea>
+    <!-- File drop zone -->
+    <div id="wkDropZone" onclick="document.getElementById('wkFileInput').click()"
+      style="border:1px dashed rgba(167,139,250,.3);border-radius:7px;padding:.65rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;transition:all .15s;background:rgba(167,139,250,.03)"
+      ondragover="event.preventDefault();this.style.borderColor='#a78bfa';this.style.background='rgba(167,139,250,.08)'"
+      ondragleave="this.style.borderColor='rgba(167,139,250,.3)';this.style.background='rgba(167,139,250,.03)'"
+      ondrop="event.preventDefault();this.style.borderColor='rgba(167,139,250,.3)';this.style.background='rgba(167,139,250,.03)';handleWkFileDrop(event)">
+      <span style="font-size:16px">📎</span>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:#a78bfa">Wgraj plik lub przeciągnij tutaj</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">TXT · CSV · PDF (tekst) · MD</div>
+      </div>
+      <div id="wkFileStatus" style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text3)"></div>
+    </div>
+    <input type="file" id="wkFileInput" accept=".txt,.csv,.md,.pdf" style="display:none" onchange="handleWkFileSelect(this)">
+    <textarea id="wkContent" placeholder="Wklej treść lub wgraj plik powyżej — Agent przeczyta to przed każdą odpowiedzią."></textarea>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.6rem">
       <span id="wkCharCount" style="font-family:var(--mono);font-size:9px;color:var(--text3)">0 znaków</span>
       <div style="display:flex;gap:.5rem">
@@ -4729,6 +4743,106 @@ document.addEventListener('input', e => {
     document.getElementById('wkCharCount').textContent = e.target.value.length.toLocaleString('pl-PL') + ' znaków';
   }
 });
+
+// ── WIEDZA — obsługa plików ────────────────────────────────
+function handleWkFileDrop(e) {
+  const file = e.dataTransfer.files[0];
+  if (file) processWkFile(file);
+}
+
+function handleWkFileSelect(input) {
+  const file = input.files[0];
+  if (file) processWkFile(file);
+  input.value = '';
+}
+
+function processWkFile(file) {
+  const status = document.getElementById('wkFileStatus');
+  const maxSize = 500 * 1024; // 500KB limit
+  if (file.size > maxSize) {
+    status.textContent = '⚠ Plik za duży (max 500KB)';
+    status.style.color = 'var(--red)';
+    return;
+  }
+  status.textContent = '⟳ Wczytuję...';
+  status.style.color = '#a78bfa';
+
+  // Auto-fill title from filename
+  const titleEl = document.getElementById('wkTitle');
+  if (!titleEl.value) {
+    titleEl.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+  }
+
+  if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+    readPdfFile(file);
+  } else {
+    // TXT, CSV, MD — plain text
+    const reader = new FileReader();
+    reader.onload = e => {
+      const text = e.target.result;
+      appendToWkContent(text, file.name);
+      status.textContent = `✓ ${file.name} (${Math.round(file.size/1024)}KB)`;
+      status.style.color = 'var(--green)';
+    };
+    reader.onerror = () => {
+      status.textContent = '✕ Błąd odczytu pliku';
+      status.style.color = 'var(--red)';
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+}
+
+function readPdfFile(file) {
+  const status = document.getElementById('wkFileStatus');
+  // Load PDF.js if not loaded
+  if (typeof pdfjsLib === 'undefined') {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    script.onload = () => {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      extractPdfText(file);
+    };
+    script.onerror = () => {
+      status.textContent = '✕ Nie można załadować czytnika PDF';
+      status.style.color = 'var(--red)';
+    };
+    document.head.appendChild(script);
+  } else {
+    extractPdfText(file);
+  }
+}
+
+async function extractPdfText(file) {
+  const status = document.getElementById('wkFileStatus');
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = '';
+    const maxPages = Math.min(pdf.numPages, 30); // max 30 stron
+    for (let i = 1; i <= maxPages; i++) {
+      status.textContent = `⟳ Strona ${i}/${maxPages}...`;
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items.map(item => item.str).join(' ');
+      fullText += `\n--- Strona ${i} ---\n${pageText}`;
+    }
+    if (pdf.numPages > 30) fullText += `\n\n[Plik ma ${pdf.numPages} stron — wczytano pierwsze 30]`;
+    appendToWkContent(fullText.trim(), file.name);
+    status.textContent = `✓ ${file.name} · ${pdf.numPages} str. · ${Math.round(file.size/1024)}KB`;
+    status.style.color = 'var(--green)';
+  } catch(err) {
+    status.textContent = '✕ Błąd PDF — spróbuj TXT';
+    status.style.color = 'var(--red)';
+    console.error('PDF error:', err);
+  }
+}
+
+function appendToWkContent(text, filename) {
+  const ta = document.getElementById('wkContent');
+  const existing = ta.value.trim();
+  ta.value = existing ? existing + '\n\n' + text : text;
+  document.getElementById('wkCharCount').textContent = ta.value.length.toLocaleString('pl-PL') + ' znaków';
+}
 
 // D2D — Day to Day
 // ═══════════════════════════════════════════════════════════
