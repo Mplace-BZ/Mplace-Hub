@@ -4396,23 +4396,31 @@ function openSavedReport(id) {
 function printOverlay() {
   const overlay = document.getElementById('reportOverlay');
   if (!overlay) return;
-  // Temporarily hide everything except overlay
-  document.body.childNodes.forEach(n => {
-    if (n !== overlay && n.style) n.style.setProperty('display', 'none', 'important');
-  });
-  overlay.style.position = 'static';
-  overlay.style.overflow = 'visible';
-  overlay.style.height = 'auto';
-  window.print();
-  // Restore after print dialog closes
-  setTimeout(() => {
-    document.body.childNodes.forEach(n => {
-      if (n !== overlay && n.style) n.style.removeProperty('display');
+
+  const restoreStyles = [];
+
+  function beforePrint() {
+    // Hide all body children except overlay
+    Array.from(document.body.children).forEach(el => {
+      if (el !== overlay) {
+        restoreStyles.push({el, display: el.style.display});
+        el.style.display = 'none';
+      }
     });
-    overlay.style.position = 'fixed';
-    overlay.style.overflow = 'auto';
-    overlay.style.height = '';
-  }, 500);
+    overlay.style.cssText = 'position:static;overflow:visible;height:auto;background:#fff;';
+  }
+
+  function afterPrint() {
+    restoreStyles.forEach(({el, display}) => el.style.display = display);
+    restoreStyles.length = 0;
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:800;background:#fff;overflow-y:auto;font-family:"DM Sans",sans-serif;font-size:13px;color:#1f2937;';
+    window.removeEventListener('beforeprint', beforePrint);
+    window.removeEventListener('afterprint', afterPrint);
+  }
+
+  window.addEventListener('beforeprint', beforePrint);
+  window.addEventListener('afterprint', afterPrint);
+  window.print();
 }
 
 // D2D — Day to Day
