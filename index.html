@@ -5224,7 +5224,7 @@ function openAdsReportWindow(entry) {
   const results = entry.rawResults || [];
   const totRoas = entry.totKoszt>0?(entry.totSprzedaz/entry.totKoszt):0;
   const th = (t,align)=>`<th style="padding:5px 8px;font-family:monospace;font-size:9px;text-transform:uppercase;color:#f472b6;border-bottom:2px solid #e8e8e8;text-align:${align||'left'};white-space:nowrap;letter-spacing:.04em">${t}</th>`;
-  const td = (t,align,color)=>`<td style="padding:5px 8px;font-family:monospace;font-size:10px;border-bottom:1px solid #f0f0f0;text-align:${align||'left'}${color?';color:'+color+';font-weight:700':''}">${t}</td>`;
+  const td = (t,align,color)=>`<td style="padding:5px 8px;font-family:monospace;font-size:10px;border-bottom:1px solid #f0f0f0;text-align:${align||'left'};color:${color||'#222'}${color?';font-weight:700':''}">${t}</td>`;
   const roasColor = r=>r>=7?'#2dd4a0':r>=4?'#f5a623':'#ff4d6a';
   const akcja = (r,koszt)=>{
     if(koszt!==undefined){
