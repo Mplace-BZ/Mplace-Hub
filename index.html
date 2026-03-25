@@ -488,6 +488,38 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .backup-status.err{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd);display:block;}
 #importFileInput{display:none;}
 
+/* ── REPORT MODAL ── */
+.report-modal-overlay{
+  position:fixed;inset:0;z-index:650;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(6px);
+}
+.report-modal{
+  background:var(--bg2);border:1px solid var(--border2);border-radius:14px;
+  padding:1.5rem 1.7rem;max-width:460px;width:92%;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+.report-modal-title{font-family:var(--mono);font-size:13px;font-weight:500;margin-bottom:.25rem;}
+.report-modal-title span{color:var(--accent);}
+.report-modal-sub{font-size:12px;color:var(--text3);margin-bottom:1.1rem;line-height:1.5;}
+.report-group-label{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;margin-bottom:.45rem;margin-top:.9rem;display:flex;align-items:center;gap:6px;}
+.report-group-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.report-checks{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.2rem;}
+.report-check{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s;font-family:var(--mono);font-size:11px;color:var(--text2);user-select:none;}
+.report-check:hover{border-color:var(--border2);color:var(--text);}
+.report-check.checked{border-color:rgba(255,107,53,.4);background:rgba(255,107,53,.1);color:var(--accent);}
+.report-check input{display:none;}
+.report-check-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--border2);transition:background .15s;}
+.report-check.checked .report-check-dot{background:var(--accent);}
+.report-modal-actions{display:flex;gap:.5rem;margin-top:1.2rem;}
+.report-modal-go{flex:1;padding:.65rem;border-radius:8px;border:1px solid rgba(255,107,53,.4);background:rgba(255,107,53,.12);color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+.report-modal-go:hover{background:rgba(255,107,53,.22);}
+.report-modal-go:disabled{opacity:.4;cursor:not-allowed;}
+.report-modal-cancel{padding:.65rem 1rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s;}
+.report-modal-cancel:hover{color:var(--text);border-color:var(--border2);}
+.report-select-all{font-family:var(--mono);font-size:9px;color:var(--text3);cursor:pointer;text-decoration:underline;margin-left:auto;}
+.report-select-all:hover{color:var(--accent);}
+
 /* ── MOBILE RESPONSIVE ── */
 @media(max-width:700px){
   .topbar-inner{padding:0 10px;height:40px;}
@@ -1114,6 +1146,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="agentAsk('Które konto ma największy potencjał wzrostu i dlaczego?')" class="agent-chip">Największy potencjał?</button>
     <button onclick="agentAsk('Oceń kondycję każdego konta w skali 1-10 z uzasadnieniem.')" class="agent-chip">Kondycja kont 1-10</button>
     <button onclick="agentAsk('Gdzie tracę pieniądze? Gdzie są największe wycieki marży?')" class="agent-chip">Gdzie tracę pieniądze?</button>
+    <button onclick="generateMTDReport()" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:var(--accent);background:rgba(255,107,53,.08)">📊 Raport MTD</button>
   </div>
 
   <!-- Input -->
@@ -3838,15 +3871,332 @@ ${question ? `<div class="pq"><strong>Pytanie</strong>${question}</div>` : ''}
 
 function emailAgentResponse() {
   const msgEl = document.querySelector('#agentResponse .agent-msg');
+  const qEl   = document.querySelector('#agentResponse [style*="Pytanie"]');
   if (!msgEl) return;
   const time = new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  // Strip HTML tags to plain text
-  const plain = msgEl.innerText || msgEl.textContent || '';
-  const subject = encodeURIComponent('MPlace Hub · Agent · ' + time);
-  const body = encodeURIComponent(plain.trim() + '\n\n---\nMPlace Hub · Agent ✦ · ' + time);
-  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+  const question = qEl ? qEl.textContent.replace('Pytanie:','').trim() : '';
+
+  // Convert HTML to structured plain text
+  let plain = msgEl.innerHTML
+    .replace(/<h3[^>]*>(.*?)<\/h3>/gi, '\n\n■ $1\n' + '─'.repeat(40))
+    .replace(/<strong>(.*?)<\/strong>/gi, '$1')
+    .replace(/<em>(.*?)<\/em>/gi, '$1')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<p>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  const sep = '═'.repeat(48);
+  const body =
+    sep + '\n' +
+    'MPLACE HUB  ·  AGENT  ·  ANALIZA\n' +
+    sep + '\n' +
+    (question ? 'Pytanie: ' + question + '\n' + '─'.repeat(48) + '\n\n' : '') +
+    plain + '\n\n' +
+    '─'.repeat(48) + '\n' +
+    'Wygenerowano: ' + time + '\n' +
+    'MPlace Hub · mplace-bz.github.io/Mplace-Hub\n' +
+    sep;
+
+  const subject = encodeURIComponent('MPlace Hub · Analiza · ' + time);
+  window.location.href = 'mailto:?subject=' + subject + '&body=' + encodeURIComponent(body);
 }
 
+
+// ── RAPORT MTD ─────────────────────────────────────────────
+function generateMTDReport() {
+  // Reset checkboxes
+  document.querySelectorAll('#reportModal .report-check').forEach(el => {
+    el.classList.remove('checked');
+    el.querySelector('input').checked = false;
+  });
+  updateReportCount();
+  document.getElementById('reportModal').style.display = 'flex';
+}
+
+function closeReportModal() {
+  document.getElementById('reportModal').style.display = 'none';
+}
+
+function updateReportCount() {
+  const n = document.querySelectorAll('#reportModal .report-check.checked').length;
+  document.getElementById('reportSelectedCount').textContent = n === 0 ? '0 kont wybranych' : n + (n===1?' konto wybrane':n<5?' konta wybrane':' kont wybranych');
+  document.getElementById('reportGoBtn').disabled = n === 0;
+}
+
+function reportSelectAll() {
+  document.querySelectorAll('#reportModal .report-check').forEach(el => {
+    el.classList.add('checked');
+    el.querySelector('input').checked = true;
+  });
+  updateReportCount();
+}
+
+function reportSelectNone() {
+  document.querySelectorAll('#reportModal .report-check').forEach(el => {
+    el.classList.remove('checked');
+    el.querySelector('input').checked = false;
+  });
+  updateReportCount();
+}
+
+// Toggle checkbox on click
+document.addEventListener('click', e => {
+  const chk = e.target.closest('#reportModal .report-check');
+  if (!chk) return;
+  chk.classList.toggle('checked');
+  chk.querySelector('input').checked = chk.classList.contains('checked');
+  updateReportCount();
+});
+
+async function runSelectedReport() {
+  const selected = [...document.querySelectorAll('#reportModal .report-check.checked')]
+    .map(el => el.dataset.key);
+  if (!selected.length) return;
+  closeReportModal();
+  await runMTDReport(selected);
+}
+
+async function runMTDReport(selectedKeys) {
+  const responseEl = document.getElementById('agentResponse');
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const dayNum = now.getDate();
+  const accLabel = selectedKeys.length === 9 ? 'wszystkich 9 kont' : selectedKeys.length + ' ' + (selectedKeys.length===1?'konta':selectedKeys.length<5?'kont':'kont');
+
+  // Loading state
+  responseEl.innerHTML = `<div class="agent-thinking">
+    <div class="agent-thinking-dot"></div>
+    <div class="agent-thinking-dot"></div>
+    <div class="agent-thinking-dot"></div>
+    <span style="margin-left:.3rem">Generuję raport MTD dla ${accLabel}...</span>
+  </div>`;
+
+  // Build raw data snapshot — only selected accounts
+  const snap = {};
+  const groups = {
+    MEBLE: { accs:['MobelKap','PerfektCiecie','MeblenaCzasie'], prod:65 },
+    LUXSEN:{ accs:['Luxsen','Semmi','BOTAVIT'], prod:60 },
+    ONE:   { accs:['Materazzi','MtzzEU','Ankado24'], prod:55 }
+  };
+
+  // Filter groups to only include selected accounts
+  const filteredGroups = {};
+  Object.entries(groups).forEach(([gKey, g]) => {
+    const filteredAccs = g.accs.filter(k => selectedKeys.includes(k));
+    if (filteredAccs.length) filteredGroups[gKey] = {...g, accs: filteredAccs};
+  });
+
+  let dataCtx = '';
+  Object.entries(filteredGroups).forEach(([gKey, g]) => {
+    dataCtx += `\n=== GRUPA ${gKey} (producent ${g.prod}%) ===\n`;
+    g.accs.forEach(k => {
+      const D = getData(k);
+      const prod = getProd(k);
+      const cur = D.find(d => d.m === curM);
+      const prev = D.filter(d => d.m !== curM).slice(-3);
+      if (!cur) { dataCtx += `${AC_META[k].name}: brak danych za ${curM}\n`; return; }
+      const C = calc(cur, prod);
+      const est = Math.round(cur.sprzedaz * 30 / Math.max(dayNum - 1, 1));
+      snap[k] = { C, est, cur, prod };
+      dataCtx += `\n${AC_META[k].name}:\n`;
+      dataCtx += `  MTD (dzień ${dayNum}): sprzedaż ${Math.round(cur.sprzedaz).toLocaleString('pl-PL')} zł | est. EOM: ${est.toLocaleString('pl-PL')} zł\n`;
+      dataCtx += `  Ads: koszt ${Math.round(cur.adsCost||0).toLocaleString('pl-PL')} zł | ROAS ${(cur.roas||0).toFixed(2)} | wartość ${Math.round(cur.wartoscAds||0).toLocaleString('pl-PL')} zł\n`;
+      dataCtx += `  Marża po reklamie: ${C.mAfter.toFixed(1)}% | ROAS Glob: ${(C.roasGlob||0).toFixed(2)} | BE ROAS: ${(C.beRoasAds||0).toFixed(2)} | Prowizja: ${(cur.commission||0).toFixed(1)}%\n`;
+      if (prev.length) {
+        const prevMargins = prev.map(d => calc(d,prod).mAfter.toFixed(1)+'%').join(' → ');
+        dataCtx += `  Poprzednie marże: ${prevMargins}\n`;
+      }
+    });
+  });
+
+  const n = selectedKeys.length;
+  const isAll = n === 9;
+  const systemPrompt = buildAgentContext();
+  const reportPrompt = `Wygeneruj profesjonalny raport miesięczny MTD (miesiąc: ${curM}, dzień: ${dayNum}/30).
+Raport dotyczy ${isAll ? 'wszystkich 9 kont' : 'wybranych kont: ' + selectedKeys.map(k=>AC_META[k]?.name||k).join(', ')}.
+
+DANE DO RAPORTU:
+${dataCtx}
+
+Raport musi zawierać DOKŁADNIE te sekcje w tej kolejności:
+
+1. PODSUMOWANIE WYKONAWCZE (3-4 zdania — ogólna kondycja wybranych kont)
+
+${Object.keys(filteredGroups).length > 1 ? `2. WYNIKI PER GRUPA\n   Dla każdej grupy: łączna sprzedaż MTD, est. EOM, średnia marża, 1 zdanie oceny\n\n` : ''}3. WYNIKI PER KONTO
+   Format dla każdego: nazwa | sprzedaż MTD | est. EOM | marża% | ROAS | status (✅/⚠️/🔴)
+
+4. CO DZIAŁA — najlepsze konta z uzasadnieniem liczb
+
+5. CO NIE DZIAŁA — konta wymagające uwagi, konkretne problemy z liczbami
+
+6. REKOMENDACJE NA NASTĘPNY TYDZIEŃ — 3-5 konkretnych działań z priorytetem (PILNE/WAŻNE)
+
+Bądź konkretny, podawaj liczby. Odpowiedz po polsku.`;
+
+  try {
+    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2048,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: reportPrompt }]
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    const text = data.content?.map(b => b.text||'').join('') || '';
+    openReportWindow(text, curM, dayNum, snap, filteredGroups, selectedKeys);
+    responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--accent)">
+      <strong style="color:var(--accent)">📊 Raport MTD wygenerowany</strong><br>
+      <span style="font-size:11px;color:var(--text3)">Otwarto w nowym oknie · Ctrl+P = PDF</span>
+    </div>`;
+  } catch(err) {
+    responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)">
+      <strong>Błąd generowania raportu:</strong> ${err.message}
+    </div>`;
+  }
+}
+
+function openReportWindow(aiText, curM, dayNum, snap, groups, selectedKeys) {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('pl-PL', {day:'2-digit',month:'long',year:'numeric'});
+  const timeStr = now.toLocaleTimeString('pl-PL', {hour:'2-digit',minute:'2-digit'});
+  const isAll = selectedKeys.length === 9;
+  const scopeLabel = isAll ? 'Wszystkie konta' : selectedKeys.map(k=>AC_META[k]?.name||k).join(', ');
+
+  // Format AI text to HTML
+  const aiHtml = aiText
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^#{1,3} (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+
+  // Build group summary table rows
+  let groupRows = '';
+  Object.entries(groups).forEach(([gKey, g]) => {
+    let sumSp=0, sumEst=0, margins=[], hasData=false;
+    g.accs.forEach(k => {
+      if(snap[k]){ sumSp+=snap[k].cur.sprzedaz||0; sumEst+=snap[k].est||0; margins.push(snap[k].C.mAfter); hasData=true; }
+    });
+    const avgM = margins.length ? (margins.reduce((a,b)=>a+b,0)/margins.length) : 0;
+    const mColor = avgM>=10?'#2dd4a0':avgM>=0?'#f5a623':'#ff4d6a';
+    const gColor = gKey==='MEBLE'?'#ff6b35':gKey==='LUXSEN'?'#2dd4a0':'#b47fff';
+    if(hasData) groupRows += `<tr>
+      <td><span style="color:${gColor};font-weight:600">${gKey}</span></td>
+      <td>${Math.round(sumSp).toLocaleString('pl-PL')} zł</td>
+      <td>${Math.round(sumEst).toLocaleString('pl-PL')} zł</td>
+      <td style="color:${mColor};font-weight:600">${avgM.toFixed(1)}%</td>
+    </tr>`;
+  });
+
+  // Build accounts table rows
+  let accRows = '';
+  Object.entries(groups).forEach(([gKey, g]) => {
+    const gColor = gKey==='MEBLE'?'#ff6b35':gKey==='LUXSEN'?'#2dd4a0':'#b47fff';
+    g.accs.forEach(k => {
+      if(!snap[k]) return;
+      const {C, est, cur} = snap[k];
+      const status = C.mAfter>=10?'✅':C.mAfter>=0?'⚠️':'🔴';
+      const mColor = C.mAfter>=10?'#2dd4a0':C.mAfter>=0?'#f5a623':'#ff4d6a';
+      accRows += `<tr>
+        <td><span style="color:${gColor};font-size:9px">${gKey}</span><br><strong>${AC_META[k].name}</strong></td>
+        <td>${Math.round(cur.sprzedaz||0).toLocaleString('pl-PL')} zł</td>
+        <td style="color:#8b91a8">${Math.round(est).toLocaleString('pl-PL')} zł</td>
+        <td style="color:${mColor};font-weight:600">${C.mAfter.toFixed(1)}%</td>
+        <td>${(cur.roas||0).toFixed(2)}</td>
+        <td style="color:#8b91a8">${C.beRoasAds.toFixed(2)}</td>
+        <td style="font-size:14px">${status}</td>
+      </tr>`;
+    });
+  });
+
+  const win = window.open('', '_blank', 'width=900,height=700');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>MPlace Hub · Raport MTD · ${curM}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1f2937;background:#fff;padding:2.5rem 3rem;}
+/* header */
+.rh{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:.85rem;margin-bottom:1.75rem;border-bottom:3px solid #ff6b35;}
+.rh-logo{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#111;}
+.rh-logo span{color:#ff6b35;}
+.rh-meta{text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;line-height:1.8;}
+.rh-tag{display:inline-block;background:#fff7ed;color:#ff6b35;border:1px solid #fdba74;border-radius:4px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;margin-bottom:4px;}
+/* section */
+.sec{margin-bottom:2rem;}
+.sec-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#ff6b35;padding-bottom:.4rem;border-bottom:1px solid #fde8dc;margin-bottom:1rem;}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#9ca3af;padding:6px 10px;border-bottom:1px solid #e5e7eb;text-align:left;background:#fafafa;}
+tbody tr{border-bottom:1px solid #f3f4f6;}
+tbody tr:last-child{border-bottom:none;}
+tbody td{padding:8px 10px;vertical-align:middle;}
+tbody tr:hover{background:#fafafa;}
+/* ai section */
+.ai-body{line-height:1.75;color:#374151;}
+.ai-body h3{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:#ff6b35;margin:1.25rem 0 .5rem;padding-bottom:.3rem;border-bottom:1px solid #fde8dc;}
+.ai-body p{margin-bottom:.65rem;}
+.ai-body strong{font-weight:600;color:#111;}
+/* footer */
+.rf{margin-top:2.5rem;padding-top:.75rem;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;}
+.rf-left{font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;}
+.rf-right{font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;text-align:right;}
+/* print button */
+.print-btn{position:fixed;bottom:1.5rem;right:1.5rem;font-family:'DM Mono',monospace;font-size:11px;padding:8px 18px;border-radius:6px;border:1px solid #ff6b35;background:#fff7ed;color:#ff6b35;cursor:pointer;}
+.print-btn:hover{background:#ff6b35;color:#fff;}
+@media print{.print-btn{display:none!important;}body{padding:1.5rem 2rem;}}
+</style></head><body>
+
+<div class="rh">
+  <div>
+    <div class="rh-logo">M<span>Place</span> Hub</div>
+    <div style="font-size:12px;color:#6b7280;margin-top:3px">Raport wewnętrzny · Poufny</div>
+  </div>
+  <div class="rh-meta">
+    <div class="rh-tag">Raport MTD</div><br>
+    <strong style="color:#111;font-size:13px">${curM.toUpperCase()} · dzień ${dayNum}/30</strong><br>
+    <span style="color:#ff6b35">${scopeLabel}</span><br>
+    Wygenerowano: ${dateStr}, ${timeStr}
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-title">Wyniki grupowe</div>
+  <table>
+    <thead><tr><th>Grupa</th><th>Sprzedaż MTD</th><th>Estymacja EOM</th><th>Śr. marża</th></tr></thead>
+    <tbody>${groupRows}</tbody>
+  </table>
+</div>
+
+<div class="sec">
+  <div class="sec-title">Wyniki per konto — wszystkie 9</div>
+  <table>
+    <thead><tr><th>Konto</th><th>Sprzedaż MTD</th><th>Est. EOM</th><th>Marża</th><th>ROAS</th><th>BE ROAS</th><th>Status</th></tr></thead>
+    <tbody>${accRows}</tbody>
+  </table>
+</div>
+
+<div class="sec">
+  <div class="sec-title">Analiza AI — co działa, co nie, rekomendacje</div>
+  <div class="ai-body"><p>${aiHtml}</p></div>
+</div>
+
+<div class="rf">
+  <div class="rf-left">MPlace Hub · Raport wewnętrzny · Poufny</div>
+  <div class="rf-right">${curM.toUpperCase()} ${now.getFullYear()} · dzień ${dayNum} · ${dateStr}</div>
+</div>
+
+<button class="print-btn" onclick="window.print()">⎙ Drukuj / Zapisz PDF</button>
+</body></html>`);
+  win.document.close();
+}
 
 // D2D — Day to Day
 // ═══════════════════════════════════════════════════════════
@@ -4581,6 +4931,46 @@ self.addEventListener('fetch', e => e.respondWith(
     <div class="sc-rows" id="scRows"></div>
     <div class="sc-sync" id="scSync"></div>
     <button class="sc-close" onclick="closeSaveConfirm()">OK — Zamknij</button>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="report-modal-overlay" id="reportModal" style="display:none" onclick="if(event.target===this)closeReportModal()">
+  <div class="report-modal">
+    <div class="report-modal-title">📊 Generuj <span>Raport MTD</span></div>
+    <div class="report-modal-sub">Wybierz konta do raportu — możesz wybrać dowolną kombinację</div>
+
+    <div class="report-group-label" style="color:var(--g-meble)">· MEBLE</div>
+    <div class="report-checks">
+      <label class="report-check" data-key="MobelKap"><input type="checkbox" value="MobelKap"><div class="report-check-dot"></div>MobelKap</label>
+      <label class="report-check" data-key="PerfektCiecie"><input type="checkbox" value="PerfektCiecie"><div class="report-check-dot"></div>PerfektCiecie</label>
+      <label class="report-check" data-key="MeblenaCzasie"><input type="checkbox" value="MeblenaCzasie"><div class="report-check-dot"></div>MeblenaCzasie</label>
+    </div>
+
+    <div class="report-group-label" style="color:var(--g-luxsen)">· LUXSEN</div>
+    <div class="report-checks">
+      <label class="report-check" data-key="Luxsen"><input type="checkbox" value="Luxsen"><div class="report-check-dot"></div>Luxsen</label>
+      <label class="report-check" data-key="Semmi"><input type="checkbox" value="Semmi"><div class="report-check-dot"></div>Semmi</label>
+      <label class="report-check" data-key="BOTAVIT"><input type="checkbox" value="BOTAVIT"><div class="report-check-dot"></div>BOTAVIT</label>
+    </div>
+
+    <div class="report-group-label" style="color:var(--g-one)">· ONE</div>
+    <div class="report-checks">
+      <label class="report-check" data-key="Materazzi"><input type="checkbox" value="Materazzi"><div class="report-check-dot"></div>Materazzi</label>
+      <label class="report-check" data-key="MtzzEU"><input type="checkbox" value="MtzzEU"><div class="report-check-dot"></div>MtzzEU</label>
+      <label class="report-check" data-key="Ankado24"><input type="checkbox" value="Ankado24"><div class="report-check-dot"></div>Ankado24</label>
+    </div>
+
+    <div style="display:flex;align-items:center;margin-top:.9rem;gap:.6rem">
+      <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="reportSelectedCount">0 kont wybranych</span>
+      <span class="report-select-all" onclick="reportSelectAll()">zaznacz wszystkie</span>
+      <span class="report-select-all" onclick="reportSelectNone()">odznacz</span>
+    </div>
+
+    <div class="report-modal-actions">
+      <button class="report-modal-cancel" onclick="closeReportModal()">Anuluj</button>
+      <button class="report-modal-go" id="reportGoBtn" onclick="runSelectedReport()" disabled>▸ Generuj raport</button>
+    </div>
   </div>
 </div>
 
