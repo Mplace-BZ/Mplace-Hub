@@ -557,6 +557,32 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .pdfs-clear{font-family:var(--mono);font-size:9px;color:var(--text3);cursor:pointer;text-decoration:underline;}
 .pdfs-clear:hover{color:var(--red);}
 
+/* ── WIEDZA ── */
+.wk-cat{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:10px;border:1px solid;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;transition:all .15s;}
+.wk-cat.slownik{color:#a78bfa;border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.08);}
+.wk-cat.benchmark{color:var(--yellow);border-color:var(--yellow-bd);background:var(--yellow-bg);}
+.wk-cat.artykul{color:var(--blue);border-color:var(--blue-bd);background:var(--blue-bg);}
+.wk-cat.zasady{color:var(--accent);border-color:rgba(255,107,53,.3);background:rgba(255,107,53,.08);}
+.wk-cat.inne{color:var(--text3);border-color:var(--border);background:var(--bg3);}
+.wk-entry{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.6rem;transition:border-color .15s;}
+.wk-entry:hover{border-color:var(--border2);}
+.wk-entry-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;flex-wrap:wrap;}
+.wk-entry-title{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);flex:1;}
+.wk-entry-body{font-size:12px;color:var(--text2);line-height:1.7;white-space:pre-wrap;max-height:120px;overflow:hidden;transition:max-height .3s;}
+.wk-entry-body.expanded{max-height:2000px;}
+.wk-entry-footer{display:flex;align-items:center;gap:.5rem;margin-top:.5rem;font-family:var(--mono);font-size:9px;color:var(--text3);}
+.wk-btn{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;}
+.wk-btn:hover{color:var(--text);border-color:var(--border2);background:var(--bg3);}
+.wk-btn.del:hover{color:var(--red);border-color:var(--red-bd);}
+.wk-btn.edit:hover{color:var(--accent);border-color:rgba(255,107,53,.3);}
+.wk-add-form{background:var(--bg2);border:1px solid rgba(167,139,250,.25);border-radius:10px;padding:1.1rem;margin-bottom:1rem;}
+.wk-add-form textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--sans);font-size:12px;padding:.6rem .8rem;outline:none;resize:vertical;min-height:100px;line-height:1.6;transition:border-color .15s;}
+.wk-add-form textarea:focus{border-color:#a78bfa;}
+.wk-add-form input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:12px;padding:.5rem .8rem;outline:none;margin-bottom:.5rem;transition:border-color .15s;}
+.wk-add-form input:focus{border-color:#a78bfa;}
+.wk-cats-select{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.75rem;}
+.wk-agent-status{background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.2);border-radius:7px;padding:.45rem .85rem;font-family:var(--mono);font-size:10px;color:#a78bfa;display:flex;align-items:center;gap:.5rem;}
+
 /* ── MOBILE RESPONSIVE ── */
 @media(max-width:700px){
   .topbar-inner{padding:0 10px;height:40px;}
@@ -680,6 +706,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn" onclick="showView('insights')" id="navInsights" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Insights</button>
     <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
     <button class="nav-btn" onclick="showView('agent')" id="navAgent" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Agent ✦</button>
+    <button class="nav-btn" onclick="showView('wiedza')" id="navWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza ✦</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-meble">MEBLE</span>
     <button class="nav-btn" onclick="showView('MobelKap')" id="navMobelKap">MoK</button>
@@ -1203,6 +1230,58 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 </div>
 </div>
 
+<!-- ═══ VIEW: WIEDZA ═══ -->
+<div class="view" id="viewWiedza">
+<div class="container">
+  <div style="margin-bottom:1rem">
+    <div class="ph-eyebrow" style="color:#a78bfa">▸ Baza wiedzy Agenta</div>
+    <div class="ph-title">Wiedza <span style="color:#a78bfa">✦</span></div>
+    <div class="ph-sub">Dodaj artykuły, słowniki, benchmarki — Agent uczy się z każdego wpisu</div>
+  </div>
+
+  <!-- Agent status -->
+  <div class="wk-agent-status mb" id="wkAgentStatus">
+    <span>✦</span> <span id="wkAgentStatusTxt">Ładowanie bazy wiedzy...</span>
+  </div>
+
+  <!-- Add form -->
+  <div class="wk-add-form mb" id="wkAddForm">
+    <div class="card-title" style="color:#a78bfa">+ Dodaj wpis</div>
+    <input type="text" id="wkTitle" placeholder="Tytuł wpisu (np. Słownik pojęć Allegro Ads)">
+    <div class="wk-cats-select" id="wkCatSelect">
+      <div class="wk-cat slownik" onclick="selectWkCat('slownik',this)">· Słownik</div>
+      <div class="wk-cat benchmark" onclick="selectWkCat('benchmark',this)">· Benchmark</div>
+      <div class="wk-cat artykul" onclick="selectWkCat('artykul',this)">· Artykuł</div>
+      <div class="wk-cat zasady" onclick="selectWkCat('zasady',this)">· Zasady</div>
+      <div class="wk-cat inne" onclick="selectWkCat('inne',this)">· Inne</div>
+    </div>
+    <textarea id="wkContent" placeholder="Wklej treść — tekst, słownik, dane, artykuł, notatki. Agent przeczyta to przed każdą odpowiedzią."></textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.6rem">
+      <span id="wkCharCount" style="font-family:var(--mono);font-size:9px;color:var(--text3)">0 znaków</span>
+      <div style="display:flex;gap:.5rem">
+        <button class="wk-btn" onclick="clearWkForm()">Wyczyść</button>
+        <button onclick="saveWkEntry()" style="font-family:var(--mono);font-size:11px;padding:5px 16px;border-radius:6px;border:1px solid rgba(167,139,250,.4);background:rgba(167,139,250,.12);color:#a78bfa;cursor:pointer">+ Zapisz wpis</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem" id="wkFilters">
+    <span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-right:.2rem">Filtr:</span>
+    <div class="wk-btn active-filter" onclick="filterWk('all',this)" style="color:var(--text)">Wszystkie</div>
+    <div class="wk-btn" onclick="filterWk('slownik',this)">Słownik</div>
+    <div class="wk-btn" onclick="filterWk('benchmark',this)">Benchmark</div>
+    <div class="wk-btn" onclick="filterWk('artykul',this)">Artykuł</div>
+    <div class="wk-btn" onclick="filterWk('zasady',this)">Zasady</div>
+    <div class="wk-btn" onclick="filterWk('inne',this)">Inne</div>
+    <div style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text3)" id="wkStats"></div>
+  </div>
+
+  <!-- Entries list -->
+  <div id="wkList"></div>
+</div>
+</div>
+
 <!-- ═══ VIEW: SYMULATOR ═══ -->
 <div class="view" id="viewSim">
 <div class="container">
@@ -1496,7 +1575,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent'].forEach(id=>{
+  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -1540,6 +1619,10 @@ function showView(v){
     document.getElementById('viewAgent').classList.add('active');
     document.getElementById('navAgent').classList.add('active');
     initAgent();
+  } else if(v==='wiedza'){
+    document.getElementById('viewWiedza').classList.add('active');
+    document.getElementById('navWiedza').classList.add('active');
+    renderWkList();
   } else {
     document.getElementById('viewAccount').classList.add('active');
     document.getElementById('nav'+v)?.classList.add('active');
@@ -3751,21 +3834,61 @@ function agentAsk(q){
 function buildAgentContext(){
   const now = new Date();
   const curM = MONTHS[now.getMonth()];
-  let ctx = `Jesteś asystentem analitycznym dla agencji e-commerce zarządzającej kontami Allegro.
-Dzisiaj jest ${now.toLocaleDateString('pl-PL', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.
-Bieżący miesiąc: ${curM}, dzień: ${now.getDate()}/31.
+
+  // Build group-level summaries for benchmarking
+  let groupSummary = '';
+  Object.entries(GROUPS).forEach(([gKey, g]) => {
+    const curData = g.accs.map(k => {
+      const D = getData(k); const prod = getProd(k);
+      const cur = D.find(d => d.m === curM);
+      const prev = D.filter(d => d.m !== curM).slice(-1)[0];
+      if (!cur) return null;
+      const C = calc(cur, prod);
+      const Cp = prev ? calc(prev, prod) : null;
+      return { name: AC_META[k].name, sp: cur.sprzedaz, mAfter: C.mAfter, roas: cur.roas||0,
+        promo: cur.promoC||0, ads: cur.adsCost||0,
+        prom_pct: cur.sprzedaz>0?(cur.promoC||0)/cur.sprzedaz*100:0,
+        ads_pct: cur.sprzedaz>0?(cur.adsCost||0)/cur.sprzedaz*100:0,
+        prevM: Cp?Cp.mAfter:null, prevSp: prev?prev.sprzedaz:null };
+    }).filter(Boolean);
+    if (!curData.length) return;
+    const totalSp = curData.reduce((s,x)=>s+x.sp,0);
+    const avgM = curData.reduce((s,x)=>s+x.mAfter,0)/curData.length;
+    groupSummary += `\nGrupa ${gKey}: łączna sprzedaż ${Math.round(totalSp).toLocaleString('pl-PL')} zł | śr. marża ${avgM.toFixed(1)}%\n`;
+    curData.forEach(x => {
+      const mm = x.prevSp ? ((x.sp-x.prevSp)/x.prevSp*100).toFixed(1) : '—';
+      const mTrend = x.prevM !== null ? (x.mAfter-x.prevM).toFixed(1) : '—';
+      const mSign = x.prevM !== null && x.mAfter >= x.prevM ? '+' : '';
+      groupSummary += `  ${x.name}: sprzedaż ${Math.round(x.sp).toLocaleString('pl-PL')} zł (${mm}% m/m) | marża ${x.mAfter.toFixed(1)}% (${mSign}${mTrend} pp) | ROAS ${x.roas.toFixed(2)} | Ads ${x.ads_pct.toFixed(1)}% | wyróżnienia ${x.prom_pct.toFixed(1)}%\n`;
+    });
+  });
+
+  let ctx = `Jesteś wewnętrznym analitykiem agencji e-commerce zarządzającej kontami Allegro.
+Dzisiaj: ${now.toLocaleDateString('pl-PL', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.
+Bieżący miesiąc: ${curM}, dzień: ${now.getDate()}/30.
+
+FILOZOFIA ANALIZY — tak myśl o danych:
+- MeblenaCzasie = benchmark efektywności grupy MEBLE: wyróżnienia ~3% sprzedaży, Smart jako dźwignia konwersji
+- Konta MEBLE sprzedają ten sam asortyment → kanibalizacja to realny koszt
+- Główna dźwignia kosztowa: wyróżnienia poza Ads (promoC), nie Ads — Ads są podobne % na wszystkich kontach
+- Benchmark przepalania: wyróżnienia >5% sprzedaży = sygnał do cięcia
+- Koszt efektywności = (Ads + wyróżnienia) / sprzedaż × 100 — im niższy tym lepiej
+- Marża rosnąca + rosnący ROAS = zdrowy wzrost; marża spada + rosną koszty = przepalanie
+- Efekt zarządzania = różnica vs trend grupy (ile by stracono bez aktywnego zarządzania)
 
 STRUKTURA KONT:
-- Grupa MEBLE (producent 65%): MobelKap, PerfektCiecie, MeblenaCzasie
+- Grupa MEBLE (producent 65%): MobelKap, PerfektCiecie, MeblenaCzasie (ten sam asortyment!)
 - Grupa LUXSEN (producent 60%): Luxsen, Semmi, BOTAVIT
 - Grupa ONE (producent 55%): Materazzi, MtzzEU, Ankado24
 
 WZORY:
 - Marża po reklamie = (sprzedaż × (1-producent%) - prowizja - dostawa - Ads - wyróżnienia) / sprzedaż × 100
 - ROAS Ads = wartość sprzedaży z Ads / koszt Ads
-- Estymacja EOM = sprzedaż × dni_w_miesiącu / (dzień-1)
-- Break-even ROAS = 1 / (marża_przed_reklamą / 100)
+- BE ROAS = 1 / (marża_przed_reklamą / 100)
+- Wyróżnienia % = promoC / sprzedaż × 100 (benchmark MeblenaCzasie: ~3%)
 
+DANE ZBIORCZE ${curM}:
+${groupSummary}
 DANE HISTORYCZNE PER KONTO:
 `;
 
@@ -3781,16 +3904,23 @@ DANE HISTORYCZNE PER KONTO:
         const est = estym(d);
         const isCur = d.m === curM;
         ctx += `  ${d.m[0].toUpperCase()+d.m.slice(1)}${isCur?' (bieżący, dzień '+(d.dzien||'?')+')':' (pełny)'}:\n`;
-        ctx += `    Sprzedaż: ${Math.round(d.sprzedaz).toLocaleString('pl-PL')} zł${isCur?' | Estymacja EOM: '+Math.round(est).toLocaleString('pl-PL')+' zł':''}\n`;
-        ctx += `    Ads: koszt ${Math.round(d.adsCost||0).toLocaleString('pl-PL')} zł | ROAS ${(d.roas||0).toFixed(2)} | wartość ${Math.round(d.wartoscAds||0).toLocaleString('pl-PL')} zł\n`;
-        ctx += `    Prowizja: ${(d.commission||0).toFixed(1)}% | Dostawa: ${Math.round(d.delivery||0)} zł | Wyróżnienia: ${Math.round(d.promoC||0)} zł\n`;
-        ctx += `    Marża po reklamie: ${C.mAfter.toFixed(1)}% | ROAS Glob: ${(C.roasGlob||0).toFixed(2)} | ACOS: ${(C.acosTotal||0).toFixed(1)}% | BE ROAS: ${(C.beRoasAds||0).toFixed(2)}\n`;
+        ctx += `    Sprzedaż: ${Math.round(d.sprzedaz).toLocaleString('pl-PL')} zł${isCur?' | Est.EOM: '+Math.round(est).toLocaleString('pl-PL')+' zł':''}\n`;
+        ctx += `    Ads: ${Math.round(d.adsCost||0).toLocaleString('pl-PL')} zł (${d.sprzedaz>0?((d.adsCost||0)/d.sprzedaz*100).toFixed(1):'0'}%) | ROAS ${(d.roas||0).toFixed(2)} | BE: ${C.beRoasAds.toFixed(2)}\n`;
+        ctx += `    Wyróżnienia: ${Math.round(d.promoC||0).toLocaleString('pl-PL')} zł (${d.sprzedaz>0?((d.promoC||0)/d.sprzedaz*100).toFixed(1):'0'}%) ← benchmark 3%\n`;
+        ctx += `    Prowizja: ${(d.commission||0).toFixed(1)}% | Dostawa: ${Math.round(d.delivery||0)} zł | Marża: ${C.mAfter.toFixed(1)}% | ROAS Glob: ${(C.roasGlob||0).toFixed(2)}\n`;
         if(d.ss) ctx += `    Super Sprzedawca: ${d.ss} | Qlt: ${d.qlt||'—'}\n`;
       });
     });
   });
 
-  ctx += `\nOdpowiadaj po polsku. Bądź konkretny i stanowczy. Podawaj liczby. Używaj nagłówków dla czytelności. Jeśli sugerujesz działanie — napisz dokładnie co i dlaczego.`;
+  ctx += `\nSTYL ODPOWIEDZI:
+- Polski, konkretny, liczby zawsze w zł/% 
+- Dla MEBLE: zawsze porównuj między kontami, wskazuj kanibalizację i benchmark MeblenaCzasie
+- Wyróżnienia >5%: zawsze flaguj jako przepalanie z konkretną kwotą oszczędności
+- Rekomendacje: "zmniejsz wyróżnienia X z Y% do 3% = ~Z zł oszczędności/mies."
+- Używaj nagłówków`;
+  // Inject knowledge base
+  ctx += buildWiedzyContext();
   return ctx;
 }
 
@@ -4063,18 +4193,27 @@ ${dataCtx}
 
 Raport musi zawierać DOKŁADNIE te sekcje w tej kolejności:
 
-1. PODSUMOWANIE WYKONAWCZE (3-4 zdania — ogólna kondycja wybranych kont)
+1. PODSUMOWANIE WYKONAWCZE (3-4 zdania — kondycja, trend, jedna kluczowa obserwacja z liczbą)
 
-${Object.keys(filteredGroups).length > 1 ? `2. WYNIKI PER GRUPA\n   Dla każdej grupy: łączna sprzedaż MTD, est. EOM, średnia marża, 1 zdanie oceny\n\n` : ''}3. WYNIKI PER KONTO
-   Format dla każdego: nazwa | sprzedaż MTD | est. EOM | marża% | ROAS | status (✅/⚠️/🔴)
+${Object.keys(filteredGroups).length > 1 ? `2. WYNIKI PER GRUPA\n   Dla każdej grupy: łączna sprzedaż MTD, est. EOM, średnia marża, zmiana m/m, 1 zdanie oceny\n\n` : ''}3. WYNIKI PER KONTO
+   Format: nazwa | sprzedaż MTD | est. EOM | marża% | ROAS | wyróżnienia% | status (✅/⚠️/🔴)
+   Dla grupy MEBLE: dodaj benchmark vs MeblenaCzasie
 
-4. CO DZIAŁA — najlepsze konta z uzasadnieniem liczb
+4. ANALIZA KOSZTÓW REKLAMY
+   - Ads % dla każdego konta (powinno być podobne ~6-7%)
+   - Wyróżnienia % dla każdego konta (benchmark: MeblenaCzasie ~3%)
+   - Jeśli wyróżnienia >5%: policz konkretną kwotę przepalania (różnica vs 3%)
+   ${selectedKeys.some(k=>['MobelKap','PerfektCiecie','MeblenaCzasie'].includes(k)) ? '- Dla grupy MEBLE: wskaż kanibalizację jeśli widoczna (te same konta, ten sam asortyment)' : ''}
 
-5. CO NIE DZIAŁA — konta wymagające uwagi, konkretne problemy z liczbami
+5. CO DZIAŁA — konta z rosnącą marżą i zdrowym ROAS, uzasadnienie liczbami
 
-6. REKOMENDACJE NA NASTĘPNY TYDZIEŃ — 3-5 konkretnych działań z priorytetem (PILNE/WAŻNE)
+6. CO WYMAGA DZIAŁANIA — konkretne problemy z liczbami (nie ogólniki)
 
-Bądź konkretny, podawaj liczby. Odpowiedz po polsku.`;
+7. REKOMENDACJE NA NASTĘPNY TYDZIEŃ
+   Format: [PILNE/WAŻNE] Działanie → oczekiwany efekt w zł lub %
+   Min. 3 rekomendacje, max 5
+
+Bądź konkretny jak analityk finansowy. Podawaj liczby. Odpowiedz po polsku.`;
 
   try {
     const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
@@ -4437,6 +4576,159 @@ tbody td{padding:6px 8px;vertical-align:middle;}
     setTimeout(() => document.body.removeChild(iframe), 1000);
   };
 }
+
+// ── WIEDZA — Baza wiedzy Agenta ────────────────────────────
+const SK_WIEDZA = 'mplace_wiedza_v1';
+let wkActiveCat = null;
+let wkActiveFilter = 'all';
+let wkEditId = null;
+
+function getWiedza() {
+  try { return JSON.parse(localStorage.getItem(SK_WIEDZA) || '[]'); } catch(e) { return []; }
+}
+
+function saveWiedza(entries) {
+  localStorage.setItem(SK_WIEDZA, JSON.stringify(entries));
+  updateWkAgentStatus();
+}
+
+function updateWkAgentStatus() {
+  const entries = getWiedza();
+  const total = entries.length;
+  const chars = entries.reduce((s, e) => s + (e.content||'').length, 0);
+  const el = document.getElementById('wkAgentStatusTxt');
+  if (el) el.textContent = total === 0
+    ? 'Baza pusta — Agent działa bez dodatkowej wiedzy'
+    : `Agent zasilony: ${total} wpisów · ~${Math.round(chars/1000)}k znaków wiedzy · aktywne przy każdym zapytaniu`;
+}
+
+function selectWkCat(cat, el) {
+  wkActiveCat = cat;
+  document.querySelectorAll('#wkCatSelect .wk-cat').forEach(e => e.style.opacity = '0.4');
+  el.style.opacity = '1';
+  el.style.boxShadow = '0 0 0 1px currentColor';
+}
+
+function clearWkForm() {
+  document.getElementById('wkTitle').value = '';
+  document.getElementById('wkContent').value = '';
+  document.getElementById('wkCharCount').textContent = '0 znaków';
+  document.querySelectorAll('#wkCatSelect .wk-cat').forEach(e => { e.style.opacity = '1'; e.style.boxShadow = ''; });
+  wkActiveCat = null;
+  wkEditId = null;
+  document.querySelector('#wkAddForm .card-title').textContent = '+ Dodaj wpis';
+}
+
+function saveWkEntry() {
+  const title = document.getElementById('wkTitle').value.trim();
+  const content = document.getElementById('wkContent').value.trim();
+  if (!title) { alert('Podaj tytuł wpisu'); return; }
+  if (!content) { alert('Dodaj treść wpisu'); return; }
+  const cat = wkActiveCat || 'inne';
+  const entries = getWiedza();
+  if (wkEditId) {
+    const idx = entries.findIndex(e => e.id === wkEditId);
+    if (idx >= 0) entries[idx] = { ...entries[idx], title, content, cat, updated: Date.now() };
+  } else {
+    entries.unshift({ id: Date.now(), title, content, cat, created: Date.now() });
+  }
+  saveWiedza(entries);
+  clearWkForm();
+  renderWkList();
+}
+
+function editWkEntry(id) {
+  const entry = getWiedza().find(e => e.id === id);
+  if (!entry) return;
+  document.getElementById('wkTitle').value = entry.title;
+  document.getElementById('wkContent').value = entry.content;
+  document.getElementById('wkCharCount').textContent = entry.content.length + ' znaków';
+  wkActiveCat = entry.cat;
+  wkEditId = id;
+  document.querySelector('#wkAddForm .card-title').textContent = '✎ Edytujesz wpis';
+  document.querySelectorAll('#wkCatSelect .wk-cat').forEach(e => {
+    const isSel = e.onclick.toString().includes(`'${entry.cat}'`);
+    e.style.opacity = isSel ? '1' : '0.4';
+    e.style.boxShadow = isSel ? '0 0 0 1px currentColor' : '';
+  });
+  document.getElementById('wkAddForm').scrollIntoView({behavior:'smooth'});
+}
+
+function deleteWkEntry(id) {
+  if (!confirm('Usunąć ten wpis z bazy wiedzy?')) return;
+  saveWiedza(getWiedza().filter(e => e.id !== id));
+  renderWkList();
+}
+
+function toggleWkExpand(id) {
+  const body = document.getElementById('wkBody_' + id);
+  const btn = document.getElementById('wkExp_' + id);
+  if (!body) return;
+  body.classList.toggle('expanded');
+  btn.textContent = body.classList.contains('expanded') ? '▲ zwiń' : '▼ rozwiń';
+}
+
+function filterWk(cat, el) {
+  wkActiveFilter = cat;
+  document.querySelectorAll('#wkFilters .wk-btn').forEach(e => e.style.color = '');
+  if (el) el.style.color = '#a78bfa';
+  renderWkList();
+}
+
+const CAT_LABELS = { slownik:'Słownik', benchmark:'Benchmark', artykul:'Artykuł', zasady:'Zasady', inne:'Inne' };
+
+function renderWkList() {
+  const entries = getWiedza();
+  const filtered = wkActiveFilter === 'all' ? entries : entries.filter(e => e.cat === wkActiveFilter);
+  const list = document.getElementById('wkList');
+  const stats = document.getElementById('wkStats');
+  if (stats) stats.textContent = `${filtered.length} / ${entries.length} wpisów`;
+  if (!filtered.length) {
+    list.innerHTML = `<div style="text-align:center;padding:3rem 1rem;font-family:var(--mono);font-size:11px;color:var(--text3)">
+      ${entries.length === 0 ? 'Baza wiedzy pusta · Dodaj pierwszy wpis powyżej' : 'Brak wpisów w tej kategorii'}
+    </div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(e => {
+    const date = new Date(e.updated || e.created).toLocaleDateString('pl-PL', {day:'2-digit',month:'2-digit',year:'numeric'});
+    const preview = (e.content || '').length > 200;
+    return `<div class="wk-entry">
+      <div class="wk-entry-hdr">
+        <div class="wk-cat ${e.cat}">${CAT_LABELS[e.cat]||e.cat}</div>
+        <div class="wk-entry-title">${e.title}</div>
+        <button class="wk-btn edit" onclick="editWkEntry(${e.id})">✎ edytuj</button>
+        <button class="wk-btn del" onclick="deleteWkEntry(${e.id})">✕</button>
+      </div>
+      <div class="wk-entry-body${preview?'':' expanded'}" id="wkBody_${e.id}">${e.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      <div class="wk-entry-footer">
+        <span>${date}</span>
+        <span>·</span>
+        <span>${(e.content||'').length.toLocaleString('pl-PL')} znaków</span>
+        ${preview ? `<span>·</span><span id="wkExp_${e.id}" onclick="toggleWkExpand(${e.id})" style="cursor:pointer;color:#a78bfa">▼ rozwiń</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  updateWkAgentStatus();
+}
+
+function buildWiedzyContext() {
+  const entries = getWiedza();
+  if (!entries.length) return '';
+  let ctx = '\n\n=== BAZA WIEDZY (zasilona przez użytkownika) ===\n';
+  ctx += 'Poniższe materiały to wiedza którą użytkownik dostarczył — traktuj ją jako kontekst branżowy.\n';
+  entries.forEach(e => {
+    ctx += `\n[${CAT_LABELS[e.cat]||e.cat}] ${e.title}:\n${e.content}\n`;
+  });
+  ctx += '\n=== KONIEC BAZY WIEDZY ===\n';
+  return ctx;
+}
+
+// Textarea char counter
+document.addEventListener('input', e => {
+  if (e.target.id === 'wkContent') {
+    document.getElementById('wkCharCount').textContent = e.target.value.length.toLocaleString('pl-PL') + ' znaków';
+  }
+});
 
 // D2D — Day to Day
 // ═══════════════════════════════════════════════════════════
@@ -5140,6 +5432,7 @@ function renderBiznes(){
 }
 
 renderEntry();
+updateWkAgentStatus();
 </script>
 
   <script>
