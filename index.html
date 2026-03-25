@@ -3840,33 +3840,47 @@ function printAgentResponse() {
   if (!msgEl) return;
   const time = new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
   const question = qEl ? qEl.textContent.replace('Pytanie: ','').trim() : '';
-  const win = window.open('', '_blank', 'width=800,height=600');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-<title>MPlace Hub \xb7 Agent \xb7 ${time}</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1a1a2e;background:#fff;padding:2.5rem 3rem;}
-.ph{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #ff6b35;padding-bottom:.75rem;margin-bottom:1.5rem;}
-.ph-logo{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;}
-.ph-logo span{color:#ff6b35;}
-.ph-meta{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;text-align:right;line-height:1.7;}
-.pq{background:#f3f4f6;border-left:3px solid #ff6b35;padding:.6rem 1rem;border-radius:0 6px 6px 0;font-family:'DM Mono',monospace;font-size:11px;color:#374151;margin-bottom:1.25rem;}
-.pq strong{color:#ff6b35;display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;}
-.pb{line-height:1.7;color:#1f2937;}
-.pb h3{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;margin:1rem 0 .4rem;color:#111827;}
-.pb p{margin-bottom:.65rem;}
-.pb strong{font-weight:600;color:#111;}
-.pf{margin-top:2rem;padding-top:.75rem;border-top:1px solid #e5e7eb;font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;text-align:right;}
-@media print{body{padding:1.5rem 2rem;}}
-</style></head><body>
-<div class="ph"><div class="ph-logo">M<span>Place</span> Hub</div><div class="ph-meta"><strong style="color:#ff6b35;font-size:9px;letter-spacing:.1em">AGENT \u2726 ODPOWIED\u017a</strong><br>${time}</div></div>
-${question ? `<div class="pq"><strong>Pytanie</strong>${question}</div>` : ''}
-<div class="pb">${msgEl.innerHTML}</div>
-<div class="pf">MPlace Hub \xb7 Wygenerowano przez Agent \u2726 \xb7 ${time}</div>
-<script>window.onload=()=>window.print();<\/script>
-</body></html>`);
-  win.document.close();
+
+  let overlay = document.getElementById('reportOverlay');
+  if (!overlay) { overlay = document.createElement('div'); overlay.id = 'reportOverlay'; document.body.appendChild(overlay); }
+  overlay.innerHTML = '';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:800;background:#fff;overflow-y:auto;font-family:"DM Sans",sans-serif;font-size:13px;color:#1f2937;';
+
+  const inner = document.createElement('div');
+  inner.style.cssText = 'max-width:800px;margin:0 auto;padding:2.5rem 3rem 5rem;';
+  inner.innerHTML = `
+    <style>
+      #reportOverlay .ph{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #ff6b35;padding-bottom:.75rem;margin-bottom:1.5rem;}
+      #reportOverlay .ph-logo{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;}
+      #reportOverlay .ph-logo span{color:#ff6b35;}
+      #reportOverlay .ph-meta{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;text-align:right;line-height:1.7;}
+      #reportOverlay .pq{background:#f3f4f6;border-left:3px solid #ff6b35;padding:.6rem 1rem;border-radius:0 6px 6px 0;font-family:'DM Mono',monospace;font-size:11px;color:#374151;margin-bottom:1.25rem;}
+      #reportOverlay .pq strong{color:#ff6b35;display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;}
+      #reportOverlay .pb{line-height:1.7;color:#1f2937;}
+      #reportOverlay .pb h3{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;margin:1rem 0 .4rem;color:#111827;}
+      #reportOverlay .pb p{margin-bottom:.65rem;}
+      #reportOverlay .pb strong{font-weight:600;color:#111;}
+      #reportOverlay .pf{margin-top:2rem;padding-top:.75rem;border-top:1px solid #e5e7eb;font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;text-align:right;}
+      #reportOverlay .ro-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:.75rem 2rem;display:flex;gap:.75rem;justify-content:flex-end;z-index:801;}
+      #reportOverlay .ro-btn{font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid;}
+      #reportOverlay .ro-print{background:#fff7ed;color:#ff6b35;border-color:#fdba74;}
+      #reportOverlay .ro-close{background:#f9fafb;color:#6b7280;border-color:#e5e7eb;}
+      @media print{#reportOverlay .ro-bar{display:none!important;}}
+    </style>
+    <div class="ph">
+      <div class="ph-logo">M<span>Place</span> Hub</div>
+      <div class="ph-meta"><strong style="color:#ff6b35;font-size:9px;letter-spacing:.1em">AGENT ✦ ODPOWIEDŹ</strong><br>${time}</div>
+    </div>
+    ${question ? `<div class="pq"><strong>Pytanie</strong>${question}</div>` : ''}
+    <div class="pb">${msgEl.innerHTML}</div>
+    <div class="pf">MPlace Hub · Wygenerowano przez Agent ✦ · ${time}</div>
+    <div class="ro-bar">
+      <button class="ro-btn ro-close" onclick="document.getElementById('reportOverlay').style.display='none'">✕ Zamknij</button>
+      <button class="ro-btn ro-print" onclick="window.print()">⎙ Drukuj / Zapisz PDF</button>
+    </div>`;
+  overlay.appendChild(inner);
+  overlay.style.display = 'block';
+  overlay.scrollTop = 0;
 }
 
 function emailAgentResponse() {
@@ -4103,86 +4117,80 @@ function openReportWindow(aiText, curM, dayNum, snap, groups, selectedKeys) {
     });
   });
 
-  const win = window.open('', '_blank', 'width=900,height=700');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-<title>MPlace Hub · Raport MTD · ${curM}</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1f2937;background:#fff;padding:2.5rem 3rem;}
-/* header */
-.rh{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:.85rem;margin-bottom:1.75rem;border-bottom:3px solid #ff6b35;}
-.rh-logo{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#111;}
-.rh-logo span{color:#ff6b35;}
-.rh-meta{text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;line-height:1.8;}
-.rh-tag{display:inline-block;background:#fff7ed;color:#ff6b35;border:1px solid #fdba74;border-radius:4px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;margin-bottom:4px;}
-/* section */
-.sec{margin-bottom:2rem;}
-.sec-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#ff6b35;padding-bottom:.4rem;border-bottom:1px solid #fde8dc;margin-bottom:1rem;}
-/* tables */
-table{width:100%;border-collapse:collapse;font-size:12px;}
-thead th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#9ca3af;padding:6px 10px;border-bottom:1px solid #e5e7eb;text-align:left;background:#fafafa;}
-tbody tr{border-bottom:1px solid #f3f4f6;}
-tbody tr:last-child{border-bottom:none;}
-tbody td{padding:8px 10px;vertical-align:middle;}
-tbody tr:hover{background:#fafafa;}
-/* ai section */
-.ai-body{line-height:1.75;color:#374151;}
-.ai-body h3{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:#ff6b35;margin:1.25rem 0 .5rem;padding-bottom:.3rem;border-bottom:1px solid #fde8dc;}
-.ai-body p{margin-bottom:.65rem;}
-.ai-body strong{font-weight:600;color:#111;}
-/* footer */
-.rf{margin-top:2.5rem;padding-top:.75rem;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;}
-.rf-left{font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;}
-.rf-right{font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;text-align:right;}
-/* print button */
-.print-btn{position:fixed;bottom:1.5rem;right:1.5rem;font-family:'DM Mono',monospace;font-size:11px;padding:8px 18px;border-radius:6px;border:1px solid #ff6b35;background:#fff7ed;color:#ff6b35;cursor:pointer;}
-.print-btn:hover{background:#ff6b35;color:#fff;}
-@media print{.print-btn{display:none!important;}body{padding:1.5rem 2rem;}}
-</style></head><body>
+  // Build in-page overlay instead of popup (popup blocked on file://)
+  let overlay = document.getElementById('reportOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'reportOverlay';
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = '';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:800;background:#fff;overflow-y:auto;font-family:"DM Sans",sans-serif;font-size:13px;color:#1f2937;';
 
-<div class="rh">
-  <div>
-    <div class="rh-logo">M<span>Place</span> Hub</div>
-    <div style="font-size:12px;color:#6b7280;margin-top:3px">Raport wewnętrzny · Poufny</div>
-  </div>
-  <div class="rh-meta">
-    <div class="rh-tag">Raport MTD</div><br>
-    <strong style="color:#111;font-size:13px">${curM.toUpperCase()} · dzień ${dayNum}/30</strong><br>
-    <span style="color:#ff6b35">${scopeLabel}</span><br>
-    Wygenerowano: ${dateStr}, ${timeStr}
-  </div>
-</div>
-
-<div class="sec">
-  <div class="sec-title">Wyniki grupowe</div>
-  <table>
-    <thead><tr><th>Grupa</th><th>Sprzedaż MTD</th><th>Estymacja EOM</th><th>Śr. marża</th></tr></thead>
-    <tbody>${groupRows}</tbody>
-  </table>
-</div>
-
-<div class="sec">
-  <div class="sec-title">Wyniki per konto — wszystkie 9</div>
-  <table>
-    <thead><tr><th>Konto</th><th>Sprzedaż MTD</th><th>Est. EOM</th><th>Marża</th><th>ROAS</th><th>BE ROAS</th><th>Status</th></tr></thead>
-    <tbody>${accRows}</tbody>
-  </table>
-</div>
-
-<div class="sec">
-  <div class="sec-title">Analiza AI — co działa, co nie, rekomendacje</div>
-  <div class="ai-body"><p>${aiHtml}</p></div>
-</div>
-
-<div class="rf">
-  <div class="rf-left">MPlace Hub · Raport wewnętrzny · Poufny</div>
-  <div class="rf-right">${curM.toUpperCase()} ${now.getFullYear()} · dzień ${dayNum} · ${dateStr}</div>
-</div>
-
-<button class="print-btn" onclick="window.print()">⎙ Drukuj / Zapisz PDF</button>
-</body></html>`);
-  win.document.close();
+  const inner = document.createElement('div');
+  inner.style.cssText = 'max-width:900px;margin:0 auto;padding:2.5rem 3rem 5rem;';
+  inner.innerHTML = `
+    <style>
+      #reportOverlay .rh{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:.85rem;margin-bottom:1.75rem;border-bottom:3px solid #ff6b35;}
+      #reportOverlay .rh-logo{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#111;}
+      #reportOverlay .rh-logo span{color:#ff6b35;}
+      #reportOverlay .rh-meta{text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;line-height:1.8;}
+      #reportOverlay .rh-tag{display:inline-block;background:#fff7ed;color:#ff6b35;border:1px solid #fdba74;border-radius:4px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;margin-bottom:4px;}
+      #reportOverlay .sec{margin-bottom:2rem;}
+      #reportOverlay .sec-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#ff6b35;padding-bottom:.4rem;border-bottom:1px solid #fde8dc;margin-bottom:1rem;}
+      #reportOverlay table{width:100%;border-collapse:collapse;font-size:12px;}
+      #reportOverlay thead th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#9ca3af;padding:6px 10px;border-bottom:1px solid #e5e7eb;text-align:left;background:#fafafa;}
+      #reportOverlay tbody tr{border-bottom:1px solid #f3f4f6;}
+      #reportOverlay tbody td{padding:8px 10px;vertical-align:middle;}
+      #reportOverlay .ai-body{line-height:1.75;color:#374151;}
+      #reportOverlay .ai-body h3{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:#ff6b35;margin:1.25rem 0 .5rem;padding-bottom:.3rem;border-bottom:1px solid #fde8dc;}
+      #reportOverlay .ai-body p{margin-bottom:.65rem;}
+      #reportOverlay .ai-body strong{font-weight:600;color:#111;}
+      #reportOverlay .rf{margin-top:2.5rem;padding-top:.75rem;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;}
+      #reportOverlay .rf-txt{font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;}
+      #reportOverlay .ro-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:.75rem 2rem;display:flex;gap:.75rem;justify-content:flex-end;z-index:801;}
+      #reportOverlay .ro-btn{font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid;}
+      #reportOverlay .ro-print{background:#fff7ed;color:#ff6b35;border-color:#fdba74;}
+      #reportOverlay .ro-close{background:#f9fafb;color:#6b7280;border-color:#e5e7eb;}
+      @media print{#reportOverlay .ro-bar{display:none!important;}}
+    </style>
+    <div class="rh">
+      <div>
+        <div class="rh-logo">M<span>Place</span> Hub</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:3px">Raport wewnętrzny · Poufny</div>
+      </div>
+      <div class="rh-meta">
+        <div class="rh-tag">Raport MTD</div><br>
+        <strong style="color:#111;font-size:13px">${curM.toUpperCase()} · dzień ${dayNum}/30</strong><br>
+        <span style="color:#ff6b35">${scopeLabel}</span><br>
+        Wygenerowano: ${dateStr}, ${timeStr}
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Wyniki grupowe</div>
+      <table><thead><tr><th>Grupa</th><th>Sprzedaż MTD</th><th>Estymacja EOM</th><th>Śr. marża</th></tr></thead>
+      <tbody>${groupRows}</tbody></table>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Wyniki per konto</div>
+      <table><thead><tr><th>Konto</th><th>Sprzedaż MTD</th><th>Est. EOM</th><th>Marża</th><th>ROAS</th><th>BE ROAS</th><th>Status</th></tr></thead>
+      <tbody>${accRows}</tbody></table>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Analiza AI — co działa, co nie, rekomendacje</div>
+      <div class="ai-body"><p>${aiHtml}</p></div>
+    </div>
+    <div class="rf">
+      <div class="rf-txt">MPlace Hub · Raport wewnętrzny · Poufny</div>
+      <div class="rf-txt">${curM.toUpperCase()} ${now.getFullYear()} · ${dateStr}</div>
+    </div>
+    <div class="ro-bar">
+      <button class="ro-btn ro-close" onclick="document.getElementById('reportOverlay').style.display='none'">✕ Zamknij</button>
+      <button class="ro-btn ro-print" onclick="window.print()">⎙ Drukuj / Zapisz PDF</button>
+    </div>`;
+  overlay.appendChild(inner);
+  overlay.style.display = 'block';
+  overlay.scrollTop = 0;
 }
 
 // D2D — Day to Day
