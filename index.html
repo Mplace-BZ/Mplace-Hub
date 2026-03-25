@@ -5223,8 +5223,8 @@ function adsDeleteHistory(i) {
 function openAdsReportWindow(entry) {
   const results = entry.rawResults || [];
   const totRoas = entry.totKoszt>0?(entry.totSprzedaz/entry.totKoszt):0;
-  const th = (t,align)=>`<th style="padding:5px 8px;font-family:monospace;font-size:9px;text-transform:uppercase;color:#f472b6;border-bottom:2px solid #e8e8e8;text-align:${align||'left'};white-space:nowrap;letter-spacing:.04em">${t}</th>`;
-  const td = (t,align,color)=>`<td style="padding:5px 8px;font-family:monospace;font-size:10px;border-bottom:1px solid #f0f0f0;text-align:${align||'left'};color:${color||'#222'}${color?';font-weight:700':''}">${t}</td>`;
+  const th = (t,align)=>`<th style="padding:6px 8px;font-family:monospace;font-size:9px;text-transform:uppercase;color:#f472b6;border-bottom:2px solid #ddd;text-align:${align||'left'};white-space:nowrap;letter-spacing:.04em;background:#f4f4f4">${t}</th>`;
+  const td = (t,align,color)=>`<td style="padding:5px 8px;font-family:monospace;font-size:10px;border-bottom:1px solid #e8e8e8;text-align:${align||'left'};color:${color||'#111'}">${t}</td>`;
   const roasColor = r=>r>=7?'#2dd4a0':r>=4?'#f5a623':'#ff4d6a';
   const akcja = (r,koszt)=>{
     if(koszt!==undefined){
@@ -5269,16 +5269,16 @@ function openAdsReportWindow(entry) {
 
       k.grupy.forEach(g=>{
         const ga=akcja(g.roas);
-        tablesHtml += `<tr style="background:#fafafa">
-          ${td('<strong>GRUPA</strong>')}
-          ${td(`<strong>${g.grupa}</strong>`)}
-          ${td('—','center','#ccc')}
-          ${td(g.koszt.toFixed(0)+' zł','right')}
-          ${td(g.sprzedaz.toFixed(0)+' zł','right')}
+        tablesHtml += `<tr style="background:#f0f0f0">
+          ${td('<strong>GRUPA</strong>','','#111')}
+          ${td(`<strong style="color:#111">${g.grupa}</strong>`)}
+          ${td('—','center','#bbb')}
+          ${td(g.koszt.toFixed(0)+' zł','right','#111')}
+          ${td(g.sprzedaz.toFixed(0)+' zł','right','#111')}
           ${td(g.roas.toFixed(2),'right',ga.color)}
-          ${td(g.ctr.toFixed(2)+'%','right')}
-          ${td(String(g.sztuki),'right')}
-          ${td(ga.txt,'center',ga.color)}
+          ${td(g.ctr.toFixed(2)+'%','right','#111')}
+          ${td(String(g.sztuki),'right','#111')}
+          ${td(`<strong>${ga.txt}</strong>`,'center',ga.color)}
         </tr>`;
         g.aukcje.forEach(a=>{
           const aa=akcja(a.roas, a.koszt);
@@ -5286,15 +5286,15 @@ function openAdsReportWindow(entry) {
           const isObserwuj = a.koszt>0&&a.koszt<30&&a.sprzedaz===0;
           const rowBg = isAlarm?'background:#fff5f5':isObserwuj?'background:#fafafa':'';
           tablesHtml += `<tr style="${rowBg}">
-            ${td('aukcja','',isAlarm?'#ff4d6a':isObserwuj?'#888':'#aaa')}
-            ${td(a.oferta.substring(0,55)+(a.oferta.length>55?'…':''),'','#333')}
+            ${td('aukcja','',isAlarm?'#ff4d6a':isObserwuj?'#666':'#666')}
+            ${td(a.oferta.substring(0,55)+(a.oferta.length>55?'…':''),'','#111')}
             ${td(`<a href="https://allegro.pl/oferta/${a.nr}" target="_blank" style="color:#4d9fff;text-decoration:none;font-family:monospace;font-weight:600">${a.nr}</a>`,'center')}
-            ${td(a.koszt>0?a.koszt.toFixed(0)+' zł':'—','right',isAlarm?'#ff4d6a':'')}
-            ${td(a.sprzedaz>0?a.sprzedaz.toFixed(0)+' zł':'—','right')}
-            ${td(a.koszt>0&&a.sprzedaz>0?a.roas.toFixed(2):'—','right',roasColor(a.roas))}
-            ${td(a.ctr.toFixed(2)+'%','right',a.ctr<1&&a.koszt>0?'#ff4d6a':'')}
-            ${td(String(a.sztuki),'right')}
-            ${td(a.koszt>0?aa.txt:'—','center',aa.color)}
+            ${td(a.koszt>0?a.koszt.toFixed(0)+' zł':'—','right',isAlarm?'#ff4d6a':'#111')}
+            ${td(a.sprzedaz>0?a.sprzedaz.toFixed(0)+' zł':'—','right','#111')}
+            ${td(a.koszt>0&&a.sprzedaz>0?a.roas.toFixed(2):'—','right',a.koszt>0&&a.sprzedaz>0?roasColor(a.roas):'#bbb')}
+            ${td(a.ctr.toFixed(2)+'%','right',a.ctr<1&&a.koszt>0?'#ff4d6a':'#111')}
+            ${td(String(a.sztuki),'right','#111')}
+            ${td(a.koszt>0?aa.txt:'—','center',a.koszt>0?aa.color:'#bbb')}
           </tr>`;
         });
       });
