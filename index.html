@@ -5109,7 +5109,7 @@ async function adsRunAnalysis() {
   // Build prompt
   const dateStr = new Date().toLocaleDateString('pl-PL');
 
-  let prompt = `Analityk Allegro Ads. Dane 3-poziomowe: Kampania → Grupa Reklam → Aukcja.\n\nREGUŁY:\n- ROAS>7 → SKALUJ +10-20% | ROAS 4-7 → TRZYMAJ | ROAS<4 → TNIJ | ROAS=0 i koszt>0 → ZATRZYMAJ\n- CTR<1% z kosztem → podejrzana aukcja\n- Zgniłe jajo = koszt>0, sprzedaż=0\n\n`;
+  let prompt = `Analityk Allegro Ads. Dane 3-poziomowe: Kampania → Grupa Reklam → Aukcja.\n\nREGUŁY (próg alarmu = 30 zł, średni koszyk ~300 zł = 10% kosztu):\n- ROAS>7 → SKALUJ +10-20% | ROAS 4-7 → TRZYMAJ | ROAS<4 → TNIJ\n- koszt>=30 zł i sprzedaż=0 → ZATRZYMAJ (alarm)\n- koszt<30 zł i sprzedaż=0 → OBSERWUJ (nie działaj jeszcze)\n- CTR<1% z kosztem → podejrzana aukcja\n\n`;
 
   results.forEach(r=>{
     prompt += `\n══ ${r.accountName} ══\n`;
@@ -5223,10 +5223,24 @@ function adsDeleteHistory(i) {
 function openAdsReportWindow(entry) {
   const results = entry.rawResults || [];
   const totRoas = entry.totKoszt>0?(entry.totSprzedaz/entry.totKoszt):0;
-  const th = (t,align)=>`<th style="padding:5px 8px;font-family:monospace;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #e8e8e8;text-align:${align||'left'};white-space:nowrap">${t}</th>`;
+  const th = (t,align)=>`<th style="padding:5px 8px;font-family:monospace;font-size:9px;text-transform:uppercase;color:#f472b6;border-bottom:2px solid #e8e8e8;text-align:${align||'left'};white-space:nowrap;letter-spacing:.04em">${t}</th>`;
   const td = (t,align,color)=>`<td style="padding:5px 8px;font-family:monospace;font-size:10px;border-bottom:1px solid #f0f0f0;text-align:${align||'left'}${color?';color:'+color+';font-weight:700':''}">${t}</td>`;
   const roasColor = r=>r>=7?'#2dd4a0':r>=4?'#f5a623':'#ff4d6a';
-  const akcja = r=>r===0?'ZATRZYMAJ':r<4?'TNIJ':r<7?'TRZYMAJ':'SKALUJ';
+  const akcja = (r,koszt)=>{
+    if(koszt!==undefined){
+      if(r===0&&koszt>0&&koszt<30) return {txt:'OBSERWUJ',color:'#888'};
+      if(r===0&&koszt>=30) return {txt:'ZATRZYMAJ',color:'#ff4d6a'};
+      if(r>0&&r<4) return {txt:'TNIJ',color:'#ff4d6a'};
+      if(r>=4&&r<7) return {txt:'TRZYMAJ',color:'#f5a623'};
+      if(r>=7) return {txt:'SKALUJ',color:'#2dd4a0'};
+      return {txt:'—',color:'#888'};
+    }
+    // kampania/grupa level (no koszt threshold)
+    if(r===0) return {txt:'ZATRZYMAJ',color:'#ff4d6a'};
+    if(r<4) return {txt:'TNIJ',color:'#ff4d6a'};
+    if(r<7) return {txt:'TRZYMAJ',color:'#f5a623'};
+    return {txt:'SKALUJ',color:'#2dd4a0'};
+  };
 
   let tablesHtml = '';
   results.forEach(r=>{
@@ -5241,11 +5255,11 @@ function openAdsReportWindow(entry) {
 
     // Tabela kampania → grupa → aukcja
     r.kampanie.forEach(k=>{
-      const kc=roasColor(k.roas), ka=akcja(k.roas);
+      const ka=akcja(k.roas);
       tablesHtml += `<table style="width:100%;border-collapse:collapse;margin-bottom:1.25rem;font-size:10px">
         <thead>
           <tr style="background:#1a1a2e">
-            <th colspan="7" style="padding:6px 10px;text-align:left;font-family:monospace;font-size:11px;color:#fff;font-weight:700">${k.kampania} <span style="color:${kc};margin-left:.5rem">${ka}</span> <span style="color:#aaa;font-weight:400;font-size:9px">· ${k.koszt.toFixed(0)}zł → ${k.sprzedaz.toFixed(0)}zł · ROAS ${k.roas.toFixed(2)} · CTR ${k.ctr.toFixed(2)}%</span></th>
+            <th colspan="9" style="padding:6px 10px;text-align:left;font-family:monospace;font-size:11px;color:#fff;font-weight:700">${k.kampania} <span style="color:${ka.color};margin-left:.5rem">${ka.txt}</span> <span style="color:#aaa;font-weight:400;font-size:9px">· ${k.koszt.toFixed(0)}zł → ${k.sprzedaz.toFixed(0)}zł · ROAS ${k.roas.toFixed(2)} · CTR ${k.ctr.toFixed(2)}%</span></th>
           </tr>
           <tr style="background:#f4f4f4">
             ${th('Poziom')}${th('Nazwa')}${th('Nr aukcji','center')}${th('Koszt','right')}${th('Sprzedaż','right')}${th('ROAS','right')}${th('CTR','right')}${th('Sztuki','right')}${th('Akcja','center')}
@@ -5254,32 +5268,33 @@ function openAdsReportWindow(entry) {
         <tbody>`;
 
       k.grupy.forEach(g=>{
-        const gc=roasColor(g.roas), ga=akcja(g.roas);
+        const ga=akcja(g.roas);
         tablesHtml += `<tr style="background:#fafafa">
           ${td('<strong>GRUPA</strong>')}
           ${td(`<strong>${g.grupa}</strong>`)}
           ${td('—','center','#ccc')}
           ${td(g.koszt.toFixed(0)+' zł','right')}
           ${td(g.sprzedaz.toFixed(0)+' zł','right')}
-          ${td(g.roas.toFixed(2),'right',gc)}
+          ${td(g.roas.toFixed(2),'right',ga.color)}
           ${td(g.ctr.toFixed(2)+'%','right')}
           ${td(String(g.sztuki),'right')}
-          ${td(ga,'center',gc)}
+          ${td(ga.txt,'center',ga.color)}
         </tr>`;
         g.aukcje.forEach(a=>{
-          const ac=roasColor(a.roas), aa=akcja(a.roas);
-          const isZgnile = a.koszt>0&&a.sprzedaz===0;
-          const rowBg = isZgnile?'background:#fff5f5':'';
+          const aa=akcja(a.roas, a.koszt);
+          const isAlarm = a.koszt>=30&&a.sprzedaz===0;
+          const isObserwuj = a.koszt>0&&a.koszt<30&&a.sprzedaz===0;
+          const rowBg = isAlarm?'background:#fff5f5':isObserwuj?'background:#fafafa':'';
           tablesHtml += `<tr style="${rowBg}">
-            ${td('aukcja','',isZgnile?'#ff4d6a':'#aaa')}
+            ${td('aukcja','',isAlarm?'#ff4d6a':isObserwuj?'#888':'#aaa')}
             ${td(a.oferta.substring(0,55)+(a.oferta.length>55?'…':''),'','#333')}
-            ${td(`<a href="https://allegro.pl/oferta/${a.nr}" target="_blank" style="color:#4d9fff;text-decoration:none;font-family:monospace">${a.nr}</a>`,'center')}
-            ${td(a.koszt>0?a.koszt.toFixed(0)+' zł':'—','right',isZgnile?'#ff4d6a':'')}
+            ${td(`<a href="https://allegro.pl/oferta/${a.nr}" target="_blank" style="color:#4d9fff;text-decoration:none;font-family:monospace;font-weight:600">${a.nr}</a>`,'center')}
+            ${td(a.koszt>0?a.koszt.toFixed(0)+' zł':'—','right',isAlarm?'#ff4d6a':'')}
             ${td(a.sprzedaz>0?a.sprzedaz.toFixed(0)+' zł':'—','right')}
-            ${td(a.koszt>0&&a.sprzedaz>0?a.roas.toFixed(2):'—','right',a.koszt>0?ac:'')}
+            ${td(a.koszt>0&&a.sprzedaz>0?a.roas.toFixed(2):'—','right',roasColor(a.roas))}
             ${td(a.ctr.toFixed(2)+'%','right',a.ctr<1&&a.koszt>0?'#ff4d6a':'')}
             ${td(String(a.sztuki),'right')}
-            ${td(a.koszt>0?aa:'—','center',a.koszt>0?ac:'#ccc')}
+            ${td(a.koszt>0?aa.txt:'—','center',aa.color)}
           </tr>`;
         });
       });
