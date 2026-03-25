@@ -286,6 +286,23 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   .ph-title span,.brand span{color:#ea580c!important;}
   .pdf-header{display:flex!important;}
   canvas{max-width:100%!important;}
+
+  /* ── REPORT OVERLAY PRINT ── */
+  #reportOverlay{
+    position:static !important;
+    overflow:visible !important;
+    height:auto !important;
+  }
+  #reportOverlay > div {
+    padding:0 !important;
+    max-width:100% !important;
+  }
+  #reportOverlay .ro-bar { display:none !important; }
+  #reportOverlay table { break-inside:auto; }
+  #reportOverlay tr { break-inside:avoid; }
+  #reportOverlay .sec { break-inside:avoid; }
+  #reportOverlay .ai-body { break-inside:auto; }
+  #reportOverlay .rh { break-inside:avoid; }
 }
 .pdf-header{
   display:none;
@@ -3886,7 +3903,7 @@ function printAgentResponse() {
       #reportOverlay .ro-btn{font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid;}
       #reportOverlay .ro-print{background:#fff7ed;color:#ff6b35;border-color:#fdba74;}
       #reportOverlay .ro-close{background:#f9fafb;color:#6b7280;border-color:#e5e7eb;}
-      @media print{#reportOverlay .ro-bar{display:none!important;}}
+      
     </style>
     <div class="ph">
       <div class="ph-logo">M<span>Place</span> Hub</div>
@@ -3897,7 +3914,7 @@ function printAgentResponse() {
     <div class="pf">MPlace Hub · Wygenerowano przez Agent ✦ · ${time}</div>
     <div class="ro-bar">
       <button class="ro-btn ro-close" onclick="document.getElementById('reportOverlay').style.display='none'">✕ Zamknij</button>
-      <button class="ro-btn ro-print" onclick="window.print()">⎙ Drukuj / Zapisz PDF</button>
+      <button class="ro-btn ro-print" onclick="printOverlay()">⎙ Drukuj / Zapisz PDF</button>
     </div>`;
   overlay.appendChild(inner);
   overlay.style.display = 'block';
@@ -4174,7 +4191,7 @@ function openReportWindow(aiText, curM, dayNum, snap, groups, selectedKeys) {
       #reportOverlay .ro-btn{font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid;}
       #reportOverlay .ro-print{background:#fff7ed;color:#ff6b35;border-color:#fdba74;}
       #reportOverlay .ro-close{background:#f9fafb;color:#6b7280;border-color:#e5e7eb;}
-      @media print{#reportOverlay .ro-bar{display:none!important;}}
+      
     </style>
     <div class="rh">
       <div>
@@ -4208,7 +4225,7 @@ function openReportWindow(aiText, curM, dayNum, snap, groups, selectedKeys) {
     </div>
     <div class="ro-bar">
       <button class="ro-btn ro-close" onclick="document.getElementById('reportOverlay').style.display='none'">✕ Zamknij</button>
-      <button class="ro-btn ro-print" onclick="window.print()">⎙ Drukuj / Zapisz PDF</button>
+      <button class="ro-btn ro-print" onclick="printOverlay()">⎙ Drukuj / Zapisz PDF</button>
     </div>`;
   overlay.appendChild(inner);
   overlay.style.display = 'block';
@@ -4338,7 +4355,7 @@ function openSavedReport(id) {
       #reportOverlay .ro-btn{font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid;}
       #reportOverlay .ro-print{background:#fff7ed;color:#ff6b35;border-color:#fdba74;}
       #reportOverlay .ro-close{background:#f9fafb;color:#6b7280;border-color:#e5e7eb;}
-      @media print{#reportOverlay .ro-bar{display:none!important;}}
+      
     </style>
     <div class="rh">
       <div><div class="rh-logo">M<span>Place</span> Hub</div><div style="font-size:12px;color:#6b7280;margin-top:3px">Raport wewnętrzny · Poufny</div></div>
@@ -4369,11 +4386,33 @@ function openSavedReport(id) {
     </div>
     <div class="ro-bar">
       <button class="ro-btn ro-close" onclick="document.getElementById('reportOverlay').style.display='none'">✕ Zamknij</button>
-      <button class="ro-btn ro-print" onclick="window.print()">⎙ Drukuj / Zapisz PDF</button>
+      <button class="ro-btn ro-print" onclick="printOverlay()">⎙ Drukuj / Zapisz PDF</button>
     </div>`;
   overlay.appendChild(inner);
   overlay.style.display = 'block';
   overlay.scrollTop = 0;
+}
+
+function printOverlay() {
+  const overlay = document.getElementById('reportOverlay');
+  if (!overlay) return;
+  // Temporarily hide everything except overlay
+  document.body.childNodes.forEach(n => {
+    if (n !== overlay && n.style) n.style.setProperty('display', 'none', 'important');
+  });
+  overlay.style.position = 'static';
+  overlay.style.overflow = 'visible';
+  overlay.style.height = 'auto';
+  window.print();
+  // Restore after print dialog closes
+  setTimeout(() => {
+    document.body.childNodes.forEach(n => {
+      if (n !== overlay && n.style) n.style.removeProperty('display');
+    });
+    overlay.style.position = 'fixed';
+    overlay.style.overflow = 'auto';
+    overlay.style.height = '';
+  }, 500);
 }
 
 // D2D — Day to Day
