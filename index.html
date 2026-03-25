@@ -3943,14 +3943,11 @@ function reportSelectNone() {
   updateReportCount();
 }
 
-// Toggle checkbox on click
-document.addEventListener('click', e => {
-  const chk = e.target.closest('#reportModal .report-check');
-  if (!chk) return;
-  chk.classList.toggle('checked');
-  chk.querySelector('input').checked = chk.classList.contains('checked');
+function toggleReportCheck(el) {
+  el.classList.toggle('checked');
+  el.querySelector('input').checked = el.classList.contains('checked');
   updateReportCount();
-});
+}
 
 async function runSelectedReport() {
   const selected = [...document.querySelectorAll('#reportModal .report-check.checked')]
@@ -4942,23 +4939,23 @@ self.addEventListener('fetch', e => e.respondWith(
 
     <div class="report-group-label" style="color:var(--g-meble)">· MEBLE</div>
     <div class="report-checks">
-      <label class="report-check" data-key="MobelKap"><input type="checkbox" value="MobelKap"><div class="report-check-dot"></div>MobelKap</label>
-      <label class="report-check" data-key="PerfektCiecie"><input type="checkbox" value="PerfektCiecie"><div class="report-check-dot"></div>PerfektCiecie</label>
-      <label class="report-check" data-key="MeblenaCzasie"><input type="checkbox" value="MeblenaCzasie"><div class="report-check-dot"></div>MeblenaCzasie</label>
+      <label class="report-check" data-key="MobelKap" onclick="toggleReportCheck(this)"><input type="checkbox" value="MobelKap"><div class="report-check-dot"></div>MobelKap</label>
+      <label class="report-check" data-key="PerfektCiecie" onclick="toggleReportCheck(this)"><input type="checkbox" value="PerfektCiecie"><div class="report-check-dot"></div>PerfektCiecie</label>
+      <label class="report-check" data-key="MeblenaCzasie" onclick="toggleReportCheck(this)"><input type="checkbox" value="MeblenaCzasie"><div class="report-check-dot"></div>MeblenaCzasie</label>
     </div>
 
     <div class="report-group-label" style="color:var(--g-luxsen)">· LUXSEN</div>
     <div class="report-checks">
-      <label class="report-check" data-key="Luxsen"><input type="checkbox" value="Luxsen"><div class="report-check-dot"></div>Luxsen</label>
-      <label class="report-check" data-key="Semmi"><input type="checkbox" value="Semmi"><div class="report-check-dot"></div>Semmi</label>
-      <label class="report-check" data-key="BOTAVIT"><input type="checkbox" value="BOTAVIT"><div class="report-check-dot"></div>BOTAVIT</label>
+      <label class="report-check" data-key="Luxsen" onclick="toggleReportCheck(this)"><input type="checkbox" value="Luxsen"><div class="report-check-dot"></div>Luxsen</label>
+      <label class="report-check" data-key="Semmi" onclick="toggleReportCheck(this)"><input type="checkbox" value="Semmi"><div class="report-check-dot"></div>Semmi</label>
+      <label class="report-check" data-key="BOTAVIT" onclick="toggleReportCheck(this)"><input type="checkbox" value="BOTAVIT"><div class="report-check-dot"></div>BOTAVIT</label>
     </div>
 
     <div class="report-group-label" style="color:var(--g-one)">· ONE</div>
     <div class="report-checks">
-      <label class="report-check" data-key="Materazzi"><input type="checkbox" value="Materazzi"><div class="report-check-dot"></div>Materazzi</label>
-      <label class="report-check" data-key="MtzzEU"><input type="checkbox" value="MtzzEU"><div class="report-check-dot"></div>MtzzEU</label>
-      <label class="report-check" data-key="Ankado24"><input type="checkbox" value="Ankado24"><div class="report-check-dot"></div>Ankado24</label>
+      <label class="report-check" data-key="Materazzi" onclick="toggleReportCheck(this)"><input type="checkbox" value="Materazzi"><div class="report-check-dot"></div>Materazzi</label>
+      <label class="report-check" data-key="MtzzEU" onclick="toggleReportCheck(this)"><input type="checkbox" value="MtzzEU"><div class="report-check-dot"></div>MtzzEU</label>
+      <label class="report-check" data-key="Ankado24" onclick="toggleReportCheck(this)"><input type="checkbox" value="Ankado24"><div class="report-check-dot"></div>Ankado24</label>
     </div>
 
     <div style="display:flex;align-items:center;margin-top:.9rem;gap:.6rem">
