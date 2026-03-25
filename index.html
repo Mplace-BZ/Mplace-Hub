@@ -520,6 +520,26 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .report-select-all{font-family:var(--mono);font-size:9px;color:var(--text3);cursor:pointer;text-decoration:underline;margin-left:auto;}
 .report-select-all:hover{color:var(--accent);}
 
+/* ── PDFS MODAL ── */
+.pdfs-modal-overlay{position:fixed;inset:0;z-index:650;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);}
+.pdfs-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:1.5rem 1.7rem;max-width:480px;width:92%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.pdfs-modal-title{font-family:var(--mono);font-size:13px;font-weight:500;margin-bottom:.25rem;}
+.pdfs-modal-title span{color:var(--blue);}
+.pdfs-modal-sub{font-size:12px;color:var(--text3);margin-bottom:1rem;line-height:1.5;}
+.pdfs-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:.4rem;min-height:60px;}
+.pdfs-empty{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;padding:1.5rem 0;}
+.pdfs-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s;}
+.pdfs-item:hover{border-color:rgba(77,159,255,.3);background:rgba(77,159,255,.06);}
+.pdfs-item-icon{font-size:16px;flex-shrink:0;}
+.pdfs-item-info{flex:1;min-width:0;}
+.pdfs-item-title{font-family:var(--mono);font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pdfs-item-meta{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px;}
+.pdfs-item-del{font-size:10px;color:var(--text3);padding:2px 6px;border-radius:4px;border:1px solid transparent;cursor:pointer;flex-shrink:0;}
+.pdfs-item-del:hover{color:var(--red);border-color:var(--red-bd);background:var(--red-bg);}
+.pdfs-modal-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border);}
+.pdfs-clear{font-family:var(--mono);font-size:9px;color:var(--text3);cursor:pointer;text-decoration:underline;}
+.pdfs-clear:hover{color:var(--red);}
+
 /* ── MOBILE RESPONSIVE ── */
 @media(max-width:700px){
   .topbar-inner{padding:0 10px;height:40px;}
@@ -1147,6 +1167,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="agentAsk('Oceń kondycję każdego konta w skali 1-10 z uzasadnieniem.')" class="agent-chip">Kondycja kont 1-10</button>
     <button onclick="agentAsk('Gdzie tracę pieniądze? Gdzie są największe wycieki marży?')" class="agent-chip">Gdzie tracę pieniądze?</button>
     <button onclick="generateMTDReport()" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:var(--accent);background:rgba(255,107,53,.08)">📊 Raport MTD</button>
+    <button onclick="openPDFsModal()" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.07)">📁 PDF's</button>
   </div>
 
   <!-- Input -->
@@ -4053,9 +4074,10 @@ Bądź konkretny, podawaj liczby. Odpowiedz po polsku.`;
     if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     const text = data.content?.map(b => b.text||'').join('') || '';
     openReportWindow(text, curM, dayNum, snap, filteredGroups, selectedKeys);
+    saveReportToHistory(text, curM, dayNum, snap, filteredGroups, selectedKeys);
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--accent)">
       <strong style="color:var(--accent)">📊 Raport MTD wygenerowany</strong><br>
-      <span style="font-size:11px;color:var(--text3)">Otwarto w nowym oknie · Ctrl+P = PDF</span>
+      <span style="font-size:11px;color:var(--text3)">Zapisano w 📁 PDF's · Ctrl+P = PDF</span>
     </div>`;
   } catch(err) {
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)">
@@ -4183,6 +4205,167 @@ function openReportWindow(aiText, curM, dayNum, snap, groups, selectedKeys) {
     <div class="rf">
       <div class="rf-txt">MPlace Hub · Raport wewnętrzny · Poufny</div>
       <div class="rf-txt">${curM.toUpperCase()} ${now.getFullYear()} · ${dateStr}</div>
+    </div>
+    <div class="ro-bar">
+      <button class="ro-btn ro-close" onclick="document.getElementById('reportOverlay').style.display='none'">✕ Zamknij</button>
+      <button class="ro-btn ro-print" onclick="window.print()">⎙ Drukuj / Zapisz PDF</button>
+    </div>`;
+  overlay.appendChild(inner);
+  overlay.style.display = 'block';
+  overlay.scrollTop = 0;
+}
+
+// ── HISTORIA RAPORTÓW ──────────────────────────────────────
+const SK_REPORTS = 'mplace_reports_history';
+
+function getReportsHistory() {
+  try { return JSON.parse(localStorage.getItem(SK_REPORTS) || '[]'); } catch(e) { return []; }
+}
+
+function saveReportToHistory(aiText, curM, dayNum, snap, groups, selectedKeys) {
+  const history = getReportsHistory();
+  const id = Date.now();
+  const now = new Date();
+  const isAll = selectedKeys.length === 9;
+  const scopeLabel = isAll ? 'Wszystkie konta (9)' : selectedKeys.map(k => AC_META[k]?.name || k).join(', ');
+
+  // Build group/account rows HTML (same as openReportWindow)
+  let groupRows = '', accRows = '';
+  Object.entries(groups).forEach(([gKey, g]) => {
+    let sumSp=0, sumEst=0, margins=[], hasData=false;
+    g.accs.forEach(k => {
+      if(snap[k]){ sumSp+=snap[k].cur.sprzedaz||0; sumEst+=snap[k].est||0; margins.push(snap[k].C.mAfter); hasData=true; }
+    });
+    if (!hasData) return;
+    const avgM = margins.reduce((a,b)=>a+b,0)/margins.length;
+    const mColor = avgM>=10?'#2dd4a0':avgM>=0?'#f5a623':'#ff4d6a';
+    const gColor = gKey==='MEBLE'?'#ff6b35':gKey==='LUXSEN'?'#2dd4a0':'#b47fff';
+    groupRows += `<tr><td><span style="color:${gColor};font-weight:600">${gKey}</span></td><td>${Math.round(sumSp).toLocaleString('pl-PL')} zł</td><td>${Math.round(sumEst).toLocaleString('pl-PL')} zł</td><td style="color:${mColor};font-weight:600">${avgM.toFixed(1)}%</td></tr>`;
+    g.accs.forEach(k => {
+      if(!snap[k]) return;
+      const {C, est, cur} = snap[k];
+      const status = C.mAfter>=10?'✅':C.mAfter>=0?'⚠️':'🔴';
+      const mColor2 = C.mAfter>=10?'#2dd4a0':C.mAfter>=0?'#f5a623':'#ff4d6a';
+      accRows += `<tr><td><span style="color:${gColor};font-size:9px">${gKey}</span><br><strong>${AC_META[k].name}</strong></td><td>${Math.round(cur.sprzedaz||0).toLocaleString('pl-PL')} zł</td><td style="color:#8b91a8">${Math.round(est).toLocaleString('pl-PL')} zł</td><td style="color:${mColor2};font-weight:600">${C.mAfter.toFixed(1)}%</td><td>${(cur.roas||0).toFixed(2)}</td><td style="color:#8b91a8">${C.beRoasAds.toFixed(2)}</td><td style="font-size:14px">${status}</td></tr>`;
+    });
+  });
+
+  const aiHtml = aiText
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^#{1,3} (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+
+  history.unshift({
+    id, curM, dayNum, scopeLabel,
+    date: now.toLocaleDateString('pl-PL', {day:'2-digit', month:'2-digit', year:'numeric'}),
+    time: now.toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}),
+    groupRows, accRows, aiHtml
+  });
+
+  // Keep max 20 reports
+  if (history.length > 20) history.splice(20);
+  localStorage.setItem(SK_REPORTS, JSON.stringify(history));
+}
+
+function openPDFsModal() {
+  const history = getReportsHistory();
+  const list = document.getElementById('pdfsList');
+  if (!history.length) {
+    list.innerHTML = '<div class="pdfs-empty">Brak zapisanych raportów.<br>Wygeneruj pierwszy raport MTD.</div>';
+  } else {
+    list.innerHTML = history.map(r => `
+      <div class="pdfs-item" onclick="openSavedReport(${r.id})">
+        <div class="pdfs-item-icon">📄</div>
+        <div class="pdfs-item-info">
+          <div class="pdfs-item-title">${r.curM.toUpperCase()} · dzień ${r.dayNum} · ${r.scopeLabel}</div>
+          <div class="pdfs-item-meta">${r.date} ${r.time}</div>
+        </div>
+        <div class="pdfs-item-del" onclick="event.stopPropagation();deleteReport(${r.id})">✕</div>
+      </div>`).join('');
+  }
+  document.getElementById('pdfsModal').style.display = 'flex';
+}
+
+function closePDFsModal() {
+  document.getElementById('pdfsModal').style.display = 'none';
+}
+
+function deleteReport(id) {
+  const history = getReportsHistory().filter(r => r.id !== id);
+  localStorage.setItem(SK_REPORTS, JSON.stringify(history));
+  openPDFsModal(); // refresh list
+}
+
+function clearAllReports() {
+  if (!confirm('Usunąć wszystkie zapisane raporty?')) return;
+  localStorage.removeItem(SK_REPORTS);
+  openPDFsModal();
+}
+
+function openSavedReport(id) {
+  const report = getReportsHistory().find(r => r.id === id);
+  if (!report) return;
+  closePDFsModal();
+
+  let overlay = document.getElementById('reportOverlay');
+  if (!overlay) { overlay = document.createElement('div'); overlay.id = 'reportOverlay'; document.body.appendChild(overlay); }
+  overlay.innerHTML = '';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:800;background:#fff;overflow-y:auto;font-family:"DM Sans",sans-serif;font-size:13px;color:#1f2937;';
+
+  const inner = document.createElement('div');
+  inner.style.cssText = 'max-width:900px;margin:0 auto;padding:2.5rem 3rem 5rem;';
+  inner.innerHTML = `
+    <style>
+      #reportOverlay .rh{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:.85rem;margin-bottom:1.75rem;border-bottom:3px solid #ff6b35;}
+      #reportOverlay .rh-logo{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#111;}
+      #reportOverlay .rh-logo span{color:#ff6b35;}
+      #reportOverlay .rh-meta{text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;line-height:1.8;}
+      #reportOverlay .rh-tag{display:inline-block;background:#fff7ed;color:#ff6b35;border:1px solid #fdba74;border-radius:4px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;margin-bottom:4px;}
+      #reportOverlay .sec{margin-bottom:2rem;}
+      #reportOverlay .sec-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#ff6b35;padding-bottom:.4rem;border-bottom:1px solid #fde8dc;margin-bottom:1rem;}
+      #reportOverlay table{width:100%;border-collapse:collapse;font-size:12px;}
+      #reportOverlay thead th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#9ca3af;padding:6px 10px;border-bottom:1px solid #e5e7eb;text-align:left;background:#fafafa;}
+      #reportOverlay tbody tr{border-bottom:1px solid #f3f4f6;}
+      #reportOverlay tbody td{padding:8px 10px;vertical-align:middle;}
+      #reportOverlay .ai-body{line-height:1.75;color:#374151;}
+      #reportOverlay .ai-body h3{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:#ff6b35;margin:1.25rem 0 .5rem;padding-bottom:.3rem;border-bottom:1px solid #fde8dc;}
+      #reportOverlay .ai-body p{margin-bottom:.65rem;}
+      #reportOverlay .ai-body strong{font-weight:600;color:#111;}
+      #reportOverlay .rf{margin-top:2.5rem;padding-top:.75rem;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;}
+      #reportOverlay .rf-txt{font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;}
+      #reportOverlay .ro-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:.75rem 2rem;display:flex;gap:.75rem;justify-content:flex-end;z-index:801;}
+      #reportOverlay .ro-btn{font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid;}
+      #reportOverlay .ro-print{background:#fff7ed;color:#ff6b35;border-color:#fdba74;}
+      #reportOverlay .ro-close{background:#f9fafb;color:#6b7280;border-color:#e5e7eb;}
+      @media print{#reportOverlay .ro-bar{display:none!important;}}
+    </style>
+    <div class="rh">
+      <div><div class="rh-logo">M<span>Place</span> Hub</div><div style="font-size:12px;color:#6b7280;margin-top:3px">Raport wewnętrzny · Poufny</div></div>
+      <div class="rh-meta">
+        <div class="rh-tag">Raport MTD</div><br>
+        <strong style="color:#111;font-size:13px">${report.curM.toUpperCase()} · dzień ${report.dayNum}/30</strong><br>
+        <span style="color:#ff6b35">${report.scopeLabel}</span><br>
+        Wygenerowano: ${report.date}, ${report.time}
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Wyniki grupowe</div>
+      <table><thead><tr><th>Grupa</th><th>Sprzedaż MTD</th><th>Estymacja EOM</th><th>Śr. marża</th></tr></thead>
+      <tbody>${report.groupRows}</tbody></table>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Wyniki per konto</div>
+      <table><thead><tr><th>Konto</th><th>Sprzedaż MTD</th><th>Est. EOM</th><th>Marża</th><th>ROAS</th><th>BE ROAS</th><th>Status</th></tr></thead>
+      <tbody>${report.accRows}</tbody></table>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Analiza AI</div>
+      <div class="ai-body"><p>${report.aiHtml}</p></div>
+    </div>
+    <div class="rf">
+      <div class="rf-txt">MPlace Hub · Raport wewnętrzny · Poufny</div>
+      <div class="rf-txt">${report.curM.toUpperCase()} · ${report.date}</div>
     </div>
     <div class="ro-bar">
       <button class="ro-btn ro-close" onclick="document.getElementById('reportOverlay').style.display='none'">✕ Zamknij</button>
@@ -4926,6 +5109,19 @@ self.addEventListener('fetch', e => e.respondWith(
     <div class="sc-rows" id="scRows"></div>
     <div class="sc-sync" id="scSync"></div>
     <button class="sc-close" onclick="closeSaveConfirm()">OK — Zamknij</button>
+  </div>
+</div>
+
+<!-- PDFS MODAL -->
+<div class="pdfs-modal-overlay" id="pdfsModal" style="display:none" onclick="if(event.target===this)closePDFsModal()">
+  <div class="pdfs-modal">
+    <div class="pdfs-modal-title">📁 Zapisane <span>Raporty</span></div>
+    <div class="pdfs-modal-sub">Kliknij raport aby otworzyć bez wydawania tokenów</div>
+    <div class="pdfs-list" id="pdfsList"></div>
+    <div class="pdfs-modal-footer">
+      <span class="pdfs-clear" onclick="clearAllReports()">usuń wszystkie</span>
+      <button onclick="closePDFsModal()" style="font-family:var(--mono);font-size:11px;padding:5px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Zamknij</button>
+    </div>
   </div>
 </div>
 
