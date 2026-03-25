@@ -4396,31 +4396,45 @@ function openSavedReport(id) {
 function printOverlay() {
   const overlay = document.getElementById('reportOverlay');
   if (!overlay) return;
+  const inner = overlay.querySelector('div');
+  if (!inner) return;
 
-  const restoreStyles = [];
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:210mm;height:297mm;border:none;';
+  document.body.appendChild(iframe);
 
-  function beforePrint() {
-    // Hide all body children except overlay
-    Array.from(document.body.children).forEach(el => {
-      if (el !== overlay) {
-        restoreStyles.push({el, display: el.style.display});
-        el.style.display = 'none';
-      }
-    });
-    overlay.style.cssText = 'position:static;overflow:visible;height:auto;background:#fff;';
-  }
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;font-size:12px;color:#1f2937;background:#fff;padding:1.5cm 2cm;}
+.ro-bar{display:none!important;}
+.rh{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:.75rem;margin-bottom:1.5rem;border-bottom:3px solid #ff6b35;}
+.rh-logo{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#111;}
+.rh-logo span{color:#ff6b35;}
+.rh-meta{text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;line-height:1.8;}
+.rh-tag{display:inline-block;background:#fff7ed;color:#ff6b35;border:1px solid #fdba74;border-radius:4px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;margin-bottom:4px;}
+.sec{margin-bottom:1.5rem;break-inside:avoid;}
+.sec-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#ff6b35;padding-bottom:.3rem;border-bottom:1px solid #fde8dc;margin-bottom:.75rem;}
+table{width:100%;border-collapse:collapse;font-size:11px;}
+thead th{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#9ca3af;padding:5px 8px;border-bottom:1px solid #e5e7eb;text-align:left;background:#fafafa;}
+tbody tr{border-bottom:1px solid #f3f4f6;}
+tbody td{padding:6px 8px;vertical-align:middle;}
+.ai-body{line-height:1.65;color:#374151;font-size:11px;}
+.ai-body h3{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:#ff6b35;margin:1rem 0 .4rem;padding-bottom:.25rem;border-bottom:1px solid #fde8dc;break-after:avoid;}
+.ai-body p{margin-bottom:.5rem;}
+.ai-body strong{font-weight:600;color:#111;}
+.rf{margin-top:1.5rem;padding-top:.5rem;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;}
+</style></head><body>${inner.innerHTML}</body></html>`);
+  doc.close();
 
-  function afterPrint() {
-    restoreStyles.forEach(({el, display}) => el.style.display = display);
-    restoreStyles.length = 0;
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:800;background:#fff;overflow-y:auto;font-family:"DM Sans",sans-serif;font-size:13px;color:#1f2937;';
-    window.removeEventListener('beforeprint', beforePrint);
-    window.removeEventListener('afterprint', afterPrint);
-  }
-
-  window.addEventListener('beforeprint', beforePrint);
-  window.addEventListener('afterprint', afterPrint);
-  window.print();
+  iframe.onload = () => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    setTimeout(() => document.body.removeChild(iframe), 1000);
+  };
 }
 
 // D2D — Day to Day
