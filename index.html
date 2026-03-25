@@ -548,6 +548,18 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .pdfs-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s;}
 .pdfs-item:hover{border-color:rgba(77,159,255,.3);background:rgba(77,159,255,.06);}
 .pdfs-item-icon{font-size:16px;flex-shrink:0;}
+/* Import Ads */
+.ads-map-row{display:flex;align-items:center;gap:.75rem;padding:.5rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);}
+.ads-map-file{font-family:var(--mono);font-size:10px;color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ads-map-select{font-family:var(--mono);font-size:10px;padding:4px 8px;border-radius:5px;border:1px solid rgba(244,114,182,.3);background:var(--bg2);color:#f472b6;cursor:pointer;}
+.ads-map-status{font-family:var(--mono);font-size:9px;color:var(--text3);}
+.ads-history-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s;}
+.ads-history-item:hover{border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.05);}
+.ads-history-meta{flex:1;}
+.ads-history-title{font-family:var(--mono);font-size:11px;color:var(--text);margin-bottom:2px;}
+.ads-history-sub{font-family:var(--mono);font-size:9px;color:var(--text3);}
+.ads-history-del{font-size:13px;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:4px;transition:color .15s;}
+.ads-history-del:hover{color:var(--red);}
 .pdfs-item-info{flex:1;min-width:0;}
 .pdfs-item-title{font-family:var(--mono);font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .pdfs-item-meta{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px;}
@@ -707,6 +719,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
     <button class="nav-btn" onclick="showView('agent')" id="navAgent" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Agent ✦</button>
     <button class="nav-btn" onclick="showView('wiedza')" id="navWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza ✦</button>
+    <button class="nav-btn" onclick="showView('importads')" id="navImportAds" style="color:#f472b6;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2)">Import Ads</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-meble">MEBLE</span>
     <button class="nav-btn" onclick="showView('MobelKap')" id="navMobelKap">MoK</button>
@@ -1231,6 +1244,44 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 </div>
 
 <!-- ═══ VIEW: WIEDZA ═══ -->
+<div class="view" id="viewImportAds">
+  <div class="sec-header" style="margin-bottom:1.5rem">
+    <span class="sec-num">08</span>
+    <h2 style="font-size:1.1rem;font-weight:600;color:var(--text)">Import Ads <span style="color:#f472b6">✦</span></h2>
+    <span style="font-size:10px;color:var(--text3);font-family:var(--mono)">Allegro Ads · xlsx · analiza per kampania</span>
+  </div>
+
+  <!-- Upload zone -->
+  <div id="adsDropZone" style="border:2px dashed rgba(244,114,182,.3);border-radius:10px;padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;background:rgba(244,114,182,.03);margin-bottom:1.5rem"
+    ondragover="event.preventDefault();this.style.borderColor='#f472b6';this.style.background='rgba(244,114,182,.08)'"
+    ondragleave="this.style.borderColor='rgba(244,114,182,.3)';this.style.background='rgba(244,114,182,.03)'"
+    ondrop="adsHandleDrop(event)"
+    onclick="document.getElementById('adsFileInput').click()">
+    <div style="font-size:1.4rem;margin-bottom:.5rem">📊</div>
+    <div style="font-family:var(--mono);font-size:11px;color:#f472b6;margin-bottom:.25rem">Przeciągnij pliki xlsx lub kliknij</div>
+    <div style="font-size:10px;color:var(--text3)">Możesz wgrać kilka plików naraz · jeden plik = jedno konto</div>
+    <input type="file" id="adsFileInput" accept=".xlsx" multiple style="display:none" onchange="adsHandleFiles(this.files)">
+  </div>
+
+  <!-- Konto mapping -->
+  <div id="adsMappingArea" style="display:none;margin-bottom:1.5rem">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.05em">Przypisanie plików do kont</div>
+    <div id="adsMappingList" style="display:flex;flex-direction:column;gap:.5rem"></div>
+    <div style="margin-top:1rem;display:flex;gap:.75rem;align-items:center">
+      <button onclick="adsRunAnalysis()" id="adsRunBtn" style="font-family:var(--mono);font-size:11px;padding:7px 18px;border-radius:6px;border:1px solid rgba(244,114,182,.4);background:rgba(244,114,182,.12);color:#f472b6;cursor:pointer">▸ Analizuj z AI</button>
+      <button onclick="adsClearAll()" style="font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--text3);cursor:pointer">✕ Wyczyść</button>
+      <span id="adsMappingStatus" style="font-family:var(--mono);font-size:10px;color:var(--text3)"></span>
+    </div>
+  </div>
+
+  <!-- Historia analiz -->
+  <div id="adsHistoryArea">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.05em">Historia analiz</div>
+    <div id="adsHistoryList" style="display:flex;flex-direction:column;gap:.5rem"></div>
+    <div id="adsHistoryEmpty" style="font-size:11px;color:var(--text3);padding:1rem 0">Brak zapisanych analiz. Wgraj pliki xlsx z Allegro Ads.</div>
+  </div>
+</div>
+
 <div class="view" id="viewWiedza">
 <div class="container">
   <div style="margin-bottom:1rem">
@@ -1589,7 +1640,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza'].forEach(id=>{
+  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -1637,6 +1688,10 @@ function showView(v){
     document.getElementById('viewWiedza').classList.add('active');
     document.getElementById('navWiedza').classList.add('active');
     renderWkList();
+  } else if(v==='importads'){
+    document.getElementById('viewImportAds').classList.add('active');
+    document.getElementById('navImportAds').classList.add('active');
+    renderImportAdsList();
   } else {
     document.getElementById('viewAccount').classList.add('active');
     document.getElementById('nav'+v)?.classList.add('active');
@@ -4842,6 +4897,346 @@ function appendToWkContent(text, filename) {
   const existing = ta.value.trim();
   ta.value = existing ? existing + '\n\n' + text : text;
   document.getElementById('wkCharCount').textContent = ta.value.length.toLocaleString('pl-PL') + ' znaków';
+}
+
+// ═══════════════════════════════════════════════════════════
+// IMPORT ADS
+// ═══════════════════════════════════════════════════════════
+
+const SK_ADS_HISTORY = 'mplace_ads_history_v1';
+const ADS_ACCOUNT_KEYS = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
+const ADS_ACCOUNT_NAMES = {
+  MobelKap:'MobelKap',PerfektCiecie:'PerfektCięcie',MeblenaCzasie:'MeblenaCzasie',
+  Luxsen:'Luxsen',Semmi:'Semmi',BOTAVIT:'BOTAVIT',
+  Materazzi:'Materazzi',MtzzEU:'MtzzEU',Ankado24:'Ankado24'
+};
+
+// Detect account from filename
+function adsDetectAccount(filename) {
+  const f = filename.toLowerCase().replace(/[_\-\s]/g,'');
+  if(f.includes('mobelkap')||f.includes('mobel')) return 'MobelKap';
+  if(f.includes('perfekt')||f.includes('pec')||f.includes('ciecie')||f.includes('cięcie')) return 'PerfektCiecie';
+  if(f.includes('meblena')||f.includes('mnc')||f.includes('meblenaczasie')) return 'MeblenaCzasie';
+  if(f.includes('luxsen')||f.includes('lux')) return 'Luxsen';
+  if(f.includes('semmi')||f.includes('sem')) return 'Semmi';
+  if(f.includes('botavit')||f.includes('bov')) return 'BOTAVIT';
+  if(f.includes('materazzi')||f.includes('mtz')) return 'Materazzi';
+  if(f.includes('mtzzeu')||f.includes('meu')) return 'MtzzEU';
+  if(f.includes('ankado')||f.includes('a24')) return 'Ankado24';
+  return '';
+}
+
+let adsPendingFiles = []; // {file, accountKey, parsed}
+
+function adsHandleDrop(e) {
+  e.preventDefault();
+  document.getElementById('adsDropZone').style.borderColor='rgba(244,114,182,.3)';
+  document.getElementById('adsDropZone').style.background='rgba(244,114,182,.03)';
+  const files = Array.from(e.dataTransfer.files).filter(f=>f.name.endsWith('.xlsx'));
+  if(files.length) adsHandleFiles(files);
+}
+
+function adsHandleFiles(filesInput) {
+  const files = Array.from(filesInput);
+  if(!files.length) return;
+  files.forEach(f => {
+    if(!adsPendingFiles.find(p=>p.file.name===f.file)) {
+      adsPendingFiles.push({file:f, accountKey: adsDetectAccount(f.name), parsed:null});
+    }
+  });
+  renderAdsMappingArea();
+}
+
+function renderAdsMappingArea() {
+  const area = document.getElementById('adsMappingArea');
+  const list = document.getElementById('adsMappingList');
+  if(!adsPendingFiles.length){ area.style.display='none'; return; }
+  area.style.display='block';
+  list.innerHTML = adsPendingFiles.map((p,i)=>`
+    <div class="ads-map-row">
+      <span style="color:#f472b6;font-size:13px">📄</span>
+      <span class="ads-map-file">${p.file.name}</span>
+      <select class="ads-map-select" onchange="adsPendingFiles[${i}].accountKey=this.value">
+        <option value="">— wybierz konto —</option>
+        ${ADS_ACCOUNT_KEYS.map(k=>`<option value="${k}" ${p.accountKey===k?'selected':''}>${ADS_ACCOUNT_NAMES[k]}</option>`).join('')}
+      </select>
+      <span class="ads-map-status">${p.accountKey?'✅':' '}</span>
+      <span style="cursor:pointer;color:var(--text3);font-size:12px;padding:2px 6px" onclick="adsPendingFiles.splice(${i},1);renderAdsMappingArea()">✕</span>
+    </div>
+  `).join('');
+  const assigned = adsPendingFiles.filter(p=>p.accountKey).length;
+  document.getElementById('adsMappingStatus').textContent = `${assigned}/${adsPendingFiles.length} kont przypisanych`;
+  document.getElementById('adsRunBtn').style.opacity = assigned>0?'1':'0.4';
+  document.getElementById('adsRunBtn').disabled = assigned===0;
+}
+
+// Parse xlsx using SheetJS (CDN)
+async function adsParseXlsx(file) {
+  return new Promise((resolve,reject)=>{
+    if(!window.XLSX){ reject('SheetJS nie załadowany'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const wb = XLSX.read(e.target.result, {type:'array'});
+        const sheetName = wb.SheetNames.find(s=>s.startsWith('Statystyki')) || wb.SheetNames[0];
+        const ws = wb.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(ws, {header:1});
+        if(rows.length<2){ reject('Brak danych'); return; }
+        const headers = rows[0];
+        const idxKampania=0, idxGrupa=1, idxWysw=4, idxKlik=5, idxKoszt=9, idxRoas=10, idxSztuki=11, idxSprzedaz=12;
+        const kampMap = {};
+        for(let i=1;i<rows.length;i++){
+          const r=rows[i];
+          const k=r[idxKampania]||'';
+          if(!k) continue;
+          if(!kampMap[k]) kampMap[k]={kampania:k,wyswietlenia:0,klikniecia:0,koszt:0,sprzedaz:0,sztuki:0};
+          kampMap[k].wyswietlenia += Number(r[idxWysw])||0;
+          kampMap[k].klikniecia  += Number(r[idxKlik])||0;
+          kampMap[k].koszt       += Number(r[idxKoszt])||0;
+          kampMap[k].sprzedaz    += Number(r[idxSprzedaz])||0;
+          kampMap[k].sztuki      += Number(r[idxSztuki])||0;
+        }
+        const kampanie = Object.values(kampMap).map(k=>({
+          ...k,
+          roas: k.koszt>0 ? k.sprzedaz/k.koszt : 0,
+          ctr:  k.wyswietlenia>0 ? k.klikniecia/k.wyswietlenia*100 : 0,
+          cpc:  k.klikniecia>0 ? k.koszt/k.klikniecia : 0
+        })).sort((a,b)=>b.sprzedaz-a.sprzedaz);
+        const totKoszt = kampanie.reduce((s,k)=>s+k.koszt,0);
+        const totSprzedaz = kampanie.reduce((s,k)=>s+k.sprzedaz,0);
+        resolve({kampanie, totKoszt, totSprzedaz, totRoas: totKoszt>0?totSprzedaz/totKoszt:0});
+      } catch(err){ reject(err.message); }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function adsLoadSheetJS() {
+  if(window.XLSX) return;
+  await new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload=res; s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function adsRunAnalysis() {
+  const btn = document.getElementById('adsRunBtn');
+  btn.textContent='⟳ Przetwarzam...'; btn.disabled=true;
+
+  try {
+    await adsLoadSheetJS();
+  } catch(e) {
+    alert('Nie udało się załadować parsera xlsx. Sprawdź połączenie z internetem.');
+    btn.textContent='▸ Analizuj z AI'; btn.disabled=false; return;
+  }
+
+  // Parse all files
+  const toAnalyze = adsPendingFiles.filter(p=>p.accountKey);
+  const results = [];
+  for(const p of toAnalyze){
+    try {
+      const parsed = await adsParseXlsx(p.file);
+      results.push({accountKey: p.accountKey, accountName: ADS_ACCOUNT_NAMES[p.accountKey], ...parsed});
+    } catch(e) {
+      console.warn('Parse error', p.file.name, e);
+    }
+  }
+
+  if(!results.length){ alert('Nie udało się odczytać żadnego pliku.'); btn.textContent='▸ Analizuj z AI'; btn.disabled=false; return; }
+
+  // Build prompt
+  btn.textContent='⟳ AI analizuje...';
+  const dateStr = new Date().toLocaleDateString('pl-PL');
+
+  let prompt = `Jesteś analitykiem Allegro Ads agencji e-commerce. Mam dane kampanii Ads dla ${results.length} kont za okres wgranych plików.\n\n`;
+  prompt += `REGUŁY DECYZYJNE:\n- ROAS > 7 → SKALUJ budżet +10-20%\n- ROAS 4-7 → TRZYMAJ (monitoruj)\n- ROAS < 4 → TNIJ budżet lub zatrzymaj\n- ROAS = 0 → ZATRZYMAJ kampanię\n\n`;
+
+  results.forEach(r=>{
+    prompt += `\n═══ ${r.accountName} ═══\n`;
+    prompt += `Łącznie: Koszt ${r.totKoszt.toFixed(0)} zł | Sprzedaż ${r.totSprzedaz.toFixed(0)} zł | ROAS ${r.totRoas.toFixed(2)}\n\n`;
+    prompt += `Kampanie:\n`;
+    r.kampanie.forEach(k=>{
+      const akcja = k.roas===0?'🔴 ZATRZYMAJ':k.roas<4?'🔴 TNIJ':k.roas<7?'🟡 TRZYMAJ':'🟢 SKALUJ +10-20%';
+      prompt += `  ${k.kampania}: Koszt ${k.koszt.toFixed(0)}zł | Sprzedaż ${k.sprzedaz.toFixed(0)}zł | ROAS ${k.roas.toFixed(2)} | CTR ${k.ctr.toFixed(2)}% | ${akcja}\n`;
+    });
+  });
+
+  prompt += `\nWygeneruj pełną analizę Ads w formacie raportu. Dla każdego konta:\n`;
+  prompt += `1. PODSUMOWANIE KONTA — ogólna ocena efektywności Ads\n`;
+  prompt += `2. TABELA KAMPANII — wszystkie kampanie z kolumnami: Kampania | Koszt | Sprzedaż | ROAS | Akcja\n`;
+  prompt += `3. CZERWONE FLAGI — kampanie które tracą pieniądze (ROAS<4), z kwotą przepalania\n`;
+  prompt += `4. ZIELONE OKAZJE — kampanie ROAS>7 do skalowania, ile można zyskać przy +20% budżetu\n`;
+  prompt += `5. REKOMENDACJE [PILNE/WAŻNE] — konkretne działania w formacie: działanie → oczekiwany efekt w zł\n`;
+  prompt += `\nNa końcu: PODSUMOWANIE CROSS-ACCOUNT — porównanie kont, gdzie najlepszy ROI, gdzie najgorszy.\n`;
+  prompt += `Styl: konkretny, liczby w zł, po polsku, nagłówki H3.`;
+
+  try {
+    const res = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:2000,
+        system: buildAgentContext(),
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content||[]).map(b=>b.text||'').join('');
+
+    // Save to history
+    const entry = {
+      id: Date.now(),
+      date: dateStr,
+      accounts: results.map(r=>r.accountName).join(', '),
+      accountCount: results.length,
+      totKoszt: results.reduce((s,r)=>s+r.totKoszt,0),
+      totSprzedaz: results.reduce((s,r)=>s+r.totSprzedaz,0),
+      aiText: text,
+      rawResults: results
+    };
+    const hist = JSON.parse(localStorage.getItem(SK_ADS_HISTORY)||'[]');
+    hist.unshift(entry);
+    if(hist.length>15) hist.length=15;
+    localStorage.setItem(SK_ADS_HISTORY, JSON.stringify(hist));
+
+    adsClearAll();
+    openAdsReportWindow(entry);
+    renderImportAdsList();
+
+  } catch(e) {
+    alert('Błąd API: '+e.message);
+  }
+  btn.textContent='▸ Analizuj z AI'; btn.disabled=false;
+}
+
+function adsClearAll() {
+  adsPendingFiles=[];
+  renderAdsMappingArea();
+  document.getElementById('adsFileInput').value='';
+}
+
+function renderImportAdsList() {
+  const hist = JSON.parse(localStorage.getItem(SK_ADS_HISTORY)||'[]');
+  const list = document.getElementById('adsHistoryList');
+  const empty = document.getElementById('adsHistoryEmpty');
+  if(!hist.length){ list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.innerHTML = hist.map((h,i)=>`
+    <div class="ads-history-item" onclick="openAdsReportFromHistory(${i})">
+      <span style="font-size:16px">📊</span>
+      <div class="ads-history-meta">
+        <div class="ads-history-title">${h.accounts}</div>
+        <div class="ads-history-sub">${h.date} · ${h.accountCount} kont · Koszt ${Math.round(h.totKoszt).toLocaleString('pl-PL')} zł · Sprzedaż ${Math.round(h.totSprzedaz).toLocaleString('pl-PL')} zł · ROAS ${h.totKoszt>0?(h.totSprzedaz/h.totKoszt).toFixed(2):'—'}</div>
+      </div>
+      <span class="ads-history-del" onclick="event.stopPropagation();adsDeleteHistory(${i})" title="Usuń">✕</span>
+    </div>
+  `).join('');
+}
+
+function openAdsReportFromHistory(i) {
+  const hist = JSON.parse(localStorage.getItem(SK_ADS_HISTORY)||'[]');
+  if(hist[i]) openAdsReportWindow(hist[i]);
+}
+
+function adsDeleteHistory(i) {
+  const hist = JSON.parse(localStorage.getItem(SK_ADS_HISTORY)||'[]');
+  hist.splice(i,1);
+  localStorage.setItem(SK_ADS_HISTORY, JSON.stringify(hist));
+  renderImportAdsList();
+}
+
+function openAdsReportWindow(entry) {
+  const results = entry.rawResults || [];
+  const totRoas = entry.totKoszt>0?(entry.totSprzedaz/entry.totKoszt):0;
+
+  // Build campaign tables HTML
+  let tablesHtml = '';
+  results.forEach(r=>{
+    const rows = r.kampanie.map(k=>{
+      const akcjaColor = k.roas===0||k.roas<4?'#ff4d6a':k.roas<7?'#f5a623':'#2dd4a0';
+      const akcja = k.roas===0?'ZATRZYMAJ':k.roas<4?'TNIJ':k.roas<7?'TRZYMAJ':'SKALUJ +20%';
+      return `<tr>
+        <td style="padding:5px 8px;font-size:10px;color:#333;border-bottom:1px solid #eee">${k.kampania}</td>
+        <td style="padding:5px 8px;font-family:monospace;font-size:10px;text-align:right;border-bottom:1px solid #eee">${k.koszt.toFixed(0)} zł</td>
+        <td style="padding:5px 8px;font-family:monospace;font-size:10px;text-align:right;border-bottom:1px solid #eee">${k.sprzedaz.toFixed(0)} zł</td>
+        <td style="padding:5px 8px;font-family:monospace;font-size:10px;text-align:right;border-bottom:1px solid #eee">${k.roas.toFixed(2)}</td>
+        <td style="padding:5px 8px;font-family:monospace;font-size:9px;text-align:center;border-bottom:1px solid #eee;color:${akcjaColor};font-weight:700">${akcja}</td>
+      </tr>`;
+    }).join('');
+    tablesHtml += `
+      <h3 style="margin:1.5rem 0 .5rem;font-size:13px;color:#1a1a2e;border-left:3px solid #f472b6;padding-left:.75rem">${r.accountName}</h3>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:.5rem">
+        <thead><tr style="background:#f8f8f8">
+          <th style="padding:5px 8px;text-align:left;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">Kampania</th>
+          <th style="padding:5px 8px;text-align:right;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">Koszt</th>
+          <th style="padding:5px 8px;text-align:right;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">Sprzedaż</th>
+          <th style="padding:5px 8px;text-align:right;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">ROAS</th>
+          <th style="padding:5px 8px;text-align:center;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">Akcja</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  });
+
+  const aiHtml = (entry.aiText||'')
+    .replace(/###\s*(.+)/g,'<h3 style="margin:1.2rem 0 .4rem;font-size:13px;color:#1a1a2e;border-left:3px solid #f472b6;padding-left:.75rem">$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n\n/g,'</p><p style="margin:.4rem 0">')
+    .replace(/\n/g,'<br>');
+
+  const overlay = document.createElement('div');
+  overlay.id = 'adsReportOverlay';
+  overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:9999;overflow:auto;padding:2rem;box-sizing:border-box';
+  overlay.innerHTML = `
+    <div style="max-width:860px;margin:0 auto" id="adsReportContent">
+      <div style="border-bottom:3px solid #f472b6;padding-bottom:1rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-end">
+        <div>
+          <div style="font-family:monospace;font-size:10px;color:#f472b6;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.25rem">MPlace Hub · Import Ads</div>
+          <h1 style="font-size:1.3rem;font-weight:700;color:#1a1a2e;margin:0">Analiza Kampanii Allegro Ads</h1>
+          <div style="font-family:monospace;font-size:10px;color:#888;margin-top:.25rem">${entry.accounts} · ${entry.date}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:monospace;font-size:10px;color:#888">Łączny ROAS</div>
+          <div style="font-family:monospace;font-size:1.6rem;font-weight:700;color:${totRoas>=7?'#2dd4a0':totRoas>=4?'#f5a623':'#ff4d6a'}">${totRoas.toFixed(2)}</div>
+          <div style="font-family:monospace;font-size:9px;color:#aaa">${Math.round(entry.totKoszt).toLocaleString('pl-PL')} zł → ${Math.round(entry.totSprzedaz).toLocaleString('pl-PL')} zł</div>
+        </div>
+      </div>
+      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:0 0 .75rem">Kampanie per konto</h2>
+      ${tablesHtml}
+      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:1.5rem 0 .75rem">Analiza AI</h2>
+      <div style="font-size:11px;line-height:1.7;color:#333"><p style="margin:.4rem 0">${aiHtml}</p></div>
+      <div style="border-top:1px solid #eee;margin-top:2rem;padding-top:.75rem;font-family:monospace;font-size:9px;color:#aaa">
+        Wygenerowano: ${entry.date} · MPlace Hub · mplace-bz.github.io/Mplace-Hub
+      </div>
+    </div>
+    <div style="position:fixed;bottom:1.5rem;right:1.5rem;display:flex;gap:.75rem">
+      <button onclick="printAdsOverlay()" style="font-family:monospace;font-size:11px;padding:8px 16px;border-radius:7px;border:1px solid #ddd;background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.1)">⎙ Drukuj / PDF</button>
+      <button onclick="document.getElementById('adsReportOverlay').remove()" style="font-family:monospace;font-size:11px;padding:8px 16px;border-radius:7px;border:1px solid #ddd;background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.1)">✕ Zamknij</button>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function printAdsOverlay() {
+  const content = document.getElementById('adsReportContent');
+  if(!content) return;
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none';
+  document.body.appendChild(iframe);
+  iframe.contentDocument.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:Arial,sans-serif;font-size:11px;color:#333;padding:15mm 15mm 15mm 15mm;background:#fff}
+      h1{font-size:16px;margin-bottom:4px}h2{font-size:11px;margin:16px 0 8px}h3{font-size:12px;margin:12px 0 4px;padding-left:.5rem;border-left:3px solid #f472b6}
+      table{width:100%;border-collapse:collapse;margin-bottom:8px;page-break-inside:auto}
+      tr{page-break-inside:avoid}
+      th,td{padding:4px 6px;font-size:9px}
+      p{margin:3px 0;line-height:1.6}
+    </style>
+  </head><body>${content.innerHTML}</body></html>`);
+  iframe.contentDocument.close();
+  iframe.contentWindow.onload = ()=>{ iframe.contentWindow.print(); setTimeout(()=>iframe.remove(),1000); };
 }
 
 // D2D — Day to Day
