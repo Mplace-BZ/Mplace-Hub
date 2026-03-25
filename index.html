@@ -718,7 +718,6 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn" onclick="showView('insights')" id="navInsights" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Insights</button>
     <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
     <button class="nav-btn" onclick="showView('agent')" id="navAgent" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Agent ✦</button>
-    <button class="nav-btn" onclick="showView('wiedza')" id="navWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza ✦</button>
     <button class="nav-btn" onclick="showView('importads')" id="navImportAds" style="color:#f472b6;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2)">Import Ads</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-meble">MEBLE</span>
@@ -736,6 +735,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn" onclick="showView('MtzzEU')" id="navMtzzEU">mEU</button>
     <button class="nav-btn" onclick="showView('Ankado24')" id="navAnkado24">a24</button>
     <div class="nav-sep"></div>
+    <button class="nav-btn" onclick="showView('wiedza')" id="navWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza ✦</button>
     <button class="nav-btn" onclick="showView('d2d')" id="navD2d" style="color:#b47fff;background:rgba(180,127,255,.08);border:1px solid rgba(180,127,255,.2)">D2D</button>
     <button class="nav-btn" onclick="showView('sim')" id="navSim" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Symulator</button>
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
@@ -1245,40 +1245,47 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 
 <!-- ═══ VIEW: WIEDZA ═══ -->
 <div class="view" id="viewImportAds">
-  <div class="sec-header" style="margin-bottom:1.5rem">
+  <div class="sec-header" style="margin-bottom:2rem">
     <span class="sec-num">08</span>
     <h2 style="font-size:1.1rem;font-weight:600;color:var(--text)">Import Ads <span style="color:#f472b6">✦</span></h2>
     <span style="font-size:10px;color:var(--text3);font-family:var(--mono)">Allegro Ads · xlsx · analiza per kampania</span>
   </div>
 
   <!-- Upload zone -->
-  <div id="adsDropZone" style="border:2px dashed rgba(244,114,182,.3);border-radius:10px;padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;background:rgba(244,114,182,.03);margin-bottom:1.5rem"
+  <div id="adsDropZone" style="border:2px dashed rgba(244,114,182,.3);border-radius:12px;padding:3rem 2rem;text-align:center;cursor:pointer;transition:all .2s;background:rgba(244,114,182,.03);margin-bottom:2rem"
     ondragover="event.preventDefault();this.style.borderColor='#f472b6';this.style.background='rgba(244,114,182,.08)'"
     ondragleave="this.style.borderColor='rgba(244,114,182,.3)';this.style.background='rgba(244,114,182,.03)'"
     ondrop="adsHandleDrop(event)"
     onclick="document.getElementById('adsFileInput').click()">
-    <div style="font-size:1.4rem;margin-bottom:.5rem">📊</div>
-    <div style="font-family:var(--mono);font-size:11px;color:#f472b6;margin-bottom:.25rem">Przeciągnij pliki xlsx lub kliknij</div>
-    <div style="font-size:10px;color:var(--text3)">Możesz wgrać kilka plików naraz · jeden plik = jedno konto</div>
+    <div style="font-size:1.8rem;margin-bottom:.75rem">📊</div>
+    <div style="font-family:var(--mono);font-size:12px;color:#f472b6;margin-bottom:.4rem">Przeciągnij pliki xlsx lub kliknij</div>
+    <div style="font-size:11px;color:var(--text3)">Możesz wgrać kilka plików naraz · jeden plik = jedno konto</div>
     <input type="file" id="adsFileInput" accept=".xlsx" multiple style="display:none" onchange="adsHandleFiles(this.files)">
   </div>
 
   <!-- Konto mapping -->
-  <div id="adsMappingArea" style="display:none;margin-bottom:1.5rem">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.05em">Przypisanie plików do kont</div>
-    <div id="adsMappingList" style="display:flex;flex-direction:column;gap:.5rem"></div>
-    <div style="margin-top:1rem;display:flex;gap:.75rem;align-items:center">
-      <button onclick="adsRunAnalysis()" id="adsRunBtn" style="font-family:var(--mono);font-size:11px;padding:7px 18px;border-radius:6px;border:1px solid rgba(244,114,182,.4);background:rgba(244,114,182,.12);color:#f472b6;cursor:pointer">▸ Analizuj z AI</button>
-      <button onclick="adsClearAll()" style="font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--text3);cursor:pointer">✕ Wyczyść</button>
+  <div id="adsMappingArea" style="display:none;margin-bottom:2rem">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.05em">Przypisanie plików do kont</div>
+    <div id="adsMappingList" style="display:flex;flex-direction:column;gap:.6rem"></div>
+    <div style="margin-top:1.25rem;display:flex;gap:.75rem;align-items:center">
+      <button onclick="adsRunAnalysis()" id="adsRunBtn" style="font-family:var(--mono);font-size:11px;padding:8px 20px;border-radius:6px;border:1px solid rgba(244,114,182,.4);background:rgba(244,114,182,.12);color:#f472b6;cursor:pointer">▸ Analizuj z AI</button>
+      <button onclick="adsClearAll()" style="font-family:var(--mono);font-size:10px;padding:7px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--text3);cursor:pointer">✕ Wyczyść</button>
       <span id="adsMappingStatus" style="font-family:var(--mono);font-size:10px;color:var(--text3)"></span>
+    </div>
+    <!-- Loading indicator -->
+    <div id="adsThinking" style="display:none;align-items:center;gap:.5rem;margin-top:1rem;padding:.75rem 1rem;border-radius:8px;background:rgba(244,114,182,.06);border:1px solid rgba(244,114,182,.15)">
+      <div class="agent-thinking-dot" style="background:#f472b6"></div>
+      <div class="agent-thinking-dot" style="background:#f472b6"></div>
+      <div class="agent-thinking-dot" style="background:#f472b6"></div>
+      <span style="font-family:var(--mono);font-size:10px;color:#f472b6;margin-left:.3rem" id="adsThinkingText">Ładuję parser xlsx...</span>
     </div>
   </div>
 
   <!-- Historia analiz -->
   <div id="adsHistoryArea">
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.05em">Historia analiz</div>
-    <div id="adsHistoryList" style="display:flex;flex-direction:column;gap:.5rem"></div>
-    <div id="adsHistoryEmpty" style="font-size:11px;color:var(--text3);padding:1rem 0">Brak zapisanych analiz. Wgraj pliki xlsx z Allegro Ads.</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.05em">Historia analiz</div>
+    <div id="adsHistoryList" style="display:flex;flex-direction:column;gap:.6rem"></div>
+    <div id="adsHistoryEmpty" style="font-size:11px;color:var(--text3);padding:1.5rem 0">Brak zapisanych analiz. Wgraj pliki xlsx z Allegro Ads.</div>
   </div>
 </div>
 
@@ -5023,14 +5030,22 @@ async function adsLoadSheetJS() {
 
 async function adsRunAnalysis() {
   const btn = document.getElementById('adsRunBtn');
-  btn.textContent='⟳ Przetwarzam...'; btn.disabled=true;
+  const thinking = document.getElementById('adsThinking');
+  const thinkingText = document.getElementById('adsThinkingText');
+
+  btn.textContent='▸ Analizuj z AI'; btn.disabled=true;
+  thinking.style.display='flex';
+  thinkingText.textContent='Ładuję parser xlsx...';
 
   try {
     await adsLoadSheetJS();
   } catch(e) {
+    thinking.style.display='none';
     alert('Nie udało się załadować parsera xlsx. Sprawdź połączenie z internetem.');
-    btn.textContent='▸ Analizuj z AI'; btn.disabled=false; return;
+    btn.disabled=false; return;
   }
+
+  thinkingText.textContent='Przetwarzam pliki...';
 
   // Parse all files
   const toAnalyze = adsPendingFiles.filter(p=>p.accountKey);
@@ -5044,10 +5059,15 @@ async function adsRunAnalysis() {
     }
   }
 
-  if(!results.length){ alert('Nie udało się odczytać żadnego pliku.'); btn.textContent='▸ Analizuj z AI'; btn.disabled=false; return; }
+  if(!results.length){
+    thinking.style.display='none';
+    alert('Nie udało się odczytać żadnego pliku.');
+    btn.disabled=false; return;
+  }
+
+  thinkingText.textContent='AI analizuje kampanie...';
 
   // Build prompt
-  btn.textContent='⟳ AI analizuje...';
   const dateStr = new Date().toLocaleDateString('pl-PL');
 
   let prompt = `Jesteś analitykiem Allegro Ads agencji e-commerce. Mam dane kampanii Ads dla ${results.length} kont za okres wgranych plików.\n\n`;
@@ -5102,14 +5122,16 @@ async function adsRunAnalysis() {
     if(hist.length>15) hist.length=15;
     localStorage.setItem(SK_ADS_HISTORY, JSON.stringify(hist));
 
+    thinking.style.display='none';
     adsClearAll();
     openAdsReportWindow(entry);
     renderImportAdsList();
 
   } catch(e) {
+    thinking.style.display='none';
     alert('Błąd API: '+e.message);
   }
-  btn.textContent='▸ Analizuj z AI'; btn.disabled=false;
+  btn.disabled=false;
 }
 
 function adsClearAll() {
