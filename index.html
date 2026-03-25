@@ -3361,13 +3361,14 @@ function renderGlobalMonthsTable(){
   const pct = v => v != null ? v.toFixed(1)+'%' : '—';
 
   const dArrow = (v, prev, good) => {
-    if(v == null || prev == null || prev === 0) return '';
+    const empty = `<span style="display:inline-block;width:36px"></span>`;
+    if(v == null || prev == null || prev === 0) return empty;
     const d = (v - prev) / Math.abs(prev) * 100;
-    if(Math.abs(d) < 0.5) return '';
+    if(Math.abs(d) < 0.5) return empty;
     const up = d > 0;
     const positive = good === 'high' ? up : !up;
     const col = positive ? 'var(--green)' : 'var(--red)';
-    return ` <span style="color:${col};font-family:var(--mono);font-size:9px">${up?'▲':'▼'}${Math.abs(d).toFixed(0)}%</span>`;
+    return `<span style="display:inline-block;width:36px;color:${col};font-family:var(--mono);font-size:9px;text-align:left"> ${up?'▲':'▼'}${Math.abs(d).toFixed(0)}%</span>`;
   };
 
   // Columns — no sumaZl
