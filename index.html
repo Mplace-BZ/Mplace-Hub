@@ -3382,9 +3382,11 @@ function renderGlobalMonthsTable(){
   ];
 
   // Header row
+  const colW = 'width:130px;min-width:130px';
   const thead = `<thead><tr style="background:var(--bg3)">
-    <th style="padding:7px 12px;text-align:left;font-family:var(--mono);font-size:9px;color:var(--text3);font-weight:400;border-bottom:2px solid var(--border2);min-width:150px">Konto / Miesiąc</th>
-    ${COLS.map(col=>`<th style="padding:7px 10px;text-align:right;font-family:var(--mono);font-size:9px;color:var(--text3);font-weight:400;border-bottom:2px solid var(--border2)">${col.lbl}</th>`).join('')}
+    <th style="padding:7px 12px;text-align:left;font-family:var(--mono);font-size:9px;color:var(--text3);font-weight:400;border-bottom:2px solid var(--border2);width:140px;min-width:140px">Konto</th>
+    <th style="padding:7px 10px;text-align:left;font-family:var(--mono);font-size:9px;color:var(--text3);font-weight:400;border-bottom:2px solid var(--border2);width:70px">Miesiąc</th>
+    ${COLS.map(col=>`<th style="padding:7px 10px;text-align:right;font-family:var(--mono);font-size:9px;color:var(--text3);font-weight:400;border-bottom:2px solid var(--border2);width:130px">${col.lbl}</th>`).join('')}
   </tr></thead>`;
 
   // Body: per account block, per month row
