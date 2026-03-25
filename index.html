@@ -4991,29 +4991,66 @@ async function adsParseXlsx(file) {
         const ws = wb.Sheets[sheetName];
         const rows = XLSX.utils.sheet_to_json(ws, {header:1});
         if(rows.length<2){ reject('Brak danych'); return; }
-        const headers = rows[0];
-        const idxKampania=0, idxGrupa=1, idxWysw=4, idxKlik=5, idxKoszt=9, idxRoas=10, idxSztuki=11, idxSprzedaz=12;
-        const kampMap = {};
+
+        // Kolumny: 0=kampania,1=grupa,2=oferta,3=nr,4=wysw,5=klik,6=zaint,7=cpc,8=ctr,9=koszt,10=roas,11=sztuki,12=sprzedaz
+        const aukcje = [];
         for(let i=1;i<rows.length;i++){
           const r=rows[i];
-          const k=r[idxKampania]||'';
+          const k=String(r[0]||'').trim();
           if(!k) continue;
-          if(!kampMap[k]) kampMap[k]={kampania:k,wyswietlenia:0,klikniecia:0,koszt:0,sprzedaz:0,sztuki:0};
-          kampMap[k].wyswietlenia += Number(r[idxWysw])||0;
-          kampMap[k].klikniecia  += Number(r[idxKlik])||0;
-          kampMap[k].koszt       += Number(r[idxKoszt])||0;
-          kampMap[k].sprzedaz    += Number(r[idxSprzedaz])||0;
-          kampMap[k].sztuki      += Number(r[idxSztuki])||0;
+          aukcje.push({
+            kampania: k,
+            grupa: String(r[1]||'').trim(),
+            oferta: String(r[2]||'').trim(),
+            nr: String(r[3]||'').trim(),
+            wysw: Number(r[4])||0,
+            klik: Number(r[5])||0,
+            koszt: Number(r[9])||0,
+            sprzedaz: Number(r[12])||0,
+            sztuki: Number(r[11])||0,
+          });
         }
-        const kampanie = Object.values(kampMap).map(k=>({
-          ...k,
-          roas: k.koszt>0 ? k.sprzedaz/k.koszt : 0,
-          ctr:  k.wyswietlenia>0 ? k.klikniecia/k.wyswietlenia*100 : 0,
-          cpc:  k.klikniecia>0 ? k.koszt/k.klikniecia : 0
-        })).sort((a,b)=>b.sprzedaz-a.sprzedaz);
-        const totKoszt = kampanie.reduce((s,k)=>s+k.koszt,0);
-        const totSprzedaz = kampanie.reduce((s,k)=>s+k.sprzedaz,0);
-        resolve({kampanie, totKoszt, totSprzedaz, totRoas: totKoszt>0?totSprzedaz/totKoszt:0});
+
+        // Agreguj per kampania
+        const kampMap={};
+        aukcje.forEach(a=>{
+          if(!kampMap[a.kampania]) kampMap[a.kampania]={kampania:a.kampania,wysw:0,klik:0,koszt:0,sprzedaz:0,sztuki:0,grupy:{}};
+          const km=kampMap[a.kampania];
+          km.wysw+=a.wysw; km.klik+=a.klik; km.koszt+=a.koszt; km.sprzedaz+=a.sprzedaz; km.sztuki+=a.sztuki;
+          // Agreguj per grupa
+          if(!km.grupy[a.grupa]) km.grupy[a.grupa]={grupa:a.grupa,wysw:0,klik:0,koszt:0,sprzedaz:0,sztuki:0,aukcje:[]};
+          const gm=km.grupy[a.grupa];
+          gm.wysw+=a.wysw; gm.klik+=a.klik; gm.koszt+=a.koszt; gm.sprzedaz+=a.sprzedaz; gm.sztuki+=a.sztuki;
+          gm.aukcje.push(a);
+        });
+
+        // Oblicz ROAS/CTR/CPC na każdym poziomie
+        const calc = o=>({
+          ...o,
+          roas: o.koszt>0?o.sprzedaz/o.koszt:0,
+          ctr: o.wysw>0?o.klik/o.wysw*100:0,
+          cpc: o.klik>0?o.koszt/o.klik:0
+        });
+
+        const kampanie = Object.values(kampMap).map(km=>{
+          const grupy = Object.values(km.grupy).map(gm=>({
+            ...calc(gm),
+            aukcje: gm.aukcje.map(a=>calc(a)).sort((a,b)=>b.koszt-a.koszt)
+          })).sort((a,b)=>b.sprzedaz-a.sprzedaz);
+          return {...calc(km), grupy};
+        }).sort((a,b)=>b.sprzedaz-a.sprzedaz);
+
+        const totKoszt=kampanie.reduce((s,k)=>s+k.koszt,0);
+        const totSprzedaz=kampanie.reduce((s,k)=>s+k.sprzedaz,0);
+
+        // Zgniłe jaja: koszt>0, sprzedaz=0
+        const zgnile = aukcje.filter(a=>a.koszt>0&&a.sprzedaz===0).map(a=>calc(a)).sort((a,b)=>b.koszt-a.koszt);
+        const kosztZgnile = zgnile.reduce((s,a)=>s+a.koszt,0);
+
+        // Gwiazdy: ROAS>7, sprzedaz>0
+        const gwiazdy = aukcje.filter(a=>a.sprzedaz>0&&a.koszt>0&&a.sprzedaz/a.koszt>7).map(a=>calc(a)).sort((a,b)=>b.roas-a.roas);
+
+        resolve({kampanie, totKoszt, totSprzedaz, totRoas:totKoszt>0?totSprzedaz/totKoszt:0, zgnile, kosztZgnile, gwiazdy, aukcje});
       } catch(err){ reject(err.message); }
     };
     reader.readAsArrayBuffer(file);
@@ -5072,27 +5109,38 @@ async function adsRunAnalysis() {
   // Build prompt
   const dateStr = new Date().toLocaleDateString('pl-PL');
 
-  let prompt = `Jesteś analitykiem Allegro Ads agencji e-commerce. Mam dane kampanii Ads dla ${results.length} kont za okres wgranych plików.\n\n`;
-  prompt += `REGUŁY DECYZYJNE:\n- ROAS > 7 → SKALUJ budżet +10-20%\n- ROAS 4-7 → TRZYMAJ (monitoruj)\n- ROAS < 4 → TNIJ budżet lub zatrzymaj\n- ROAS = 0 → ZATRZYMAJ kampanię\n\n`;
+  let prompt = `Analityk Allegro Ads. Dane 3-poziomowe: Kampania → Grupa Reklam → Aukcja.\n\nREGUŁY:\n- ROAS>7 → SKALUJ +10-20% | ROAS 4-7 → TRZYMAJ | ROAS<4 → TNIJ | ROAS=0 i koszt>0 → ZATRZYMAJ\n- CTR<1% z kosztem → podejrzana aukcja\n- Zgniłe jajo = koszt>0, sprzedaż=0\n\n`;
 
   results.forEach(r=>{
-    prompt += `\n═══ ${r.accountName} ═══\n`;
-    prompt += `Łącznie: Koszt ${r.totKoszt.toFixed(0)} zł | Sprzedaż ${r.totSprzedaz.toFixed(0)} zł | ROAS ${r.totRoas.toFixed(2)}\n\n`;
-    prompt += `Kampanie:\n`;
+    prompt += `\n══ ${r.accountName} ══\n`;
+    prompt += `ŁĄCZNIE: Koszt ${r.totKoszt.toFixed(0)}zł | Sprzedaż ${r.totSprzedaz.toFixed(0)}zł | ROAS ${r.totRoas.toFixed(2)} | Zgniłe jaja: ${(r.zgnile||[]).length} aukcji = ${(r.kosztZgnile||0).toFixed(0)}zł przepalone\n\n`;
     r.kampanie.forEach(k=>{
-      const akcja = k.roas===0?'🔴 ZATRZYMAJ':k.roas<4?'🔴 TNIJ':k.roas<7?'🟡 TRZYMAJ':'🟢 SKALUJ +10-20%';
-      prompt += `  ${k.kampania}: Koszt ${k.koszt.toFixed(0)}zł | Sprzedaż ${k.sprzedaz.toFixed(0)}zł | ROAS ${k.roas.toFixed(2)} | CTR ${k.ctr.toFixed(2)}% | ${akcja}\n`;
+      const ak=k.roas===0&&k.koszt>0?'ZATRZYMAJ':k.roas<4?'TNIJ':k.roas<7?'TRZYMAJ':'SKALUJ';
+      prompt += `KAMPANIA: ${k.kampania} | Koszt:${k.koszt.toFixed(0)}zł Sprzedaż:${k.sprzedaz.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}% → ${ak}\n`;
+      k.grupy.forEach(g=>{
+        const ag=g.roas===0&&g.koszt>0?'ZATRZYMAJ':g.roas<4?'TNIJ':g.roas<7?'TRZYMAJ':'SKALUJ';
+        prompt += `  GRUPA: ${g.grupa} | Koszt:${g.koszt.toFixed(0)}zł Sprzedaż:${g.sprzedaz.toFixed(0)}zł ROAS:${g.roas.toFixed(2)} CTR:${g.ctr.toFixed(2)}% → ${ag}\n`;
+        g.aukcje.forEach(a=>{
+          const aa=a.roas===0&&a.koszt>0?'ZATRZYMAJ':a.roas>0&&a.roas<4?'TNIJ':a.roas>=4&&a.roas<7?'TRZYMAJ':a.roas>=7?'SKALUJ':'brak sprzedazy';
+          prompt += `    AUKCJA [${a.nr}] ${a.oferta.substring(0,50)} | Koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} CTR:${a.ctr.toFixed(2)}% Sztuki:${a.sztuki} → ${aa}\n`;
+        });
+      });
+      prompt += '\n';
     });
+    if(r.zgnile&&r.zgnile.length){
+      prompt += `ZGNIŁE JAJA TOP (${r.zgnile.length} aukcji, ${(r.kosztZgnile||0).toFixed(0)}zł przepalone):\n`;
+      r.zgnile.slice(0,10).forEach(a=>{ prompt+=`  [${a.nr}] ${a.oferta.substring(0,45)} | ${a.koszt.toFixed(0)}zł | CTR:${a.ctr.toFixed(2)}%\n`; });
+      prompt+='\n';
+    }
   });
 
-  prompt += `\nWygeneruj pełną analizę Ads w formacie raportu. Dla każdego konta:\n`;
-  prompt += `1. PODSUMOWANIE KONTA — ogólna ocena efektywności Ads\n`;
-  prompt += `2. TABELA KAMPANII — wszystkie kampanie z kolumnami: Kampania | Koszt | Sprzedaż | ROAS | Akcja\n`;
-  prompt += `3. CZERWONE FLAGI — kampanie które tracą pieniądze (ROAS<4), z kwotą przepalania\n`;
-  prompt += `4. ZIELONE OKAZJE — kampanie ROAS>7 do skalowania, ile można zyskać przy +20% budżetu\n`;
-  prompt += `5. REKOMENDACJE [PILNE/WAŻNE] — konkretne działania w formacie: działanie → oczekiwany efekt w zł\n`;
-  prompt += `\nNa końcu: PODSUMOWANIE CROSS-ACCOUNT — porównanie kont, gdzie najlepszy ROI, gdzie najgorszy.\n`;
-  prompt += `Styl: konkretny, liczby w zł, po polsku, nagłówki H3.`;
+  prompt += `\nWygeneruj raport w 5 sekcjach — BEZ tabel markdown (bez |---|), używaj list i akapitów:\n`;
+  prompt += `1. PRZEGLĄD — 3-4 zdania: łączny ROAS, ile przepalone na zgniłych jajach, główny wniosek\n`;
+  prompt += `2. ZGNIŁE JAJA — lista aukcji do natychmiastowego zatrzymania: [numer] skrócona nazwa | przepalono Xzł | powód\n`;
+  prompt += `3. GWIAZDY — aukcje ROAS>7: [numer] nazwa | ROAS X | koszt obecny Xzł → sugerowany Xzł | szac. dodatkowy przychód Xzł\n`;
+  prompt += `4. GRUPY REKLAM — które grupy ciągną w dół (ROAS<4), które w górę — konkretna diagnoza per grupa\n`;
+  prompt += `5. REKOMENDACJE — max 5 działań: [PILNE/WAŻNE] co zrobić z jaką aukcją/grupą → efekt w zł\n`;
+  prompt += `Styl: konkretny, liczby w zł i %, po polsku.`;
 
   try {
     const res = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev', {
@@ -5175,47 +5223,84 @@ function adsDeleteHistory(i) {
 function openAdsReportWindow(entry) {
   const results = entry.rawResults || [];
   const totRoas = entry.totKoszt>0?(entry.totSprzedaz/entry.totKoszt):0;
+  const th = (t,align)=>`<th style="padding:5px 8px;font-family:monospace;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #e8e8e8;text-align:${align||'left'};white-space:nowrap">${t}</th>`;
+  const td = (t,align,color)=>`<td style="padding:5px 8px;font-family:monospace;font-size:10px;border-bottom:1px solid #f0f0f0;text-align:${align||'left'}${color?';color:'+color+';font-weight:700':''}">${t}</td>`;
+  const roasColor = r=>r>=7?'#2dd4a0':r>=4?'#f5a623':'#ff4d6a';
+  const akcja = r=>r===0?'ZATRZYMAJ':r<4?'TNIJ':r<7?'TRZYMAJ':'SKALUJ';
 
-  // Build campaign tables HTML
   let tablesHtml = '';
   results.forEach(r=>{
-    const rows = r.kampanie.map(k=>{
-      const akcjaColor = k.roas===0||k.roas<4?'#ff4d6a':k.roas<7?'#f5a623':'#2dd4a0';
-      const akcja = k.roas===0?'ZATRZYMAJ':k.roas<4?'TNIJ':k.roas<7?'TRZYMAJ':'SKALUJ +20%';
-      return `<tr>
-        <td style="padding:5px 8px;font-size:10px;color:#333;border-bottom:1px solid #eee">${k.kampania}</td>
-        <td style="padding:5px 8px;font-family:monospace;font-size:10px;text-align:right;border-bottom:1px solid #eee">${k.koszt.toFixed(0)} zł</td>
-        <td style="padding:5px 8px;font-family:monospace;font-size:10px;text-align:right;border-bottom:1px solid #eee">${k.sprzedaz.toFixed(0)} zł</td>
-        <td style="padding:5px 8px;font-family:monospace;font-size:10px;text-align:right;border-bottom:1px solid #eee">${k.roas.toFixed(2)}</td>
-        <td style="padding:5px 8px;font-family:monospace;font-size:9px;text-align:center;border-bottom:1px solid #eee;color:${akcjaColor};font-weight:700">${akcja}</td>
-      </tr>`;
-    }).join('');
-    tablesHtml += `
-      <h3 style="margin:1.5rem 0 .5rem;font-size:13px;color:#1a1a2e;border-left:3px solid #f472b6;padding-left:.75rem">${r.accountName}</h3>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:.5rem">
-        <thead><tr style="background:#f8f8f8">
-          <th style="padding:5px 8px;text-align:left;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">Kampania</th>
-          <th style="padding:5px 8px;text-align:right;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">Koszt</th>
-          <th style="padding:5px 8px;text-align:right;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">Sprzedaż</th>
-          <th style="padding:5px 8px;text-align:right;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">ROAS</th>
-          <th style="padding:5px 8px;text-align:center;font-size:9px;text-transform:uppercase;color:#888;border-bottom:2px solid #eee">Akcja</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>`;
+    // Podsumowanie konta
+    tablesHtml += `<h3 style="margin:1.5rem 0 .75rem;font-size:14px;font-weight:700;color:#1a1a2e;border-left:4px solid #f472b6;padding-left:.75rem">${r.accountName}</h3>`;
+    tablesHtml += `<div style="display:flex;gap:1.5rem;margin-bottom:1rem;flex-wrap:wrap">
+      <div style="font-family:monospace;font-size:11px;color:#555">Koszt: <strong>${r.totKoszt.toFixed(0)} zł</strong></div>
+      <div style="font-family:monospace;font-size:11px;color:#555">Sprzedaż: <strong>${r.totSprzedaz.toFixed(0)} zł</strong></div>
+      <div style="font-family:monospace;font-size:11px;color:${roasColor(r.totRoas)}">ROAS: <strong>${r.totRoas.toFixed(2)}</strong></div>
+      <div style="font-family:monospace;font-size:11px;color:#ff4d6a">Przepalone: <strong>${((r.kosztZgnile)||0).toFixed(0)} zł</strong> (${(r.zgnile||[]).length} aukcji)</div>
+    </div>`;
+
+    // Tabela kampania → grupa → aukcja
+    r.kampanie.forEach(k=>{
+      const kc=roasColor(k.roas), ka=akcja(k.roas);
+      tablesHtml += `<table style="width:100%;border-collapse:collapse;margin-bottom:1.25rem;font-size:10px">
+        <thead>
+          <tr style="background:#1a1a2e">
+            <th colspan="7" style="padding:6px 10px;text-align:left;font-family:monospace;font-size:11px;color:#fff;font-weight:700">${k.kampania} <span style="color:${kc};margin-left:.5rem">${ka}</span> <span style="color:#aaa;font-weight:400;font-size:9px">· ${k.koszt.toFixed(0)}zł → ${k.sprzedaz.toFixed(0)}zł · ROAS ${k.roas.toFixed(2)} · CTR ${k.ctr.toFixed(2)}%</span></th>
+          </tr>
+          <tr style="background:#f4f4f4">
+            ${th('Poziom')}${th('Nazwa')}${th('Nr aukcji','center')}${th('Koszt','right')}${th('Sprzedaż','right')}${th('ROAS','right')}${th('CTR','right')}${th('Sztuki','right')}${th('Akcja','center')}
+          </tr>
+        </thead>
+        <tbody>`;
+
+      k.grupy.forEach(g=>{
+        const gc=roasColor(g.roas), ga=akcja(g.roas);
+        tablesHtml += `<tr style="background:#fafafa">
+          ${td('<strong>GRUPA</strong>')}
+          ${td(`<strong>${g.grupa}</strong>`)}
+          ${td('—','center','#ccc')}
+          ${td(g.koszt.toFixed(0)+' zł','right')}
+          ${td(g.sprzedaz.toFixed(0)+' zł','right')}
+          ${td(g.roas.toFixed(2),'right',gc)}
+          ${td(g.ctr.toFixed(2)+'%','right')}
+          ${td(String(g.sztuki),'right')}
+          ${td(ga,'center',gc)}
+        </tr>`;
+        g.aukcje.forEach(a=>{
+          const ac=roasColor(a.roas), aa=akcja(a.roas);
+          const isZgnile = a.koszt>0&&a.sprzedaz===0;
+          const rowBg = isZgnile?'background:#fff5f5':'';
+          tablesHtml += `<tr style="${rowBg}">
+            ${td('aukcja','',isZgnile?'#ff4d6a':'#aaa')}
+            ${td(a.oferta.substring(0,55)+(a.oferta.length>55?'…':''),'','#333')}
+            ${td(`<a href="https://allegro.pl/oferta/${a.nr}" target="_blank" style="color:#4d9fff;text-decoration:none;font-family:monospace">${a.nr}</a>`,'center')}
+            ${td(a.koszt>0?a.koszt.toFixed(0)+' zł':'—','right',isZgnile?'#ff4d6a':'')}
+            ${td(a.sprzedaz>0?a.sprzedaz.toFixed(0)+' zł':'—','right')}
+            ${td(a.koszt>0&&a.sprzedaz>0?a.roas.toFixed(2):'—','right',a.koszt>0?ac:'')}
+            ${td(a.ctr.toFixed(2)+'%','right',a.ctr<1&&a.koszt>0?'#ff4d6a':'')}
+            ${td(String(a.sztuki),'right')}
+            ${td(a.koszt>0?aa:'—','center',a.koszt>0?ac:'#ccc')}
+          </tr>`;
+        });
+      });
+      tablesHtml += '</tbody></table>';
+    });
   });
 
   const aiHtml = (entry.aiText||'')
     .replace(/###\s*(.+)/g,'<h3 style="margin:1.2rem 0 .4rem;font-size:13px;color:#1a1a2e;border-left:3px solid #f472b6;padding-left:.75rem">$1</h3>')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\n\n/g,'</p><p style="margin:.4rem 0">')
+    .replace(/\n\n/g,'</p><p style="margin:.5rem 0">')
     .replace(/\n/g,'<br>');
 
+  const existing = document.getElementById('adsReportOverlay');
+  if(existing) existing.remove();
   const overlay = document.createElement('div');
   overlay.id = 'adsReportOverlay';
-  overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:9999;overflow:auto;padding:2rem;box-sizing:border-box';
+  overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:9999;overflow:auto;padding:2rem 2.5rem;box-sizing:border-box';
   overlay.innerHTML = `
-    <div style="max-width:860px;margin:0 auto" id="adsReportContent">
-      <div style="border-bottom:3px solid #f472b6;padding-bottom:1rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-end">
+    <div style="max-width:960px;margin:0 auto" id="adsReportContent">
+      <div style="border-bottom:3px solid #f472b6;padding-bottom:1rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem">
         <div>
           <div style="font-family:monospace;font-size:10px;color:#f472b6;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.25rem">MPlace Hub · Import Ads</div>
           <h1 style="font-size:1.3rem;font-weight:700;color:#1a1a2e;margin:0">Analiza Kampanii Allegro Ads</h1>
@@ -5223,14 +5308,14 @@ function openAdsReportWindow(entry) {
         </div>
         <div style="text-align:right">
           <div style="font-family:monospace;font-size:10px;color:#888">Łączny ROAS</div>
-          <div style="font-family:monospace;font-size:1.6rem;font-weight:700;color:${totRoas>=7?'#2dd4a0':totRoas>=4?'#f5a623':'#ff4d6a'}">${totRoas.toFixed(2)}</div>
+          <div style="font-family:monospace;font-size:1.8rem;font-weight:700;color:${roasColor(totRoas)}">${totRoas.toFixed(2)}</div>
           <div style="font-family:monospace;font-size:9px;color:#aaa">${Math.round(entry.totKoszt).toLocaleString('pl-PL')} zł → ${Math.round(entry.totSprzedaz).toLocaleString('pl-PL')} zł</div>
         </div>
       </div>
-      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:0 0 .75rem">Kampanie per konto</h2>
+      <h2 style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:0 0 1rem;border-bottom:1px solid #eee;padding-bottom:.4rem">Dane per kampania / grupa / aukcja</h2>
       ${tablesHtml}
-      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:1.5rem 0 .75rem">Analiza AI</h2>
-      <div style="font-size:11px;line-height:1.7;color:#333"><p style="margin:.4rem 0">${aiHtml}</p></div>
+      <h2 style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:2rem 0 .75rem;border-bottom:1px solid #eee;padding-bottom:.4rem">Analiza AI</h2>
+      <div style="font-size:11px;line-height:1.8;color:#333"><p style="margin:.5rem 0">${aiHtml}</p></div>
       <div style="border-top:1px solid #eee;margin-top:2rem;padding-top:.75rem;font-family:monospace;font-size:9px;color:#aaa">
         Wygenerowano: ${entry.date} · MPlace Hub · mplace-bz.github.io/Mplace-Hub
       </div>
