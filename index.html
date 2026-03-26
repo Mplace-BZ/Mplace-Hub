@@ -1233,6 +1233,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;padding-top:.4rem;border-top:1px solid var(--border)">
     <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;align-self:center">Playbook:</span>
     <button onclick="openPlaybook('PD')" class="agent-chip" style="border-color:rgba(245,166,35,.3);color:var(--yellow);background:rgba(245,166,35,.06)">📋 Plan Dnia</button>
+    <button onclick="openPlaybook('RM')" class="agent-chip" style="border-color:rgba(45,212,160,.3);color:var(--green);background:rgba(45,212,160,.06)">📋 Rentowność</button>
   </div>
 
   <!-- Input -->
@@ -5442,25 +5443,71 @@ const PLAYBOOK_SECTIONS = {
     color: 'var(--yellow)',
     prompts: [
       { id:'PD-01', name:'Plan dnia 60 min – wszystkie konta', needsKonto: false,
+        tags:['#PLAYBOOK','#DZIENNE','#PRIORYTETY','#RENTOWNOŚĆ','#D2D','#WSZYSTKIE-KONTA'],
         prompt: `Masz aktualne dane D2D, MTD, Dashboard i Insights dla wszystkich kont. Przyjmij, że mam dziś 60 minut na pracę operacyjną.\n\nUłóż szczegółowy plan dnia jako listę maksymalnie 7 zadań.\n\nDla każdego zadania podaj:\n- Konto lub grupa kont\n- Konkretne działanie (co dokładnie mam zrobić)\n- Dlaczego właśnie teraz (najważniejsza przyczyna wynikająca z danych)\n- Szacowany czas realizacji w minutach\n- Szacowany impact finansowy w zł do końca bieżącego miesiąca\n- Poziom ryzyka pominięcia: niski / średni / wysoki\n\nPosortuj od największego impactu. Łączny czas max 60 minut. Na końcu podsumowanie 3–4 zdania: cel dnia, czego absolutnie nie pominąć i jaki EOM mogę się spodziewać.` },
       { id:'PD-02', name:'Plan dnia 30 min – tryb ekspresowy', needsKonto: false,
+        tags:['#PLAYBOOK','#DZIENNE','#SZYBKA-DECYZJA','#ALERTY'],
         prompt: `Mam dziś maksymalnie 30 minut. Działaj jak dyspozytornia kryzysowa: wybierz 3 i tylko 3 zadania z największym impaktem.\n\nKażde zadanie w formacie jednej linii:\nKONTO → DZIAŁANIE → IMPACT (zł) → CZAS (min)\n\nNie opisuj, nie analizuj, nie dodawaj kontekstu. Na końcu jedno zdanie: 'Jeśli nie zrobię nic więcej dziś, priorytet absolutny to: [jedno zdanie].'` },
       { id:'PD-03', name:'Poranek – na co dziś zwrócić uwagę', needsKonto: false,
+        tags:['#PLAYBOOK','#DZIENNE','#ALERTY','#D2D','#WSZYSTKIE-KONTA'],
         prompt: `Jestem właśnie po wejściu do pracy. Daj mi poranny briefing w 3 sekcjach:\n\nALERTY – co od ostatniego zapisu D2D zmieniło się wymagając natychmiastowej reakcji (ROAS poniżej BE, wyróżnienia >5%, marża ujemna). Każdy alert: konto → co się stało → jak pilne (dziś / ten tydzień).\n\nSZANSE – konta z potencjałem do działania ofensywnego dziś (skalowanie Ads, dobry ROAS do podbicia budżetu).\n\nPLAN – 3 konkretne zadania na dziś w kolejności priorytetów. Jedno zdanie na zadanie.` },
       { id:'PD-04', name:'Koniec dnia – retro i plan na jutro', needsKonto: false,
+        tags:['#PLAYBOOK','#DZIENNE','#RETRO','#D2D','#MENTOR'],
         prompt: `Porównaj dane D2D z dzisiaj vs poprzedni dzień dla wszystkich kont. Retro dnia w 3 sekcjach:\n\nCO POSZŁO DOBRZE – konta które poprawiły metryki (wzrost sprzedaży, poprawa ROAS, marży). Konkretne liczby.\n\nCZERWONE FLAGI – konta które pogorszyły wyniki lub przekroczyły próg ryzyka. Podaj przyczynę jeśli można odczytać z danych.\n\nPLAN NA JUTRO – 5 konkretnych zadań posortowanych priorytetem: Konto → Działanie → Impact (zł) → Czas (min).` },
       { id:'PD-05', name:'Tygodniowy plan działań – poniedziałek', needsKonto: false,
+        tags:['#PLAYBOOK','#TYGODNIOWE','#PRIORYTETY','#MARŻA','#WSZYSTKIE-KONTA'],
         prompt: `Masz dane MTD, D2D i Insights dla wszystkich kont. Zaplanuj tydzień (Pn–Pt):\n\nPn: przegląd kondycji kont i korekty budżetów Ads\nWt–Śr: optymalizacje operacyjne (wyróżnienia, kampanie, ceny)\nCzw: analiza trendów i porównanie MTD do poprzedniego miesiąca\nPt: raport dla klientów + plan budżetów na kolejny tydzień\n\nDla każdego zadania: Konto → Działanie → Impact (zł) → Czas (min). Na końcu: 'Jeśli wykonam ten plan, spodziewany EOM marży całej agencji wyniesie: [szacunek w zł].'` },
       { id:'PD-06', name:'Interwencja kryzysowa – konto spada', needsKonto: true,
+        tags:['#PLAYBOOK','#KRYZYS','#SZYBKA-DECYZJA','#MARŻA','#ROAS','#ADS'],
         prompt: `Konto [KONTO] ma w tym miesiącu wyraźnie gorsze wyniki. Działaj jak konsultant kryzysowy.\n\nDIAGNOZA – co dokładnie się pogorszyło (które metryki, od kiedy, jak bardzo vs poprzedni miesiąc i vs benchmark grupy).\n\nPRZYCZYNY – lista możliwych przyczyn (Ads, wyróżnienia, prowizja, cena, sezonowość, kanibalizacja), posortowana od najbardziej prawdopodobnej.\n\nPLAN RATUNKOWY – 5 konkretnych działań do wykonania w 48h: Działanie → Oczekiwany efekt w zł → Ryzyko.\n\nNa końcu oceń: czy sytuacja odwracalna w bieżącym miesiącu?` },
       { id:'PD-07', name:'Priorytetyzacja po weekendzie', needsKonto: false,
+        tags:['#PLAYBOOK','#DZIENNE','#D2D','#EOM','#PRIORYTETY'],
         prompt: `Porównaj dane D2D z piątku z danymi z weekendu dla wszystkich kont:\n\n1. Które konta miały dobry / zły weekend i dlaczego (ROAS, sprzedaż, marża – konkretne liczby)?\n2. Jak zmienił się prognozowany EOM dla każdego konta po weekendzie?\n3. Które konta wymagają korekty Ads lub wyróżnień na początek tygodnia?\n\nNa końcu 'Reset tygodnia' – top 5 zadań priorytetowych na dziś: Konto → Działanie → Impact (zł) → Czas (min).` },
       { id:'PD-08', name:'Ostatnie 5 dni miesiąca – domknięcie', needsKonto: false,
+        tags:['#PLAYBOOK','#EOM','#PRIORYTETY','#ADS','#BUDŻET'],
         prompt: `Jest ostatnie 5 dni miesiąca. Zmaksymalizuj wynik EOM dla wszystkich kont.\n\nDla każdego konta:\n1. Czy EOM jest na dobrej drodze vs cel / poprzedni miesiąc?\n2. Jedno konkretne działanie do wykonania dziś lub jutro które da efekt w 5 dni.\n3. Czego absolutnie NIE ruszać w ostatnich dniach miesiąca?\n\nTabela: Konto / Status EOM / Jedno działanie / Czego nie ruszać. Na końcu: prognoza łącznej marży agencji na EOM (zł).` },
       { id:'PD-09', name:'Gdzie dziś tracę pieniądze – szybki audyt', needsKonto: false,
+        tags:['#PLAYBOOK','#RENTOWNOŚĆ','#MARŻA','#WYRÓŻNIENIA','#SZYBKA-DECYZJA'],
         prompt: `Przejrzyj aktualne dane wszystkich kont i znajdź miejsca gdzie tracę pieniądze:\n\n- Wyróżnienia >5% sprzedaży (przepalanie – podaj kwotę)\n- Kampanie Ads z ROAS poniżej BE ROAS (konto, różnica ROAS, strata w zł/mies.)\n- Konta z marżą po reklamie poniżej 0%\n- Konta gdzie koszt dostawy + prowizja pochłania >35% sprzedaży\n\nTabela: Konto / Rodzaj wycieku / Kwota straty (zł/mies.) / Jedno działanie naprawcze.\nNa końcu: łączna szacowana strata miesięczna i łączny potencjał oszczędności.` },
       { id:'PD-10', name:'Prognoza tygodnia – czy jestem na dobrej drodze', needsKonto: false,
+        tags:['#PLAYBOOK','#EOM','#TREND','#D2D','#PROGNOZA'],
         prompt: `Na podstawie danych D2D i MTD dla wszystkich kont oceń czy jestem na dobrej drodze do dobrego wyniku EOM.\n\nDla każdego konta:\n1. Aktualne tempo: średnia dzienna sprzedaż i marża z ostatnich 7 dni\n2. Prognozowany EOM przy obecnym tempie (zł sprzedaży i marży)\n3. Ocena trajektorii: rośnie / spada / stabilna vs poprzedni miesiąc\n4. Jedno działanie które poprawi trajektorię jeśli niezadowalająca\n\nNa końcu: sumaryczna prognoza marży agencji na EOM i ocena 1–10 z uzasadnieniem w 2 zdaniach.` }
+    ]
+  },
+  RM: {
+    label: 'Sekcja 2 — Rentowność i Marża',
+    color: '#2dd4a0',
+    prompts: [
+      { id:'RM-01', name:'Gdzie uciekają pieniądze – pełny audyt marży', needsKonto: false,
+        tags:['#MARŻA','#RENTOWNOŚĆ','#WYRÓŻNIENIA','#ADS','#WSZYSTKIE-KONTA'],
+        prompt: `Przejrzyj aktualne dane wszystkich 9 kont i znajdź każde miejsce, gdzie uciekają pieniądze z marży.\n\nSzukaj w 4 kategoriach:\n1. Wyróżnienia powyżej 5% sprzedaży → podaj konto, % i kwotę przepalenia w zł/mies.\n2. Kampanie Ads z ROAS poniżej BE ROAS → konto, różnica ROAS, szacowana strata zł/mies.\n3. Marża po reklamie poniżej 0% → konto, aktualna marża %, strata zł/mies.\n4. Dostawa + prowizja powyżej 35% sprzedaży → konto, % udział, szacowany nadmiar kosztów.\n\nTabela: Konto / Kategoria wycieku / Kwota straty (zł/mies.) / Działanie naprawcze / Czas realizacji (min).\nPosortuj od największej straty. Na końcu: łączna strata miesięczna + łączny potencjał odzyskania.` },
+      { id:'RM-02', name:'BE ROAS – kontrola wszystkich kont', needsKonto: false,
+        tags:['#RENTOWNOŚĆ','#ROAS','#MARŻA','#ADS','#WSZYSTKIE-KONTA'],
+        prompt: `Oblicz BE ROAS dla każdego z 9 kont: BE ROAS = 1 / (marża_przed_reklamą / 100).\n\nDla każdego konta:\n- Marża przed reklamą (%)\n- BE ROAS (wyliczony)\n- Aktualny ROAS Ads (z danych MTD)\n- Różnica: aktualny ROAS vs BE ROAS (+ lub −)\n- Ocena: BEZPIECZNY (>115% BE) / UWAGA (85–115% BE) / KRYZYS (<85% BE)\n\nTabela posortowana od największego ryzyka. Na końcu wskaż 3 konta wymagające natychmiastowej korekty ROAS i zaproponuj konkretną wartość docelowego ROAS.` },
+      { id:'RM-03', name:'Marża po reklamie – ranking kont', needsKonto: false,
+        tags:['#MARŻA','#RENTOWNOŚĆ','#WSZYSTKIE-KONTA','#TREND','#EOM'],
+        prompt: `Wylicz marżę po reklamie dla każdego konta:\nMarża = (sprzedaż × (1–producent%) – prowizja – dostawa – Ads – wyróżnienia) / sprzedaż × 100.\n\nTabela: Konto / Sprzedaż MTD / Marża po reklamie (%) / Marża (zł) / Zmiana vs poprzedni miesiąc (pp).\nPosortuj od najwyższej marży. Zaznacz: ≥10% = zielony / 0–10% = żółty / <0% = czerwony.\nNa końcu: lider rentowności, największe ryzyko i prognoza łącznej marży EOM (zł).` },
+      { id:'RM-04', name:'Wyróżnienia – audyt przepalania', needsKonto: false,
+        tags:['#WYRÓŻNIENIA','#RENTOWNOŚĆ','#MARŻA','#WSZYSTKIE-KONTA'],
+        prompt: `Sprawdź wyróżnienia (promoC) dla wszystkich kont. Próg bezpieczny: ≤5% sprzedaży.\n\nDla każdego konta:\n- Wyróżnienia (zł) i jako % sprzedaży\n- Czy powyżej progu 5%: TAK / NIE\n- Jeśli TAK: kwota przepalenia = (wyróżnienia − 5% × sprzedaż) w zł/mies.\n- Rekomendacja: o ile obniżyć i jaki efekt na marżę w zł\n\nNa końcu: łączna kwota przepalenia w całej agencji i potencjalna poprawa marży po korekcie.` },
+      { id:'RM-05', name:'Rentowność grupy MEBLE – analiza globalna', needsKonto: false,
+        tags:['#RENTOWNOŚĆ','#MARŻA','#MEBLE','#KANIBALIZACJA','#EOM'],
+        prompt: `Przeanalizuj grupę MEBLE (MobelKap, PerfektCięcie, MeblenaCzasie) jako jeden organizm.\n\nPolicz:\n1. Łączna sprzedaż grupy MTD i prognoza EOM\n2. Łączna marża po reklamie grupy (%) i (zł)\n3. Łączny koszt Ads + wyróżnienia jako % łącznej sprzedaży grupy\n4. Udział każdego konta w sprzedaży i marży grupy (%)\n5. Ocena kanibalizacji: czy któreś konto odbiera sprzedaż innemu bez poprawy marży globalnej?\n\nNa końcu: czy MEBLE Global jest rentowne? Które konto najbardziej 'kosztuje' grupę? Jedna rekomendacja strukturalna.` },
+      { id:'RM-06', name:'Porównaj marżę: ten miesiąc vs poprzedni', needsKonto: false,
+        tags:['#MARŻA','#RENTOWNOŚĆ','#TREND','#WSZYSTKIE-KONTA','#RAPORT'],
+        prompt: `Porównaj marżę po reklamie wszystkich kont: bieżący miesiąc MTD vs poprzedni miesiąc (pełny).\n\nDla każdego konta:\n- Marża poprzedni miesiąc (%)\n- Marża bieżący MTD (%)\n- Zmiana w pp\n- Główna przyczyna zmiany (1 zdanie)\n- Czy trend wymaga działania: TAK / NIE / OBSERWUJ\n\nPosortuj od największego pogorszenia. Na końcu: średnia marża agencji poprzedni vs bieżący miesiąc i ocena kierunku.` },
+      { id:'RM-07', name:'Symulator marży – co jeśli zmienię prowizję', needsKonto: true,
+        tags:['#MARŻA','#RENTOWNOŚĆ','#SYMULATOR','#SZYBKA-DECYZJA'],
+        prompt: `Dla konta [KONTO] wykonaj symulację wrażliwości marży na zmianę prowizji.\n\nPrezelicz marżę dla 5 scenariuszy:\nAktualna / −1pp / −2pp / +1pp / +2pp.\n\nDla każdego: marża (%), marża (zł/mies.), zmiana vs aktualny (zł/mies.).\nNa końcu: przy jakiej maksymalnej prowizji konto nadal rentowne (marża ≥5%)? Czy obecna prowizja jest bezpieczna?` },
+      { id:'RM-08', name:'Rentowność po dostawie – czy dostawa zjada marżę', needsKonto: false,
+        tags:['#MARŻA','#RENTOWNOŚĆ','#SZYBKA-DECYZJA','#WSZYSTKIE-KONTA'],
+        prompt: `Przeanalizuj udział kosztu dostawy w sprzedaży dla wszystkich kont.\n\nDla każdego konta:\n- Koszt dostawy (zł MTD) i jako % sprzedaży\n- Marża bez dostawy (%) i z dostawą (%)\n- Ile pp zabiera dostawa z marży\n\nPosortuj od największego udziału dostawy. Zaznacz konta gdzie dostawa >10% sprzedaży.\nNa końcu: czy któreś konto byłoby nieopłacalne bez Ads? Łączny koszt dostawy agencji w miesiącu?` },
+      { id:'RM-09', name:'Top 3 konta do poprawy rentowności – plan 30 dni', needsKonto: false,
+        tags:['#RENTOWNOŚĆ','#MARŻA','#PRIORYTETY','#PLAYBOOK','#MENTOR'],
+        prompt: `Wskaż 3 konta z największym potencjałem poprawy rentowności w ciągu 30 dni.\n\nDla każdego:\n- Aktualna marża (%) i (zł)\n- Realistyczna marża docelowa po 30 dniach (%)\n- Potencjalna poprawa w zł/mies.\n- Plan 30 dni – 3 kroki z tygodniowym harmonogramem\n- Główne ryzyko i jak je ograniczyć\n\nNa końcu: łączny potencjał poprawy marży dla top 3 w zł/mies. i ocena trudności: łatwe / średnie / wymagające.` },
+      { id:'RM-10', name:'Health check rentowności – ocena 1-10', needsKonto: false,
+        tags:['#RENTOWNOŚĆ','#MARŻA','#HEALTH-SCORE','#WSZYSTKIE-KONTA','#ALERTY'],
+        prompt: `Oceń kondycję rentowności każdego z 9 kont w skali 1–10:\n10 = doskonała (marża >15%, ROAS daleko powyżej BE, wyróżnienia w normie)\n1 = konto generuje straty, wymaga natychmiastowej interwencji.\n\nDla każdego konta:\n- Ocena 1–10\n- Główny argument (1 zdanie, liczby)\n- Jedna rzecz najbardziej obniżająca score\n- Jedna rzecz którą mogę zrobić dziś żeby podnieść score o 1–2 punkty\n\nPosortuj od najniższego. Na końcu: średni health score agencji, trend vs poprzedni miesiąc, ocena kondycji w 2–3 zdaniach.` }
     ]
   }
 };
@@ -5478,15 +5525,23 @@ function openPlaybook(section) {
 
   const list = document.getElementById('pbList');
   list.innerHTML = sec.prompts.map((p,i) => `
-    <div onclick="selectPlaybookPrompt('${section}',${i})"
-      style="padding:.65rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.75rem"
-      onmouseover="this.style.borderColor='rgba(245,166,35,.4)';this.style.background='rgba(245,166,35,.05)'"
-      onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg3)'">
-      <span style="font-family:var(--mono);font-size:9px;color:${sec.color};flex-shrink:0;letter-spacing:.04em">${p.id}</span>
-      <span style="font-size:11px;color:var(--text)">${p.name}</span>
-      ${p.needsKonto ? '<span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto">wymaga konta</span>' : ''}
+    <div data-section="${section}" data-idx="${i}" class="pb-item"
+      style="padding:.65rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s">
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <span style="font-family:var(--mono);font-size:9px;color:${sec.color};flex-shrink:0;letter-spacing:.04em;min-width:40px">${p.id}</span>
+        <span style="font-size:11px;color:var(--text);flex:1">${p.name}</span>
+        ${p.needsKonto ? '<span style="font-family:var(--mono);font-size:9px;color:var(--text3)">+ konto</span>' : ''}
+      </div>
+      <div style="margin-top:4px;padding-left:52px;font-family:var(--mono);font-size:9px;color:var(--text3)">${p.tags.join(' ')}</div>
     </div>
   `).join('');
+
+  // Event delegation — jeden listener zamiast inline onclick
+  list.querySelectorAll('.pb-item').forEach(el => {
+    el.addEventListener('mouseover', ()=>{ el.style.borderColor='rgba(245,166,35,.4)'; el.style.background='rgba(245,166,35,.05)'; });
+    el.addEventListener('mouseout', ()=>{ el.style.borderColor='var(--border)'; el.style.background='var(--bg3)'; });
+    el.addEventListener('click', ()=> selectPlaybookPrompt(el.dataset.section, parseInt(el.dataset.idx)));
+  });
 
   const modal = document.getElementById('playbookModal');
   modal.style.display = 'flex';
