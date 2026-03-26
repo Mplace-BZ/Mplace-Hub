@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub</title>
+<title>MPlace Hub v2.6</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1240,6 +1240,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="openPlaybook('RA')" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.06)">📋 ROAS / Ads</button>
     <button onclick="openPlaybook('KP')" class="agent-chip" style="border-color:rgba(244,114,182,.3);color:#f472b6;background:rgba(244,114,182,.06)">📋 Kanibalizacja</button>
     <button onclick="openPlaybook('DT')" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.06)">📋 D2D / Trend</button>
+    <button onclick="openPlaybook('SE')" class="agent-chip" style="border-color:rgba(232,121,249,.3);color:#e879f9;background:rgba(232,121,249,.06)">📋 Symulator</button>
   </div>
 
   <!-- Input -->
@@ -5626,6 +5627,42 @@ const PLAYBOOK_SECTIONS = {
         tags:['#D2D','#TREND','#WSZYSTKIE-KONTA','#MARŻA','#ROAS','#EOM','#RAPORT'],
         prompt: `Wygeneruj tygodniowy dashboard kondycji agencji na podstawie danych D2D z ostatnich 7 dni.\n\n5 sekcji:\n1. LICZBY TYGODNIA – łączna sprzedaż, marża, ROAS, koszt Ads, wyróżnienia agencji\n2. RANKING KONT – tabela 9 kont posortowana po marży (zł): Konto / Sprzedaż / Marża % / Marża zł / ROAS / Trend vs poprzedni tydzień (↑↓→)\n3. SYGNAŁY – max 5 najważniejszych: [ALERT/SZANSA/INFO] Konto → Co się dzieje → Impact w zł\n4. PROGNOZA EOM – aktualna prognoza sprzedaży i marży per konto i łącznie. Zmiana vs prognoza sprzed tygodnia\n5. PRIORYTETY NA 7 DNI – 5 zadań: Konto → Działanie → Impact (zł) → Czas (min) → Deadline\n\nNa końcu: ocena tygodnia agencji 1–10 i jedna decyzja strategiczna której nie można odłożyć.` }
     ]
+  },
+  SE: {
+    label: 'Sekcja 6 — Symulator i Eksperymenty',
+    color: '#e879f9',
+    prompts: [
+      { id:'SE-01', name:'Symulator marży – 3 scenariusze dla konta', needsKonto: true,
+        tags:['#SYMULATOR','#MARŻA','#ROAS','#BUDŻET','#PROGNOZA'],
+        prompt: `Dla konta [KONTO] wykonaj symulację marży po reklamie w 3 scenariuszach.\n\nA – Konserwatywny: ROAS +10% powyżej obecnego, budżet i wyróżnienia bez zmian.\nB – Zrównoważony: ROAS 110% BE ROAS, budżet Ads +15%, wyróżnienia zredukowane do 4% sprzedaży.\nC – Agresywny: ROAS −10% poniżej obecnego, budżet Ads +30%, wyróżnienia na poziomie benchmarku MeblenaCzasie.\n\nDla każdego: szacowana sprzedaż EOM, koszt Ads EOM, koszt wyróżnień EOM, marża (%) i (zł), zmiana marży vs bazowy (zł).\nNa końcu: który scenariusz rekomendуjesz i dlaczego. Jakie jedno ryzyko może sprawić że nie zadziała?` },
+      { id:'SE-02', name:'Symulator ceny – jak zmiana ceny uderza w marżę', needsKonto: true,
+        tags:['#SYMULATOR','#MARŻA','#RENTOWNOŚĆ','#MENTOR'],
+        prompt: `Dla konta [KONTO] zasymuluj wpływ zmiany ceny na marżę.\n\n5 poziomów ceny: −10% / −5% / obecna / +5% / +10%.\nDla każdego dwa warianty:\n- Wariant 1: popyt stały\n- Wariant 2: elastyczny (−5% wolumenu na każde +10% ceny)\n\nDla każdej kombinacji: sprzedaż, marża (%) i (zł/mies.), zmiana vs cena obecna.\nNa końcu: przy jakiej cenie marża maksymalna? Czy obecna cena jest optymalna? Jedna rekomendacja cenowa w zł.` },
+      { id:'SE-03', name:'Symulator prowizji – granica opłacalności', needsKonto: true,
+        tags:['#SYMULATOR','#MARŻA','#RENTOWNOŚĆ','#SZYBKA-DECYZJA'],
+        prompt: `Dla konta [KONTO] zasymuluj wpływ zmiany prowizji Allegro na marżę.\n\n7 poziomów: aktualna −3pp / −2pp / −1pp / aktualna / +1pp / +2pp / +3pp.\nDla każdego: marża (%) i (zł/mies.), zmiana (zł), status: BEZPIECZNY (≥10%) / UWAGA (5–10%) / RYZYKO (0–5%) / STRATA (<0%).\n\nNa końcu:\n- Przy jakiej prowizji konto schodzi poniżej 5% marży?\n- Przy jakiej marża <0%?\n- O ile zł/mies. poprawi się marża przy prowizji niższej o 1pp?` },
+      { id:'SE-04', name:'Eksperyment budżetowy – test +20% Ads na 14 dni', needsKonto: true,
+        tags:['#SYMULATOR','#BUDŻET','#ADS','#ROAS','#D2D','#MENTOR'],
+        prompt: `Zaprojektuj eksperyment: zwiększam budżet Ads o 20% na koncie [KONTO] na 14 dni.\n\n1. HIPOTEZA – co zakładam ze sprzedażą i marżą\n2. WARUNKI STARTOWE – aktualne metryki bazowe\n3. METRYKI DO ŚLEDZENIA W D2D – 4–5 liczb codziennie\n4. KRYTERIUM SUKCESU – co musi się stać po 14 dniach\n5. KRYTERIUM ZATRZYMANIA – kiedy przerywam wcześniej\n6. SZACOWANY KOSZT – dodatkowe zł Ads w 14 dni\n7. SZACOWANY ZWROT – dodatkowa marża jeśli hipoteza się potwierdzi\n\nCzy warto przeprowadzić teraz biorąc pod uwagę fazę miesiąca i trend konta?` },
+      { id:'SE-05', name:'Co jeśli odetnę wyróżnienia o 50% – symulacja', needsKonto: true,
+        tags:['#SYMULATOR','#WYRÓŻNIENIA','#MARŻA','#RENTOWNOŚĆ'],
+        prompt: `Zasymuluj: redukuję wyróżnienia o 50% na koncie [KONTO].\n\nDwa warianty:\n- Optymistyczny: sprzedaż spada o 10%\n- Pesymistyczny: sprzedaż spada o 25%\n\nDla każdego: nowa sprzedaż MTD i EOM, nowy koszt wyróżnień, nowa marża (%) i (zł), zmiana marży vs obecny stan.\nPróg: przy jakim spadku sprzedaży redukcja przestaje być opłacalna?\nCzy redukcja o 50% jest bezpieczna? Jaki rekomendowany poziom docelowy (zł i %)?` },
+      { id:'SE-06', name:'Scenariusz wzrostu o 10 000 zł marży', needsKonto: false,
+        tags:['#SYMULATOR','#MARŻA','#RENTOWNOŚĆ','#BUDŻET','#WSZYSTKIE-KONTA'],
+        prompt: `Chcę zwiększyć łączną marżę agencji o 10 000 zł w przyszłym miesiącu vs bieżący. Nie zmieniam cen.\n\nSzukaj w 4 obszarach:\n1. Redukcja przepalania Ads (ROAS <BE) – ile marży i na których kontach\n2. Redukcja przepalania wyróżnień (>5%) – ile marży\n3. Skalowanie kampanii ROAS >130% BE – ile dodatkowej marży i jakim kosztem\n4. Optymalizacja alokacji budżetu między kontami\n\nDla każdego obszaru: konto, działanie, efekt w zł.\nNa końcu: czy 10 000 zł jest osiągalne i jakie prawdopodobieństwo sukcesu (1–10)?` },
+      { id:'SE-07', name:'Symulator kanibalizacji – co zyska grupa jeśli wyciszę konto', needsKonto: true,
+        tags:['#SYMULATOR','#KANIBALIZACJA','#MEBLE','#MARŻA'],
+        prompt: `Zasymuluj pełny efekt wyciszenia konta [KONTO] na marżę jego grupy.\n\n3 scenariusze przepływu:\nA: 70% sprzedaży przechodzi na grupę, 30% traci agencja\nB: 50% przechodzi, 50% traci\nC: 30% przechodzi, 70% traci\n\nDla każdego: łączna sprzedaż grupy, marża grupy, zmiana marży, oszczędność Ads+wyróżnienia, wynik netto.\nPrzy którym scenariuszu wyciszenie jest opłacalne? Jaki minimalny % sprzedaży musi przejść na inne konta żeby decyzja miała sens?` },
+      { id:'SE-08', name:'Test ceny na jednej aukcji – jak zaprojektować eksperyment', needsKonto: true,
+        tags:['#SYMULATOR','#MARŻA','#MENTOR','#D2D'],
+        prompt: `Zaprojektuj eksperyment cenowy dla konta [KONTO] na 21 dni.\n\n3 fazy:\n- Faza 1 (dni 1–7): cena obecna – dane bazowe\n- Faza 2 (dni 8–14): cena +X% (zaproponuj optymalną zmianę)\n- Faza 3 (dni 15–21): cena −X% poniżej obecnej\n\nDla każdej fazy: docelowa cena (zł), szacowana sprzedaż (szt./tydzień), marża (%) i (zł/tydzień), metryki do śledzenia w D2D, kryterium zatrzymania fazy.\nJak po 21 dniach wybieram optymalną cenę? Wzór decyzyjny: maksymalna marża w zł, nie maksymalny wolumen.` },
+      { id:'SE-09', name:'Symulator fee agencji – jak decyzje wpływają na wynagrodzenie', needsKonto: false,
+        tags:['#SYMULATOR','#MARŻA','#RENTOWNOŚĆ','#BIZNES-AGENCJI','#PROGNOZA'],
+        prompt: `Zasymuluj wpływ 3 scenariuszy operacyjnych na moje łączne fee agencyjne w bieżącym miesiącu.\n\nModel fee: MEBLE 7 500 zł netto / LUXSEN 20% od marży grupy / Materazzi+MtzzEU 3 500 zł / Ankado24 2 900 zł.\n\nA – Status quo: obecne tempo bez zmian\nB – Optymistyczny: wdrażam top 3 działania z ostatniego playbooka (podaj które i ich efekt na marżę LUXSEN)\nC – Pesymistyczny: LUXSEN traci 15% marży przez nieoptymalne Ads przez resztę miesiąca\n\nDla każdego: marża LUXSEN i fee z LUXSEN, łączne fee agencji, zmiana fee vs A, annualizowane fee (×12).\nKtóre jedno działanie dziś ma największy wpływ na moje wynagrodzenie i o ile zł może je zwiększyć?` },
+      { id:'SE-10', name:'Symulator pełny – wszystkie dźwignie naraz', needsKonto: true,
+        tags:['#SYMULATOR','#MARŻA','#ROAS','#BUDŻET','#WYRÓŻNIENIA','#RENTOWNOŚĆ'],
+        prompt: `Wykonaj pełną symulację wszystkich 4 dźwigni dla konta [KONTO] jednocześnie.\n\nDźwignia 1 – ROAS Ads: obecny → docelowy\nDźwignia 2 – Budżet Ads: obecny zł/mies. → docelowy\nDźwignia 3 – Wyróżnienia: obecny % → docelowy % sprzedaży\nDźwignia 4 – Prowizja: obecna % → docelowa % (scenariusz renegocjacji)\n\nJeśli nie podałem wartości docelowych – zaproponuj je sam na podstawie benchmarków.\n\nEfekt kombinowany: sprzedaż EOM, koszt Ads+wyróżnienia EOM, marża (%) i (zł), zmiana marży (zł i pp), która dźwignia ma największy wpływ, które się wzajemnie wzmacniają a które są w konflikcie.\nGdybym mógł ruszyć tylko jedną dźwignię dziś – którą wybierasz i dlaczego? Oczekiwany efekt w zł w 30 dni.` }
+    ]
   }
 };
 
@@ -5668,17 +5705,30 @@ function selectPlaybookPrompt(section, idx) {
   if(!p) return;
   pbCurrentPrompt = p;
 
-  // Highlight selected item
-  document.querySelectorAll('.pb-item').forEach(el=>el.style.background='var(--bg3)');
-  const selected = document.querySelector(`.pb-item[data-idx="${idx}"]`);
-  if(selected) selected.style.background='rgba(245,166,35,.08)';
+  // Podświetl wybrany item
+  document.querySelectorAll('.pb-item').forEach(el=>{
+    el.style.background='var(--bg3)';
+    el.style.borderColor='var(--border)';
+  });
+  const selected = document.querySelector(`.pb-item[data-section="${section}"][data-idx="${idx}"]`);
+  if(selected){
+    selected.style.background='rgba(245,166,35,.1)';
+    selected.style.borderColor='rgba(245,166,35,.5)';
+  }
 
-  // Always show action bar
+  // Pokaż pasek akcji
   const wrap = document.getElementById('pbKontoWrap');
+  const label = document.getElementById('pbKontoLabel');
+  const sel = document.getElementById('pbKontoSelect');
   wrap.style.display = 'block';
-  document.getElementById('pbKontoSelect').style.display = p.needsKonto ? 'block' : 'none';
-  document.querySelector('#pbKontoWrap .pb-konto-label').style.display = p.needsKonto ? 'block' : 'none';
-  document.getElementById('pbKontoSelect').value = '';
+  if(p.needsKonto){
+    label.style.display = 'block';
+    sel.style.display = 'block';
+    sel.value = '';
+  } else {
+    label.style.display = 'none';
+    sel.style.display = 'none';
+  }
 }
 
 function runPlaybookWithKonto() {
@@ -6421,10 +6471,10 @@ self.addEventListener('fetch', e => e.respondWith(
       <button onclick="closePlaybook()" style="background:transparent;border:none;color:var(--text3);font-size:16px;cursor:pointer">✕</button>
     </div>
     <div id="pbList" style="display:flex;flex-direction:column;gap:.5rem"></div>
-    <!-- Action bar (zawsze widoczna po wyborze promptu) -->
+    <!-- Action bar -->
     <div id="pbKontoWrap" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
-      <div class="pb-konto-label" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.5rem">Wybierz konto:</div>
-      <select id="pbKontoSelect" style="width:100%;font-family:var(--mono);font-size:11px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);margin-bottom:.75rem">
+      <div id="pbKontoLabel" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.5rem;display:none">Wybierz konto:</div>
+      <select id="pbKontoSelect" style="width:100%;font-family:var(--mono);font-size:11px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);margin-bottom:.75rem;display:none">
         <option value="">— wybierz konto —</option>
         <option value="MobelKap">MobelKap</option>
         <option value="PerfektCięcie">PerfektCięcie</option>
