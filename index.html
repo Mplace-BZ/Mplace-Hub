@@ -2,6 +2,9 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>MPlace Hub</title>
@@ -1236,6 +1239,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="openPlaybook('RM')" class="agent-chip" style="border-color:rgba(45,212,160,.3);color:var(--green);background:rgba(45,212,160,.06)">📋 Rentowność</button>
     <button onclick="openPlaybook('RA')" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.06)">📋 ROAS / Ads</button>
     <button onclick="openPlaybook('KP')" class="agent-chip" style="border-color:rgba(244,114,182,.3);color:#f472b6;background:rgba(244,114,182,.06)">📋 Kanibalizacja</button>
+    <button onclick="openPlaybook('DT')" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.06)">📋 D2D / Trend</button>
   </div>
 
   <!-- Input -->
@@ -5586,6 +5590,42 @@ const PLAYBOOK_SECTIONS = {
         tags:['#KANIBALIZACJA','#MARŻA','#ROAS','#WSZYSTKIE-KONTA','#HEALTH-SCORE','#RAPORT'],
         prompt: `Stwórz pełną mapę portfela wszystkich 9 kont w układzie 3 grup (MEBLE / LUXSEN / ONE).\n\nTabela dla każdego konta:\n- Sprzedaż MTD (zł) i udział w sprzedaży grupy (%)\n- Marża po reklamie (%) i (zł)\n- ROAS Ads vs BE ROAS – status: SKALUJ / TRZYMAJ / OPTYMALIZUJ / KRYZYS\n- Health score 1–10\n- Rola: LIDER / WSPIERAJĄCE / SŁABE OGNIWO / TESTOWE\n- Jeden priorytet strategiczny na kolejny miesiąc (max 10 słów)\n\nPodsumowanie per grupa (3 zdania): łączna marża i trend, największa szansa, największe ryzyko.\nNa końcu: ocena portfela agencji 1–10, prognoza łącznej marży EOM (zł) i jedna decyzja strategiczna na najbliższy tydzień.` }
     ]
+  },
+  DT: {
+    label: 'Sekcja 5 — D2D / Trend / Anomalie',
+    color: '#b47fff',
+    prompts: [
+      { id:'DT-01', name:'Anomalie D2D – co się dziś wyłamuje z trendu', needsKonto: false,
+        tags:['#D2D','#ANOMALIE','#TREND','#ALERTY','#SZYBKA-DECYZJA'],
+        prompt: `Przeanalizuj dane D2D dla wszystkich kont z ostatnich 14 dni. Znajdź anomalie – miejsca gdzie dzisiejsze dane wyraźnie odchylają się od średniej z ostatnich 7 dni.\n\nDla każdej anomalii:\n- Konto i metryka (sprzedaż / ROAS / koszt Ads / marża)\n- Średnia z 7 dni vs dzisiejsza wartość\n- Odchylenie w % od średniej\n- Anomalia pozytywna (szansa) czy negatywna (ryzyko)\n- Prawdopodobna przyczyna w 1 zdaniu\n- Czy wymaga działania dziś: TAK / OBSERWUJ / NIE\n\nPosortuj od największego odchylenia negatywnego. Na końcu: które 2–3 anomalie są najważniejsze i co sprawdzić jako pierwsze.` },
+      { id:'DT-02', name:'Momentum kont – kto przyspiesza, kto hamuje', needsKonto: false,
+        tags:['#D2D','#TREND','#PROGNOZA','#WSZYSTKIE-KONTA','#EOM'],
+        prompt: `Porównaj momentum sprzedaży i marży: pierwszy tydzień miesiąca vs ostatnie 7 dni.\n\nDla każdego konta:\n- Średnia dzienna sprzedaż: pierwszy tydzień vs ostatnie 7 dni (zł/dzień)\n- Zmiana momentum w % (+ przyspiesza / − hamuje)\n- Średnia dzienna marża: pierwszy tydzień vs ostatnie 7 dni\n- Ocena trendu: ROSNĄCY / STABILNY / SPADAJĄCY / ODWRACAJĄCY SIĘ\n\nPosortuj od największego spadku momentum. Na końcu: które konta zmieniły kierunek w trakcie miesiąca i jakie działanie może odwrócić negatywne momentum w 3–5 dni.` },
+      { id:'DT-03', name:'Prognoza EOM na dziś – ile zarobimy do końca miesiąca', needsKonto: false,
+        tags:['#D2D','#EOM','#PROGNOZA','#WSZYSTKIE-KONTA','#MARŻA'],
+        prompt: `Oblicz prognozę EOM dla każdego konta na podstawie tempa z ostatnich 7 dni.\n\nDla każdego konta:\n- Średnia dzienna sprzedaż z ostatnich 7 dni (zł)\n- Liczba dni pozostałych do końca miesiąca\n- Prognoza sprzedaży EOM: MTD + (średnia dzienna × dni pozostałe) (zł)\n- Prognoza marży po reklamie EOM (zł)\n- Porównanie do poprzedniego miesiąca: +/− zł i %\n- Ocena: LEPIEJ / NA POZIOMIE / GORZEJ\n\nNa końcu: łączna prognoza sprzedaży i marży agencji EOM. Czy ten miesiąc będzie rekordowy, przeciętny czy słaby – uzasadnij w 3 zdaniach.` },
+      { id:'DT-04', name:'Tygodnie vs siebie – czy ten tydzień jest lepszy', needsKonto: false,
+        tags:['#D2D','#TREND','#WSZYSTKIE-KONTA','#MARŻA','#ROAS'],
+        prompt: `Porównaj wszystkie konta: bieżący tydzień (ostatnie 7 dni) vs poprzedni tydzień (7–14 dni temu).\n\nDla każdego konta:\n- Sprzedaż: bieżący vs poprzedni tydzień (zł i % zmiana)\n- Marża po reklamie: bieżący vs poprzedni (% i pp zmiana)\n- ROAS Ads: bieżący vs poprzedni\n- Koszt Ads: bieżący vs poprzedni (zł i % zmiana)\n- Ocena tygodnia konta: LEPSZY / GORSZY / STABILNY\n\nPosortuj od największej poprawy. Na końcu: ile kont poprawiło wyniki, łączna zmiana marży agencji tydzień do tygodnia w zł.` },
+      { id:'DT-05', name:'Dni tygodnia – kiedy sprzedaję najlepiej i najgorzej', needsKonto: false,
+        tags:['#D2D','#TREND','#ANOMALIE','#BUDŻET','#ADS'],
+        prompt: `Przeanalizuj dane D2D z ostatnich 4 tygodni pod kątem wzorców według dni tygodnia.\n\nDla każdego dnia tygodnia (Pn–Nd):\n- Średnia sprzedaż dzienna (zł) – wszystkie konta łącznie\n- Średni ROAS Ads w ten dzień\n- Średnia marża po reklamie (%)\n- Który dzień najlepszy i najgorszy sprzedażowo?\n\nDla top 3 kont: ich indywidualny wzorzec tygodniowy.\nNa końcu: jak alokować budżet Ads dziennie na podstawie tych wzorców? Konkretna rekomendacja w zł i %.` },
+      { id:'DT-06', name:'Alert spadku – konto traci tempo od X dni', needsKonto: false,
+        tags:['#D2D','#ANOMALIE','#ALERTY','#KRYZYS','#TREND'],
+        prompt: `Przejrzyj dane D2D z ostatnich 14 dni. Znajdź konta z nieprzerwanym trendem spadkowym przez 3+ dni z rzędu.\n\nDla każdego konta:\n- Ile dni z rzędu trwa trend spadkowy\n- Sprzedaż/marża na początku trendu vs dziś (zł i %)\n- Łączna strata przez ten okres (zł)\n- Prognozowana strata do EOM jeśli trend się nie odwróci (zł)\n- Najbardziej prawdopodobna przyczyna\n- Jedno działanie do wykonania dziś żeby zatrzymać spadek\n\nPosortuj od najdłuższego trendu. Na końcu: czy któreś konto wymaga interwencji kryzysowej dziś?` },
+      { id:'DT-07', name:'Porównanie miesięcy – pełna analiza', needsKonto: false,
+        tags:['#TREND','#D2D','#MARŻA','#ROAS','#WSZYSTKIE-KONTA','#RAPORT'],
+        prompt: `Porównaj wyniki wszystkich kont: bieżący miesiąc MTD (ekstrapolowany) vs poprzedni miesiąc (pełne dane).\n\nTabela dla każdego konta:\n- Sprzedaż poprzedni vs prognoza bieżący (zł i % zmiana)\n- Marża po reklamie poprzedni vs bieżący (% i pp zmiana)\n- ROAS Ads poprzedni vs bieżący MTD\n- Koszt Ads poprzedni vs bieżący (zł i %)\n- Wyróżnienia jako % sprzedaży: poprzedni vs bieżący\n- Ocena: POPRAWA / BEZ ZMIAN / POGORSZENIE\n\nPodsumowanie per grupa. Łączna marża agencji poprzedni vs bieżący w zł i ocena trendu w 2 zdaniach.` },
+      { id:'DT-08', name:'Sezonowość – czego spodziewać się w kolejnym miesiącu', needsKonto: false,
+        tags:['#TREND','#PROGNOZA','#EOM','#BUDŻET','#MENTOR'],
+        prompt: `Na podstawie historii miesięcznej wszystkich kont przeanalizuj wzorce sezonowe.\n\nDla każdego konta lub grupy:\n- Które miesiące historycznie najsilniejsze i najsłabsze?\n- Jak kolejny miesiąc wypadał historycznie vs bieżący (% różnicy sprzedaży)?\n- Prognoza sprzedaży i marży na kolejny miesiąc\n\nStrategia budżetowa na kolejny miesiąc uwzględniająca sezonowość:\n- Które konta zwiększyć budżet Ads (sezon w górę)\n- Które zmniejszyć (sezon w dół)\n- Jak zmienić wyróżnienia\nKonkretne liczby w zł i % dla każdego konta.` },
+      { id:'DT-09', name:'Najlepszy i najgorszy dzień miesiąca – co za tym stoi', needsKonto: false,
+        tags:['#D2D','#ANOMALIE','#TREND','#ROAS','#MENTOR'],
+        prompt: `Z danych D2D bieżącego miesiąca wskaż dla każdego konta najlepszy i najgorszy dzień (sprzedaż lub marża).\n\nDla każdego ekstremalnego dnia:\n- Metryki dnia (sprzedaż, ROAS, koszt Ads, wyróżnienia, marża)\n- Co się działo dzień przed i dzień po\n- Prawdopodobna przyczyna szczytu lub dołka\n- Czy wzorzec się powtarza w historii D2D?\n\n3 praktyczne wnioski:\n- Co robić żeby replikować najlepsze dni\n- Czego unikać żeby nie generować najgorszych dni\n- Jedna zmiana w Ads lub wyróżnieniach do wdrożenia natychmiast.` },
+      { id:'DT-10', name:'Dashboard trendów – tygodniowy przegląd kondycji agencji', needsKonto: false,
+        tags:['#D2D','#TREND','#WSZYSTKIE-KONTA','#MARŻA','#ROAS','#EOM','#RAPORT'],
+        prompt: `Wygeneruj tygodniowy dashboard kondycji agencji na podstawie danych D2D z ostatnich 7 dni.\n\n5 sekcji:\n1. LICZBY TYGODNIA – łączna sprzedaż, marża, ROAS, koszt Ads, wyróżnienia agencji\n2. RANKING KONT – tabela 9 kont posortowana po marży (zł): Konto / Sprzedaż / Marża % / Marża zł / ROAS / Trend vs poprzedni tydzień (↑↓→)\n3. SYGNAŁY – max 5 najważniejszych: [ALERT/SZANSA/INFO] Konto → Co się dzieje → Impact w zł\n4. PROGNOZA EOM – aktualna prognoza sprzedaży i marży per konto i łącznie. Zmiana vs prognoza sprzed tygodnia\n5. PRIORYTETY NA 7 DNI – 5 zadań: Konto → Działanie → Impact (zł) → Czas (min) → Deadline\n\nNa końcu: ocena tygodnia agencji 1–10 i jedna decyzja strategiczna której nie można odłożyć.` }
+    ]
   }
 };
 
@@ -5623,7 +5663,10 @@ function openPlaybook(section) {
 
 function selectPlaybookPrompt(section, idx) {
   const sec = PLAYBOOK_SECTIONS[section];
-  pbCurrentPrompt = sec.prompts[idx];
+  if(!sec) { console.error('Brak sekcji:', section); return; }
+  const prompt = sec.prompts[idx];
+  if(!prompt) { console.error('Brak promptu idx:', idx, 'w sekcji:', section, 'prompts:', sec.prompts.length); return; }
+  pbCurrentPrompt = prompt;
 
   if(pbCurrentPrompt.needsKonto) {
     document.getElementById('pbKontoWrap').style.display = 'block';
