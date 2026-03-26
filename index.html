@@ -1242,6 +1242,8 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="openPlaybook('DT')" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.06)">📋 D2D / Trend</button>
     <button onclick="openPlaybook('SE')" class="agent-chip" style="border-color:rgba(232,121,249,.3);color:#e879f9;background:rgba(232,121,249,.06)">📋 Symulator</button>
     <button onclick="openPlaybook('IA')" class="agent-chip" style="border-color:rgba(245,166,35,.3);color:var(--yellow);background:rgba(245,166,35,.06)">📋 Insights</button>
+    <button onclick="openPlaybook('RC')" class="agent-chip" style="border-color:rgba(255,107,53,.3);color:var(--accent);background:rgba(255,107,53,.06)">📋 Raporty</button>
+    <button onclick="openPlaybook('MC')" class="agent-chip" style="border-color:rgba(45,212,160,.3);color:var(--green);background:rgba(45,212,160,.06)">📋 Mentor</button>
   </div>
 
   <!-- Input -->
@@ -5700,6 +5702,78 @@ const PLAYBOOK_SECTIONS = {
         tags:['#INSIGHTS','#RENTOWNOŚĆ','#MARŻA','#MENTOR','#WSZYSTKIE-KONTA','#KANIBALIZACJA'],
         prompt: `Przeanalizuj dane historyczne z ostatnich 3–6 miesięcy. Szukaj nie jednorazowych anomalii ale powtarzających się wzorców strat.\n\n5 obszarów:\n1. SYSTEMOWE PRZEPALANIE ADS – konta regularnie ROAS <BE mimo korekt, łączny koszt 3 miesiące (zł)\n2. CHRONICZNE PRZEPALANIE WYRÓŻNIEŃ – konta regularnie >5% mimo alertów, łączna kwota (zł)\n3. STRUKTURALNA KANIBALIZACJA – MEBLE traci marżę co miesiąc przez kanibalizację, koszt miesięcznie (zł)\n4. KONTA CHRONICZNE SŁABE – health score <5 przez 3+ miesiące, czy mają sens przy obecnym modelu fee\n5. LUKI W DECYZJACH – gdzie regularnie reaguję za późno i co to kosztuje\n\nDla każdego wzorca: opis, koszt 3 miesiące (zł), operacyjny czy strukturalny, systemowe rozwiązanie.\nRanking 5 problemów od największego kosztu. Łączna kwota strat systemowych przez 3 miesiące i ile miesięcznie zarabiam MNIEJ przez te problemy.` }
     ]
+  },
+  RC: {
+    label: 'Sekcja 8 — Raporty / Mail do Klienta',
+    color: '#ff6b35',
+    prompts: [
+      { id:'RC-01', name:'Raport MTD – pełny dla klienta MEBLE', needsKonto: false,
+        tags:['#RAPORT','#MEBLE','#MARŻA','#ROAS','#MAIL-DO-KLIENTA'],
+        prompt: `Przygotuj raport MTD dla klienta grupy MEBLE (MobelKap, PerfektCięcie, MeblenaCzasie).\n\n6 sekcji:\n1. PODSUMOWANIE WYKONAWCZE – 3 punkty: co poszło dobrze, co wymaga uwagi, prognoza EOM. Język właściciela biznesu, nie analityk.\n2. WYNIKI LICZBOWE – tabela: Konto / Sprzedaż MTD / Marża (%) / ROAS Ads / Koszt Ads / Zmiana vs poprzedni miesiąc (%).\n3. CO ZROBILIŚMY – 3–5 działań z efektem każdego w zł.\n4. CO PLANUJEMY – 3 działania na kolejny tydzień z oczekiwanym efektem.\n5. RYZYKA – max 2 ryzyka na kolejne 2 tygodnie z propozycją ograniczenia.\n6. PROGNOZA EOM – sprzedaż i marża per konto i łącznie (zł).\n\nStyl: konkretny, rzeczowy, bez technikaliów Ads.` },
+      { id:'RC-02', name:'Raport MTD – pełny dla klienta LUXSEN', needsKonto: false,
+        tags:['#RAPORT','#LUXSEN','#MARŻA','#ROAS','#MAIL-DO-KLIENTA','#BIZNES-AGENCJI'],
+        prompt: `Przygotuj raport MTD dla klienta grupy LUXSEN (Luxsen, Semmi, BOTAVIT).\n\n6 sekcji:\n1. PODSUMOWANIE WYKONAWCZE – wynik marży MTD, trend vs poprzedni miesiąc, prognoza EOM.\n2. WYNIKI LICZBOWE – tabela: Konto / Sprzedaż MTD / Marża (%) / Marża (zł) / ROAS Ads / Zmiana marży vs poprzedni miesiąc (pp).\n3. ANALIZA MARŻY – co wpłynęło na marżę (Ads, wyróżnienia, prowizja, mix). Dla każdego czynnika: wpływ w zł.\n4. CO ZROBILIŚMY – 3–5 działań z efektem w zł. Nacisk na ochronę i wzrost marży klienta.\n5. PLAN NA 2 TYGODNIE – 3 działania z prognozowanym efektem na marżę (zł).\n6. PROGNOZA EOM – marża grupy LUXSEN łącznie i per konto (zł).\n\nStyl: partnerski, zorientowany na zysk. Klient płaci 20% od marży więc zależy nam na tym samym.` },
+      { id:'RC-03', name:'Raport MTD – pełny dla klienta ONE', needsKonto: false,
+        tags:['#RAPORT','#MARŻA','#ROAS','#MAIL-DO-KLIENTA'],
+        prompt: `Przygotuj raport MTD dla klientów grupy ONE (Materazzi, MtzzEU, Ankado24).\n\n6 sekcji:\n1. PODSUMOWANIE WYKONAWCZE – per konto jedno zdanie: jak idzie miesiąc i prognoza EOM.\n2. WYNIKI LICZBOWE – tabela: Konto / Sprzedaż MTD / Marża (%) / ROAS / Koszt Ads / Wyróżnienia / Zmiana vs poprzedni.\n3. CO ZROBILIŚMY – per konto 2–3 działania z efektem. Co by się stało bez tych działań (strata lub zysk w zł).\n4. OBSERWACJE – max 2 per konto: sezonowość, zmiana algorytmu, konkurencja.\n5. PLAN NA KOLEJNY TYDZIEŃ – per konto 2 działania z oczekiwanym efektem.\n6. PROGNOZA EOM – per konto sprzedaż i marża (zł).\n\nStyl: profesjonalny, konkretny. Raport musi pokazywać wartość agencji przez konkretne działania.` },
+      { id:'RC-04', name:'Mail tygodniowy – krótki update dla klienta', needsKonto: true,
+        tags:['#RAPORT','#MAIL-DO-KLIENTA','#SZYBKA-DECYZJA','#TREND'],
+        prompt: `Przygotuj krótki tygodniowy update dla klienta [KONTO].\n\nWersja mail – maksymalnie 5 zdań:\n- wynik tygodnia (liczba)\n- co zrobiłem\n- co planuję w kolejnym tygodniu\n- ewentualne ryzyko lub szansa\n- prognoza EOM\n\nWersja WhatsApp – maksymalnie 3 zdania, tylko kluczowe liczby i jeden priorytet.\n\nStyl obu: bezpośredni, partnerski, bez żargonu. Klient ma poczuć że wszystko pod kontrolą.` },
+      { id:'RC-05', name:'Executive summary – 5 zdań na szefa', needsKonto: true,
+        tags:['#RAPORT','#MAIL-DO-KLIENTA','#SZYBKA-DECYZJA','#MARŻA','#PROGNOZA'],
+        prompt: `Przygotuj executive summary dla klienta [KONTO] w formie 5 zdań.\n\nKażde zdanie odpowiada na jedno pytanie:\n1. Ile zarobiłem do tej pory i ile zarobię do końca miesiąca? (liczby zł)\n2. Czy to lepiej czy gorzej niż poprzedni miesiąc i dlaczego w jednym słowie?\n3. Co agencja zrobiła żeby poprawić wynik?\n4. Co może zagrozić wynikowi w kolejnych 2 tygodniach?\n5. Co robimy dalej?\n\nPo 5 zdaniach tabela: 3 liczby które klient powinien zapamiętać (marża %, ROAS, sprzedaż EOM).\nStyl: rozmowa z partnerem biznesowym. Zero skrótów technicznych (ROAS = 'zwrot z reklamy', BE ROAS = 'próg opłacalności').` },
+      { id:'RC-06', name:'Raport porównawczy – ten miesiąc vs poprzedni', needsKonto: true,
+        tags:['#RAPORT','#TREND','#MARŻA','#ROAS','#MAIL-DO-KLIENTA'],
+        prompt: `Przygotuj raport porównawczy dla klienta [KONTO]: bieżący miesiąc vs poprzedni.\n\n4 sekcje:\n1. ZESTAWIENIE LICZBOWE – tabela: Metryka / Poprzedni miesiąc / Bieżący (prognoza EOM) / Zmiana / Ocena (↑↓→). Metryki: sprzedaż, marża (%), marża (zł), koszt reklamy, zwrot z reklamy.\n2. CO SIĘ ZMIENIŁO I DLACZEGO – dla każdej metryki zmiany >5% jedno zdanie wyjaśnienia w języku biznesowym.\n3. CO ZROBILIŚMY – 3–5 działań agencji z efektem: 'Zrobiliśmy X → efekt: +/− Y zł marży.'\n4. CEL NA KOLEJNY MIESIĄC – jeden cel liczbowy i 2 działania prowadzące do celu.\n\nStyl: przejrzysty, oparty na liczbach, bez technikaliów.` },
+      { id:'RC-07', name:'Mail po kryzysie – wyjaśnienie słabego wyniku', needsKonto: true,
+        tags:['#RAPORT','#MAIL-DO-KLIENTA','#KRYZYS','#MARŻA','#MENTOR'],
+        prompt: `Przygotuj mail do klienta [KONTO] wyjaśniający słabszy wynik w tym miesiącu.\n\n5 akapitów:\n1. OTWIERAJĄCY – przyznaj wprost że wynik poniżej oczekiwań, podaj kluczową liczbę. Bez usprawiedliwień w pierwszym zdaniu.\n2. PRZYCZYNY – 2–3 główne przyczyny. Rozróżnij: zewnętrzne (sezonowość, Allegro, konkurencja) vs wewnętrzne (decyzje Ads). Bądź uczciwy co do wewnętrznych.\n3. CO ZROBILIŚMY KIEDY ZOBACZYLIŚMY PROBLEM – działania naprawcze już wdrożone, konkretne daty.\n4. PLAN NA 30 DNI – 3 zmiany z efektem: 'Zrobimy X → spodziewamy się Y zł poprawy marży.'\n5. ZAMKNIĘCIE – co monitoruję codziennie żeby wcześnie wykryć następny problem.\n\nStyl: uczciwy, spokojny, profesjonalny.` },
+      { id:'RC-08', name:'Mail z sukcesem – pochwal się wynikiem', needsKonto: true,
+        tags:['#RAPORT','#MAIL-DO-KLIENTA','#MARŻA','#TREND','#BIZNES-AGENCJI'],
+        prompt: `Przygotuj mail do klienta [KONTO] komunikujący bardzo dobry wynik miesiąca.\n\n4 akapity:\n1. WYNIK – podaj kluczową liczbę sukcesu wprost w pierwszym zdaniu. Nie buduj napięcia.\n2. CO TO UMOŻLIWIŁO – 2–3 konkretne działania agencji z efektem: 'Zrobiliśmy X → efekt: +Y zł marży.' Pokaż że sukces nie był przypadkowy.\n3. CO DALEJ – jak utrzymać wynik i jedna konkretna szansa do dalszego wzrostu (z szacunkiem w zł).\n4. ZAMKNIĘCIE – jedno zdanie zapraszające do rozmowy o kolejnym kroku (skalowanie, nowe konto).\n\nStyl: pewny siebie, konkretny, bez przesadnego entuzjazmu.` },
+      { id:'RC-09', name:'Raport kwartalny – podsumowanie 3 miesięcy', needsKonto: true,
+        tags:['#RAPORT','#TREND','#MARŻA','#ROAS','#MAIL-DO-KLIENTA','#PROGNOZA'],
+        prompt: `Przygotuj raport kwartalny dla klienta [KONTO] z ostatnich 3 miesięcy.\n\n7 sekcji:\n1. WYNIKI KWARTAŁU – tabela: Miesiąc / Sprzedaż / Marża (%) / Marża (zł) / ROAS / Koszt Ads. Wiersz sum i średniej.\n2. TREND – rosnący/stabilny/spadający? % zmiana sprzedaży i marży między miesiącem 1 a 3.\n3. TOP 3 DZIAŁANIA KWARTAŁU – najważniejsze optymalizacje z łącznym efektem w zł przez kwartał.\n4. CO NIE ZADZIAŁAŁO – 1–2 działania które okazały się błędne i czego się nauczyłem.\n5. BENCHMARKI – jak konto wypadło vs benchmark grupy.\n6. STRATEGIA NA KOLEJNY KWARTAŁ – 3 priorytety z celem liczbowym i efektem na marżę (zł/kwartał).\n7. PROGNOZA KOLEJNEGO KWARTAŁU – sprzedaż i marża łącznie przy wdrożeniu strategii.\n\nStyl: strategiczny i partnerski, buduje długoterminową relację.` },
+      { id:'RC-10', name:'Mail ofertowy – propozycja rozszerzenia współpracy', needsKonto: true,
+        tags:['#RAPORT','#MAIL-DO-KLIENTA','#BIZNES-AGENCJI','#MENTOR','#PROGNOZA'],
+        prompt: `Przygotuj mail do klienta [KONTO] z propozycją rozszerzenia współpracy.\n\n5 akapitów:\n1. KOTWICA W WYNIKACH – zacznij od konkretnego sukcesu z ostatnich 2 miesięcy (liczba). Buduje wiarygodność.\n2. OBSERWACJA – co widzę w danych co wskazuje na niewykorzystaną szansę. Konkretna liczba lub trend.\n3. PROPOZYCJA – co konkretnie proponuję, jak by działało i ile kosztuje. Jeden akapit, zero lania wody.\n4. SZACOWANY EFEKT – ile dodatkowej marży lub sprzedaży klient może osiągnąć. Zakres min–max w zł/mies. Ostrożne szacunki.\n5. CALL TO ACTION – jedno zdanie co klient ma zrobić (np. '15-minutowa rozmowa w tym tygodniu').\n\nStyl: partnerski doradca, nie sprzedawca. Propozycja zakorzeniona w jego danych.` }
+    ]
+  },
+  MC: {
+    label: 'Sekcja 9 — Mentor / Coach',
+    color: '#2dd4a0',
+    prompts: [
+      { id:'MC-01', name:'Oceń moje decyzje z tego miesiąca', needsKonto: false,
+        tags:['#MENTOR','#MARŻA','#ROAS','#WSZYSTKIE-KONTA','#INSIGHTS'],
+        prompt: `Na podstawie zmian w danych MTD i D2D z bieżącego miesiąca zrekonstruuj 5 najważniejszych decyzji operacyjnych które prawdopodobnie podjąłem.\n\nDla każdej decyzji:\n- Co prawdopodobnie zrobiłem (na podstawie zmian w danych)\n- Czy to była dobra decyzja: TAK / NIE / ZA WCZEŚNIE OCENIAĆ\n- Jaki był efekt w D2D w kolejnych dniach\n- Co zrobiłbyś inaczej jako doświadczony menedżer i dlaczego\n- Jedna zasada do nauczenia się\n\nPosortuj od największego negatywnego do największego pozytywnego efektu.\nNa końcu: ocena mojego stylu zarządzania w 3 zdaniach: co robię dobrze, co zmienić, jedna rzecz do wdrożenia od jutra.` },
+      { id:'MC-02', name:'Mój styl zarządzania – mocne i słabe strony', needsKonto: false,
+        tags:['#MENTOR','#INSIGHTS','#TREND','#WSZYSTKIE-KONTA','#D2D'],
+        prompt: `Na podstawie danych historycznych z ostatnich 3–6 miesięcy przeanalizuj mój styl zarządzania kontami.\n\n5 obszarów (każdy ocena 1–5 + przykład z danych + rekomendacja):\n1. TIMING DECYZJI – reaguję szybko (1–2 dni) czy za późno? Prewencyjnie czy reaktywnie?\n2. ZARZĄDZANIE ADS – zmiany systematyczne i spójne czy chaotyczne? Skaluję kiedy warto, tnę kiedy trzeba?\n3. WYRÓŻNIENIA – utrzymuję dyscyplinę <5% czy regularnie przepalam?\n4. PRIORYTETYZACJA KONT – daję uwagę proporcjonalnie do potrzeb czy mam ulubione konta?\n5. KONSEKWENCJA – wdrażam plany do końca czy zmieniam kurs za często?\n\nNa końcu: top 2 mocne strony i top 2 obszary do poprawy z ćwiczeniem na kolejny miesiąc.` },
+      { id:'MC-03', name:'Kodeks pracy na kontach – moje 10 zasad', needsKonto: false,
+        tags:['#MENTOR','#PLAYBOOK','#ROAS','#MARŻA','#WSZYSTKIE-KONTA'],
+        prompt: `Sformułuj mój osobisty kodeks zarządzania kontami – 10 zasad do stosowania każdego dnia.\n\nKażda zasada w formacie:\nZASADA X: [NAZWA]\nOpis: co konkretnie robię i kiedy\nDlaczego: co się dzieje jeśli nie stosuję (konsekwencja w zł)\nPrzykład: kiedy ta zasada miała znaczenie w moich danych\n\nZasady mają obejmować: Ads, wyróżnienia, reagowanie na alerty, raportowanie, priorytetyzację, kanibalizację, symulacje przed decyzją, komunikację z klientem, trendy, zarządzanie czasem.\n\nNa końcu: jedna meta-zasada nadrzędna podsumowująca cały styl zarządzania kontami w MPlace.` },
+      { id:'MC-04', name:'Challenge moich założeń – gdzie mogę się mylić', needsKonto: false,
+        tags:['#MENTOR','#SYMULATOR','#KANIBALIZACJA','#ROAS','#MARŻA'],
+        prompt: `Działaj jako adwokat diabła. Zakwestionuj moje obecne decyzje i strategie.\n\n5 założeń do sprawdzenia:\n1. ROAS – czy docelowe ROAS oparte na aktualnych danych marży czy na przeszłości? Czy BE ROAS nie zmienił się przez zmianę prowizji?\n2. KANIBALIZACJA – czy naprawdę wiem które konta się kanibalizują czy tylko zakładam? Jakie dane to potwierdzają?\n3. WYRÓŻNIENIA – czy próg 5% zawsze właściwy dla każdego konta, czy dla niektórych wyróżnienia mogą być bardziej efektywne niż Ads?\n4. BENCHMARK – czy MeblenaCzasie to nadal dobry benchmark? Co jeśli sam benchmark jest nieoptymalne?\n5. PRIORYTETY – czy konto traktuję jako problem jest naprawdę problemem czy tylko wygląda jak problem przez złe porównanie?\n\nDla każdego: alternatywne wyjaśnienie, jak sprawdzić, koszt błędnego założenia (zł/mies.).` },
+      { id:'MC-05', name:'Plan rozwoju na 90 dni – jak stać się lepszym menedżerem kont', needsKonto: false,
+        tags:['#MENTOR','#PLAYBOOK','#PRIORYTETY','#BIZNES-AGENCJI'],
+        prompt: `Przygotuj spersonalizowany plan rozwoju na 90 dni jako menedżer kont marketplace.\n\n3 miesiące:\n\nMIESIĄC 1 – DIAGNOZA I FUNDAMENTY:\n- 2 kompetencje do rozwinięcia w pierwszej kolejności (na podstawie słabych stron z danych)\n- Jedno ćwiczenie praktyczne codziennie przez 30 dni\n- Jeden wskaźnik do zmierzenia po 30 dniach\n\nMIESIĄC 2 – OPTYMALIZACJA:\n- Na czym się skupiam\n- Jedno nowe narzędzie lub proces do wdrożenia\n- Jak mierzę efekt po 60 dniach\n\nMIESIĄC 3 – SKALOWANIE:\n- Co powinienem robić automatycznie po 90 dniach\n- Jedna nowa kompetencja strategiczna\n- Jak oceniam sukces całego planu\n\nNa końcu: jakiego menedżera kont chcę być za 90 dni i ile dodatkowej marży agencji przyniesie ten plan (zł/mies.).` },
+      { id:'MC-06', name:'Czy gaszę pożary zamiast budować – analiza struktury czasu', needsKonto: false,
+        tags:['#MENTOR','#PLAYBOOK','#INSIGHTS','#PRIORYTETY','#BIZNES-AGENCJI'],
+        prompt: `Przeanalizuj strukturę moich działań z ostatnich 30 dni na podstawie zmian w danych.\n\n3 kategorie (szacowany % czasu + lista przykładów z danych):\n1. GASZENIE POŻARÓW – reakcje na problemy po tym jak się pojawiły\n2. OPTYMALIZACJA – regularne działania poprawiające wyniki bez kryzysu\n3. BUDOWANIE – działania strategiczne i długoterminowe\n\nDla każdej: % czasu, czy właściwa proporcja, co przenieść do wyższej kategorii.\n\nRekomendowana proporcja dla menedżera na moim poziomie i jeden proces do wdrożenia żeby zmniejszyć czas na gaszenie pożarów o 30%.` },
+      { id:'MC-07', name:'Symulacja trudnej rozmowy z klientem', needsKonto: true,
+        tags:['#MENTOR','#MAIL-DO-KLIENTA','#KRYZYS','#BIZNES-AGENCJI'],
+        prompt: `Wejdź w rolę wymagającego klienta [KONTO] niezadowolonego z wyników ostatniego miesiąca.\n\n5 trudnych pytań które taki klient naprawdę by zadał (konkretne, oparte na liczbach, niewygodne).\n\nPo każdym pytaniu:\nMOJA REKOMENDOWANA ODPOWIEDŹ: szczerze, konkretnie, z planem działań.\nCZEGO UNIKAĆ: jedna pułapka komunikacyjna w tej odpowiedzi.\n\nNa końcu:\n- Główny cel klienta w tej rozmowie (co naprawdę chce wiedzieć)\n- Jedno zdanie kończące rozmowę żeby odbudować zaufanie\n- Co przygotować przed rozmową (dane, plan, propozycja)` },
+      { id:'MC-08', name:'Retrospektywa decyzji – co zadziałało w ostatnich 3 miesiącach', needsKonto: false,
+        tags:['#MENTOR','#TREND','#MARŻA','#ROAS','#WSZYSTKIE-KONTA'],
+        prompt: `Przeprowadź pełną retrospektywę moich decyzji z ostatnich 3 miesięcy.\n\n4 sekcje:\n1. DECYZJE KTÓRE ZADZIAŁAŁY ŚWIETNIE – 3 najlepsze: co zrobiłem, efekt w zł, mechanizm, jak replikować\n2. DECYZJE KTÓRE NIE ZADZIAŁAŁY – 3 decyzje: co zrobiłem, efekt vs oczekiwania, dlaczego nie zadziałało, nauka\n3. DECYZJE KTÓRYCH NIE PODJĄŁEM – 2 sytuacje gdzie dane wskazywały na potrzebę ale nie zareagowałem. Koszt bezczynności w zł.\n4. WZORCE I REGUŁY – 3 nowe reguły decyzyjne do dodania do kodeksu zarządzania\n\nJedno zdanie podsumowujące mój rozwój przez 3 miesiące i jedna rzecz do zmiany w kolejnych 3 miesiącach.` },
+      { id:'MC-09', name:'Priorytet strategiczny – gdzie powinienem spędzać więcej czasu', needsKonto: false,
+        tags:['#MENTOR','#PRIORYTETY','#BIZNES-AGENCJI','#MARŻA','#WSZYSTKIE-KONTA'],
+        prompt: `Przeanalizuj gdzie powinienem spędzać więcej czasu żeby zmaksymalizować wynik finansowy agencji.\n\nDla każdego konta:\n- Szacowany czas tygodniowo (na podstawie liczby zmian w danych i złożoności)\n- Marża generowana tygodniowo (zł)\n- Moje fee tygodniowo (zł)\n- Zwrot z czasu: fee / czas = zł/godz.\n- Czy konto warte tyle czasu ile mu poświęcam?\n\nPosortuj od najwyższego zwrotu z czasu.\nNowa alokacja czasu:\n- Które konta zasługują na więcej uwagi\n- Które można obsługiwać szybciej przez lepsze procesy\n- Ile godzin zaoszczędzić i na co przeznaczyć (rozwój agencji, nowi klienci, strategia)` },
+      { id:'MC-10', name:'List do siebie za 6 miesięcy – gdzie chcę być', needsKonto: false,
+        tags:['#MENTOR','#BIZNES-AGENCJI','#PROGNOZA','#PLAYBOOK'],
+        prompt: `Pomóż mi napisać list do siebie za 6 miesięcy i plan jak tam dotrzeć.\n\nKROK 1 – WIZJA ZA 6 MIESIĘCY (5 wymiarów):\n- Łączne miesięczne fee agencji (zł/mies.) – cel vs dziś\n- Liczba kont i ich kondycja (średni health score)\n- Poziom automatyzacji (% czasu: analiza vs gaszenie pożarów)\n- Jedna nowa kompetencja lub usługa\n- Jak się czuję jako menedżer kont\n\nKROK 2 – PLAN WSTECZ (backward planning):\n- Co osiągnąć za 3 miesiące? Za 1 miesiąc? W tym tygodniu?\n\nKROK 3 – LIST DO SIEBIE (5–7 zdań):\nCo osiągnąłem, z czego jestem dumny, co zmieniłem w podejściu, jedno pytanie do siebie na przyszłość.\n\nNa końcu: jedno działanie dziś – małe ale konkretne – które za 6 miesięcy będę wspominał jako punkt zwrotny.` }
+    ]
   }
 };
 
@@ -5735,7 +5809,16 @@ function openPlaybook(section) {
         el.style.background='var(--bg3)';
       }
     });
-    el.addEventListener('click', ()=> selectPlaybookPrompt(el.dataset.section, parseInt(el.dataset.idx)));
+    el.addEventListener('click', ()=>{
+      selectPlaybookPrompt(el.dataset.section, parseInt(el.dataset.idx));
+      // Jeśli prompt nie wymaga konta — uruchom od razu
+      const sec = PLAYBOOK_SECTIONS[el.dataset.section];
+      const p = sec && sec.prompts[parseInt(el.dataset.idx)];
+      if(p && !p.needsKonto){
+        closePlaybook();
+        agentAsk(p.prompt);
+      }
+    });
   });
 
   const modal = document.getElementById('playbookModal');
