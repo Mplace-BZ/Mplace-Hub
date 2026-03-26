@@ -2975,11 +2975,14 @@ function printInsights(){
   </head><body>
   <div class="rpt-header">
     <div>
-      <div class="rpt-eyebrow">MPlace Hub · Insights & Sygnały</div>
-      <div class="rpt-title">${filterLabel}</div>
-      <div class="rpt-sub">${sub?sub.textContent:''}</div>
+      <div style="font-size:20px;font-weight:700;font-family:'DM Sans',Arial,sans-serif;color:#1a1a2e"><span style="color:#ff6b35!important">M</span>Place <span style="font-weight:400">Hub</span></div>
+      <div class="rpt-sub">Insights & Sygnały · Raport wewnętrzny</div>
     </div>
-    <div class="rpt-date">${now}</div>
+    <div style="text-align:right">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;font-weight:600;color:#1a1a2e;margin-bottom:3px">${filterLabel.toUpperCase()}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:#888">${sub?sub.textContent:''}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:#888;margin-top:2px">Wygenerowano: ${now}</div>
+    </div>
   </div>
   ${cardsHtml}
   <div class="rpt-footer">
