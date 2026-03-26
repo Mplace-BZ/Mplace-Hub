@@ -1247,7 +1247,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   <!-- Input -->
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem">
     <textarea id="agentInput" placeholder="Zapytaj o swoje konta... np. 'Jeśli podniosę ROAS BOTAVIT do 7 to jaki wynik na koniec miesiąca?'" 
-      style="width:100%;background:transparent;border:none;color:var(--text);font-family:var(--sans);font-size:13px;resize:vertical;outline:none;line-height:1.6;min-height:120px"
+      style="width:100%;background:transparent;border:none;color:var(--text);font-family:var(--sans);font-size:13px;resize:vertical;outline:none;line-height:1.6;min-height:200px"
       onkeydown="if(event.key==='Enter'&&(event.metaKey||event.ctrlKey))agentSend()"></textarea>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem">
       <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Enter+Cmd/Ctrl = wyślij</span>
@@ -3983,8 +3983,11 @@ function initAgent(){
 }
 
 function agentAsk(q){
-  document.getElementById('agentInput').value = q;
-  agentSend();
+  const input = document.getElementById('agentInput');
+  input.value = q;
+  input.focus();
+  // Scroll to input
+  input.scrollIntoView({behavior:'smooth', block:'center'});
 }
 
 function buildAgentContext(){
