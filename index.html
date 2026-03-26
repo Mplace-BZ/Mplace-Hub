@@ -2936,15 +2936,18 @@ function printInsights(){
   const content = document.getElementById('insightsContent');
   const sub = document.getElementById('insightsSub');
   const activeFilter = document.querySelector('.ins-filter.active');
-  const filterLabel = activeFilter ? activeFilter.textContent : 'Wszystkie';
+  const filterLabel = activeFilter ? activeFilter.textContent.trim() : 'Wszystkie';
   const now = new Date().toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'});
 
-  // Collect visible cards
-  const cards = [...content.querySelectorAll('.ins-card')].filter(c=>c.style.display!=='none');
+  // Karty są renderowane jako dzieci insightsContent — zbierz wszystkie widoczne
+  const allCards = [...content.querySelectorAll('.ins-card')];
+  // Filtruj po klasie jeśli nie "all"
+  const f = insCurrentFilter||'all';
+  const cards = f==='all' ? allCards : allCards.filter(c=>c.classList.contains(f));
+
   if(!cards.length){ alert('Brak sygnałów do wydruku.'); return; }
 
   const cardsHtml = cards.map(c=>c.outerHTML).join('');
-
   const iframe = document.createElement('iframe');
   iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:210mm;border:none';
   document.body.appendChild(iframe);
@@ -2953,14 +2956,13 @@ function printInsights(){
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:Arial,sans-serif;font-size:11px;color:#111;padding:12mm 14mm;background:#fff}
     h1{font-size:16px;font-weight:700;margin-bottom:2px}
-    .sub{font-size:10px;color:#888;margin-bottom:12px;font-family:monospace}
+    .sub{font-size:10px;color:#666;margin-bottom:12px;font-family:monospace}
     .ins-card{border:1px solid #ddd;border-radius:6px;padding:10px 12px;margin-bottom:8px;page-break-inside:avoid}
     .ins-card.danger{border-left:3px solid #ff4d6a}
     .ins-card.chance{border-left:3px solid #2dd4a0}
     .ins-card.watch{border-left:3px solid #f5a623}
-    span,div,p{color:#111!important;background:transparent!important}
-    .ins-filter,.btn,.ph-eyebrow,.tl-bar,.month-status{display:none!important}
-    footer{margin-top:12px;font-family:monospace;font-size:9px;color:#aaa;border-top:1px solid #eee;padding-top:6px}
+    *{color:#111!important;background:transparent!important;border-color:#ddd!important}
+    footer{margin-top:12px;font-family:monospace;font-size:9px;color:#aaa!important;border-top:1px solid #eee!important;padding-top:6px}
   </style>
   </head><body>
   <h1>Insights & Sygnały</h1>
@@ -5577,87 +5579,15 @@ function renderD2D(){
            <th style="padding:8px 6px;text-align:right;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);width:52px">%</th>`;
   });
 
-  // Razem columns
-  html+=`<th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:600;border-bottom:1px solid var(--border2);border-left:1px solid var(--border2)">Razem</th>
-         <th style="padding:8px 6px;text-align:right;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);width:52px">%</th>
+  // EST. EOM column
+  const _d=new Date(),_dm=_d.getDate(),_din=new Date(_d.getFullYear(),_d.getMonth()+1,0).getDate();
+  html+=`<th style="padding:8px 10px;text-align:right;color:var(--yellow);font-weight:600;border-bottom:1px solid var(--border2);border-left:1px solid var(--border2);font-family:var(--mono);font-size:10px">EST. EOM</th>
+         <th style="padding:8px 4px;border-bottom:1px solid var(--border2);font-family:var(--mono);font-size:9px;color:var(--text3)">dz. ${_dm}/${_din}</th>
     </tr>
     <tr style="background:var(--bg3);border-bottom:2px solid var(--border2)">
       <td style="padding:2px 12px 6px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">${metricLabel}</td>`;
   sortedDays.forEach(()=>{ html+=`<td colspan="2"></td>`; });
-  html+=`<td colspan="2" style="border-left:1px solid var(--border2)"></td></tr></thead><tbody>`;
-
-  // Per-account rows
-  accs.forEach((k,ai)=>{
-    const meta = AC_META[k];
-    const g = GROUPS[meta.group];
-    const prod = getProd(k);
-    const isLastInGroup = ai===accs.length-1 || GROUPS[AC_META[accs[ai+1]]?.group]!==g;
-    const rowBg = ai%2===0?'var(--bg2)':'var(--bg)';
-
-    html+=`<tr style="background:${rowBg}">
-      <td style="padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03)">
-        <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${g.c};margin-right:6px;vertical-align:middle"></span>
-        <span style="color:var(--text)">${meta.name}</span>
-      </td>`;
-
-    let acctTotal = 0, acctCount = 0;
-    sortedDays.forEach((day,di)=>{
-      const entry = day.entries[k];
-      const val = entry? d2dMetricVal(entry, metric, prod) : null;
-      // Find prev day value for same account
-      let prevVal = null;
-      for(let pi=di-1;pi>=0;pi--){
-        const pe = sortedDays[pi].entries[k];
-        if(pe){ prevVal=d2dMetricVal(pe,metric,prod); break; }
-      }
-      const chg = (val!=null&&prevVal!=null&&prevVal!==0)?(val-prevVal)/Math.abs(prevVal)*100:null;
-      const chgColor = chg==null?'var(--text3)':chg>0?'var(--green)':chg<0?'var(--red)':'var(--text3)';
-      const arrow = chg==null?'':chg>0?'▲':chg<0?'▼':'→';
-
-      if(val!=null){ acctTotal+=val; acctCount++; }
-
-      html+=`<td style="padding:7px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text)">${fmt(val)}</td>
-             <td style="padding:7px 6px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);color:${chgColor};font-size:10px">${arrow} ${chg!=null?pct(chg):''}</td>`;
-    });
-
-    // Total for this account across days
-    const totalVal = acctCount>0? acctTotal : null;
-    html+=`<td style="padding:7px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);border-left:1px solid var(--border2);color:var(--accent);font-weight:600">${fmt(totalVal)}</td>
-           <td style="padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.03)"></td>
-    </tr>`;
-  });
-
-  // EOM ESTYMACJA row (zamiast RAZEM)
-  const today = new Date();
-  const dayOfMonth = today.getDate();
-  const daysInMonth = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
-
-  html+=`<tr style="background:var(--bg3);border-top:2px solid var(--border2)">
-    <td style="padding:8px 12px;font-weight:600;color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:.05em">EST. EOM</td>`;
-
-  sortedDays.forEach(()=>{ html+=`<td colspan="2"></td>`; });
-  html+=`<td colspan="2" style="border-left:1px solid var(--border2);padding:8px 10px;font-size:9px;color:var(--text3);font-family:var(--mono)">dzień ${dayOfMonth}/${daysInMonth}</td></tr>`;
-
-  // Per-account EOM rows
-  accs.forEach((k,ai)=>{
-    const meta = AC_META[k];
-    const prod = getProd(k);
-    const rowBg = ai%2===0?'var(--bg2)':'var(--bg)';
-    // Get latest value for this account from D2D
-    let latestVal = null;
-    for(let di=sortedDays.length-1;di>=0;di--){
-      const e=sortedDays[di].entries[k];
-      if(e){ latestVal=d2dMetricVal(e,metric,prod); break; }
-    }
-    // EOM = latestVal / dayOfMonth * daysInMonth
-    const eom = (latestVal!=null&&dayOfMonth>0) ? latestVal/dayOfMonth*daysInMonth : null;
-    html+=`<tr style="background:${rowBg}">
-      <td style="padding:5px 12px 5px 20px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text3);font-size:10px">${meta.name}</td>`;
-    sortedDays.forEach(()=>{ html+=`<td colspan="2" style="border-bottom:1px solid rgba(255,255,255,.03)"></td>`; });
-    html+=`<td style="padding:5px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);border-left:1px solid var(--border2);color:var(--yellow);font-weight:600;font-family:var(--mono)">${eom!=null?fmt(eom):'—'}</td>
-           <td style="border-bottom:1px solid rgba(255,255,255,.03)"></td>
-    </tr>`;
-  });
+  html+=`<td colspan="2" style="border-left:1px solid var(--border2)"></td></tr>`;
 
   html+=`</tbody></table></div>
   <div style="margin-top:.75rem;font-family:var(--mono);font-size:10px;color:var(--text3)">
