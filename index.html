@@ -2939,15 +2939,11 @@ function printInsights(){
   const filterLabel = activeFilter ? activeFilter.textContent.trim() : 'Wszystkie';
   const now = new Date().toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'});
 
-  // Karty są renderowane jako dzieci insightsContent — zbierz wszystkie widoczne
-  const allCards = [...content.querySelectorAll('.ins-card')];
-  // Filtruj po klasie jeśli nie "all"
-  const f = insCurrentFilter||'all';
-  const cards = f==='all' ? allCards : allCards.filter(c=>c.classList.contains(f));
+  // Karty to bezpośrednie dzieci insightsContent (divy per konto)
+  const children = [...content.children];
+  if(!children.length){ alert('Brak sygnałów do wydruku.'); return; }
 
-  if(!cards.length){ alert('Brak sygnałów do wydruku.'); return; }
-
-  const cardsHtml = cards.map(c=>c.outerHTML).join('');
+  const cardsHtml = children.map(c=>c.outerHTML).join('');
   const iframe = document.createElement('iframe');
   iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:210mm;border:none';
   document.body.appendChild(iframe);
@@ -2957,12 +2953,9 @@ function printInsights(){
     body{font-family:Arial,sans-serif;font-size:11px;color:#111;padding:12mm 14mm;background:#fff}
     h1{font-size:16px;font-weight:700;margin-bottom:2px}
     .sub{font-size:10px;color:#666;margin-bottom:12px;font-family:monospace}
-    .ins-card{border:1px solid #ddd;border-radius:6px;padding:10px 12px;margin-bottom:8px;page-break-inside:avoid}
-    .ins-card.danger{border-left:3px solid #ff4d6a}
-    .ins-card.chance{border-left:3px solid #2dd4a0}
-    .ins-card.watch{border-left:3px solid #f5a623}
-    *{color:#111!important;background:transparent!important;border-color:#ddd!important}
-    footer{margin-top:12px;font-family:monospace;font-size:9px;color:#aaa!important;border-top:1px solid #eee!important;padding-top:6px}
+    div{page-break-inside:avoid;color:#111!important;background:#fff!important}
+    span{color:#111!important;background:transparent!important}
+    footer{margin-top:12px;font-family:monospace;font-size:9px;color:#888;border-top:1px solid #eee;padding-top:6px}
   </style>
   </head><body>
   <h1>Insights & Sygnały</h1>
@@ -5588,6 +5581,45 @@ function renderD2D(){
       <td style="padding:2px 12px 6px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">${metricLabel}</td>`;
   sortedDays.forEach(()=>{ html+=`<td colspan="2"></td>`; });
   html+=`<td colspan="2" style="border-left:1px solid var(--border2)"></td></tr>`;
+
+  html+=`<tbody>`;
+
+  // Per-account rows
+  accs.forEach((k,ai)=>{
+    const meta = AC_META[k];
+    const g = GROUPS[meta.group];
+    const prod = getProd(k);
+    const rowBg = ai%2===0?'var(--bg2)':'var(--bg)';
+
+    html+=`<tr style="background:${rowBg}">
+      <td style="padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03)">
+        <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${g.c};margin-right:6px;vertical-align:middle"></span>
+        <span style="color:var(--text)">${meta.name}</span>
+      </td>`;
+
+    let acctTotal = 0, acctCount = 0;
+    sortedDays.forEach((day,di)=>{
+      const entry = day.entries[k];
+      const val = entry? d2dMetricVal(entry, metric, prod) : null;
+      let prevVal = null;
+      for(let pi=di-1;pi>=0;pi--){
+        const pe = sortedDays[pi].entries[k];
+        if(pe){ prevVal=d2dMetricVal(pe,metric,prod); break; }
+      }
+      const chg = (val!=null&&prevVal!=null&&prevVal!==0)?(val-prevVal)/Math.abs(prevVal)*100:null;
+      const chgColor = chg==null?'var(--text3)':chg>0?'var(--green)':chg<0?'var(--red)':'var(--text3)';
+      const arrow = chg==null?'':chg>0?'▲':chg<0?'▼':'→';
+      if(val!=null){ acctTotal+=val; acctCount++; }
+      html+=`<td style="padding:7px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text)">${fmt(val)}</td>
+             <td style="padding:7px 6px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);color:${chgColor};font-size:10px">${arrow} ${chg!=null?pct(chg):''}</td>`;
+    });
+
+    // EOM estimation in Razem column
+    const eom = (acctCount>0&&_dm>0) ? acctTotal/_dm*_din : null;
+    html+=`<td style="padding:7px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);border-left:1px solid var(--border2);color:var(--yellow);font-weight:600">${eom!=null?fmt(eom):'—'}</td>
+           <td style="padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.03);font-size:9px;color:var(--text3)">est.</td>
+    </tr>`;
+  });
 
   html+=`</tbody></table></div>
   <div style="margin-top:.75rem;font-family:var(--mono);font-size:10px;color:var(--text3)">
