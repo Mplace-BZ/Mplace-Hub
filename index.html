@@ -1234,6 +1234,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;align-self:center">Playbook:</span>
     <button onclick="openPlaybook('PD')" class="agent-chip" style="border-color:rgba(245,166,35,.3);color:var(--yellow);background:rgba(245,166,35,.06)">📋 Plan Dnia</button>
     <button onclick="openPlaybook('RM')" class="agent-chip" style="border-color:rgba(45,212,160,.3);color:var(--green);background:rgba(45,212,160,.06)">📋 Rentowność</button>
+    <button onclick="openPlaybook('RA')" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.06)">📋 ROAS / Ads</button>
   </div>
 
   <!-- Input -->
@@ -5509,6 +5510,42 @@ const PLAYBOOK_SECTIONS = {
         tags:['#RENTOWNOŚĆ','#MARŻA','#HEALTH-SCORE','#WSZYSTKIE-KONTA','#ALERTY'],
         prompt: `Oceń kondycję rentowności każdego z 9 kont w skali 1–10:\n10 = doskonała (marża >15%, ROAS daleko powyżej BE, wyróżnienia w normie)\n1 = konto generuje straty, wymaga natychmiastowej interwencji.\n\nDla każdego konta:\n- Ocena 1–10\n- Główny argument (1 zdanie, liczby)\n- Jedna rzecz najbardziej obniżająca score\n- Jedna rzecz którą mogę zrobić dziś żeby podnieść score o 1–2 punkty\n\nPosortuj od najniższego. Na końcu: średni health score agencji, trend vs poprzedni miesiąc, ocena kondycji w 2–3 zdaniach.` }
     ]
+  },
+  RA: {
+    label: 'Sekcja 3 — ROAS / Ads / Budżety',
+    color: '#4d9fff',
+    prompts: [
+      { id:'RA-01', name:'Audyt ROAS – wszystkie konta vs BE ROAS', needsKonto: false,
+        tags:['#ROAS','#ADS','#BE-ROAS','#WSZYSTKIE-KONTA'],
+        prompt: `Dla wszystkich 9 kont porównaj aktualny ROAS Ads z BE ROAS.\n\nDla każdego konta:\n- BE ROAS wyliczony z marży przed reklamą\n- Aktualny ROAS Ads MTD\n- Odchylenie od BE ROAS w % (+ / −)\n- Status: SKALUJ (>130% BE) / TRZYMAJ (85–130%) / OPTYMALIZUJ (70–85%) / KRYZYS (<70%)\n- Jedna konkretna akcja wynikająca ze statusu\n\nTabela posortowana od największego odchylenia ujemnego. Na końcu: ile kont w KRYZYS/OPTYMALIZUJ, łączna strata w zł/mies. i ile marży odzyskam doprowadzając je do TRZYMAJ.` },
+      { id:'RA-02', name:'Decyzje Ads z Import – skaluj / tnij / zatrzymaj', needsKonto: false,
+        tags:['#ADS','#ROAS','#BUDŻET','#IMPORT-ADS','#SZYBKA-DECYZJA'],
+        prompt: `Na podstawie ostatniej analizy Import Ads wygeneruj listę decyzji operacyjnych.\n\nReguły bez wyjątków:\nROAS >7 → SKALUJ (+20–30% budżetu)\nROAS 4–7 → TRZYMAJ\nROAS <4 → TNIJ (−30–50% budżetu)\nKoszt ≥30 zł bez sprzedaży → ZATRZYMAJ\nKoszt <30 zł bez sprzedaży → OBSERWUJ 7 dni\n\nTabela: Konto / Kampania–Grupa–Aukcja / ROAS / Decyzja / Zmiana budżetu (zł) / Efekt na marżę (zł/mies.).\nPosortuj: ZATRZYMAJ → TNIJ → SKALUJ. Na końcu: łączna oszczędność z cięć + potencjał wzrostu ze skalowania.` },
+      { id:'RA-03', name:'Alokacja budżetu Ads – czy pieniądze są w dobrym miejscu', needsKonto: false,
+        tags:['#BUDŻET','#ROAS','#ADS','#WSZYSTKIE-KONTA'],
+        prompt: `Przeanalizuj alokację budżetu Ads między wszystkimi 9 kontami.\n\nDla każdego konta:\n- Budżet Ads MTD (zł) i udział w budżecie agencji (%)\n- ROAS Ads vs BE ROAS – czy budżet uzasadniony wynikami\n- Marża generowana na 1 zł wydany na Ads (zł)\n- Rekomendacja: ZWIĘKSZ / ZMNIEJSZ / ZOSTAW – o ile zł\n\nNa końcu: konkretna realokacja (skąd zabrać, gdzie dołożyć, efekt na marżę zł/mies.) i rekomendowany łączny budżet na kolejny miesiąc.` },
+      { id:'RA-04', name:'Zgniłe jaja – kampanie do natychmiastowego wycięcia', needsKonto: false,
+        tags:['#ADS','#ROAS','#SZYBKA-DECYZJA','#IMPORT-ADS'],
+        prompt: `Znajdź wszystkie kampanie i aukcje spełniające kryterium zgniłego jaja:\nKoszt ≥30 zł bez sprzedaży LUB ROAS <2 przy koszcie >50 zł MTD.\n\nDla każdej pozycji:\n- Konto / Kampania / Grupa / Aukcja\n- Koszt MTD (zł) i sprzedaż MTD (zł)\n- ROAS i strata szacowana do EOM (zł)\n- Decyzja: ZATRZYMAJ DZIŚ lub TNIJ o X%\n\nPosortuj od największej straty. Na końcu: łączna kwota do zaoszczędzenia jeśli wytnę wszystkie pozycje dziś.` },
+      { id:'RA-05', name:'Gwiazdy Ads – kampanie do agresywnego skalowania', needsKonto: false,
+        tags:['#ADS','#ROAS','#SZYBKA-DECYZJA','#IMPORT-ADS'],
+        prompt: `Znajdź wszystkie kampanie i aukcje z ROAS >7 do agresywnego skalowania.\n\nDla każdej pozycji:\n- Konto / Kampania / Grupa / Aukcja\n- Aktualny ROAS i budżet dzienny (zł)\n- Rekomendowany nowy budżet dzienny (zł) – zwiększ o 20–40%\n- Szacowany dodatkowy przychód i marża ze skalowania (zł/mies.)\n\nPosortuj od najwyższego ROAS. Na końcu: łączny potencjał wzrostu marży, ile dodatkowego budżetu potrzebuję i w ilu dniach efekt widoczny w D2D.` },
+      { id:'RA-06', name:'ACOS vs TACOS – realny koszt reklamy', needsKonto: false,
+        tags:['#ROAS','#ADS','#MARŻA','#WYRÓŻNIENIA'],
+        prompt: `Dla wszystkich kont oblicz i porównaj:\nACOS = koszt Ads / sprzedaż × 100\nTACOS = (koszt Ads + wyróżnienia) / sprzedaż × 100\n\nDla każdego konta:\n- ACOS (%) i TACOS (%)\n- Różnica TACOS − ACOS w pp\n- Maksymalny akceptowalny TACOS przy tej marży i prowizji\n- Ocena: BEZPIECZNY / UWAGA / PRZEKROCZONY\n\nPosortuj od najwyższego TACOS. Na końcu: które konto ma najbardziej zniekształcony ROAS przez wyróżnienia i jakie błędne decyzje to spowodowało.` },
+      { id:'RA-07', name:'Eksperyment ROAS – zaprojektuj test na 7 dni', needsKonto: true,
+        tags:['#ROAS','#ADS','#SYMULATOR','#MENTOR'],
+        prompt: `Zaprojektuj eksperyment testowy ROAS dla konta [KONTO] na 7 dni.\n\n3 scenariusze:\n- Konserwatywny: ROAS +10% powyżej obecnego\n- Zrównoważony: ROAS na poziomie 110% BE ROAS\n- Agresywny: ROAS −15% poniżej obecnego\n\nDla każdego scenariusza:\n- Docelowy ROAS Ads\n- Szacowana zmiana sprzedaży i marży (zł/tydzień)\n- Główne ryzyko\n- Kryterium sukcesu i kryterium zatrzymania testu\n\nNa końcu: który scenariusz rekomendуjesz na start i jak sprawdzać wyniki w D2D po 7 dniach.` },
+      { id:'RA-08', name:'Struktura kampanii – diagnoza i przeprojektowanie', needsKonto: true,
+        tags:['#ADS','#ROAS','#IMPORT-ADS','#MENTOR'],
+        prompt: `Na podstawie danych Import Ads przeanalizuj strukturę kampanii dla konta [KONTO].\n\nOceń w 4 wymiarach:\n1. PODZIAŁ KAMPANII – czy logicznie podzielone? Co zmienić?\n2. GRUPY REKLAM – czy jednorodne zestawy aukcji? Gdzie za szerokie/wąskie?\n3. AUKCJE – które źle przypisane, powinny być przeniesione?\n4. LUKI – jakich kampanii lub grup brakuje?\n\nZaproponuj docelową strukturę: Kampania → Grupy → Typ aukcji.\nCzas wdrożenia i spodziewany efekt na ROAS po 30 dniach.` },
+      { id:'RA-09', name:'Budżet Ads na kolejny miesiąc – pełna rekomendacja', needsKonto: false,
+        tags:['#BUDŻET','#ADS','#ROAS','#PROGNOZA','#WSZYSTKIE-KONTA'],
+        prompt: `Na podstawie wyników bieżącego i poprzednich miesięcy przygotuj rekomendację budżetu Ads na kolejny miesiąc.\n\nDla każdego konta:\n- Aktualny budżet Ads (zł/mies.)\n- Rekomendowany budżet na kolejny miesiąc i zmiana +/− zł oraz %\n- Uzasadnienie w 1 zdaniu\n- Prognozowany ROAS i marża po reklamie przy nowym budżecie\n\nNa końcu: łączny budżet agencji obecny vs rekomendowany, łączna zmiana marży i jedna zasada budżetowania na ten portfel kont.` },
+      { id:'RA-10', name:'Raport Ads tygodniowy – co zmieniłem i jaki efekt', needsKonto: false,
+        tags:['#ADS','#ROAS','#RAPORT','#D2D','#TREND'],
+        prompt: `Przeanalizuj dane D2D z ostatnich 7 dni dla wszystkich kont pod kątem skuteczności Ads.\n\n3 sekcje:\n1. CO ZADZIAŁAŁO – kampanie/konta gdzie ROAS poprawił się vs poprzedni tydzień. Konkretne liczby.\n2. CO NIE ZADZIAŁAŁO – kampanie/konta gdzie ROAS spadł lub budżet nie przyniósł efektu.\n3. WNIOSKI NA KOLEJNY TYDZIEŃ – 3 korekty: Konto → Zmiana → Oczekiwany efekt (zł).\n\nNa końcu: ogólna ocena tygodnia Ads w skali 1–10 z uzasadnieniem.` }
+    ]
   }
 };
 
@@ -5544,7 +5581,7 @@ function openPlaybook(section) {
   });
 
   const modal = document.getElementById('playbookModal');
-  modal.style.display = 'flex';
+  modal.style.cssText = 'display:flex;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:1rem';
 }
 
 function selectPlaybookPrompt(section, idx) {
@@ -6284,7 +6321,7 @@ self.addEventListener('fetch', e => e.respondWith(
 </div>
 
 <!-- PLAYBOOK MODAL -->
-<div id="playbookModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:1rem">
+<div id="playbookModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:1rem">
   <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:580px;max-height:85vh;overflow-y:auto;padding:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem">
       <div>
