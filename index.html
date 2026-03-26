@@ -4105,7 +4105,7 @@ async function agentSend(){
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 1024,
+        max_tokens: 4096,
         system: systemPrompt,
         messages: [{ role: 'user', content: q }]
       })
@@ -4375,7 +4375,7 @@ Bądź konkretny jak analityk finansowy. Podawaj liczby. Odpowiedz po polsku.`;
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2048,
+        max_tokens: 4096,
         system: systemPrompt,
         messages: [{ role: 'user', content: reportPrompt }]
       })
@@ -5224,7 +5224,7 @@ async function adsRunAnalysis() {
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514',
-        max_tokens:2000,
+        max_tokens:4096,
         system: buildAgentContext(),
         messages:[{role:'user',content:prompt}]
       })
