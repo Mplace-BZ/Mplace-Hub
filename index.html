@@ -1221,14 +1221,11 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <div class="ph-sub">Zadaj pytanie — agent analizuje Twoje dane i odpowiada</div>
   </div>
 
-  <!-- Quick questions -->
+  <!-- Quick questions — tylko najważniejsze, reszta w Playbook -->
   <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.5rem">
-    <button onclick="agentAsk('Na co dziś powinienem zwrócić uwagę? Które konto wymaga działania?')" class="agent-chip">Na co dziś zwrócić uwagę?</button>
-    <button onclick="agentAsk('Co jest teraz najważniejsze do zrobienia? Podaj priorytety.')" class="agent-chip">Co jest najważniejsze?</button>
-    <button onclick="agentAsk('Jak idzie marzec vs luty? Porównaj sprzedaż i marże.')" class="agent-chip">Marzec vs Luty</button>
-    <button onclick="agentAsk('Które konto ma największy potencjał wzrostu i dlaczego?')" class="agent-chip">Największy potencjał?</button>
-    <button onclick="agentAsk('Oceń kondycję każdego konta w skali 1-10 z uzasadnieniem.')" class="agent-chip">Kondycja kont 1-10</button>
     <button onclick="agentAsk('Gdzie tracę pieniądze? Gdzie są największe wycieki marży?')" class="agent-chip">Gdzie tracę pieniądze?</button>
+    <button onclick="agentAsk('Oceń kondycję każdego konta w skali 1-10 z uzasadnieniem.')" class="agent-chip">Kondycja kont 1-10</button>
+    <button onclick="agentAsk('Które konto ma największy potencjał wzrostu i dlaczego?')" class="agent-chip">Największy potencjał?</button>
     <button onclick="generateMTDReport()" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:var(--accent);background:rgba(255,107,53,.08)">📊 Raport MTD</button>
     <button onclick="openPDFsModal()" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.07)">📁 PDF's</button>
   </div>
@@ -1244,12 +1241,13 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="openPlaybook('IA')" class="agent-chip" style="border-color:rgba(245,166,35,.3);color:var(--yellow);background:rgba(245,166,35,.06)">📋 Insights</button>
     <button onclick="openPlaybook('RC')" class="agent-chip" style="border-color:rgba(255,107,53,.3);color:var(--accent);background:rgba(255,107,53,.06)">📋 Raporty</button>
     <button onclick="openPlaybook('MC')" class="agent-chip" style="border-color:rgba(45,212,160,.3);color:var(--green);background:rgba(45,212,160,.06)">📋 Mentor</button>
+    <button onclick="openPlaybook('BA')" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:var(--accent);background:rgba(255,107,53,.08)">📋 Biznes Agencji</button>
   </div>
 
   <!-- Input -->
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem">
     <textarea id="agentInput" placeholder="Zapytaj o swoje konta... np. 'Jeśli podniosę ROAS BOTAVIT do 7 to jaki wynik na koniec miesiąca?'" 
-      style="width:100%;background:transparent;border:none;color:var(--text);font-family:var(--sans);font-size:13px;resize:none;outline:none;line-height:1.6;min-height:70px"
+      style="width:100%;background:transparent;border:none;color:var(--text);font-family:var(--sans);font-size:13px;resize:vertical;outline:none;line-height:1.6;min-height:120px"
       onkeydown="if(event.key==='Enter'&&(event.metaKey||event.ctrlKey))agentSend()"></textarea>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem">
       <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Enter+Cmd/Ctrl = wyślij</span>
@@ -5773,6 +5771,42 @@ const PLAYBOOK_SECTIONS = {
       { id:'MC-10', name:'List do siebie za 6 miesięcy – gdzie chcę być', needsKonto: false,
         tags:['#MENTOR','#BIZNES-AGENCJI','#PROGNOZA','#PLAYBOOK'],
         prompt: `Pomóż mi napisać list do siebie za 6 miesięcy i plan jak tam dotrzeć.\n\nKROK 1 – WIZJA ZA 6 MIESIĘCY (5 wymiarów):\n- Łączne miesięczne fee agencji (zł/mies.) – cel vs dziś\n- Liczba kont i ich kondycja (średni health score)\n- Poziom automatyzacji (% czasu: analiza vs gaszenie pożarów)\n- Jedna nowa kompetencja lub usługa\n- Jak się czuję jako menedżer kont\n\nKROK 2 – PLAN WSTECZ (backward planning):\n- Co osiągnąć za 3 miesiące? Za 1 miesiąc? W tym tygodniu?\n\nKROK 3 – LIST DO SIEBIE (5–7 zdań):\nCo osiągnąłem, z czego jestem dumny, co zmieniłem w podejściu, jedno pytanie do siebie na przyszłość.\n\nNa końcu: jedno działanie dziś – małe ale konkretne – które za 6 miesięcy będę wspominał jako punkt zwrotny.` }
+    ]
+  },
+  BA: {
+    label: 'Sekcja 10 — Biznes Agencji / Fee',
+    color: '#ff6b35',
+    prompts: [
+      { id:'BA-01', name:'Prognoza fee agencji – ile zarobię w tym miesiącu', needsKonto: false,
+        tags:['#BIZNES-AGENCJI','#PROGNOZA','#MARŻA','#LUXSEN','#EOM'],
+        prompt: `Oblicz prognozę łącznego fee agencyjnego na koniec bieżącego miesiąca.\n\nModel fee: MEBLE 7 500 zł netto / LUXSEN 20% od marży grupy / Materazzi+MtzzEU 3 500 zł / Ankado24 2 900 zł.\n\nDla każdego klienta: podstawa naliczenia, fee MTD (zł), prognoza fee EOM (zł), zmiana vs poprzedni miesiąc (zł i %), status: LEPIEJ/NA POZIOMIE/GORZEJ.\n\nNa końcu: łączne fee EOM (zł), annualizowane fee (×12), które działanie dziś ma największy wpływ na fee i o ile zł może je zwiększyć.` },
+      { id:'BA-02', name:'LUXSEN fee – maksymalizacja 20% od marży', needsKonto: false,
+        tags:['#BIZNES-AGENCJI','#LUXSEN','#MARŻA','#ROAS','#SYMULATOR'],
+        prompt: `Skup się wyłącznie na grupie LUXSEN i znajdź działania które maksymalizują marżę grupy w bieżącym miesiącu.\n\nPamiętaj: każdy +1 000 zł marży LUXSEN = +200 zł mojego fee.\n\n4 obszary:\n1. ADS – kampanie ROAS >130% BE do przeskalowania. Efekt na marżę (zł).\n2. WYRÓŻNIENIA – konta LUXSEN przepalające >5%. Ile marży odzyska się po korekcie (zł)?\n3. BUDŻET – optymalna realokacja między Luxsen, Semmi, BOTAVIT. Efekt na marżę (zł).\n4. QUICK WINS – co zrobić dziś w 30 minut żeby poprawić marżę LUXSEN jeszcze w tym miesiącu.\n\nDla każdego obszaru: działanie → efekt na marżę LUXSEN (zł) → efekt na moje fee (zł).\nŁączny potencjał wzrostu fee z LUXSEN w tym miesiącu (zł).` },
+      { id:'BA-03', name:'Rentowność klientów – który klient jest najbardziej wartościowy', needsKonto: false,
+        tags:['#BIZNES-AGENCJI','#RENTOWNOŚĆ','#PROGNOZA','#MENTOR','#WSZYSTKIE-KONTA'],
+        prompt: `Oceń każdego klienta agencji pod kątem wartości biznesowej.\n\nDla każdego klienta (MEBLE / LUXSEN / Materazzi+MtzzEU / Ankado24) – 5 wymiarów:\n1. FEE MIESIĘCZNE – aktualne (zł) i trend\n2. CZAS OBSŁUGI – godz./tydzień i zwrot zł/godz.\n3. RYZYKO – czy może odejść lub obniżyć fee w 6 miesięcy? Ocena 1–5\n4. POTENCJAŁ WZROSTU – szacunek w zł/mies.\n5. TRUDNOŚĆ OBSŁUGI – ocena 1–5\n\nRanking klientów: fee / czas / ryzyko. Jeden wniosek per klient: co zrobić żeby zwiększyć wartość lub zmniejszyć koszt obsługi w 3 miesiące.` },
+      { id:'BA-04', name:'Rozliczenie LUXSEN – faktura 20% od marży', needsKonto: false,
+        tags:['#BIZNES-AGENCJI','#LUXSEN','#MARŻA','#RAPORT','#RENTOWNOŚĆ'],
+        prompt: `Przygotuj wyliczenie do faktury dla klienta LUXSEN za bieżący miesiąc.\n\nKROK 1 – MARŻA PER KONTO:\nDla każdego konta (Luxsen, Semmi, BOTAVIT): Sprzedaż / Koszt producenta / Prowizja / Dostawa / Ads / Wyróżnienia / Marża po reklamie (zł) / Marża po reklamie (%).\n\nKROK 2 – PODSTAWA NALICZENIA:\nŁączna marża grupy LUXSEN (zł). Moje fee = 20% × łączna marża.\n\nKROK 3 – OPIS DO FAKTURY:\n2–3 zdania w stylu: 'Usługa zarządzania kontami Allegro dla grupy LUXSEN w miesiącu [X]. Wynagrodzenie zmienne 20% od marży po reklamie w wysokości [Y] zł. Podstawa: marża [Z] zł.'\n\nNa końcu: porównanie fee LUXSEN vs poprzedni miesiąc i główna przyczyna zmiany.` },
+      { id:'BA-05', name:'Prognoza fee na 3 miesiące – planowanie finansowe', needsKonto: false,
+        tags:['#BIZNES-AGENCJI','#PROGNOZA','#MARŻA','#LUXSEN','#SYMULATOR','#TREND'],
+        prompt: `Przygotuj prognozę fee agencyjnego na kolejne 3 miesiące dla każdego klienta.\n\nDla każdego miesiąca (M+1, M+2, M+3) uwzględnij: trend z ostatnich 3 miesięcy, sezonowość kategorii, planowane działania agencji, ryzyka obniżenia fee.\n\nDla każdego klienta i miesiąca:\n- Prognoza fee (zł) – scenariusz bazowy\n- Prognoza fee (zł) – optymistyczny (+15% marży)\n- Prognoza fee (zł) – pesymistyczny (−15% marży)\n\nTabela zbiorcza: łączne fee M+1/M+2/M+3 w 3 scenariuszach. Jeden wniosek: jak zdywersyfikować ryzyko fee żeby scenariusz pesymistyczny był akceptowalny.` },
+      { id:'BA-06', name:'Gdzie agencja zostawia pieniądze na stole', needsKonto: false,
+        tags:['#BIZNES-AGENCJI','#RENTOWNOŚĆ','#MENTOR','#PROGNOZA','#WSZYSTKIE-KONTA'],
+        prompt: `Znajdź miejsca gdzie agencja zostawia pieniądze na stole bez pozyskiwania nowych klientów.\n\n5 obszarów:\n1. NIEWYKORZYSTANY POTENCJAŁ LUXSEN – ile dodatkowego fee przy marży LUXSEN +10%? Co blokuje wzrost?\n2. STAŁE FEE PONIŻEJ WARTOŚCI – czy któryś klient generuje wyniki znacznie lepsze niż zakładano przy wycenie? Warto renegocjować?\n3. USŁUGI KTÓRYCH NIE OFERUJĘ – co robię dla jednego klienta czego nie oferuję innemu?\n4. KONTA POZA OBSŁUGĄ – czy klient ma konta których nie obsługuję?\n5. EKSPANSJA – potencjał rynków CZ/SK/HU dla któregoś klienta?\n\nDla każdego obszaru: potencjał w zł/mies. i co konkretnie zrobić żeby go uruchomić.\nŁączny potencjał bez nowych klientów (zł/mies.) i ranking od najłatwiejszego do najtrudniejszego.` },
+      { id:'BA-07', name:'Analiza rentowności agencji – czy zarabiam na każdym kliencie', needsKonto: false,
+        tags:['#BIZNES-AGENCJI','#RENTOWNOŚĆ','#MENTOR','#PRIORYTETY'],
+        prompt: `Oblicz rentowność agencji per klient uwzględniając czas obsługi jako koszt.\n\nStawka godzinowa = fee miesięczne łącznie ÷ łączny czas pracy miesięcznie.\n\nDla każdego klienta:\n- Fee miesięczne (zł)\n- Szacowany czas obsługi miesięcznie (godz.)\n- Koszt czasu (godz. × stawka)\n- Marża agencji = fee − koszt czasu (zł)\n- Rentowność klienta dla agencji (%)\n- Ocena: RENTOWNY / PRÓG / NIERENTOWNY\n\nPosortuj od najbardziej rentownego. Czy jest klient nierentowny lub na granicy progu? Co zrobić: renegocjować, zmniejszyć czas przez lepsze procesy, czy zaakceptować jako strategiczny?` },
+      { id:'BA-08', name:'Strategia wzrostu agencji na 6 miesięcy', needsKonto: false,
+        tags:['#BIZNES-AGENCJI','#PROGNOZA','#MENTOR','#SYMULATOR','#PLAYBOOK'],
+        prompt: `Przygotuj strategię wzrostu łącznego fee agencji o 30% w ciągu 6 miesięcy.\n\n3 ścieżki wzrostu:\n\nŚCIEŻKA 1 – LEPSZE WYNIKI DLA OBECNYCH KLIENTÓW:\n- Ile dodatkowego fee przez poprawę marży LUXSEN?\n- Podstawy do renegocjacji stałego fee dla MEBLE lub ONE?\n- Potencjał (zł/mies.) i czas realizacji\n\nŚCIEŻKA 2 – ROZSZERZENIE USŁUG:\n- Jakie usługi dosprzedać obecnym klientom?\n- Per usługa: kto, ile (zł/mies.), trudność wdrożenia\n\nŚCIEŻKA 3 – NOWI KLIENCI:\n- Optymalny profil nowego klienta\n- Ile nowych klientów i jakiego fee żeby osiągnąć cel +30%?\n- Działania sprzedażowe na 6 miesięcy\n\nHarmonogram 6 miesięcy i prognoza fee w scenariuszu bazowym i optymistycznym (zł/mies.).` },
+      { id:'BA-09', name:'Alert fee – kiedy moje wynagrodzenie jest zagrożone', needsKonto: false,
+        tags:['#BIZNES-AGENCJI','#ALERTY','#LUXSEN','#MARŻA','#PROGNOZA','#SZYBKA-DECYZJA'],
+        prompt: `Przeskanuj wszystkie dane pod kątem zagrożeń dla mojego fee w bieżącym i kolejnym miesiącu.\n\n5 obszarów:\n1. ZAGROŻENIE FEE LUXSEN – czy marża LUXSEN spada w D2D? Prognoza fee EOM i zmiana vs poprzedni miesiąc (zł)\n2. RYZYKO STAŁYCH FEE – sygnały niezadowolenia klientów ze stałym fee. Ryzyko utraty 1–5.\n3. SEZONOWY SPADEK – historyczny wpływ kolejnego miesiąca na fee (zł)\n4. KONCENTRACJA RYZYKA – jaki % fee pochodzi z jednego klienta?\n5. ZALEGŁE SYGNAŁY – problemy operacyjne które jeszcze nie uderzyły w fee ale uderzą w 14 dni\n\nDla każdego: opis → strata fee (zł) → działanie zapobiegawcze → deadline.\nŁączne zagrożone fee i jedno działanie które dziś najbardziej chroni wynagrodzenie.` },
+      { id:'BA-10', name:'Miesięczne podsumowanie biznesu agencji – pełny obraz', needsKonto: false,
+        tags:['#BIZNES-AGENCJI','#RAPORT','#PROGNOZA','#MARŻA','#MENTOR','#WSZYSTKIE-KONTA'],
+        prompt: `Wygeneruj miesięczne podsumowanie biznesu agencji MPlace z perspektywy właściciela.\n\n7 sekcji:\n1. WYNIKI FINANSOWE – fee per klient MTD i prognoza EOM, łączne fee EOM, zmiana vs poprzedni miesiąc, annualizowane fee\n2. KONDYCJA PORTFELA – health score per klient, kto poprawił się najbardziej, kto wymaga uwagi\n3. MOJE WYNIKI JAKO MENEDŻERA – ocena 1–10, top 2 dobrze, top 2 do poprawy\n4. OPERACYJNE PODSUMOWANIE – łączna marża 9 kont, koszt Ads, wyróżnienia, ile kont z marżą >10% / 5–10% / <5%\n5. TOP 3 INSIGHTS – wnioski które zmienią działanie w kolejnym miesiącu\n6. PLAN NA KOLEJNY MIESIĄC – jeden cel finansowy, jeden cel per grupa, top 3 działania pierwszego tygodnia\n7. JEDNO ZDANIE MIESIĄCA – lekcja na przyszłość\n\nStyl: uczciwy raport właściciela do siebie. Bez koloryzowania, liczby i wnioski.` }
     ]
   }
 };
