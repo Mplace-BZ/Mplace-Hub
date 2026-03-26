@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v2.6</title>
+<title>MPlace Hub v2.6.202603262227</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1241,6 +1241,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="openPlaybook('KP')" class="agent-chip" style="border-color:rgba(244,114,182,.3);color:#f472b6;background:rgba(244,114,182,.06)">📋 Kanibalizacja</button>
     <button onclick="openPlaybook('DT')" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.06)">📋 D2D / Trend</button>
     <button onclick="openPlaybook('SE')" class="agent-chip" style="border-color:rgba(232,121,249,.3);color:#e879f9;background:rgba(232,121,249,.06)">📋 Symulator</button>
+    <button onclick="openPlaybook('IA')" class="agent-chip" style="border-color:rgba(245,166,35,.3);color:var(--yellow);background:rgba(245,166,35,.06)">📋 Insights</button>
   </div>
 
   <!-- Input -->
@@ -5663,9 +5664,46 @@ const PLAYBOOK_SECTIONS = {
         tags:['#SYMULATOR','#MARŻA','#ROAS','#BUDŻET','#WYRÓŻNIENIA','#RENTOWNOŚĆ'],
         prompt: `Wykonaj pełną symulację wszystkich 4 dźwigni dla konta [KONTO] jednocześnie.\n\nDźwignia 1 – ROAS Ads: obecny → docelowy\nDźwignia 2 – Budżet Ads: obecny zł/mies. → docelowy\nDźwignia 3 – Wyróżnienia: obecny % → docelowy % sprzedaży\nDźwignia 4 – Prowizja: obecna % → docelowa % (scenariusz renegocjacji)\n\nJeśli nie podałem wartości docelowych – zaproponuj je sam na podstawie benchmarków.\n\nEfekt kombinowany: sprzedaż EOM, koszt Ads+wyróżnienia EOM, marża (%) i (zł), zmiana marży (zł i pp), która dźwignia ma największy wpływ, które się wzajemnie wzmacniają a które są w konflikcie.\nGdybym mógł ruszyć tylko jedną dźwignię dziś – którą wybierasz i dlaczego? Oczekiwany efekt w zł w 30 dni.` }
     ]
+  },
+  IA: {
+    label: 'Sekcja 7 — Insights i Alerty',
+    color: '#f5a623',
+    prompts: [
+      { id:'IA-01', name:'Pełny Insights – wszystkie konta, wszystkie sygnały', needsKonto: false,
+        tags:['#INSIGHTS','#ALERTY','#WSZYSTKIE-KONTA','#MARŻA','#HEALTH-SCORE'],
+        prompt: `Wygeneruj pełny raport Insights dla wszystkich 9 kont. 3 kategorie:\n\n↓ ZAGROŻENIA – reakcja w 24–48h\n↑ SZANSE – możliwość zarobienia więcej dziś\n→ OBSERWUJ – bez akcji dziś, monitorować w D2D\n\nDla każdego sygnału: konto, tytuł (max 6 słów), opis (2 zdania), impact w zł/mies., ważność: WYSOKI/ŚREDNI/NISKI, działanie w 1 zdaniu.\nPosortuj każdą kategorię od najwyższego impactu.\nNa końcu: łączna liczba sygnałów per kategorię, potencjał szans w zł, ryzyko zagrożeń w zł. Jeden absolutny priorytet dziś.` },
+      { id:'IA-02', name:'Alert poranny – co wymaga reakcji dziś rano', needsKonto: false,
+        tags:['#ALERTY','#INSIGHTS','#SZYBKA-DECYZJA','#WSZYSTKIE-KONTA','#D2D'],
+        prompt: `Działasz jako system alertów MPlace Hub. Przejrzyj wszystkie dane i wygeneruj alert poranny.\n\nZasady: tylko sygnały wymagające działania dziś lub jutro, max 7 alertów, zero wstępów i opisów.\n\nFormat: [🔴/🟡/🟢] KONTO → CO SIĘ DZIEJE → DZIAŁANIE → IMPACT (zł)\n🔴 = dziś / 🟡 = 48h / 🟢 = szansa\n\nPo liście: 'Priorytet absolutny dziś: [konto] → [działanie] → [efekt w zł].' Nic więcej.` },
+      { id:'IA-03', name:'Insights zagrożenia – tylko czerwone sygnały', needsKonto: false,
+        tags:['#ALERTY','#INSIGHTS','#KRYZYS','#MARŻA','#ROAS'],
+        prompt: `Przeskanuj wszystkie konta i wygeneruj tylko sygnały zagrożeń (↓).\n\nKryterium: marża <5% / ROAS <85% BE / wyróżnienia >5% / sprzedaż spada 3+ dni / koszt Ads >30% sprzedaży / kanibalizacja MEBLE.\n\nDla każdego: konto i typ, konkretna wartość metryki, ile dni trwa, strata do EOM (zł), działanie z czasem (min).\nPosortuj od największej straty.\nNa końcu: łączna strata ze wszystkich zagrożeń do EOM i ile mogę wyeliminować dziś w 60 minut.` },
+      { id:'IA-04', name:'Insights szanse – tylko zielone sygnały', needsKonto: false,
+        tags:['#INSIGHTS','#SZYBKA-DECYZJA','#ROAS','#BUDŻET','#MARŻA'],
+        prompt: `Przeskanuj wszystkie konta i wygeneruj tylko sygnały szans (↑).\n\nKryterium: ROAS >130% BE / wyróżnienia <3% przy rosnącym trendzie / marża >15% / sprzedaż rośnie 5+ dni / nadwyżka budżetu Ads.\n\nDla każdej szansy: konto i typ, konkretna wartość, jak długo okno dostępne, potencjał do EOM (zł), działanie z czasem (min).\nPosortuj od największego potencjału.\nNa końcu: łączny potencjał wszystkich szans i top 3 do wykorzystania dziś.` },
+      { id:'IA-05', name:'Health score – tygodniowa ocena kondycji kont', needsKonto: false,
+        tags:['#HEALTH-SCORE','#INSIGHTS','#WSZYSTKIE-KONTA','#MARŻA','#ROAS'],
+        prompt: `Oceń kondycję każdego z 9 kont w skali 1–10.\n\nKryteria (każde 0–2 pkt):\n- Marża: >15%=2 / 5–15%=1 / <5%=0\n- ROAS vs BE: >130%=2 / 85–130%=1 / <85%=0\n- Wyróżnienia: <3%=2 / 3–5%=1 / >5%=0\n- Trend D2D: rosnący 7 dni=2 / stabilny=1 / spadający=0\n- Prognoza EOM: lepsza=2 / na poziomie=1 / gorsza=0\n\nDla każdego konta: score z rozpisaniem, score poprzedni tydzień, trend (↑→↓), co obniża i jak naprawić.\nNa końcu: średni health score agencji dziś vs poprzedni tydzień, ranking od najgorszego.` },
+      { id:'IA-06', name:'Insight tygodnia – jeden najważniejszy sygnał', needsKonto: false,
+        tags:['#INSIGHTS','#MENTOR','#SZYBKA-DECYZJA','#MARŻA','#PRIORYTETY'],
+        prompt: `Przejrzyj wszystkie dane z ostatnich 7 dni. Wybierz jeden absolutnie najważniejszy insight tygodnia (kryterium: największy impact finansowy).\n\n5 sekcji:\n1. TYTUŁ – max 8 słów\n2. CO SIĘ DZIEJE – dokładny opis z liczbami (3–4 zdania)\n3. DLACZEGO WAŻNE – mechanizm i co się stanie jeśli nic nie zrobię (strata lub zysk w zł)\n4. PLAN DZIAŁAŃ – 3 kroki (dziś / jutro / ten tydzień) z efektem w zł\n5. JAK ZMIERZĘ SUKCES – konkretna metryka w D2D po 7 dniach\n\nNa końcu: 'Jeśli zrobię tylko jedną rzecz w tym tygodniu, zrobię: [działanie] bo przyniesie [efekt w zł].'` },
+      { id:'IA-07', name:'Insight LUXSEN – analiza modelu 20% fee', needsKonto: false,
+        tags:['#INSIGHTS','#LUXSEN','#MARŻA','#RENTOWNOŚĆ','#BIZNES-AGENCJI'],
+        prompt: `Przeanalizuj grupę LUXSEN (Luxsen, Semmi, BOTAVIT) pod kątem modelu 20% od marży.\n\nDla każdego konta: marża MTD (zł), moje fee (20%×marża) MTD, prognoza marży EOM i fee EOM, zmiana vs poprzedni miesiąc, główny czynnik zmiany.\n\nAktywne zagrożenia dla marży LUXSEN: co obniża teraz, co może obniżyć w 14 dniach, jakie działanie chroni fee najbardziej.\nNa końcu: łączna prognoza fee z LUXSEN na EOM i jedno działanie które zwiększy fee o maksymalną kwotę dziś.` },
+      { id:'IA-08', name:'Wczesny sygnał – wykryj problem zanim urośnie', needsKonto: false,
+        tags:['#INSIGHTS','#ALERTY','#TREND','#D2D','#ANOMALIE'],
+        prompt: `Przeskanuj dane D2D i MTD pod kątem słabych sygnałów – małych anomalii które jeszcze nie przekroczyły progu alertu ale mogą być problemem za 7–14 dni.\n\nSzukaj: ROAS spada powoli 5+ dni ale nadal powyżej BE / wyróżnienia rosną i zbliżają się do 5% / marża spada o 1–2pp przez tydzień / sprzedaż 10–15% poniżej tempa poprzedniego miesiąca / koszt dostawy lub prowizja rośnie nieznacznie przez 2+ tygodnie.\n\nDla każdego: konto i metryka, obecna wartość vs 7 dni temu, prognoza za 14 dni, kiedy stanie się pełnym alertem, działanie zapobiegawcze.` },
+      { id:'IA-09', name:'Insight miesięczny – podsumowanie i wnioski na kolejny miesiąc', needsKonto: false,
+        tags:['#INSIGHTS','#TREND','#MARŻA','#ROAS','#WSZYSTKIE-KONTA','#RAPORT'],
+        prompt: `Wygeneruj miesięczny raport Insights dla wszystkich kont.\n\n6 sekcji:\n1. WYNIKI MIESIĄCA – tabela: Sprzedaż / Marża % / Marża zł / ROAS / Wyróżnienia % / Health score / Ocena (✓ ~ ✗)\n2. TOP 3 SUKCESY – co zadziałało, na których kontach, mechanizm sukcesu\n3. TOP 3 PORAŻKI – co nie zadziałało, strata w zł i przyczyna\n4. WNIOSKI STRATEGICZNE – 5 zasad do wdrożenia jako stałe reguły\n5. PLAN NA KOLEJNY MIESIĄC – per grupa: jedna zmiana strategiczna + cel liczbowy\n6. PROGNOZA KOLEJNEGO MIESIĄCA – sprzedaż i marża przy wdrożeniu planu\n\nOcena miesiąca 1–10. 'Gdybym mógł cofnąć się na początek miesiąca, zrobiłbym inaczej: [działanie].'` },
+      { id:'IA-10', name:'Insight strategiczny – gdzie agencja traci pieniądze systemowo', needsKonto: false,
+        tags:['#INSIGHTS','#RENTOWNOŚĆ','#MARŻA','#MENTOR','#WSZYSTKIE-KONTA','#KANIBALIZACJA'],
+        prompt: `Przeanalizuj dane historyczne z ostatnich 3–6 miesięcy. Szukaj nie jednorazowych anomalii ale powtarzających się wzorców strat.\n\n5 obszarów:\n1. SYSTEMOWE PRZEPALANIE ADS – konta regularnie ROAS <BE mimo korekt, łączny koszt 3 miesiące (zł)\n2. CHRONICZNE PRZEPALANIE WYRÓŻNIEŃ – konta regularnie >5% mimo alertów, łączna kwota (zł)\n3. STRUKTURALNA KANIBALIZACJA – MEBLE traci marżę co miesiąc przez kanibalizację, koszt miesięcznie (zł)\n4. KONTA CHRONICZNE SŁABE – health score <5 przez 3+ miesiące, czy mają sens przy obecnym modelu fee\n5. LUKI W DECYZJACH – gdzie regularnie reaguję za późno i co to kosztuje\n\nDla każdego wzorca: opis, koszt 3 miesiące (zł), operacyjny czy strukturalny, systemowe rozwiązanie.\nRanking 5 problemów od największego kosztu. Łączna kwota strat systemowych przez 3 miesiące i ile miesięcznie zarabiam MNIEJ przez te problemy.` }
+    ]
   }
 };
 
+/* PB_VERSION_202603262227 */
 function openPlaybook(section) {
   pbCurrentSection = section;
   pbCurrentPrompt = null;
