@@ -5663,26 +5663,36 @@ function openPlaybook(section) {
 
 function selectPlaybookPrompt(section, idx) {
   const sec = PLAYBOOK_SECTIONS[section];
-  if(!sec) { console.error('Brak sekcji:', section); return; }
-  const prompt = sec.prompts[idx];
-  if(!prompt) { console.error('Brak promptu idx:', idx, 'w sekcji:', section, 'prompts:', sec.prompts.length); return; }
-  pbCurrentPrompt = prompt;
+  if(!sec) return;
+  const p = sec.prompts[idx];
+  if(!p) return;
+  pbCurrentPrompt = p;
 
+  // Highlight selected item
+  document.querySelectorAll('.pb-item').forEach(el=>el.style.background='var(--bg3)');
+  const selected = document.querySelector(`.pb-item[data-idx="${idx}"]`);
+  if(selected) selected.style.background='rgba(245,166,35,.08)';
+
+  // Always show action bar
+  const wrap = document.getElementById('pbKontoWrap');
+  wrap.style.display = 'block';
+  document.getElementById('pbKontoSelect').style.display = p.needsKonto ? 'block' : 'none';
+  document.querySelector('#pbKontoWrap .pb-konto-label').style.display = p.needsKonto ? 'block' : 'none';
+  document.getElementById('pbKontoSelect').value = '';
+}
+
+function runPlaybookWithKonto() {
+  if(!pbCurrentPrompt) return;
   if(pbCurrentPrompt.needsKonto) {
-    document.getElementById('pbKontoWrap').style.display = 'block';
-    document.getElementById('pbKontoSelect').value = '';
+    const konto = document.getElementById('pbKontoSelect').value;
+    if(!konto) { alert('Wybierz konto.'); return; }
+    const prompt = pbCurrentPrompt.prompt.replace('[KONTO]', konto);
+    closePlaybook();
+    agentAsk(prompt);
   } else {
     closePlaybook();
     agentAsk(pbCurrentPrompt.prompt);
   }
-}
-
-function runPlaybookWithKonto() {
-  const konto = document.getElementById('pbKontoSelect').value;
-  if(!konto) { alert('Wybierz konto.'); return; }
-  const prompt = pbCurrentPrompt.prompt.replace('[KONTO]', konto);
-  closePlaybook();
-  agentAsk(prompt);
 }
 
 function closePlaybook() {
@@ -6411,10 +6421,10 @@ self.addEventListener('fetch', e => e.respondWith(
       <button onclick="closePlaybook()" style="background:transparent;border:none;color:var(--text3);font-size:16px;cursor:pointer">✕</button>
     </div>
     <div id="pbList" style="display:flex;flex-direction:column;gap:.5rem"></div>
-    <!-- Konto dropdown (pokazuje się gdy prompt wymaga konta) -->
+    <!-- Action bar (zawsze widoczna po wyborze promptu) -->
     <div id="pbKontoWrap" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.5rem">Wybierz konto:</div>
-      <select id="pbKontoSelect" style="width:100%;font-family:var(--mono);font-size:11px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text)">
+      <div class="pb-konto-label" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.5rem">Wybierz konto:</div>
+      <select id="pbKontoSelect" style="width:100%;font-family:var(--mono);font-size:11px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);margin-bottom:.75rem">
         <option value="">— wybierz konto —</option>
         <option value="MobelKap">MobelKap</option>
         <option value="PerfektCięcie">PerfektCięcie</option>
@@ -6426,7 +6436,7 @@ self.addEventListener('fetch', e => e.respondWith(
         <option value="MtzzEU">MtzzEU</option>
         <option value="Ankado24">Ankado24</option>
       </select>
-      <button onclick="runPlaybookWithKonto()" style="margin-top:.75rem;width:100%;font-family:var(--mono);font-size:11px;padding:8px;border-radius:6px;border:1px solid rgba(245,166,35,.4);background:rgba(245,166,35,.1);color:var(--yellow);cursor:pointer">▸ Uruchom</button>
+      <button onclick="runPlaybookWithKonto()" style="width:100%;font-family:var(--mono);font-size:11px;padding:8px;border-radius:6px;border:1px solid rgba(245,166,35,.4);background:rgba(245,166,35,.1);color:var(--yellow);cursor:pointer">▸ Uruchom</button>
     </div>
   </div>
 </div>
