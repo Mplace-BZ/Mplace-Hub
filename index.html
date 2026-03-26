@@ -1221,27 +1221,22 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <div class="ph-sub">Zadaj pytanie — agent analizuje Twoje dane i odpowiada</div>
   </div>
 
-  <!-- Quick questions — tylko najważniejsze, reszta w Playbook -->
-  <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.5rem">
-    <button onclick="agentAsk('Gdzie tracę pieniądze? Gdzie są największe wycieki marży?')" class="agent-chip">Gdzie tracę pieniądze?</button>
-    <button onclick="agentAsk('Oceń kondycję każdego konta w skali 1-10 z uzasadnieniem.')" class="agent-chip">Kondycja kont 1-10</button>
-    <button onclick="agentAsk('Które konto ma największy potencjał wzrostu i dlaczego?')" class="agent-chip">Największy potencjał?</button>
-    <button onclick="generateMTDReport()" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:var(--accent);background:rgba(255,107,53,.08)">📊 Raport MTD</button>
-    <button onclick="openPDFsModal()" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.07)">📁 PDF's</button>
-  </div>
   <!-- Playbook row -->
-  <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;padding-top:.4rem;border-top:1px solid var(--border)">
-    <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;align-self:center">Playbook:</span>
+  <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;align-items:center">
+    <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Playbook:</span>
     <button onclick="openPlaybook('PD')" class="agent-chip" style="border-color:rgba(245,166,35,.3);color:var(--yellow);background:rgba(245,166,35,.06)">📋 Plan Dnia</button>
     <button onclick="openPlaybook('RM')" class="agent-chip" style="border-color:rgba(45,212,160,.3);color:var(--green);background:rgba(45,212,160,.06)">📋 Rentowność</button>
     <button onclick="openPlaybook('RA')" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.06)">📋 ROAS / Ads</button>
     <button onclick="openPlaybook('KP')" class="agent-chip" style="border-color:rgba(244,114,182,.3);color:#f472b6;background:rgba(244,114,182,.06)">📋 Kanibalizacja</button>
     <button onclick="openPlaybook('DT')" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.06)">📋 D2D / Trend</button>
     <button onclick="openPlaybook('SE')" class="agent-chip" style="border-color:rgba(232,121,249,.3);color:#e879f9;background:rgba(232,121,249,.06)">📋 Symulator</button>
-    <button onclick="openPlaybook('IA')" class="agent-chip" style="border-color:rgba(245,166,35,.3);color:var(--yellow);background:rgba(245,166,35,.06)">📋 Insights</button>
-    <button onclick="openPlaybook('RC')" class="agent-chip" style="border-color:rgba(255,107,53,.3);color:var(--accent);background:rgba(255,107,53,.06)">📋 Raporty</button>
-    <button onclick="openPlaybook('MC')" class="agent-chip" style="border-color:rgba(45,212,160,.3);color:var(--green);background:rgba(45,212,160,.06)">📋 Mentor</button>
-    <button onclick="openPlaybook('BA')" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:var(--accent);background:rgba(255,107,53,.08)">📋 Biznes Agencji</button>
+    <button onclick="openPlaybook('IA')" class="agent-chip" style="border-color:rgba(251,191,36,.3);color:#fbbf24;background:rgba(251,191,36,.06)">📋 Insights</button>
+    <button onclick="openPlaybook('RC')" class="agent-chip" style="border-color:rgba(156,163,175,.3);color:#9ca3af;background:rgba(156,163,175,.06)">📋 Raporty</button>
+    <button onclick="openPlaybook('MC')" class="agent-chip" style="border-color:rgba(52,211,153,.3);color:#34d399;background:rgba(52,211,153,.06)">📋 Mentor</button>
+    <button onclick="openPlaybook('BA')" class="agent-chip" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.08)">📋 Biznes</button>
+    <div style="flex:1"></div>
+    <button onclick="generateMTDReport()" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:var(--accent);background:rgba(255,107,53,.08)">📊 Raport MTD</button>
+    <button onclick="openPDFsModal()" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.07)">📁 PDF's</button>
   </div>
 
   <!-- Input -->
