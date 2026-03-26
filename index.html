@@ -2939,7 +2939,6 @@ function printInsights(){
   const filterLabel = activeFilter ? activeFilter.textContent.trim() : 'Wszystkie';
   const now = new Date().toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'});
 
-  // Karty to bezpośrednie dzieci insightsContent (divy per konto)
   const children = [...content.children];
   if(!children.length){ alert('Brak sygnałów do wydruku.'); return; }
 
@@ -2948,20 +2947,45 @@ function printInsights(){
   iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:210mm;border:none';
   document.body.appendChild(iframe);
   iframe.contentDocument.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Arial,sans-serif;font-size:11px;color:#111;padding:12mm 14mm;background:#fff}
-    h1{font-size:16px;font-weight:700;margin-bottom:2px}
-    .sub{font-size:10px;color:#666;margin-bottom:12px;font-family:monospace}
-    div{page-break-inside:avoid;color:#111!important;background:#fff!important}
-    span{color:#111!important;background:transparent!important}
-    footer{margin-top:12px;font-family:monospace;font-size:9px;color:#888;border-top:1px solid #eee;padding-top:6px}
+    body{font-family:'DM Sans',Arial,sans-serif;font-size:11px;color:#1a1a2e;padding:12mm 14mm;background:#fff}
+    .rpt-header{border-bottom:3px solid #ff6b35;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end}
+    .rpt-eyebrow{font-family:'DM Mono',monospace;font-size:9px;color:#ff6b35;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+    .rpt-title{font-size:18px;font-weight:700;color:#1a1a2e}
+    .rpt-sub{font-family:'DM Mono',monospace;font-size:9px;color:#888;margin-top:3px}
+    .rpt-date{font-family:'DM Mono',monospace;font-size:10px;color:#888;text-align:right}
+    div{color:#1a1a2e!important}
+    span{color:#1a1a2e!important}
+    [style*="var(--red)"],[style*="#ff4d6a"]{color:#ff4d6a!important}
+    [style*="var(--green)"],[style*="#2dd4a0"]{color:#2dd4a0!important}
+    [style*="var(--yellow)"],[style*="#f5a623"]{color:#f5a623!important}
+    [style*="var(--bg2)"],[style*="var(--bg3)"],[style*="var(--bg)"]{background:#f9f9f9!important}
+    [style*="border-left:3px solid var(--red)"]{border-left:3px solid #ff4d6a!important}
+    [style*="border-left:3px solid var(--green)"]{border-left:3px solid #2dd4a0!important}
+    [style*="border-left:3px solid var(--yellow)"]{border-left:3px solid #f5a623!important}
+    [style*="border-left:2px solid"]{border-radius:0 4px 4px 0}
+    [style*="background:var(--red-bg)"]{background:#fff0f2!important}
+    [style*="background:var(--green-bg)"]{background:#f0fdf8!important}
+    [style*="background:var(--yellow-bg)"]{background:#fffbf0!important}
+    [style*="border:1px solid var(--border)"]{border:1px solid #e5e5e5!important}
+    .rpt-footer{margin-top:14px;font-family:'DM Mono',monospace;font-size:9px;color:#aaa;border-top:1px solid #eee;padding-top:6px;display:flex;justify-content:space-between}
   </style>
   </head><body>
-  <h1>Insights & Sygnały</h1>
-  <div class="sub">${filterLabel} · ${sub?sub.textContent:''} · ${now}</div>
+  <div class="rpt-header">
+    <div>
+      <div class="rpt-eyebrow">MPlace Hub · Insights & Sygnały</div>
+      <div class="rpt-title">${filterLabel}</div>
+      <div class="rpt-sub">${sub?sub.textContent:''}</div>
+    </div>
+    <div class="rpt-date">${now}</div>
+  </div>
   ${cardsHtml}
-  <footer>MPlace Hub · mplace-bz.github.io/Mplace-Hub</footer>
+  <div class="rpt-footer">
+    <span>mplace-bz.github.io/Mplace-Hub</span>
+    <span>Wygenerowano: ${now}</span>
+  </div>
   </body></html>`);
   iframe.contentDocument.close();
   iframe.contentWindow.onload=()=>{ iframe.contentWindow.print(); setTimeout(()=>iframe.remove(),1000); };
@@ -5614,8 +5638,12 @@ function renderD2D(){
              <td style="padding:7px 6px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);color:${chgColor};font-size:10px">${arrow} ${chg!=null?pct(chg):''}</td>`;
     });
 
-    // EOM estimation in Razem column
-    const eom = (acctCount>0&&_dm>0) ? acctTotal/_dm*_din : null;
+    // EOM estimation — ostatnia wartość MTD / dzień * dni w miesiącu
+    const lastEntry = sortedDays.slice().reverse().find(day=>day.entries[k])?.entries[k];
+    const lastDzien = lastEntry?.dzien || _dm;
+    const lastVal = lastEntry ? d2dMetricVal(lastEntry, metric, prod) : null;
+    const daysInM = lastEntry ? (DAYS_IN[lastEntry.m]||31) : _din;
+    const eom = (lastVal!=null&&lastDzien>0) ? Math.round(lastVal/lastDzien*daysInM) : null;
     html+=`<td style="padding:7px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);border-left:1px solid var(--border2);color:var(--yellow);font-weight:600">${eom!=null?fmt(eom):'—'}</td>
            <td style="padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.03);font-size:9px;color:var(--text3)">est.</td>
     </tr>`;
