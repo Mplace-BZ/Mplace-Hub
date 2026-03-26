@@ -1219,7 +1219,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   </div>
 
   <!-- Quick questions -->
-  <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem">
+  <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.5rem">
     <button onclick="agentAsk('Na co dziś powinienem zwrócić uwagę? Które konto wymaga działania?')" class="agent-chip">Na co dziś zwrócić uwagę?</button>
     <button onclick="agentAsk('Co jest teraz najważniejsze do zrobienia? Podaj priorytety.')" class="agent-chip">Co jest najważniejsze?</button>
     <button onclick="agentAsk('Jak idzie marzec vs luty? Porównaj sprzedaż i marże.')" class="agent-chip">Marzec vs Luty</button>
@@ -1228,6 +1228,11 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="agentAsk('Gdzie tracę pieniądze? Gdzie są największe wycieki marży?')" class="agent-chip">Gdzie tracę pieniądze?</button>
     <button onclick="generateMTDReport()" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:var(--accent);background:rgba(255,107,53,.08)">📊 Raport MTD</button>
     <button onclick="openPDFsModal()" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.07)">📁 PDF's</button>
+  </div>
+  <!-- Playbook row -->
+  <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;padding-top:.4rem;border-top:1px solid var(--border)">
+    <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;align-self:center">Playbook:</span>
+    <button onclick="openPlaybook('PD')" class="agent-chip" style="border-color:rgba(245,166,35,.3);color:var(--yellow);background:rgba(245,166,35,.06)">📋 Plan Dnia</button>
   </div>
 
   <!-- Input -->
@@ -5427,6 +5432,92 @@ function printAdsOverlay() {
   iframe.contentWindow.onload = ()=>{ iframe.contentWindow.print(); setTimeout(()=>iframe.remove(),1000); };
 }
 
+// ═══════════════════════════════════════════════════════════
+// PLAYBOOK
+// ═══════════════════════════════════════════════════════════
+
+const PLAYBOOK_SECTIONS = {
+  PD: {
+    label: 'Sekcja 1 — Plan Dnia',
+    color: 'var(--yellow)',
+    prompts: [
+      { id:'PD-01', name:'Plan dnia 60 min – wszystkie konta', needsKonto: false,
+        prompt: `Masz aktualne dane D2D, MTD, Dashboard i Insights dla wszystkich kont. Przyjmij, że mam dziś 60 minut na pracę operacyjną.\n\nUłóż szczegółowy plan dnia jako listę maksymalnie 7 zadań.\n\nDla każdego zadania podaj:\n- Konto lub grupa kont\n- Konkretne działanie (co dokładnie mam zrobić)\n- Dlaczego właśnie teraz (najważniejsza przyczyna wynikająca z danych)\n- Szacowany czas realizacji w minutach\n- Szacowany impact finansowy w zł do końca bieżącego miesiąca\n- Poziom ryzyka pominięcia: niski / średni / wysoki\n\nPosortuj od największego impactu. Łączny czas max 60 minut. Na końcu podsumowanie 3–4 zdania: cel dnia, czego absolutnie nie pominąć i jaki EOM mogę się spodziewać.` },
+      { id:'PD-02', name:'Plan dnia 30 min – tryb ekspresowy', needsKonto: false,
+        prompt: `Mam dziś maksymalnie 30 minut. Działaj jak dyspozytornia kryzysowa: wybierz 3 i tylko 3 zadania z największym impaktem.\n\nKażde zadanie w formacie jednej linii:\nKONTO → DZIAŁANIE → IMPACT (zł) → CZAS (min)\n\nNie opisuj, nie analizuj, nie dodawaj kontekstu. Na końcu jedno zdanie: 'Jeśli nie zrobię nic więcej dziś, priorytet absolutny to: [jedno zdanie].'` },
+      { id:'PD-03', name:'Poranek – na co dziś zwrócić uwagę', needsKonto: false,
+        prompt: `Jestem właśnie po wejściu do pracy. Daj mi poranny briefing w 3 sekcjach:\n\nALERTY – co od ostatniego zapisu D2D zmieniło się wymagając natychmiastowej reakcji (ROAS poniżej BE, wyróżnienia >5%, marża ujemna). Każdy alert: konto → co się stało → jak pilne (dziś / ten tydzień).\n\nSZANSE – konta z potencjałem do działania ofensywnego dziś (skalowanie Ads, dobry ROAS do podbicia budżetu).\n\nPLAN – 3 konkretne zadania na dziś w kolejności priorytetów. Jedno zdanie na zadanie.` },
+      { id:'PD-04', name:'Koniec dnia – retro i plan na jutro', needsKonto: false,
+        prompt: `Porównaj dane D2D z dzisiaj vs poprzedni dzień dla wszystkich kont. Retro dnia w 3 sekcjach:\n\nCO POSZŁO DOBRZE – konta które poprawiły metryki (wzrost sprzedaży, poprawa ROAS, marży). Konkretne liczby.\n\nCZERWONE FLAGI – konta które pogorszyły wyniki lub przekroczyły próg ryzyka. Podaj przyczynę jeśli można odczytać z danych.\n\nPLAN NA JUTRO – 5 konkretnych zadań posortowanych priorytetem: Konto → Działanie → Impact (zł) → Czas (min).` },
+      { id:'PD-05', name:'Tygodniowy plan działań – poniedziałek', needsKonto: false,
+        prompt: `Masz dane MTD, D2D i Insights dla wszystkich kont. Zaplanuj tydzień (Pn–Pt):\n\nPn: przegląd kondycji kont i korekty budżetów Ads\nWt–Śr: optymalizacje operacyjne (wyróżnienia, kampanie, ceny)\nCzw: analiza trendów i porównanie MTD do poprzedniego miesiąca\nPt: raport dla klientów + plan budżetów na kolejny tydzień\n\nDla każdego zadania: Konto → Działanie → Impact (zł) → Czas (min). Na końcu: 'Jeśli wykonam ten plan, spodziewany EOM marży całej agencji wyniesie: [szacunek w zł].'` },
+      { id:'PD-06', name:'Interwencja kryzysowa – konto spada', needsKonto: true,
+        prompt: `Konto [KONTO] ma w tym miesiącu wyraźnie gorsze wyniki. Działaj jak konsultant kryzysowy.\n\nDIAGNOZA – co dokładnie się pogorszyło (które metryki, od kiedy, jak bardzo vs poprzedni miesiąc i vs benchmark grupy).\n\nPRZYCZYNY – lista możliwych przyczyn (Ads, wyróżnienia, prowizja, cena, sezonowość, kanibalizacja), posortowana od najbardziej prawdopodobnej.\n\nPLAN RATUNKOWY – 5 konkretnych działań do wykonania w 48h: Działanie → Oczekiwany efekt w zł → Ryzyko.\n\nNa końcu oceń: czy sytuacja odwracalna w bieżącym miesiącu?` },
+      { id:'PD-07', name:'Priorytetyzacja po weekendzie', needsKonto: false,
+        prompt: `Porównaj dane D2D z piątku z danymi z weekendu dla wszystkich kont:\n\n1. Które konta miały dobry / zły weekend i dlaczego (ROAS, sprzedaż, marża – konkretne liczby)?\n2. Jak zmienił się prognozowany EOM dla każdego konta po weekendzie?\n3. Które konta wymagają korekty Ads lub wyróżnień na początek tygodnia?\n\nNa końcu 'Reset tygodnia' – top 5 zadań priorytetowych na dziś: Konto → Działanie → Impact (zł) → Czas (min).` },
+      { id:'PD-08', name:'Ostatnie 5 dni miesiąca – domknięcie', needsKonto: false,
+        prompt: `Jest ostatnie 5 dni miesiąca. Zmaksymalizuj wynik EOM dla wszystkich kont.\n\nDla każdego konta:\n1. Czy EOM jest na dobrej drodze vs cel / poprzedni miesiąc?\n2. Jedno konkretne działanie do wykonania dziś lub jutro które da efekt w 5 dni.\n3. Czego absolutnie NIE ruszać w ostatnich dniach miesiąca?\n\nTabela: Konto / Status EOM / Jedno działanie / Czego nie ruszać. Na końcu: prognoza łącznej marży agencji na EOM (zł).` },
+      { id:'PD-09', name:'Gdzie dziś tracę pieniądze – szybki audyt', needsKonto: false,
+        prompt: `Przejrzyj aktualne dane wszystkich kont i znajdź miejsca gdzie tracę pieniądze:\n\n- Wyróżnienia >5% sprzedaży (przepalanie – podaj kwotę)\n- Kampanie Ads z ROAS poniżej BE ROAS (konto, różnica ROAS, strata w zł/mies.)\n- Konta z marżą po reklamie poniżej 0%\n- Konta gdzie koszt dostawy + prowizja pochłania >35% sprzedaży\n\nTabela: Konto / Rodzaj wycieku / Kwota straty (zł/mies.) / Jedno działanie naprawcze.\nNa końcu: łączna szacowana strata miesięczna i łączny potencjał oszczędności.` },
+      { id:'PD-10', name:'Prognoza tygodnia – czy jestem na dobrej drodze', needsKonto: false,
+        prompt: `Na podstawie danych D2D i MTD dla wszystkich kont oceń czy jestem na dobrej drodze do dobrego wyniku EOM.\n\nDla każdego konta:\n1. Aktualne tempo: średnia dzienna sprzedaż i marża z ostatnich 7 dni\n2. Prognozowany EOM przy obecnym tempie (zł sprzedaży i marży)\n3. Ocena trajektorii: rośnie / spada / stabilna vs poprzedni miesiąc\n4. Jedno działanie które poprawi trajektorię jeśli niezadowalająca\n\nNa końcu: sumaryczna prognoza marży agencji na EOM i ocena 1–10 z uzasadnieniem w 2 zdaniach.` }
+    ]
+  }
+};
+
+let pbCurrentSection = null;
+let pbCurrentPrompt = null;
+
+function openPlaybook(section) {
+  pbCurrentSection = section;
+  pbCurrentPrompt = null;
+  const sec = PLAYBOOK_SECTIONS[section];
+  if(!sec) return;
+  document.getElementById('pbSectionLabel').textContent = sec.label;
+  document.getElementById('pbKontoWrap').style.display = 'none';
+
+  const list = document.getElementById('pbList');
+  list.innerHTML = sec.prompts.map((p,i) => `
+    <div onclick="selectPlaybookPrompt('${section}',${i})"
+      style="padding:.65rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.75rem"
+      onmouseover="this.style.borderColor='rgba(245,166,35,.4)';this.style.background='rgba(245,166,35,.05)'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg3)'">
+      <span style="font-family:var(--mono);font-size:9px;color:${sec.color};flex-shrink:0;letter-spacing:.04em">${p.id}</span>
+      <span style="font-size:11px;color:var(--text)">${p.name}</span>
+      ${p.needsKonto ? '<span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto">wymaga konta</span>' : ''}
+    </div>
+  `).join('');
+
+  const modal = document.getElementById('playbookModal');
+  modal.style.display = 'flex';
+}
+
+function selectPlaybookPrompt(section, idx) {
+  const sec = PLAYBOOK_SECTIONS[section];
+  pbCurrentPrompt = sec.prompts[idx];
+
+  if(pbCurrentPrompt.needsKonto) {
+    document.getElementById('pbKontoWrap').style.display = 'block';
+    document.getElementById('pbKontoSelect').value = '';
+  } else {
+    closePlaybook();
+    agentAsk(pbCurrentPrompt.prompt);
+  }
+}
+
+function runPlaybookWithKonto() {
+  const konto = document.getElementById('pbKontoSelect').value;
+  if(!konto) { alert('Wybierz konto.'); return; }
+  const prompt = pbCurrentPrompt.prompt.replace('[KONTO]', konto);
+  closePlaybook();
+  agentAsk(prompt);
+}
+
+function closePlaybook() {
+  document.getElementById('playbookModal').style.display = 'none';
+  pbCurrentPrompt = null;
+}
+
 // D2D — Day to Day
 // ═══════════════════════════════════════════════════════════
 const SK_D2D = 'adshub3_d2d_snapshots';
@@ -6134,6 +6225,37 @@ self.addEventListener('fetch', e => e.respondWith(
     <div class="sc-rows" id="scRows"></div>
     <div class="sc-sync" id="scSync"></div>
     <button class="sc-close" onclick="closeSaveConfirm()">OK — Zamknij</button>
+  </div>
+</div>
+
+<!-- PLAYBOOK MODAL -->
+<div id="playbookModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:580px;max-height:85vh;overflow-y:auto;padding:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem">
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--yellow);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px" id="pbSectionLabel">Sekcja 1 — Plan Dnia</div>
+        <div style="font-size:1rem;font-weight:600;color:var(--text)">Wybierz prompt</div>
+      </div>
+      <button onclick="closePlaybook()" style="background:transparent;border:none;color:var(--text3);font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div id="pbList" style="display:flex;flex-direction:column;gap:.5rem"></div>
+    <!-- Konto dropdown (pokazuje się gdy prompt wymaga konta) -->
+    <div id="pbKontoWrap" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.5rem">Wybierz konto:</div>
+      <select id="pbKontoSelect" style="width:100%;font-family:var(--mono);font-size:11px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text)">
+        <option value="">— wybierz konto —</option>
+        <option value="MobelKap">MobelKap</option>
+        <option value="PerfektCięcie">PerfektCięcie</option>
+        <option value="MeblenaCzasie">MeblenaCzasie</option>
+        <option value="Luxsen">Luxsen</option>
+        <option value="Semmi">Semmi</option>
+        <option value="BOTAVIT">BOTAVIT</option>
+        <option value="Materazzi">Materazzi</option>
+        <option value="MtzzEU">MtzzEU</option>
+        <option value="Ankado24">Ankado24</option>
+      </select>
+      <button onclick="runPlaybookWithKonto()" style="margin-top:.75rem;width:100%;font-family:var(--mono);font-size:11px;padding:8px;border-radius:6px;border:1px solid rgba(245,166,35,.4);background:rgba(245,166,35,.1);color:var(--yellow);cursor:pointer">▸ Uruchom</button>
+    </div>
   </div>
 </div>
 
