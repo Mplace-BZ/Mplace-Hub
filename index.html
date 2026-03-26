@@ -1235,6 +1235,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="openPlaybook('PD')" class="agent-chip" style="border-color:rgba(245,166,35,.3);color:var(--yellow);background:rgba(245,166,35,.06)">📋 Plan Dnia</button>
     <button onclick="openPlaybook('RM')" class="agent-chip" style="border-color:rgba(45,212,160,.3);color:var(--green);background:rgba(45,212,160,.06)">📋 Rentowność</button>
     <button onclick="openPlaybook('RA')" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.06)">📋 ROAS / Ads</button>
+    <button onclick="openPlaybook('KP')" class="agent-chip" style="border-color:rgba(244,114,182,.3);color:#f472b6;background:rgba(244,114,182,.06)">📋 Kanibalizacja</button>
   </div>
 
   <!-- Input -->
@@ -5435,6 +5436,9 @@ function printAdsOverlay() {
 }
 
 // ═══════════════════════════════════════════════════════════
+let pbCurrentSection = null;
+let pbCurrentPrompt = null;
+
 // PLAYBOOK
 // ═══════════════════════════════════════════════════════════
 
@@ -5546,11 +5550,44 @@ const PLAYBOOK_SECTIONS = {
         tags:['#ADS','#ROAS','#RAPORT','#D2D','#TREND'],
         prompt: `Przeanalizuj dane D2D z ostatnich 7 dni dla wszystkich kont pod kątem skuteczności Ads.\n\n3 sekcje:\n1. CO ZADZIAŁAŁO – kampanie/konta gdzie ROAS poprawił się vs poprzedni tydzień. Konkretne liczby.\n2. CO NIE ZADZIAŁAŁO – kampanie/konta gdzie ROAS spadł lub budżet nie przyniósł efektu.\n3. WNIOSKI NA KOLEJNY TYDZIEŃ – 3 korekty: Konto → Zmiana → Oczekiwany efekt (zł).\n\nNa końcu: ogólna ocena tygodnia Ads w skali 1–10 z uzasadnieniem.` }
     ]
+  },
+  KP: {
+    label: 'Sekcja 4 — Kanibalizacja i Portfel',
+    color: '#f472b6',
+    prompts: [
+      { id:'KP-01', name:'Kanibalizacja MEBLE – diagnoza globalna', needsKonto: false,
+        tags:['#KANIBALIZACJA','#MEBLE','#MARŻA','#WSZYSTKIE-KONTA'],
+        prompt: `Przeanalizuj grupę MEBLE (MobelKap, PerfektCięcie, MeblenaCzasie) pod kątem kanibalizacji.\n\nDla każdej pary kont oceń:\n- Czy mają nakładający się asortyment?\n- Czy wzrost sprzedaży jednego koreluje ze spadkiem drugiego w D2D?\n- Szacowany koszt kanibalizacji w zł/mies. (utracona marża)\n\nGrupa jako całość:\n- Jaki % sprzedaży grupy to przesunięcie między kontami, a nie nowa sprzedaż?\n- Czy łączna marża MEBLE rośnie mimo kanibalizacji?\n\nNa końcu: czy kanibalizacja w MEBLE wymaga działania teraz czy jest akceptowalnym kosztem?` },
+      { id:'KP-02', name:'MeblenaCzasie benchmark – jak wypadają pozostałe MEBLE', needsKonto: false,
+        tags:['#KANIBALIZACJA','#MEBLE','#ROAS','#MARŻA','#BENCHMARK'],
+        prompt: `Użyj MeblenaCzasie jako benchmarku efektywności dla grupy MEBLE.\n\nDla MobelKap i PerfektCięcie porównaj do MeblenaCzasie:\n- ROAS Ads – odchylenie (pp)\n- Marża po reklamie – odchylenie (pp)\n- Wyróżnienia jako % sprzedaży – odchylenie (pp)\n- Koszt Ads jako % sprzedaży – odchylenie (pp)\n- Sprzedaż MTD – odchylenie (%)\n\nDla każdego odchylenia: czy to efekt kanibalizacji, Ads czy wyróżnień?\nNa końcu: gdyby MobelKap i PerfektCięcie osiągnęły metryki benchmarku – ile dodatkowej marży zarobiłaby cała grupa MEBLE w zł/mies.?` },
+      { id:'KP-03', name:'Scenariusz: wyłącz konto na 7 dni – co się stanie', needsKonto: true,
+        tags:['#KANIBALIZACJA','#MEBLE','#SYMULATOR','#EOM'],
+        prompt: `Zasymuluj scenariusz: wyłączam konto [KONTO] na 7 dni (zero Ads, zero wyróżnień).\n\nOsacuj:\n1. Ile sprzedaży przejdzie na pozostałe konta MEBLE (% i zł)?\n2. Ile sprzedaży po prostu zniknie (klient kupi u konkurencji)?\n3. Jak zmieni się marża każdego z pozostałych kont MEBLE?\n4. Jak zmieni się łączna marża grupy MEBLE (zł/tydzień)?\n5. Jakie ryzyka długoterminowe: pozycja aukcji, jakość konta, historia sprzedaży?\n\nNa końcu: czy warto przeprowadzić ten eksperyment? Kiedy i na jakich warunkach?` },
+      { id:'KP-04', name:'Optymalny podział asortymentu między konta MEBLE', needsKonto: false,
+        tags:['#KANIBALIZACJA','#MEBLE','#MARŻA','#SYMULATOR','#MENTOR'],
+        prompt: `Zaproponuj optymalny podział asortymentu między konta MEBLE minimalizujący kanibalizację i maksymalizujący łączną marżę grupy.\n\nUwzględnij:\n- Które aukcje powinny być tylko na jednym koncie (i którym)?\n- Które aukcje warto duplikować i dlaczego?\n- Rola każdego konta: premium / zasięgowe / testowe?\n- Jak zmienić budżety Ads i wyróżnienia po tym podziale?\n\nNa końcu: szacowany efekt na łączną marżę grupy MEBLE w zł/mies. i czas wdrożenia bez ryzyka utraty pozycji aukcji.` },
+      { id:'KP-05', name:'Portfel kont – ranking potencjału wzrostu', needsKonto: false,
+        tags:['#KANIBALIZACJA','#MARŻA','#ROAS','#WSZYSTKIE-KONTA','#PROGNOZA'],
+        prompt: `Stwórz ranking wszystkich 9 kont według potencjału wzrostu marży w kolejnym miesiącu.\n\nDla każdego konta oceń w 4 wymiarach (skala 1–5):\n- Potencjał Ads (ROAS pozwala na skalowanie bez utraty rentowności?)\n- Potencjał optymalizacji kosztów (wyróżnienia, dostawa, prowizja)\n- Potencjał sprzedażowy (trend MTD, sezonowość, momentum)\n- Ryzyko kanibalizacji (wzrost tego konta uderzy w inne?)\n\nTabela: Konto / Ads / Koszty / Sprzedaż / Kanibalizacja / SUMA / Rekomendacja (inwestuj / optymalizuj / stabilizuj).\nTop 3 konta do inwestowania czasu i budżetu z uzasadnieniem.` },
+      { id:'KP-06', name:'LUXSEN vs MEBLE vs ONE – kondycja grup', needsKonto: false,
+        tags:['#KANIBALIZACJA','#MARŻA','#ROAS','#WSZYSTKIE-KONTA','#RAPORT'],
+        prompt: `Porównaj trzy grupy (MEBLE, LUXSEN, ONE) jako osobne jednostki biznesowe.\n\nDla każdej grupy:\n- Łączna sprzedaż MTD i prognoza EOM (zł)\n- Łączna marża po reklamie (%) i (zł)\n- Średni ROAS Ads vs średni BE ROAS grupy\n- Łączny koszt Ads + wyróżnienia jako % sprzedaży\n- Health score grupy 1–10\n- Główna szansa i główne ryzyko (po 1 zdaniu)\n\nRanking grup od najsilniejszej. Jedna rekomendacja strategiczna per grupa na kolejny miesiąc. Która wymaga uwagi w pierwszej kolejności?` },
+      { id:'KP-07', name:'Słabe ogniwo – które konto przeciąga grupę w dół', needsKonto: false,
+        tags:['#KANIBALIZACJA','#MARŻA','#RENTOWNOŚĆ','#WSZYSTKIE-KONTA','#KRYZYS'],
+        prompt: `W każdej grupie (MEBLE, LUXSEN, ONE) wskaż konto które najbardziej przeciąga grupę w dół.\n\nDla każdego słabego ogniwa:\n- Jak obniża łączną marżę grupy (zł/mies. i pp)\n- Problem strukturalny czy operacyjny?\n- Czy do uratowania w 30 dni – co konkretnie zrobić?\n- Gdyby działało na poziomie benchmarku – ile zyska cała grupa (zł/mies.)?\n- Scenariusz: co się stanie z grupą jeśli konto wyciszone na miesiąc?\n\nDecyzja dla każdego: RATUJ (plan) / OGRANICZ (zmniejsz budżety) / WYCISZ (symulacja efektu).` },
+      { id:'KP-08', name:'Silny koń pociągowy – skaluj lidera grupy', needsKonto: false,
+        tags:['#KANIBALIZACJA','#MARŻA','#ROAS','#BUDŻET','#SYMULATOR'],
+        prompt: `W każdej grupie wskaż konto z najwyższym potencjałem do skalowania (najlepszy ROAS, najwyższa marża, najlepszy trend MTD).\n\nDla każdego lidera plan skalowania w 3 krokach:\n- KROK 1 (tydzień 1): budżet Ads +X zł, ROAS na Y, wyróżnienia Z%\n- KROK 2 (tydzień 2): ocena efektu w D2D, korekty\n- KROK 3 (tydzień 3–4): docelowy poziom budżetu i metryki\n\nDla każdego kroku: szacowany efekt na sprzedaż i marżę (zł).\nNa końcu: łączny potencjał wzrostu marży agencji jeśli przeskaluję wszystkich 3 liderów jednocześnie i czy istnieje ryzyko kanibalizacji między grupami.` },
+      { id:'KP-09', name:'Przeniesienie aukcji między kontami – analiza opłacalności', needsKonto: true,
+        tags:['#KANIBALIZACJA','#MEBLE','#MARŻA','#SYMULATOR','#MENTOR'],
+        prompt: `Przeanalizuj czy przeniesienie aukcji z konta [KONTO] na inne konto w grupie MEBLE poprawiłoby łączną marżę grupy.\n\nDla wskazanego konta oceń top aukcje pod kątem przeniesienia:\n- Aktualne wyniki: sprzedaż, marża, ROAS, wyróżnienia\n- Jak aukcja wypadłaby na innym koncie MEBLE (uwzględnij prowizję, historię, ROAS benchmark)\n- Czy przeniesienie zwiększy łączną marżę grupy czy tylko ją przesunie?\n- Ryzyko: utrata pozycji, reset historii, wpływ na jakość konta\n- Czas odbudowy pozycji na nowym koncie\n\nDecyzja: PRZENIEŚ / DUPLIKUJ / ZOSTAW z uzasadnieniem finansowym w zł.` },
+      { id:'KP-10', name:'Mapa portfela – pełny przegląd wszystkich 9 kont', needsKonto: false,
+        tags:['#KANIBALIZACJA','#MARŻA','#ROAS','#WSZYSTKIE-KONTA','#HEALTH-SCORE','#RAPORT'],
+        prompt: `Stwórz pełną mapę portfela wszystkich 9 kont w układzie 3 grup (MEBLE / LUXSEN / ONE).\n\nTabela dla każdego konta:\n- Sprzedaż MTD (zł) i udział w sprzedaży grupy (%)\n- Marża po reklamie (%) i (zł)\n- ROAS Ads vs BE ROAS – status: SKALUJ / TRZYMAJ / OPTYMALIZUJ / KRYZYS\n- Health score 1–10\n- Rola: LIDER / WSPIERAJĄCE / SŁABE OGNIWO / TESTOWE\n- Jeden priorytet strategiczny na kolejny miesiąc (max 10 słów)\n\nPodsumowanie per grupa (3 zdania): łączna marża i trend, największa szansa, największe ryzyko.\nNa końcu: ocena portfela agencji 1–10, prognoza łącznej marży EOM (zł) i jedna decyzja strategiczna na najbliższy tydzień.` }
+    ]
   }
 };
-
-let pbCurrentSection = null;
-let pbCurrentPrompt = null;
 
 function openPlaybook(section) {
   pbCurrentSection = section;
