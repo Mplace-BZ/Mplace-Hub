@@ -6186,6 +6186,7 @@ function initD2D(){
   // Build account filter chips
   const accEl = document.getElementById('d2dAccFilter');
   accEl.innerHTML = Object.entries(GROUPS).map(([gk,g])=>
+    (gk==='ONE' ? '<div style="width:100%;height:0"></div>' : '') +
     g.accs.map(k=>`
       <button onclick="d2dToggleAcc('${k}',this)" data-key="${k}"
         class="d2d-chip ${d2dSelAccs.has(k)?'active':''}"
