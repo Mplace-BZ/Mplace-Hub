@@ -209,11 +209,11 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 
 
 /* ── DASHBOARD ── */
-.dash-group{margin-bottom:1.2rem;}
-.dash-group-hdr{display:flex;align-items:center;gap:.6rem;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:.55rem;}
+.dash-group{margin-bottom:.65rem;}
+.dash-group-hdr{display:flex;align-items:center;gap:.6rem;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:.35rem;}
 .dash-group-hdr::before{content:'';flex:none;width:3px;height:14px;border-radius:2px;background:var(--gc,var(--accent));}
 .dash-group-hdr::after{content:'';flex:1;height:1px;background:var(--border);}
-.dash-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;}
+.dash-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;}
 @media(max-width:800px){.dash-cards{grid-template-columns:1fr 1fr;}}
 
 .ac-card{
@@ -227,19 +227,19 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .ac-card.status-bad {background:linear-gradient(135deg,#1f0d12,var(--bg2));border-color:rgba(255,77,106,.3);border-top:2px solid rgba(255,77,106,.7);}
 .ac-card.status-na  {background:var(--bg2);border-color:var(--border);}
 
-.ac-card-top{display:flex;align-items:center;justify-content:space-between;padding:.6rem .85rem .4rem;}
-.ac-card-name{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);}
+.ac-card-top{display:flex;align-items:center;justify-content:space-between;padding:.35rem .75rem .25rem;}
+.ac-card-name{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text);}
 .ac-card-status-dot{width:8px;height:8px;border-radius:50%;}
 .dot-good{background:var(--green);box-shadow:0 0 6px var(--green);}
 .dot-warn{background:var(--yellow);box-shadow:0 0 6px var(--yellow);}
 .dot-bad {background:var(--red);box-shadow:0 0 6px var(--red);}
 .dot-na  {background:var(--text3);}
 
-.ac-card-metrics{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0 .85rem .7rem;}
-.ac-metric{padding:.3rem 0;}
-.ac-metric-lbl{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;}
-.ac-metric-val{font-family:var(--mono);font-size:15px;font-weight:500;}
-.ac-metric-sub{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:1px;}
+.ac-card-metrics{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0 .75rem .45rem;}
+.ac-metric{padding:.2rem 0;}
+.ac-metric-lbl{font-family:var(--mono);font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:1px;}
+.ac-metric-val{font-family:var(--mono);font-size:13px;font-weight:500;}
+.ac-metric-sub{font-family:var(--mono);font-size:8.5px;color:var(--text3);margin-top:1px;}
 
 .ac-card-bar{height:3px;width:100%;}
 .bar-good{background:var(--green);}
@@ -256,7 +256,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .trend-dn{color:var(--red);}
 .trend-neu{color:var(--text3);}
 
-.bubble-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.1rem;}
+.bubble-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.65rem .75rem;}
 .bubble-legend{display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;margin-top:.6rem;font-family:var(--mono);font-size:10px;color:var(--text3);}
 .bubble-legend-item{display:flex;align-items:center;gap:5px;}
 .bubble-legend-dot{width:10px;height:10px;border-radius:50%;}
@@ -837,7 +837,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 <!-- ═══ VIEW: DASHBOARD ═══ -->
 <div class="view" id="viewDashboard">
 <div class="container">
-  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.1rem;flex-wrap:wrap;gap:.5rem">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem">
     <div>
       <div class="ph-eyebrow" style="color:var(--green)">▸ Przegląd wszystkich kont</div>
       <div class="ph-title">Dashboard <span style="color:var(--green)">Performance</span></div>
@@ -861,7 +861,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
         <div style="font-size:13px;color:var(--text2)">ROAS Ads vs Marża po reklamie &nbsp;<span style="font-size:10px;color:var(--text3)">· rozmiar = estymacja sprzedaży m-c</span></div>
       </div>
     </div>
-    <canvas id="dashBubble" height="280"></canvas>
+    <canvas id="dashBubble" height="140"></canvas>
     <div class="bubble-legend" id="dashBubbleLegend"></div>
   </div>
 </div>
@@ -1802,7 +1802,7 @@ function renderDashboard(){
             <div class="ac-metric-val" style="color:${marColor}">${pct(C.mAfter)}</div>
             <div class="ac-metric-sub">${pln(C.zysk)}</div>
           </div>
-          <div class="ac-metric" style="grid-column:1/-1;border-top:1px solid rgba(255,255,255,.05);padding-top:.4rem;margin-top:.2rem">
+          <div class="ac-metric" style="grid-column:1/-1;border-top:1px solid rgba(255,255,255,.05);padding-top:.25rem;margin-top:.1rem">
             <div class="ac-metric-lbl">Estymacja m-c</div>
             <div style="display:flex;align-items:baseline;gap:.5rem">
               <span class="ac-metric-val" style="font-size:13px;color:${estColor}">${pln(est)}</span>
