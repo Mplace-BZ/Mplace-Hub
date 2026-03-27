@@ -694,6 +694,11 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .wk-author{font-family:var(--mono);font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);margin-bottom:.3rem;}
 .wk-years{font-family:var(--mono);font-size:11px;color:var(--text3);}
 .wk-hint{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.35;margin-top:2rem;letter-spacing:.06em;}
+/* Copy buttons */
+.cp-wrap{position:relative;display:inline-flex;align-items:baseline;gap:3px;}
+.cp-btn{opacity:0;background:none;border:none;cursor:pointer;font-size:11px;color:var(--text3);padding:0 2px;line-height:1;transition:opacity .15s;font-family:var(--mono);}
+.cp-wrap:hover .cp-btn{opacity:.7;}
+.cp-btn:hover{opacity:1 !important;color:var(--green);}
 .alert-badge{position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 3px;border-radius:8px;background:#ef4444;font-family:var(--mono);font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;line-height:1;pointer-events:none;box-sizing:border-box;}
 /* Cmd+K Search */
 #cmdkBackdrop{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);display:flex;align-items:flex-start;justify-content:center;padding-top:12vh;}
@@ -2146,18 +2151,18 @@ function renderDashboard(){
         <div class="ac-card-metrics">
           <div class="ac-metric">
             <div class="ac-metric-lbl">ROAS Ads</div>
-            <div class="ac-metric-val" style="color:${roasColor}">${xf(C.roasAds)}</div>
+            <div class="ac-metric-val cp-wrap" style="color:${roasColor}">${xf(C.roasAds)}${C.roasAds!=null?`<button class="cp-btn" onclick="cpCopy(this,${+C.roasAds.toFixed(2)})">⧉</button>`:''}</div>
             <div class="ac-metric-sub">BE: ${xf(C.beRoasAds)}</div>
           </div>
           <div class="ac-metric">
             <div class="ac-metric-lbl">Marża</div>
-            <div class="ac-metric-val" style="color:${marColor}">${pct(C.mAfter)}</div>
+            <div class="ac-metric-val cp-wrap" style="color:${marColor}">${pct(C.mAfter)}<button class="cp-btn" onclick="cpCopy(this,${+C.mAfter.toFixed(2)})">⧉</button></div>
             <div class="ac-metric-sub">${pln(C.zysk)}</div>
           </div>
           <div class="ac-metric" style="grid-column:1/-1;border-top:1px solid rgba(255,255,255,.05);padding-top:.25rem;margin-top:.1rem">
             <div class="ac-metric-lbl">Estymacja m-c</div>
             <div style="display:flex;align-items:baseline;gap:.5rem">
-              <span class="ac-metric-val" style="font-size:13px;color:${estColor}">${pln(est)}</span>
+              <span class="ac-metric-val cp-wrap" style="font-size:13px;color:${estColor}">${pln(est)}<button class="cp-btn" onclick="cpCopy(this,${Math.round(est)})">⧉</button></span>
               ${last.dzien?`<span class="ac-metric-sub">dzień ${last.dzien}/${DAYS_IN[last.m]||30}</span>`:''}
             </div>
           </div>
@@ -2778,13 +2783,13 @@ function renderAccount(k){
   const dv=mmDelta(D,D.length-1);
   const dH=(dv,inv=false)=>{if(dv===null)return`<div class="mdelta neu">—</div>`;const g=inv?dv<=0:dv>=0;return`<div class="mdelta ${g?'up':'dn'}">${dv>=0?'▲':'▼'} ${Math.abs(dv).toFixed(1)}% m/m</div>`;};
   const kpis=[
-    {l:'ROAS Ads',v:xf(C.roasAds),vc:C.roasAds>=6?'green':C.roasAds>=4?'yellow':'red',cc:C.roasAds>=6?'c-green':C.roasAds>=4?'c-yellow':'c-red',s:'kampania Ads',d:dH(prev?((C.roasAds-(calc(prev,prod).roasAds||0))/(calc(prev,prod).roasAds||1)*100):null)},
-    {l:'ROAS Globalny',v:xf(C.roasGlob),vc:C.roasGlob>=4?'green':C.roasGlob>=2.5?'yellow':'red',cc:C.roasGlob>=4?'c-green':C.roasGlob>=2.5?'c-yellow':'c-red',s:'cały budżet reklamy',d:`<div class="mdelta ${C.roasGlob>=C.beRoasGlob?'up':'dn'}">break-even ${xf(C.beRoasGlob)}</div>`},
-    {l:'ACOS łączny',v:C.acosTotal!=null?pct(C.acosTotal):'—',vc:C.acosTotal<15?'green':C.acosTotal<25?'yellow':'red',cc:C.acosTotal<15?'c-green':C.acosTotal<25?'c-yellow':'c-red',s:'cały koszt reklamy / obrót',d:`<div class="mdelta ${C.acosTotal<20?'up':'dn'}">${C.acosTotal<20?'ok':'powyżej 20%'}</div>`},
-    {l:'Marża po reklamie',v:pct(C.mAfter),vc:C.mAfter>=10?'green':C.mAfter>=5?'yellow':'red',cc:C.mAfter>=10?'c-green':C.mAfter>=5?'c-yellow':'c-red',s:`po wszystkich kosztach`,d:`<div class="mdelta ${C.mAfter>=10?'up':C.mAfter>=5?'neu':'dn'}">${C.mAfter>=10?'dobra':C.mAfter>=5?'do optymalizacji':'niebezpieczna'}</div>`},
-    {l:'Sprzedaż',v:pln(last.sprzedaz),vc:'',cc:'',s:last.dzien?`dzień ${last.dzien}/${DAYS_IN[last.m]||30} · est.za ${effectiveDzien(last.dzien)}`:'pełny mies.',d:dH(dv)},
+    {l:'ROAS Ads',v:xf(C.roasAds),raw:C.roasAds!=null?+C.roasAds.toFixed(2):null,vc:C.roasAds>=6?'green':C.roasAds>=4?'yellow':'red',cc:C.roasAds>=6?'c-green':C.roasAds>=4?'c-yellow':'c-red',s:'kampania Ads',d:dH(prev?((C.roasAds-(calc(prev,prod).roasAds||0))/(calc(prev,prod).roasAds||1)*100):null)},
+    {l:'ROAS Globalny',v:xf(C.roasGlob),raw:C.roasGlob!=null?+C.roasGlob.toFixed(2):null,vc:C.roasGlob>=4?'green':C.roasGlob>=2.5?'yellow':'red',cc:C.roasGlob>=4?'c-green':C.roasGlob>=2.5?'c-yellow':'c-red',s:'cały budżet reklamy',d:`<div class="mdelta ${C.roasGlob>=C.beRoasGlob?'up':'dn'}">break-even ${xf(C.beRoasGlob)}</div>`},
+    {l:'ACOS łączny',v:C.acosTotal!=null?pct(C.acosTotal):'—',raw:C.acosTotal!=null?+C.acosTotal.toFixed(2):null,vc:C.acosTotal<15?'green':C.acosTotal<25?'yellow':'red',cc:C.acosTotal<15?'c-green':C.acosTotal<25?'c-yellow':'c-red',s:'cały koszt reklamy / obrót',d:`<div class="mdelta ${C.acosTotal<20?'up':'dn'}">${C.acosTotal<20?'ok':'powyżej 20%'}</div>`},
+    {l:'Marża po reklamie',v:pct(C.mAfter),raw:+C.mAfter.toFixed(2),vc:C.mAfter>=10?'green':C.mAfter>=5?'yellow':'red',cc:C.mAfter>=10?'c-green':C.mAfter>=5?'c-yellow':'c-red',s:`po wszystkich kosztach`,d:`<div class="mdelta ${C.mAfter>=10?'up':C.mAfter>=5?'neu':'dn'}">${C.mAfter>=10?'dobra':C.mAfter>=5?'do optymalizacji':'niebezpieczna'}</div>`},
+    {l:'Sprzedaż',v:pln(last.sprzedaz),raw:Math.round(last.sprzedaz),vc:'',cc:'',s:last.dzien?`dzień ${last.dzien}/${DAYS_IN[last.m]||30} · est.za ${effectiveDzien(last.dzien)}`:'pełny mies.',d:dH(dv)},
   ];
-  document.getElementById('acKPI').innerHTML=kpis.map(k=>`<div class="metric ${k.cc}"><div class="ml">${k.l}</div><div class="mv ${k.vc}">${k.v}</div><div class="ms">${k.s}</div>${k.d}</div>`).join('');
+  document.getElementById('acKPI').innerHTML=kpis.map(ki=>`<div class="metric ${ki.cc}"><div class="ml">${ki.l}</div><div class="mv ${ki.vc} cp-wrap">${ki.v}${ki.raw!=null?`<button class="cp-btn" onclick="cpCopy(this,${ki.raw})">⧉</button>`:''}</div><div class="ms">${ki.s}</div>${ki.d}</div>`).join('');
 
   // Status
   const cls=C.mAfter>=10&&C.roasAds>=C.beRoasAds?'plus':C.mAfter<5?'minus':'zero';
@@ -4326,10 +4331,13 @@ function renderMonths(){
         const dHtml = d !== null
           ? `<div style="font-size:9px;color:${d>=0?'var(--green)':'var(--red)'};margin-top:1px">${d>=0?'▲':'▼'}${Math.abs(d).toFixed(0)}%</div>`
           : '';
+        const cellVal = v!==null
+          ? `<span class="cp-wrap">${fmtVal(v)}<button class="cp-btn" onclick="event.stopPropagation();cpCopy(this,${Number.isInteger(v)?v:+v.toFixed(4)})">⧉</button></span>`
+          : fmtVal(v);
         return `<td style="padding:7px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);
           ${isCur?'background:rgba(255,107,53,.04)':''}cursor:pointer"
           onclick="showView('${k}')">
-          <div style="font-weight:${isCur?'600':'400'};color:${color}">${fmtVal(v)}</div>
+          <div style="font-weight:${isCur?'600':'400'};color:${color}">${cellVal}</div>
           ${dHtml}
         </td>`;
       }).join('');
@@ -7833,6 +7841,17 @@ updateWkAgentStatus();
 </script>
 
   <script>
+  // ── Copy to clipboard ──
+  function cpCopy(btn, rawVal){
+    if(rawVal==null) return;
+    const s = Number.isInteger(rawVal) ? String(rawVal) : parseFloat(parseFloat(rawVal).toFixed(4)).toString();
+    navigator.clipboard.writeText(s).then(()=>{
+      const t=btn.textContent; btn.textContent='✓';
+      setTimeout(()=>{ btn.textContent=t; }, 1500);
+    }).catch(()=>{});
+    event.stopPropagation();
+  }
+
   // ── Cmd+K Global Search ──
   const CMDK_ITEMS = [
     {type:'tab', name:'Data',          action:()=>showView('entry')},
