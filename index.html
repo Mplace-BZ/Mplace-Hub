@@ -694,8 +694,6 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .wk-author{font-family:var(--mono);font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);margin-bottom:.3rem;}
 .wk-years{font-family:var(--mono);font-size:11px;color:var(--text3);}
 .wk-hint{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.35;margin-top:2.5rem;letter-spacing:.06em;}
-.wk-progress{position:absolute;bottom:0;left:0;height:3px;background:var(--green);width:100%;transform-origin:left;animation:wkProgress 5s linear forwards;}
-@keyframes wkProgress{from{width:100%;}to{width:0%;}}
 /* Kalendarz */
 .kal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.25rem;}
 .kal-month{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.75rem;}
@@ -7349,8 +7347,7 @@ updateWkAgentStatus();
       <div class="wk-author">${q.author}</div>
       <div class="wk-years">${q.years}</div>
     </div>
-    <div class="wk-hint">kliknij gdziekolwiek lub poczekaj 5 sekund</div>
-    <div class="wk-progress"></div>
+    <div class="wk-hint">kliknij gdziekolwiek aby kontynuować</div>
   `;
   document.body.appendChild(el);
 
@@ -7368,7 +7365,6 @@ updateWkAgentStatus();
   const clockInt=setInterval(updateClock,1000);
 
   function dismiss(){
-    clearTimeout(autoTimer);
     clearInterval(clockInt);
     el.classList.add('hiding');
     setTimeout(()=>{
@@ -7378,7 +7374,6 @@ updateWkAgentStatus();
     },500);
   }
 
-  const autoTimer=setTimeout(dismiss,5000);
   el.addEventListener('click',dismiss);
   document.addEventListener('keydown',function onKey(){
     document.removeEventListener('keydown',onKey);
