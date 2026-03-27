@@ -709,7 +709,11 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .klk-inputs{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:1.25rem;}
 @media(max-width:800px){.klk-inputs{grid-template-columns:repeat(2,1fr);}}
 .klk-input-group{display:flex;flex-direction:column;gap:4px;}
-.klk-label{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);}
+.klk-label{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:4px;}
+.klk-tip{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;border:1px solid var(--border2);color:var(--text3);font-size:8px;cursor:pointer;flex-shrink:0;position:relative;font-style:normal;line-height:1;}
+.klk-tip:hover{border-color:var(--green);color:var(--green);}
+.klk-tip-popup{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:.6rem .75rem;width:240px;font-family:var(--sans);font-size:11px;color:var(--text2);line-height:1.5;z-index:200;white-space:normal;pointer-events:none;}
+.klk-tip:hover .klk-tip-popup{display:block;}
 .klk-input{font-family:var(--mono);font-size:12px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);outline:none;width:100%;box-sizing:border-box;transition:border-color .15s;}
 .klk-input:focus{border-color:var(--accent);}
 .klk-results-pri{display:grid;grid-template-columns:repeat(5,1fr);gap:.65rem;margin-bottom:.65rem;}
@@ -745,8 +749,6 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .klk-reset-btn{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;}
 .klk-reset-btn:hover{border-color:#ef4444;color:#ef4444;}
 /* Ściąga */
-.klk-cheat-toggle{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px;border-radius:7px;border:1px solid rgba(45,212,160,.3);background:rgba(45,212,160,.05);color:var(--green);cursor:pointer;transition:all .15s;}
-.klk-cheat-toggle:hover{background:rgba(45,212,160,.1);}
 .klk-cheat-wrap{overflow-x:auto;margin-top:.75rem;}
 .klk-cheat-table{width:100%;border-collapse:collapse;min-width:900px;}
 .klk-cheat-table th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);padding:6px 10px;border-bottom:1px solid var(--border2);text-align:left;white-space:nowrap;}
@@ -1622,8 +1624,8 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
       <div class="klk-input-group"><label class="klk-label">Liczba kliknięć</label><input class="klk-input" id="ki_clicks" type="number" min="0" placeholder="0" oninput="klkCalc()"></div>
       <div class="klk-input-group"><label class="klk-label">Liczba wyświetleń</label><input class="klk-input" id="ki_impr" type="number" min="0" placeholder="0" oninput="klkCalc()"></div>
       <div class="klk-input-group"><label class="klk-label">Liczba zamówień</label><input class="klk-input" id="ki_orders" type="number" min="0" placeholder="0" oninput="klkCalc()"></div>
-      <div class="klk-input-group"><label class="klk-label">Marża netto (%)</label><input class="klk-input" id="ki_margin" type="number" min="0" max="100" placeholder="0" oninput="klkCalc()"></div>
-      <div class="klk-input-group"><label class="klk-label">COGS (zł)</label><input class="klk-input" id="ki_cogs" type="number" min="0" placeholder="0" oninput="klkCalc()"></div>
+      <div class="klk-input-group"><label class="klk-label">Marża netto (%)<span class="klk-tip">?<span class="klk-tip-popup">Ile % przychodu zostaje po wszystkich kosztach (towar, prowizje, logistyka, VAT). Wyznacza próg opłacalności reklamy — BE ACoS ≈ marża netto.</span></span></label><input class="klk-input" id="ki_margin" type="number" min="0" max="100" placeholder="0" oninput="klkCalc()"></div>
+      <div class="klk-input-group"><label class="klk-label">COGS (zł)<span class="klk-tip">?<span class="klk-tip-popup">Cost Of Goods Sold — koszt towaru sprzedanego: cena zakupu lub produkcji. Nie wlicza prowizji, reklamy ani logistyki. Używany do liczenia marży brutto (GM%).</span></span></label><input class="klk-input" id="ki_cogs" type="number" min="0" placeholder="0" oninput="klkCalc()"></div>
     </div>
 
     <div class="klk-section-hdr">Priorytetowe wskaźniki</div>
@@ -1642,14 +1644,9 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 
   <!-- ŚCIĄGA -->
   <div style="margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--border)">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div class="klk-section-hdr" style="margin:0">► Słownik wskaźników</div>
-      <button class="klk-cheat-toggle" id="klkCheatToggle" onclick="klkToggleCheat()">► Pokaż ściągę</button>
-    </div>
-    <div id="klkCheat" style="display:none">
-      <div class="klk-cheat-wrap">
-        <table class="klk-cheat-table" id="klkCheatTable"></table>
-      </div>
+    <div class="klk-section-hdr" style="margin:0">► Słownik wskaźników</div>
+    <div class="klk-cheat-wrap">
+      <table class="klk-cheat-table" id="klkCheatTable"></table>
     </div>
   </div>
 </div>
@@ -6649,18 +6646,9 @@ const KLK_INDICATORS = [
   {id:'cr',      name:'CR',          full:'Conversion Rate',           formula:'zamówienia / kliknięcia × 100',       desc:'Jak często klik kończy się zakupem.',            howto:'CR spada = problem z ofertą lub jakością ruchu.', fields:[{k:'orders',l:'Liczba zamówień'},{k:'clicks',l:'Liczba kliknięć'}], calc:f=>f.clicks?f.orders/f.clicks*100:null, fmt:v=>v.toFixed(2)+'%', unit:'%'},
   {id:'cpa',     name:'CPA',         full:'Cost Per Acquisition',      formula:'koszt reklamy / zamówienia',          desc:'Ile kosztuje jedno zamówienie z reklamy.',       howto:'Najprostszy wskaźnik kosztu zakupu.', fields:[{k:'cost',l:'Koszt reklamy (zł)'},{k:'orders',l:'Liczba zamówień'}], calc:f=>f.orders?f.cost/f.orders:null, fmt:v=>v.toFixed(2)+' zł', unit:'zł'},
   {id:'aov',     name:'AOV',         full:'Average Order Value',       formula:'sprzedaż całkowita / zamówienia',     desc:'Średnia wartość koszyka.',                       howto:'AOV rośnie = droższe koszyki lub skuteczny upsell.', fields:[{k:'totRev',l:'Sprzedaż całkowita (zł)'},{k:'orders',l:'Liczba zamówień'}], calc:f=>f.orders?f.totRev/f.orders:null, fmt:v=>v.toFixed(2)+' zł', unit:'zł'},
-  {id:'cac',     name:'CAC',         full:'Customer Acquisition Cost', formula:'koszt marketingu / nowi klienci',     desc:'Koszt pozyskania nowego klienta.',               howto:'CAC musi być niższy niż LTV.', fields:[{k:'cost',l:'Koszt marketingu (zł)'},{k:'orders',l:'Liczba nowych klientów'}], calc:f=>f.orders?f.cost/f.orders:null, fmt:v=>v.toFixed(2)+' zł', unit:'zł'},
-  {id:'ltv',     name:'LTV',         full:'Lifetime Value',            formula:'śr. zysk × liczba zamówień w czasie', desc:'Ile klient zostawia w całej relacji.',            howto:'Im wyższe LTV, tym możesz więcej zapłacić za pozyskanie.', fields:[{k:'aov',l:'Średni zysk na zamówieniu (zł)'},{k:'orders',l:'Liczba zamówień (cała relacja)'}], calc:f=>f.aov&&f.orders?f.aov*f.orders:null, fmt:v=>v.toFixed(2)+' zł', unit:'zł'},
-  {id:'cogs',    name:'COGS',        full:'Cost Of Goods Sold',        formula:'koszt towaru sprzedanego',            desc:'Koszt towaru — materiał, produkcja lub zakup.',  howto:'COGS rośnie = marża brutto spada.', fields:[{k:'cogs',l:'COGS (zł)'}], calc:f=>f.cogs||null, fmt:v=>v.toFixed(2)+' zł', unit:'zł'},
-  {id:'gm',      name:'GM%',         full:'Gross Margin',              formula:'(sprzedaż − COGS) / sprzedaż × 100', desc:'Marża brutto przed kosztami operacyjnymi.',      howto:'GM% mówi, ile masz "paliwa" na koszty i reklamę.', fields:[{k:'totRev',l:'Sprzedaż całkowita (zł)'},{k:'cogs',l:'COGS (zł)'}], calc:f=>f.totRev?((f.totRev-f.cogs)/f.totRev*100):null, fmt:v=>v.toFixed(1)+'%', unit:'%'},
-  {id:'cm',      name:'Cont.Margin', full:'Contribution Margin',       formula:'(sprzedaż − koszty zmienne) / sprzedaż × 100', desc:'Marża po kosztach zmiennych (prowizje, dostawa, reklama).', howto:'Najlepsze narzędzie do decyzji "czy to skalować".', fields:[{k:'totRev',l:'Sprzedaż całkowita (zł)'},{k:'varCosts',l:'Koszty zmienne (zł)'}], calc:f=>f.totRev?((f.totRev-f.varCosts)/f.totRev*100):null, fmt:v=>v.toFixed(1)+'%', unit:'%'},
-  {id:'cpm',     name:'CPM',         full:'Cost Per Mille',            formula:'koszt / (wyświetlenia / 1000)',       desc:'Koszt 1000 wyświetleń.',                         howto:'Przydatne gdy celem kampanii jest zasięg.', fields:[{k:'cost',l:'Koszt reklamy (zł)'},{k:'impr',l:'Liczba wyświetleń'}], calc:f=>f.impr?f.cost/(f.impr/1000):null, fmt:v=>v.toFixed(2)+' zł', unit:'zł'},
-  {id:'is',      name:'Impr.Share',  full:'Impression Share',          formula:'wyświetlenia / możliwe wyświetlenia × 100', desc:'Ile mogłeś wyświetlić vs ile wyświetliłeś.', howto:'Spadek = brak budżetu lub za niska stawka licytowania.', fields:[{k:'impr',l:'Twoje wyświetlenia'},{k:'totImpr',l:'Możliwe wyświetlenia'}], calc:f=>f.totImpr?f.impr/f.totImpr*100:null, fmt:v=>v.toFixed(1)+'%', unit:'%'},
-  {id:'freq',    name:'Frequency',   full:'Częstotliwość',             formula:'wyświetlenia / unikalni odbiorcy',    desc:'Ile razy średnio jedna osoba widzi reklamę.',    howto:'Za wysoka = przepalanie budżetu na tych samych użytkownikach.', fields:[{k:'impr',l:'Liczba wyświetleń'},{k:'reach',l:'Unikalni odbiorcy'}], calc:f=>f.reach?f.impr/f.reach:null, fmt:v=>v.toFixed(2), unit:''},
   {id:'adsshare',name:'Udział Ads',  full:'Udział sprzedaży z Ads',   formula:'sprzedaż z Ads / sprzedaż całkowita × 100', desc:'Jaki % całej sprzedaży pochodzi z reklamy.', howto:'Gdy spada a TACoS rośnie = Ads słabiej ciągną organik.', fields:[{k:'adsRev',l:'Sprzedaż z reklamy (zł)'},{k:'totRev',l:'Sprzedaż całkowita (zł)'}], calc:f=>f.totRev?f.adsRev/f.totRev*100:null, fmt:v=>v.toFixed(1)+'%', unit:'%'},
   {id:'mer',     name:'MER',         full:'Marketing Efficiency Ratio',formula:'sprzedaż całkowita / koszt marketingu', desc:'Sprzedaż podzielona przez cały marketing — nie tylko Ads.', howto:'MER rośnie = cały marketing efektywniejszy.', fields:[{k:'totRev',l:'Sprzedaż całkowita (zł)'},{k:'cost',l:'Koszt marketingu (zł)'}], calc:f=>f.cost?f.totRev/f.cost:null, fmt:v=>v.toFixed(2), unit:''},
   {id:'blroas',  name:'Blended ROAS',full:'Blended ROAS',             formula:'sprzedaż całkowita / koszt reklam',   desc:'ROAS liczony z całej sprzedaży, nie tylko atrybucji.',   howto:'Dobre do oceny efektywności całościowo, bez silosów.', fields:[{k:'totRev',l:'Sprzedaż całkowita (zł)'},{k:'cost',l:'Koszt reklam (zł)'}], calc:f=>f.cost?f.totRev/f.cost:null, fmt:v=>v.toFixed(2), unit:''},
-  {id:'incr',    name:'Incrementality',full:'Przyrost (Incrementality)',formula:'test: Ads ON vs Ads OFF',          desc:'Ile sprzedaży jest naprawdę dodatkowe dzięki reklamie.',  howto:'Kluczowe przy dużych budżetach — wyłącz Ads na części ofert i porównaj.', fields:[{k:'adsOn',l:'Sprzedaż Ads ON (zł)'},{k:'adsOff',l:'Sprzedaż Ads OFF (zł)'}], calc:f=>f.adsOff!=null&&f.adsOn!=null?f.adsOn-f.adsOff:null, fmt:v=>(v>=0?'+':'')+v.toFixed(2)+' zł', unit:'zł'},
 ];
 
 const KLK_CHEAT = [
@@ -6691,7 +6679,6 @@ const KLK_CHEAT = [
 
 let klkMode='zbiorczy';
 let klkUnitActive='roas';
-let klkCheatOpen=false;
 let klkInited=false;
 
 function klkInit(){
@@ -6862,11 +6849,7 @@ function klkBuildCheat(){
     <tbody>${rows}</tbody>`;
 }
 
-function klkToggleCheat(){
-  klkCheatOpen=!klkCheatOpen;
-  document.getElementById('klkCheat').style.display=klkCheatOpen?'':'none';
-  document.getElementById('klkCheatToggle').textContent=klkCheatOpen?'▼ Ukryj ściągę':'► Pokaż ściągę';
-}
+
 
 // ═══════════════════════════════════════════════════════════
 // ROZLICZENIE LUXSEN
