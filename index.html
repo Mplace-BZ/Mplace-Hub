@@ -907,8 +907,9 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     </div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:.85rem;margin-bottom:.85rem;align-items:stretch">
-    <!-- Fee config — row 1 col 1 -->
+  <!-- Górna sekcja: 2 kolumny 50/50 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-bottom:.85rem;align-items:stretch">
+    <!-- Fee config -->
     <div style="display:flex;flex-direction:column;">
       <div class="sec-label">Konfiguracja fee</div>
       <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:.6rem;padding:0 0 .4rem;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">
@@ -949,18 +950,17 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
         </div>
       </div>
     </div>
-
     <!-- Summary -->
     <div style="display:flex;flex-direction:column;">
       <div class="sec-label">Mój przychód — bieżący miesiąc</div>
       <div class="biz-total-card" id="bizTotalCard" style="flex:1;min-height:0;box-sizing:border-box"></div>
     </div>
-    <!-- Chart — row 2 col 1 -->
-    <div class="chart-card">
-      <div class="chart-lbl">Mój przychód miesięczny (netto)</div>
-      <div class="chart-title-sm">Historia moich fee · wszystkie grupy</div>
-      <canvas id="bizChart" height="160"></canvas>
-    </div>
+  </div>
+  <!-- Dolna sekcja: wykres pełna szerokość -->
+  <div class="chart-card" style="margin-bottom:.85rem">
+    <div class="chart-lbl">Mój przychód miesięczny (netto)</div>
+    <div class="chart-title-sm">Historia moich fee · wszystkie grupy</div>
+    <canvas id="bizChart" height="280"></canvas>
   </div>
 
   <!-- % share table -->
