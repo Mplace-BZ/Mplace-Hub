@@ -681,6 +681,27 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .btn.primary:hover{background:var(--accent2);}
 .smsg{font-family:var(--mono);font-size:11px;color:var(--green);opacity:0;transition:opacity .3s;}
 .smsg.show{opacity:1;}
+/* Kalendarz */
+.kal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.25rem;}
+.kal-month{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.75rem;}
+.kal-month-name{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#f97316;margin-bottom:.5rem;text-align:center;}
+.kal-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;}
+.kal-dow span{font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;padding:2px 0;}
+.kal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;}
+.kal-day{font-family:var(--mono);font-size:10px;text-align:center;padding:3px 1px;border-radius:3px;color:var(--text2);min-height:20px;display:flex;align-items:center;justify-content:center;position:relative;}
+.kal-day.empty{color:transparent;}
+.kal-day.today{box-shadow:0 0 0 1px #fff;color:#fff;font-weight:600;}
+.kal-day.sun{color:rgba(255,255,255,.3);}
+.kal-day.camp-days{background:rgba(249,115,22,.28);color:#fdba74;}
+.kal-day.camp-smart{background:rgba(45,212,160,.2);color:#2dd4a0;}
+.kal-day.camp-black{background:rgba(55,65,81,.7);color:#9ca3af;}
+.kal-day.camp-xmas{background:rgba(239,68,68,.22);color:#fca5a5;}
+.kal-day.camp-winter{background:rgba(59,130,246,.22);color:#93c5fd;}
+.kal-legend{display:flex;flex-wrap:wrap;gap:.6rem 1.25rem;margin-bottom:1.25rem;}
+.kal-legend-item{display:flex;align-items:center;gap:.4rem;font-size:11px;color:var(--text2);}
+.kal-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+@media(max-width:900px){.kal-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:620px){.kal-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
 
   <!-- PWA Manifest -->
@@ -740,6 +761,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn" onclick="showView('sim')" id="navSim" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Symulator</button>
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
+    <button class="nav-btn" onclick="showView('kalendarz')" id="navKalendarz" style="color:#f97316;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2)">Kalendarz</button>
   </div>
   <div class="topbar-accounts">
     <span class="nav-glbl g-meble">MEBLE</span>
@@ -1494,6 +1516,25 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   <div id="cmpContent"></div>
 </div>
 </div>
+<!-- ═══ VIEW: KALENDARZ ═══ -->
+<div class="view" id="viewKalendar">
+<div class="container">
+  <div style="margin-bottom:1rem">
+    <div class="ph-eyebrow" style="color:#f97316">► KAMPANIE 2026</div>
+    <div class="ph-title">Kalendarz <span style="color:var(--green)">✦</span></div>
+    <div class="ph-sub">Allegro Days · Smart! Weeks · Black Weeks · Xmas</div>
+  </div>
+  <div class="kal-legend">
+    <div class="kal-legend-item"><div class="kal-legend-dot" style="background:rgba(249,115,22,.55)"></div>Allegro Days</div>
+    <div class="kal-legend-item"><div class="kal-legend-dot" style="background:rgba(45,212,160,.4)"></div>Smart! Weeks</div>
+    <div class="kal-legend-item"><div class="kal-legend-dot" style="background:rgba(55,65,81,.9)"></div>Black Weeks</div>
+    <div class="kal-legend-item"><div class="kal-legend-dot" style="background:rgba(239,68,68,.45)"></div>Xmas</div>
+    <div class="kal-legend-item"><div class="kal-legend-dot" style="background:rgba(59,130,246,.45)"></div>Winter Sale</div>
+    <div class="kal-legend-item"><div class="kal-legend-dot" style="border:1px solid #fff;background:transparent"></div>Dzisiaj</div>
+  </div>
+  <div class="kal-grid" id="kalGrid"></div>
+</div>
+</div>
 <script>
 // ═══════════════════════════════════════════════════════════
 // CONFIG
@@ -1684,7 +1725,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds'].forEach(id=>{
+  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -1736,6 +1777,10 @@ function showView(v){
     document.getElementById('viewImportAds').classList.add('active');
     document.getElementById('navImportAds').classList.add('active');
     renderImportAdsList();
+  } else if(v==='kalendarz'){
+    document.getElementById('viewKalendar').classList.add('active');
+    document.getElementById('navKalendarz').classList.add('active');
+    renderKalendar();
   } else {
     document.getElementById('viewAccount').classList.add('active');
     document.getElementById('nav'+v)?.classList.add('active');
@@ -6394,6 +6439,78 @@ function closeSaveConfirm(){
   document.getElementById('saveConfirmModal').style.display = 'none';
 }
 
+
+// ═══════════════════════════════════════════════════════════
+// KALENDARZ 2026
+// ═══════════════════════════════════════════════════════════
+function renderKalendar(){
+  const YEAR = 2026;
+  // Campaign ranges: [month(1-based), dayStart, dayEnd, cssClass]
+  const CAMPAIGNS = [
+    // Allegro Days
+    [1,9,19,'camp-days'],
+    [2,6,16,'camp-days'],
+    [3,6,16,'camp-days'],
+    [4,6,13,'camp-days'],
+    [6,8,14,'camp-days'],
+    [7,6,12,'camp-days'],
+    [8,10,16,'camp-days'],
+    [9,7,13,'camp-days'],
+    [10,5,11,'camp-days'],
+    // Winter Sale
+    [1,19,31,'camp-winter'],
+    // Smart! Weeks
+    [5,4,13,'camp-smart'],
+    // Black Weeks
+    [11,2,30,'camp-black'],
+    // Xmas
+    [12,1,26,'camp-xmas'],
+  ];
+
+  // Build lookup: key = "M-D" => cssClass (priority order: days < winter < smart < black < xmas)
+  const PRIORITY = ['camp-days','camp-winter','camp-smart','camp-black','camp-xmas'];
+  const dayMap = {};
+  CAMPAIGNS.forEach(([m,s,e,cls])=>{
+    for(let d=s;d<=e;d++){
+      const key=`${m}-${d}`;
+      if(!dayMap[key]) dayMap[key]=cls;
+      else if(PRIORITY.indexOf(cls)>PRIORITY.indexOf(dayMap[key])) dayMap[key]=cls;
+    }
+  });
+
+  const today = new Date();
+  const todayKey = today.getFullYear()===YEAR ? `${today.getMonth()+1}-${today.getDate()}` : null;
+
+  const MONTH_NAMES=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+  const DOW=['Pn','Wt','Śr','Cz','Pt','Sb','Nd'];
+
+  let html='';
+  for(let m=1;m<=12;m++){
+    const firstDay = new Date(YEAR,m-1,1).getDay(); // 0=Sun
+    const offset = (firstDay===0)?6:firstDay-1; // Mon=0
+    const daysInMonth = new Date(YEAR,m,0).getDate();
+
+    let dowHtml = DOW.map(d=>`<span>${d}</span>`).join('');
+    let daysHtml = '';
+    // empty cells
+    for(let i=0;i<offset;i++) daysHtml+=`<div class="kal-day empty"></div>`;
+    for(let d=1;d<=daysInMonth;d++){
+      const key=`${m}-${d}`;
+      const campCls = dayMap[key]||'';
+      const dow=(offset+d-1)%7; // 0=Mon,6=Sun
+      const sunCls=dow===6?'sun':'';
+      const todayCls=(key===todayKey)?'today':'';
+      daysHtml+=`<div class="kal-day ${campCls} ${sunCls} ${todayCls}">${d}</div>`;
+    }
+
+    html+=`<div class="kal-month">
+      <div class="kal-month-name">${MONTH_NAMES[m-1]}</div>
+      <div class="kal-dow">${dowHtml}</div>
+      <div class="kal-days">${daysHtml}</div>
+    </div>`;
+  }
+  document.getElementById('kalGrid').innerHTML=html;
+}
 
 // ═══════════════════════════════════════════════════════════
 // ROZLICZENIE LUXSEN
