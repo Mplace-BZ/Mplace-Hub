@@ -320,8 +320,8 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   width:100%;background:rgba(245,166,35,.06);
   border:1px solid rgba(245,166,35,.2);border-radius:5px;
   color:var(--text);font-family:var(--sans);font-size:12px;
-  padding:6px 10px;outline:none;resize:none;transition:border-color .15s;
-  line-height:1.4;
+  padding:5px 10px;outline:none;resize:none;transition:border-color .15s;
+  line-height:1.4;height:calc(12px * 1.4 + 10px);
 }
 .note-input:focus{border-color:var(--yellow);box-shadow:0 0 0 2px rgba(245,166,35,.1);}
 .note-input::placeholder{color:var(--text3);}
@@ -2255,7 +2255,7 @@ function renderEntryCard(k,dotColor,curM){
       <!-- NOTATKA -->
       <div style="margin-top:.4rem">
         <div style="font-size:8.5px;color:rgba(245,166,35,.7);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">📝 Notatka do tego miesiąca <span style="color:var(--text3)">(widoczna w historii)</span></div>
-        <textarea class="note-input" id="e_${k}_note" rows="2" placeholder="np. nowa kampania, allegro promo, zmiana budżetu, powód spadku ROAS...">${pfV('note')}</textarea>
+        <textarea class="note-input" id="e_${k}_note" rows="1" placeholder="np. nowa kampania, allegro promo, zmiana budżetu, powód spadku ROAS...">${pfV('note')}</textarea>
       </div>
       <!-- AUTO ROW -->
       <div class="aec-auto" id="eAuto_${k}">
