@@ -579,7 +579,13 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .wk-cat.benchmark{color:var(--yellow);border-color:var(--yellow-bd);background:var(--yellow-bg);}
 .wk-cat.artykul{color:var(--blue);border-color:var(--blue-bd);background:var(--blue-bg);}
 .wk-cat.zasady{color:var(--accent);border-color:rgba(255,107,53,.3);background:rgba(255,107,53,.08);}
-.wk-cat.inne{color:var(--text3);border-color:var(--border);background:var(--bg3);}
+.wk-cat.inne{color:#8b91a8;border-color:rgba(139,145,168,.3);background:rgba(139,145,168,.08);}
+.wk-cat.rozne{color:#8b91a8;border-color:rgba(139,145,168,.3);background:rgba(139,145,168,.08);}
+.wk-cat.klient{color:#2dd4a0;border-color:rgba(45,212,160,.3);background:rgba(45,212,160,.08);}
+.wk-cat.rynek{color:#4d9fff;border-color:rgba(77,159,255,.3);background:rgba(77,159,255,.08);}
+.wk-cat.sezonowosc{color:#b47fff;border-color:rgba(180,127,255,.3);background:rgba(180,127,255,.08);}
+.wk-cat.produkt{color:#f5a623;border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.08);}
+.wk-cat.casestudy{color:#e879f9;border-color:rgba(232,121,249,.3);background:rgba(232,121,249,.08);}
 .wk-entry{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.6rem;transition:border-color .15s;}
 .wk-entry:hover{border-color:var(--border2);}
 .wk-entry-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;flex-wrap:wrap;}
@@ -1324,7 +1330,12 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
       <div class="wk-cat benchmark" onclick="selectWkCat('benchmark',this)">· Benchmark</div>
       <div class="wk-cat artykul" onclick="selectWkCat('artykul',this)">· Artykuł</div>
       <div class="wk-cat zasady" onclick="selectWkCat('zasady',this)">· Zasady</div>
-      <div class="wk-cat inne" onclick="selectWkCat('inne',this)">· Inne</div>
+      <div class="wk-cat klient" onclick="selectWkCat('klient',this)">· Klient</div>
+      <div class="wk-cat rynek" onclick="selectWkCat('rynek',this)">· Rynek</div>
+      <div class="wk-cat sezonowosc" onclick="selectWkCat('sezonowosc',this)">· Sezonowość</div>
+      <div class="wk-cat produkt" onclick="selectWkCat('produkt',this)">· Produkt</div>
+      <div class="wk-cat casestudy" onclick="selectWkCat('casestudy',this)">· Case Study</div>
+      <div class="wk-cat rozne" onclick="selectWkCat('rozne',this)">· Różne</div>
     </div>
     <!-- File drop zone -->
     <div id="wkDropZone" onclick="document.getElementById('wkFileInput').click()"
@@ -1358,7 +1369,12 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <div class="wk-btn" onclick="filterWk('benchmark',this)">Benchmark</div>
     <div class="wk-btn" onclick="filterWk('artykul',this)">Artykuł</div>
     <div class="wk-btn" onclick="filterWk('zasady',this)">Zasady</div>
-    <div class="wk-btn" onclick="filterWk('inne',this)">Inne</div>
+    <div class="wk-btn" onclick="filterWk('klient',this)">Klient</div>
+    <div class="wk-btn" onclick="filterWk('rynek',this)">Rynek</div>
+    <div class="wk-btn" onclick="filterWk('sezonowosc',this)">Sezonowość</div>
+    <div class="wk-btn" onclick="filterWk('produkt',this)">Produkt</div>
+    <div class="wk-btn" onclick="filterWk('casestudy',this)">Case Study</div>
+    <div class="wk-btn" onclick="filterWk('rozne',this)">Różne</div>
     <div style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text3)" id="wkStats"></div>
   </div>
 
@@ -4829,7 +4845,7 @@ function filterWk(cat, el) {
   renderWkList();
 }
 
-const CAT_LABELS = { slownik:'Słownik', benchmark:'Benchmark', artykul:'Artykuł', zasady:'Zasady', inne:'Inne' };
+const CAT_LABELS = { slownik:'Słownik', benchmark:'Benchmark', artykul:'Artykuł', zasady:'Zasady', klient:'Klient', rynek:'Rynek', sezonowosc:'Sezonowość', produkt:'Produkt', casestudy:'Case Study', inne:'Inne', rozne:'Różne' };
 
 function renderWkList() {
   const entries = getWiedza();
