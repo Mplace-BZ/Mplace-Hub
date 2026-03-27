@@ -693,7 +693,23 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .wk-line{width:60px;height:2px;background:var(--green);margin:0 auto 1rem;opacity:.7;}
 .wk-author{font-family:var(--mono);font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);margin-bottom:.3rem;}
 .wk-years{font-family:var(--mono);font-size:11px;color:var(--text3);}
-.wk-hint{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.35;margin-top:2.5rem;letter-spacing:.06em;}
+.wk-hint{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.35;margin-top:2rem;letter-spacing:.06em;}
+/* Welcome Stats */
+.welcome-stats{display:flex;flex-direction:column;gap:0;margin-top:1.75rem;width:340px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;}
+.welcome-stat-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1rem;}
+.welcome-stat-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.05em;}
+.welcome-stat-value{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text);}
+.welcome-stat-max{font-size:10px;color:var(--text3);font-weight:400;}
+.welcome-stat-trend{font-size:11px;margin-left:4px;}
+.welcome-stat-divider{height:1px;background:rgba(255,255,255,.06);margin:0 .75rem;}
+.health-good .welcome-stat-trend,.health-good{color:#2dd4a0;}
+.health-ok .welcome-stat-trend,.health-ok{color:#f5a623;}
+.health-bad .welcome-stat-trend,.health-bad{color:#ff6b6b;}
+.value-money{color:var(--text);}
+.alert-row{gap:.5rem;padding:.6rem 1rem;}
+.welcome-alert-icon{font-size:12px;flex-shrink:0;}
+.welcome-alert-text{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.03em;}
+.welcome-alert-highlight{color:var(--accent);font-weight:600;}
 /* Kalendarz */
 .kal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.25rem;}
 .kal-month{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.75rem;}
@@ -7561,6 +7577,79 @@ updateWkAgentStatus();
 
   const q=QUOTES[Math.floor(Math.random()*QUOTES.length)];
 
+  // Compute portfolio stats from localStorage
+  function computeWkStats(){
+    const months=['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
+    const now=new Date();
+    const curM=months[now.getMonth()];
+    const prevM=months[(now.getMonth()+11)%12];
+    const acKeys=Object.keys(AC_META);
+    function scoreAcc(d,prod){
+      if(!d||!d.sprzedaz) return null;
+      const c=calc(d,prod);
+      if(c.roasAds!==null&&c.beRoasAds&&c.beRoasAds>0) return Math.min(c.roasAds/c.beRoasAds,2)/2;
+      // fallback: mAfter vs 15% target
+      return Math.min(Math.max(c.mAfter/15,0),2)/2;
+    }
+    let curScores=[],prevScores=[];
+    let totalEomMarza=0,eomCount=0;
+    let worstName=null,worstScore=Infinity;
+    acKeys.forEach(k=>{
+      const D=getData(k);
+      const prod=getProd(k);
+      const curRow=D.find(r=>r.m===curM);
+      const prevRow=D.find(r=>r.m===prevM);
+      if(curRow&&curRow.sprzedaz){
+        const s=scoreAcc(curRow,prod);
+        if(s!==null){ curScores.push(s); if(s<worstScore){worstScore=s;worstName=AC_META[k].name;} }
+        const c=calc(curRow,prod);
+        const eomRev=estym(curRow);
+        totalEomMarza+=eomRev*(c.mAfter/100);
+        eomCount++;
+      }
+      if(prevRow&&prevRow.sprzedaz){
+        const s=scoreAcc(prevRow,prod);
+        if(s!==null) prevScores.push(s);
+      }
+    });
+    const avg=arr=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:null;
+    const curAvg=avg(curScores);
+    const prevAvg=avg(prevScores);
+    const healthScore=curAvg!==null?Math.round(curAvg*10*10)/10:null;
+    const trend=curAvg!==null&&prevAvg!==null?(curAvg>prevAvg*1.02?'↑':curAvg<prevAvg*0.98?'↓':'→'):null;
+    const healthCls=healthScore===null?'':healthScore>=6?'health-good':healthScore>=4?'health-ok':'health-bad';
+    return{healthScore,trend,healthCls,totalEomMarza:eomCount?totalEomMarza:null,worstName};
+  }
+  const wkStats=computeWkStats();
+
+  function fmtZl(n){
+    if(n===null||isNaN(n)) return '—';
+    return Math.round(n).toLocaleString('pl-PL')+' zł';
+  }
+  function buildStatsHtml(s){
+    const healthVal=s.healthScore!==null
+      ?`${s.healthScore.toFixed(1)}<span class="welcome-stat-max">/10</span>${s.trend?`<span class="welcome-stat-trend">${s.trend}</span>`:''}`
+      :'—';
+    const alertName=s.worstName||'brak danych';
+    return `
+    <div class="welcome-stats">
+      <div class="welcome-stat-row">
+        <span class="welcome-stat-label">Kondycja portfela</span>
+        <span class="welcome-stat-value ${s.healthCls}">${healthVal}</span>
+      </div>
+      <div class="welcome-stat-divider"></div>
+      <div class="welcome-stat-row">
+        <span class="welcome-stat-label">Prognoza marży EOM</span>
+        <span class="welcome-stat-value value-money">${fmtZl(s.totalEomMarza)}</span>
+      </div>
+      <div class="welcome-stat-divider"></div>
+      <div class="welcome-stat-row alert-row">
+        <span class="welcome-alert-icon">&#9889;</span>
+        <span class="welcome-alert-text">Sprawdź dziś: <span class="welcome-alert-highlight">${alertName} ROAS</span></span>
+      </div>
+    </div>`;
+  }
+
   const el=document.createElement('div');
   el.id='welcomeOverlay';
   el.innerHTML=`
@@ -7572,6 +7661,7 @@ updateWkAgentStatus();
       <div class="wk-author">${q.author}</div>
       <div class="wk-years">${q.years}</div>
     </div>
+    ${buildStatsHtml(wkStats)}
     <div class="wk-hint">kliknij gdziekolwiek aby kontynuować</div>
   `;
   document.body.appendChild(el);
