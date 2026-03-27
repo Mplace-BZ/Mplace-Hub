@@ -1698,43 +1698,85 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   <!-- TRYB: ALLEGRO -->
   <div id="klkAllegro" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
-      <div class="klk-section-hdr" style="margin:0">Dane transakcji</div>
+      <div class="klk-section-hdr" style="margin:0">Dane transakcji Allegro</div>
       <button class="klk-reset-btn" onclick="klkAllegroReset()">✕ Wyczyść</button>
     </div>
-    <div class="alg-wrap">
-      <!-- KOSZTY -->
+
+    <!-- ROW 1: kwoty -->
+    <div class="alg-wrap" style="margin-bottom:.65rem">
       <div class="alg-panel">
-        <div class="alg-panel-title cost">▼ Koszty</div>
+        <div class="alg-panel-title cost">▼ Kwoty (zł)</div>
         <div class="klk-input-group" style="margin-bottom:.6rem">
-          <label class="klk-label">Cena zakupu / produkcji (zł)</label>
+          <label class="klk-label">Koszt zakupu / produkcji (zł)</label>
           <input class="klk-input" id="alg_koszt" type="number" min="0" placeholder="0" oninput="klkAllegroCalc()">
         </div>
-        <div class="klk-input-group" style="margin-bottom:.6rem">
-          <label class="klk-label" style="justify-content:space-between">
-            <span>Prowizja Allegro (%)</span>
-            <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="algProwizjaZl">0,00 zł</span>
-          </label>
-          <input class="klk-input" id="alg_prowizja" type="number" min="0" max="100" step="0.1" placeholder="np. 8" oninput="klkAllegroCalc()">
-        </div>
-        <div class="klk-input-group" style="margin-bottom:.6rem">
-          <label class="klk-label">Wyróżnienie / Reklama Allegro (zł)</label>
-          <input class="klk-input" id="alg_wyroz" type="number" min="0" placeholder="0" oninput="klkAllegroCalc()">
-        </div>
-        <div class="klk-input-group">
-          <label class="klk-label">Koszt dostawy (zł)</label>
-          <input class="klk-input" id="alg_dostawa" type="number" min="0" placeholder="0" oninput="klkAllegroCalc()">
-        </div>
       </div>
-      <!-- PRZYCHÓD -->
       <div class="alg-panel">
         <div class="alg-panel-title rev">▲ Przychód</div>
-        <div class="klk-input-group" style="margin-bottom:.6rem">
-          <label class="klk-label">Cena sprzedaży (zł) — co płaci kupujący</label>
-          <input class="klk-input" id="alg_cena" type="number" min="0" placeholder="0" oninput="klkAllegroCalc()" style="font-size:18px;padding:10px 12px">
+        <div class="klk-input-group">
+          <label class="klk-label">Cena sprzedaży (zł)</label>
+          <input class="klk-input" id="alg_cena" type="number" min="0" placeholder="0" oninput="klkAllegroCalc()" style="font-size:16px">
         </div>
-        <div style="margin-top:.75rem;background:var(--bg3);border-radius:8px;padding:.75rem 1rem">
-          <div class="klk-label" style="margin-bottom:.4rem">Minimalna cena (próg 0 zł zysku)</div>
-          <div style="font-family:var(--mono);font-size:16px;color:var(--yellow)" id="algMinCena">—</div>
+      </div>
+    </div>
+
+    <!-- ROW 2: % koszty Allegro -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-bottom:.65rem">
+      <div class="alg-panel-title" style="color:#f97316;margin-bottom:.75rem">% Opłaty Allegro (od ceny sprzedaży)</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem">
+
+        <!-- Prowizja -->
+        <div class="klk-input-group">
+          <label class="klk-label" style="justify-content:space-between">
+            <span>Prowizja obowiązkowa (%)</span>
+            <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="algProwizjaZl">— zł</span>
+          </label>
+          <input class="klk-input" id="alg_prowizja" type="number" min="0" max="100" step="0.1" placeholder="np. 11,2" oninput="klkAllegroCalc()">
+        </div>
+
+        <!-- Wyróżnienie -->
+        <div class="klk-input-group">
+          <label class="klk-label" style="justify-content:space-between">
+            <span>Wyróżnienie (%)</span>
+            <span style="display:flex;align-items:center;gap:4px">
+              <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="algWyrozZl">— zł</span>
+              <label style="display:flex;align-items:center;gap:3px;cursor:pointer;margin:0">
+                <input type="checkbox" id="alg_wyroz_tak" onchange="klkAllegroToggleWyroz()" style="accent-color:var(--accent);width:11px;height:11px">
+                <span style="font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.05em">TAK</span>
+              </label>
+            </span>
+          </label>
+          <input class="klk-input" id="alg_wyroz_pct" type="number" min="0" max="100" step="0.01" placeholder="0,75" oninput="klkAllegroCalc()" disabled style="opacity:.4">
+        </div>
+
+        <!-- Dostawa -->
+        <div class="klk-input-group">
+          <label class="klk-label" style="justify-content:space-between">
+            <span>Dostawa (%)</span>
+            <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="algDostawaZl">— zł</span>
+          </label>
+          <input class="klk-input" id="alg_dostawa_pct" type="number" min="0" max="100" step="0.1" placeholder="np. 4,1" oninput="klkAllegroCalc()">
+        </div>
+
+        <!-- Allegro Ads -->
+        <div class="klk-input-group">
+          <label class="klk-label" style="justify-content:space-between">
+            <span>Allegro Ads (%)</span>
+            <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="algAdsZl">— zł</span>
+          </label>
+          <input class="klk-input" id="alg_ads_pct" type="number" min="0" max="100" step="0.1" placeholder="np. 4,5" oninput="klkAllegroCalc()">
+        </div>
+
+        <!-- Abonament -->
+        <div class="klk-input-group">
+          <label class="klk-label">Abonament (zł/mies.)</label>
+          <input class="klk-input" id="alg_abonament" type="number" min="0" placeholder="np. 199" oninput="klkAllegroCalc()">
+        </div>
+
+        <!-- Min cena -->
+        <div class="klk-input-group">
+          <label class="klk-label">Min. cena (próg 0 zł zysku)</label>
+          <div style="font-family:var(--mono);font-size:18px;color:var(--yellow);padding:6px 0" id="algMinCena">—</div>
         </div>
       </div>
     </div>
@@ -6828,48 +6870,73 @@ function klkSetMode(m){
 }
 
 function klkAllegroReset(){
-  ['alg_koszt','alg_prowizja','alg_wyroz','alg_dostawa','alg_cena'].forEach(id=>{
+  ['alg_koszt','alg_prowizja','alg_wyroz_pct','alg_dostawa_pct','alg_ads_pct','alg_abonament','alg_cena'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
+  const cb=document.getElementById('alg_wyroz_tak');
+  if(cb){ cb.checked=false; }
+  const wyrozInp=document.getElementById('alg_wyroz_pct');
+  if(wyrozInp){ wyrozInp.disabled=true; wyrozInp.style.opacity='.4'; }
+  klkAllegroCalc();
+}
+
+function klkAllegroToggleWyroz(){
+  const cb=document.getElementById('alg_wyroz_tak');
+  const inp=document.getElementById('alg_wyroz_pct');
+  if(!cb||!inp) return;
+  const on=cb.checked;
+  inp.disabled=!on;
+  inp.style.opacity=on?'1':'.4';
+  if(on && !inp.value) inp.value='0.75';
   klkAllegroCalc();
 }
 
 function klkAllegroCalc(){
-  const v=id=>parseFloat(document.getElementById(id)?.value)||0;
-  const koszt   = v('alg_koszt');
-  const prowPct = v('alg_prowizja');
-  const wyroz   = v('alg_wyroz');
-  const dostawa = v('alg_dostawa');
-  const cena    = v('alg_cena');
-
-  const prowizjaZl = cena * prowPct / 100;
-  const calKoszty  = koszt + prowizjaZl + wyroz + dostawa;
-  const zysk       = cena - calKoszty;
-  const marza      = cena ? zysk / cena * 100 : null;
-  const narzut     = koszt ? zysk / koszt * 100 : null;
-  const minCena    = koszt + wyroz + dostawa > 0 && prowPct < 100
-                      ? (koszt + wyroz + dostawa) / (1 - prowPct / 100)
-                      : null;
-
-  // prowizja zł inline
-  const pzEl = document.getElementById('algProwizjaZl');
-  if(pzEl) pzEl.textContent = prowizjaZl ? fmtPl(prowizjaZl)+' zł' : '0,00 zł';
-
-  // min cena
-  const mcEl = document.getElementById('algMinCena');
-  if(mcEl) mcEl.textContent = minCena ? fmtPl(minCena)+' zł' : '—';
-
   function fmtPl(n){ return n.toFixed(2).replace('.',','); }
   function zyskColor(v){ return v>0?'green':v<0?'red':''; }
   function marzaColor(m){ if(m===null) return ''; return m>20?'green':m>0?'yellow':'red'; }
 
+  const v=id=>parseFloat(document.getElementById(id)?.value)||0;
+  const koszt     = v('alg_koszt');
+  const cena      = v('alg_cena');
+  const prowPct   = v('alg_prowizja');
+  const dostawaPct= v('alg_dostawa_pct');
+  const adsPct    = v('alg_ads_pct');
+  const abonament = v('alg_abonament');
+  const wyrozEnabled = document.getElementById('alg_wyroz_tak')?.checked || false;
+  const wyrozPct  = wyrozEnabled ? v('alg_wyroz_pct') : 0;
+
+  const prowizjaZl = cena * prowPct / 100;
+  const wyrozZl    = cena * wyrozPct / 100;
+  const dostawaZl  = cena * dostawaPct / 100;
+  const adsZl      = cena * adsPct / 100;
+  const calKoszty  = koszt + prowizjaZl + wyrozZl + dostawaZl + adsZl + abonament;
+  const zysk       = cena - calKoszty;
+  const marza      = cena ? zysk / cena * 100 : null;
+  const narzut     = koszt ? zysk / koszt * 100 : null;
+
+  // Min cena break-even: koszt + abonament = cena * (1 - totalPct/100)
+  const totalPct = prowPct + wyrozPct + dostawaPct + adsPct;
+  const minCena  = totalPct < 100 ? (koszt + abonament) / (1 - totalPct / 100) : null;
+
+  // Inline zł displays
+  const set=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val?fmtPl(val)+' zł':'— zł'; };
+  set('algProwizjaZl', prowizjaZl);
+  set('algWyrozZl',    wyrozEnabled ? wyrozZl : 0);
+  set('algDostawaZl',  dostawaZl);
+  set('algAdsZl',      adsZl);
+
+  // Min cena
+  const mcEl=document.getElementById('algMinCena');
+  if(mcEl) mcEl.textContent = minCena ? fmtPl(minCena)+' zł' : '—';
+
   // Karty wyników
   const cards=[
-    {name:'Zysk netto',     val:zysk,   fmt:v=>fmtPl(v)+' zł',  cls:'accent',  vcls:zyskColor(zysk)},
-    {name:'Marża',          val:marza,  fmt:v=>fmtPl(v)+'%',    cls:'green-b', vcls:marzaColor(marza)},
-    {name:'Narzut',         val:narzut, fmt:v=>fmtPl(v)+'%',    cls:'accent',  vcls:zyskColor(narzut)},
-    {name:'Przychód',       val:cena||null,  fmt:v=>fmtPl(v)+' zł', cls:'', vcls:''},
-    {name:'Całk. koszty',   val:calKoszty||null, fmt:v=>fmtPl(v)+' zł', cls:'', vcls:'red'},
+    {name:'Zysk netto',      val:zysk,         fmt:v=>fmtPl(v)+' zł', cls:'accent',  vcls:zyskColor(zysk)},
+    {name:'Marża',           val:marza,        fmt:v=>fmtPl(v)+'%',   cls:'green-b', vcls:marzaColor(marza)},
+    {name:'Narzut',          val:narzut,       fmt:v=>fmtPl(v)+'%',   cls:'accent',  vcls:zyskColor(narzut)},
+    {name:'Przychód',        val:cena||null,   fmt:v=>fmtPl(v)+' zł', cls:'', vcls:''},
+    {name:'Całk. koszty',    val:calKoszty||null, fmt:v=>fmtPl(v)+' zł', cls:'', vcls:'red'},
     {name:'Prowizja Alleg.', val:prowizjaZl||null, fmt:v=>fmtPl(v)+' zł', cls:'', vcls:''},
   ];
   document.getElementById('algResults').innerHTML=cards.map(c=>`
@@ -6880,15 +6947,17 @@ function klkAllegroCalc(){
 
   // Rozliczenie szczegółowe
   const rows=[
-    {label:'Cena sprzedaży',             val:cena,        sign:'+'},
-    {label:'Cena zakupu / produkcja',    val:-koszt,      sign:'−'},
-    {label:`Prowizja Allegro (${prowPct}%)`, val:-prowizjaZl, sign:'−'},
-    {label:'Wyróżnienie / Reklama',      val:-wyroz,      sign:'−'},
-    {label:'Koszt dostawy',              val:-dostawa,    sign:'−'},
-    {label:'Zysk netto',                 val:zysk,        sign:'=', total:true},
+    {label:'Cena sprzedaży',                       val:cena,        sign:'+'},
+    {label:'Cena zakupu / produkcja',              val:-koszt,      sign:'−'},
+    {label:`Prowizja Allegro (${prowPct}%)`,        val:-prowizjaZl, sign:'−'},
+    ...(wyrozEnabled?[{label:`Wyróżnienie (${wyrozPct}%)`, val:-wyrozZl, sign:'−'}]:[]),
+    {label:`Dostawa (${dostawaPct}%)`,              val:-dostawaZl,  sign:'−'},
+    ...(adsPct?[{label:`Allegro Ads (${adsPct}%)`, val:-adsZl, sign:'−'}]:[]),
+    ...(abonament?[{label:'Abonament',              val:-abonament,  sign:'−'}]:[]),
+    {label:'Zysk netto',                           val:zysk,        sign:'=', total:true},
   ];
   document.getElementById('algBreakdownRows').innerHTML=rows.map(r=>{
-    const disp = r.val!==0||r.total ? fmtPl(Math.abs(r.val))+' zł' : '—';
+    const disp = (r.val!==0||r.total) ? fmtPl(Math.abs(r.val))+' zł' : '—';
     const cls  = r.val>0?'pos':r.val<0?'neg':'';
     const rowStyle = r.total?'padding-top:.5rem;margin-top:.25rem;border-top:1px solid var(--border2)!important':'';
     return `<div class="alg-breakdown-row" style="${rowStyle}">
