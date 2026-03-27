@@ -464,7 +464,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .biz-result{font-family:var(--mono);font-size:13px;color:var(--green);text-align:right;}
 .biz-pct{font-family:var(--mono);font-size:10px;color:var(--text3);text-align:right;}
 
-.biz-total-card{background:linear-gradient(135deg,rgba(255,107,53,.08),var(--bg2));border:1px solid rgba(255,107,53,.25);border-radius:10px;padding:1.2rem 1.4rem;}
+.biz-total-card{background:linear-gradient(135deg,rgba(255,107,53,.08),var(--bg2));border:1px solid rgba(255,107,53,.25);border-radius:10px;padding:1.2rem 1.4rem;display:flex;flex-direction:column;}
 .biz-total-row{display:flex;justify-content:space-between;align-items:baseline;padding:.3rem 0;font-size:12px;color:var(--text3);}
 .biz-total-row.big{font-size:15px;color:var(--text);font-weight:600;border-top:1px solid var(--border2);padding-top:.7rem;margin-top:.3rem;}
 .biz-total-val{font-family:var(--mono);}
@@ -6674,12 +6674,16 @@ function renderBiznes(){
 
   // Total card
   document.getElementById('bizTotalCard').innerHTML = `
-    <div class="biz-total-row"><span>MEBLE (stałe)</span><span class="biz-total-val green">${pln(f.mebleFeeNetto)}</span></div>
-    <div class="biz-total-row"><span>LUXSEN (${cfg.pctLuxsen}% zysku)</span><span class="biz-total-val green">${pln(f.luxsenFeeNetto)}</span></div>
-    <div class="biz-total-row"><span>Materazzi + MtzzEU (stałe)</span><span class="biz-total-val green">${pln(f.matsFeeNetto)}</span></div>
-    <div class="biz-total-row"><span>Ankado24 (stałe)</span><span class="biz-total-val green">${pln(f.ankadoFeeNetto)}</span></div>
-    <div class="biz-total-row big"><span>Razem netto</span><span class="biz-total-val accent">${pln(f.totalNetto)}</span></div>
-    <div class="biz-total-row"><span>VAT 23%</span><span class="biz-total-val">${pln(f.totalVat)}</span></div>`;
+    <div>
+      <div class="biz-total-row"><span>MEBLE (stałe)</span><span class="biz-total-val green">${pln(f.mebleFeeNetto)}</span></div>
+      <div class="biz-total-row"><span>LUXSEN (${cfg.pctLuxsen}% zysku)</span><span class="biz-total-val green">${pln(f.luxsenFeeNetto)}</span></div>
+      <div class="biz-total-row"><span>Materazzi + MtzzEU (stałe)</span><span class="biz-total-val green">${pln(f.matsFeeNetto)}</span></div>
+      <div class="biz-total-row"><span>Ankado24 (stałe)</span><span class="biz-total-val green">${pln(f.ankadoFeeNetto)}</span></div>
+    </div>
+    <div style="margin-top:auto">
+      <div class="biz-total-row big"><span>Razem netto</span><span class="biz-total-val accent">${pln(f.totalNetto)}</span></div>
+      <div class="biz-total-row"><span>VAT 23%</span><span class="biz-total-val">${pln(f.totalVat)}</span></div>
+    </div>`;
 
 
   // Share table — per account
