@@ -1753,7 +1753,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
         <!-- Wyróżnienie -->
         <div class="klk-input-group">
           <label class="klk-label" style="justify-content:space-between">
-            <span>Wyróżnienie (%)</span>
+            <span>Wyróżnienie (× prowizji)</span>
             <span style="display:flex;align-items:center;gap:4px">
               <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="algWyrozZl">— zł</span>
               <label style="display:flex;align-items:center;gap:3px;cursor:pointer;margin:0">
@@ -6920,7 +6920,8 @@ function klkAllegroCalc(){
   const adsPct    = v('alg_ads_pct');
   const abonament = v('alg_abonament');
   const wyrozEnabled = document.getElementById('alg_wyroz_tak')?.checked || false;
-  const wyrozPct  = wyrozEnabled ? v('alg_wyroz_pct') : 0;
+  const wyrozMult = wyrozEnabled ? v('alg_wyroz_pct') : 0;  // e.g. 0.75 → multiplier of prowizja rate
+  const wyrozPct  = wyrozMult * prowPct;                     // e.g. 0.75 × 11 = 8.25%
 
   const prowizjaZl = cena * prowPct / 100;
   const wyrozZl    = cena * wyrozPct / 100;
@@ -6932,7 +6933,7 @@ function klkAllegroCalc(){
   const narzut     = koszt ? zysk / koszt * 100 : null;
 
   // Min cena break-even: koszt + abonament = cena * (1 - totalPct/100)
-  const totalPct = prowPct + wyrozPct + dostawaPct + adsPct;
+  const totalPct = prowPct + wyrozPct + dostawaPct + adsPct;  // wyrozPct already = mult × prowPct
   const minCena  = totalPct < 100 ? (koszt + abonament) / (1 - totalPct / 100) : null;
 
   // Inline zł displays
@@ -6966,7 +6967,7 @@ function klkAllegroCalc(){
     {label:'Cena sprzedaży',                       val:cena,        sign:'+'},
     {label:'Cena zakupu / produkcja',              val:-koszt,      sign:'−'},
     {label:`Prowizja Allegro (${prowPct}%)`,        val:-prowizjaZl, sign:'−'},
-    ...(wyrozEnabled?[{label:`Wyróżnienie (${wyrozPct}%)`, val:-wyrozZl, sign:'−'}]:[]),
+    ...(wyrozEnabled?[{label:`Wyróżnienie (${wyrozPct.toFixed(2)}%)`, val:-wyrozZl, sign:'−'}]:[]),
     {label:`Dostawa (${dostawaPct}%)`,              val:-dostawaZl,  sign:'−'},
     ...(adsPct?[{label:`Allegro Ads (${adsPct}%)`, val:-adsZl, sign:'−'}]:[]),
     ...(abonament?[{label:'Abonament',              val:-abonament,  sign:'−'}]:[]),
