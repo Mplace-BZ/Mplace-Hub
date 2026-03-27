@@ -455,7 +455,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .ins-dot.watch{background:var(--yellow);}
 .d2d-chip.active{background:rgba(180,127,255,.12);color:#b47fff;border-color:rgba(180,127,255,.4);}
 .d2d-chip:hover{background:var(--bg3);color:var(--text);}
-.biz-fee-row{display:grid;grid-template-columns:1fr 70px 100px 100px 70px;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.biz-fee-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
 .biz-fee-row:last-child{border-bottom:none;}
 .biz-fee-name{font-size:12px;color:var(--text2);}
 .biz-fee-type{font-family:var(--mono);font-size:9px;color:var(--text3);width:60px;}
@@ -719,7 +719,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 
 <div class="topbar">
   <div class="topbar-inner">
-    <div class="brand">MPlace <span>Hub</span> <span style="color:var(--text3);font-size:9px">v2.7</span></div>
+    <div class="brand">MPlace <span>Hub</span></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap;padding-right:10px;border-right:1px solid var(--border2);margin-right:4px"></div>
     <button class="nav-btn entry-btn active" onclick="showView('entry')" id="navEntry">Data</button>
     <button class="nav-btn" onclick="showView('months')" id="navMonths" style="color:#4d9fff;background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Trend</button>
@@ -906,7 +906,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <!-- Fee config — row 1 col 1 -->
     <div style="display:flex;flex-direction:column;">
       <div class="sec-label">Konfiguracja fee</div>
-      <div style="display:grid;grid-template-columns:1fr 70px 100px 100px 70px;gap:.6rem;padding:0 0 .4rem;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:.6rem;padding:0 0 .4rem;font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);">
   <div>Konto / Grupa</div><div>Typ</div><div style="text-align:right">Kwota</div><div style="text-align:right">Moje fee</div>
   <div style="text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:3px">% zysku <span class="tip" data-tip="Twoje fee netto jako % łącznej marży po reklamie tej grupy. Pokazuje ile z zysku klienta zarabiasz. Im wyższy % — tym więcej zarabiasz proporcjonalnie do wyniku kampanii.">?</span></div>
 </div>
@@ -956,8 +956,6 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
       <div class="chart-title-sm">Historia moich fee · wszystkie grupy</div>
       <canvas id="bizChart" height="160"></canvas>
     </div>
-    <!-- Annual projection — row 2 col 2 -->
-    <div class="card" id="bizAnnual"></div>
   </div>
 
   <!-- % share table -->
@@ -6676,23 +6674,8 @@ function renderBiznes(){
     <div class="biz-total-row"><span>Materazzi + MtzzEU (stałe)</span><span class="biz-total-val green">${pln(f.matsFeeNetto)}</span></div>
     <div class="biz-total-row"><span>Ankado24 (stałe)</span><span class="biz-total-val green">${pln(f.ankadoFeeNetto)}</span></div>
     <div class="biz-total-row big"><span>Razem netto</span><span class="biz-total-val accent">${pln(f.totalNetto)}</span></div>
-    <div class="biz-total-row"><span>VAT 23%</span><span class="biz-total-val">${pln(f.totalVat)}</span></div>
-    <div class="biz-total-row"><span style="font-weight:600">Do wystawienia (brutto)</span><span class="biz-total-val" style="font-size:18px;color:var(--accent)">${pln(f.totalBrutto)}</span></div>`;
+    <div class="biz-total-row"><span>VAT 23%</span><span class="biz-total-val">${pln(f.totalVat)}</span></div>`;
 
-  // Annual projection
-  document.getElementById('bizAnnual').innerHTML = `
-    <div class="card-title">Projekcja roczna</div>
-    <table class="bk-tbl">
-      <tr><td>Bieżący miesiąc (netto)</td><td></td><td style="color:var(--green)">${pln(f.totalNetto)}</td></tr>
-      <tr><td>× 12 miesięcy</td><td></td><td style="color:var(--green)">${pln(f.totalNetto*12)}</td></tr>
-      <tr class="bk-total"><td>Rok netto</td><td></td><td style="color:var(--accent);font-size:16px">${pln(f.totalNetto*12)}</td></tr>
-      <tr><td>Rok brutto (×1,23)</td><td></td><td style="color:var(--text3)">${pln(f.totalNetto*12*1.23)}</td></tr>
-      <tr class="bk-sep"><td colspan="3">Udział % w zysku klientów</td></tr>
-      <tr><td>MEBLE</td><td></td><td>${f.mebleZysk>0?pct(f.mebleFeeNetto/f.mebleZysk*100):'brak danych'}</td></tr>
-      <tr><td>LUXSEN</td><td></td><td>${f.luxsenZysk>0?pct(f.luxsenFeeBrutto/f.luxsenZysk*100):'brak danych'}</td></tr>
-      <tr><td>ONE (Materazzi+MtzzEU)</td><td></td><td>${f.matZysk>0?pct(f.matsFeeNetto/f.matZysk*100):'brak danych'}</td></tr>
-      <tr><td>ONE (Ankado24)</td><td></td><td>${f.ankadoZysk>0?pct(f.ankadoFeeNetto/f.ankadoZysk*100):'brak danych'}</td></tr>
-    </table>`;
 
   // Share table — per account
   const allAccs = [
