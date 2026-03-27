@@ -5926,6 +5926,84 @@ const PLAYBOOK_SECTIONS = {
 };
 
 /* PB_VERSION_202603262227 */
+function pbAttachListeners(list) {
+  list.querySelectorAll('.pb-item').forEach(el => {
+    el.addEventListener('mouseover', ()=>{ el.style.borderColor='rgba(245,166,35,.4)'; el.style.background='rgba(245,166,35,.05)'; });
+    el.addEventListener('mouseout', ()=>{
+      if(el.dataset.selected !== '1'){ el.style.borderColor='var(--border)'; el.style.background='var(--bg3)'; }
+    });
+    el.addEventListener('click', ()=>{
+      selectPlaybookPrompt(el.dataset.section, parseInt(el.dataset.idx));
+      const sec = PLAYBOOK_SECTIONS[el.dataset.section];
+      const p = sec && sec.prompts[parseInt(el.dataset.idx)];
+      if(p && !p.needsKonto){ closePlaybook(); agentAsk(p.prompt); }
+    });
+  });
+}
+
+function pbHighlight(text, q) {
+  if(!q || !text) return text || '';
+  const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+  return text.replace(re, '<mark style="background:transparent;color:var(--accent);font-weight:600">$1</mark>');
+}
+
+function pbSearchFilter() {
+  const q = (document.getElementById('pbSearch').value || '').trim();
+  const list = document.getElementById('pbList');
+  document.getElementById('pbKontoWrap').style.display = 'none';
+  pbCurrentPrompt = null;
+
+  if(!q) {
+    // Wróć do widoku bieżącej sekcji
+    const sec = PLAYBOOK_SECTIONS[pbCurrentSection];
+    if(!sec) return;
+    list.innerHTML = sec.prompts.map((p,i) => `
+      <div data-section="${pbCurrentSection}" data-idx="${i}" class="pb-item"
+        style="padding:.65rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s">
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <span style="font-family:var(--mono);font-size:9px;color:${sec.color};flex-shrink:0;letter-spacing:.04em;min-width:40px">${p.id}</span>
+          <span style="font-size:11px;color:var(--text);flex:1">${p.name}</span>
+          ${p.needsKonto ? '<span style="font-family:var(--mono);font-size:9px;color:var(--text3)">+ konto</span>' : ''}
+        </div>
+        ${p.cel ? `<div style="margin-top:3px;padding-left:52px;font-size:10px;color:#6ee7b7;font-style:italic;line-height:1.4">${p.cel}</div>` : ''}
+        <div style="margin-top:4px;padding-left:52px;font-family:var(--mono);font-size:9px;color:var(--text3)">${p.tags.join(' ')}</div>
+      </div>
+    `).join('');
+    pbAttachListeners(list);
+    return;
+  }
+
+  const ql = q.toLowerCase();
+  const results = [];
+  Object.entries(PLAYBOOK_SECTIONS).forEach(([secKey, sec]) => {
+    sec.prompts.forEach((p, i) => {
+      const hay = [p.id, p.name, p.cel||'', ...p.tags].join(' ').toLowerCase();
+      if(hay.includes(ql)) results.push({secKey, sec, p, i});
+    });
+  });
+
+  if(!results.length) {
+    list.innerHTML = `<div style="text-align:center;padding:2rem;font-family:var(--mono);font-size:11px;color:var(--text3)">Brak wyników dla '<span style="color:var(--text)">${q}</span>'</div>`;
+    return;
+  }
+
+  const secShortLabel = label => label.replace(/^Sekcja \d+ — /, '');
+  list.innerHTML = results.map(({secKey, sec, p, i}) => `
+    <div data-section="${secKey}" data-idx="${i}" class="pb-item"
+      style="padding:.65rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s">
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+        <span style="font-family:var(--mono);font-size:9px;color:${sec.color};flex-shrink:0;letter-spacing:.04em;min-width:40px">${pbHighlight(p.id, q)}</span>
+        <span style="font-size:11px;color:var(--text);flex:1">${pbHighlight(p.name, q)}</span>
+        <span style="font-family:var(--mono);font-size:8px;padding:1px 7px;border-radius:8px;border:1px solid ${sec.color};color:${sec.color};opacity:.75;white-space:nowrap;flex-shrink:0">${secShortLabel(sec.label)}</span>
+        ${p.needsKonto ? '<span style="font-family:var(--mono);font-size:9px;color:var(--text3)">+ konto</span>' : ''}
+      </div>
+      ${p.cel ? `<div style="margin-top:3px;padding-left:52px;font-size:10px;color:#6ee7b7;font-style:italic;line-height:1.4">${pbHighlight(p.cel, q)}</div>` : ''}
+      <div style="margin-top:4px;padding-left:52px;font-family:var(--mono);font-size:9px;color:var(--text3)">${pbHighlight(p.tags.join(' '), q)}</div>
+    </div>
+  `).join('');
+  pbAttachListeners(list);
+}
+
 function openPlaybook(section) {
   pbCurrentSection = section;
   pbCurrentPrompt = null;
@@ -5933,6 +6011,10 @@ function openPlaybook(section) {
   if(!sec) return;
   document.getElementById('pbSectionLabel').textContent = sec.label;
   document.getElementById('pbKontoWrap').style.display = 'none';
+
+  // Wyczyść wyszukiwarkę
+  const searchEl = document.getElementById('pbSearch');
+  if(searchEl) searchEl.value = '';
 
   const list = document.getElementById('pbList');
   list.innerHTML = sec.prompts.map((p,i) => `
@@ -5947,31 +6029,12 @@ function openPlaybook(section) {
       <div style="margin-top:4px;padding-left:52px;font-family:var(--mono);font-size:9px;color:var(--text3)">${p.tags.join(' ')}</div>
     </div>
   `).join('');
-
-  // Event delegation — jeden listener zamiast inline onclick
-  list.querySelectorAll('.pb-item').forEach(el => {
-    el.addEventListener('mouseover', ()=>{ el.style.borderColor='rgba(245,166,35,.4)'; el.style.background='rgba(245,166,35,.05)'; });
-    el.addEventListener('mouseout', ()=>{
-      // Nie resetuj jeśli to zaznaczony element
-      if(el.dataset.selected !== '1'){
-        el.style.borderColor='var(--border)';
-        el.style.background='var(--bg3)';
-      }
-    });
-    el.addEventListener('click', ()=>{
-      selectPlaybookPrompt(el.dataset.section, parseInt(el.dataset.idx));
-      // Jeśli prompt nie wymaga konta — uruchom od razu
-      const sec = PLAYBOOK_SECTIONS[el.dataset.section];
-      const p = sec && sec.prompts[parseInt(el.dataset.idx)];
-      if(p && !p.needsKonto){
-        closePlaybook();
-        agentAsk(p.prompt);
-      }
-    });
-  });
+  pbAttachListeners(list);
 
   const modal = document.getElementById('playbookModal');
   modal.style.cssText = 'display:flex;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:1rem';
+  // Fokus na wyszukiwarkę
+  setTimeout(()=>{ if(searchEl) searchEl.focus(); }, 80);
 }
 
 function selectPlaybookPrompt(section, idx) {
@@ -6755,6 +6818,11 @@ self.addEventListener('fetch', e => e.respondWith(
       </div>
       <button onclick="closePlaybook()" style="background:transparent;border:none;color:var(--text3);font-size:16px;cursor:pointer">✕</button>
     </div>
+    <input id="pbSearch" type="text" placeholder="Szukaj po nazwie, tagu lub ID..."
+      oninput="pbSearchFilter()"
+      style="width:100%;font-family:var(--mono);font-size:11px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);outline:none;margin-bottom:.85rem;transition:border-color .15s;box-sizing:border-box"
+      onfocus="this.style.borderColor='var(--accent)'"
+      onblur="this.style.borderColor='var(--border2)'">
     <div id="pbList" style="display:flex;flex-direction:column;gap:.5rem"></div>
     <!-- Action bar -->
     <div id="pbKontoWrap" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
