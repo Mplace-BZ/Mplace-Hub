@@ -746,17 +746,29 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .klk-card-val.green{color:var(--green);}
 .klk-card-val.red{color:#ef4444;}
 .klk-card-val.yellow{color:var(--yellow);}
-.klk-unit-sel{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap;}
-@media(max-width:800px){.klk-unit-sel{grid-template-columns:repeat(3,1fr);}}
-.klk-unit-btn{font-family:var(--mono);font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;text-align:center;transition:all .15s;}
-.klk-unit-btn:hover{border-color:var(--accent);color:var(--accent);}
-.klk-unit-btn.active{border-color:var(--accent);background:rgba(255,107,53,.1);color:var(--accent);}
-.klk-unit-form{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;}
-.klk-unit-inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:1rem;}
-@media(max-width:700px){.klk-unit-inputs{grid-template-columns:repeat(2,1fr);}}
-.klk-unit-result{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.65rem;padding:.75rem 1rem;background:var(--bg3);border-radius:8px;border-left:3px solid var(--accent);}
-.klk-unit-result-val{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--text);}
-.klk-unit-result-lbl{font-family:var(--mono);font-size:11px;color:var(--text3);}
+.klk-unit-sel{display:flex;flex-direction:column;gap:.65rem;margin-bottom:1.25rem;}
+.klk-unit-group-hdr{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem;}
+.klk-unit-group-btns{display:flex;flex-wrap:wrap;gap:.4rem;}
+.klk-unit-btn{font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;padding:6px 14px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text3);cursor:pointer;transition:all .15s;}
+.klk-unit-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(255,107,53,.06);}
+.klk-unit-btn.active{border-color:var(--accent);background:rgba(255,107,53,.12);color:var(--accent);font-weight:500;}
+.klk-unit-form{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.klk-unit-header{margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);}
+.klk-unit-name{font-family:var(--mono);font-size:16px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.klk-unit-full{font-size:12px;color:var(--text3);}
+.klk-formula-box{background:var(--bg3);border:1px solid rgba(45,212,160,.2);border-left:3px solid var(--green);border-radius:8px;padding:.7rem 1rem;margin-bottom:1rem;}
+.klk-formula-label{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);opacity:.7;margin-bottom:3px;}
+.klk-formula-text{font-family:var(--mono);font-size:13px;color:var(--green);}
+.klk-unit-inputs{display:flex;flex-wrap:wrap;gap:.65rem;margin-bottom:1rem;}
+.klk-unit-inputs .klk-input-group{flex:1;min-width:160px;}
+.klk-unit-result{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;background:var(--bg3);border-radius:10px;border-left:3px solid var(--accent);margin-bottom:.75rem;}
+.klk-unit-result-val{font-family:var(--mono);font-size:36px;font-weight:500;color:var(--text);line-height:1;}
+.klk-unit-result-lbl{font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.4;}
+.klk-unit-meta{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+@media(max-width:600px){.klk-unit-meta{grid-template-columns:1fr;}}
+.klk-meta-box{background:var(--bg3);border-radius:7px;padding:.6rem .8rem;}
+.klk-meta-label{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:3px;}
+.klk-meta-text{font-size:11px;color:var(--text2);line-height:1.45;}
 .klk-formula{font-family:var(--mono);font-size:10px;color:var(--green);margin-bottom:.4rem;}
 .klk-desc{font-size:11px;color:var(--text3);margin-bottom:.25rem;line-height:1.5;}
 .klk-howto{font-size:11px;color:var(--text2);line-height:1.5;}
@@ -1657,7 +1669,6 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 
   <!-- TRYB: JEDNOSTKOWY -->
   <div id="klkJednostkowy" style="display:none">
-    <div class="klk-section-hdr">Wybierz wskaźnik</div>
     <div class="klk-unit-sel" id="klkUnitSel"></div>
     <div class="klk-unit-form" id="klkUnitForm"></div>
   </div>
@@ -6656,19 +6667,41 @@ function renderKalendar(){
 // ═══════════════════════════════════════════════════════════
 // KALKULATOR
 // ═══════════════════════════════════════════════════════════
-const KLK_INDICATORS = [
-  {id:'roas',    name:'ROAS',        full:'Return On Ad Spend',        formula:'sprzedaż z reklamy / koszt',         desc:'Ile sprzedaży robi 1 zł reklamy.',              howto:'ROAS 7 = z 1 zł reklamy masz 7 zł sprzedaży.',    fields:[{k:'adsRev',l:'Sprzedaż z reklamy (zł)'},{k:'cost',l:'Koszt reklamy (zł)'}], calc:f=>f.cost?f.adsRev/f.cost:null, fmt:v=>v.toFixed(2), unit:''},
-  {id:'acos',    name:'ACoS',        full:'Advertising Cost of Sales', formula:'koszt / sprzedaż z reklamy × 100',   desc:'Jaki % sprzedaży z reklamy zjada koszt reklamy.',howto:'ACoS 15% = z 100 zł sprzedaży 15 zł poszło na reklamę.', fields:[{k:'cost',l:'Koszt reklamy (zł)'},{k:'adsRev',l:'Sprzedaż z reklamy (zł)'}], calc:f=>f.adsRev?f.cost/f.adsRev*100:null, fmt:v=>v.toFixed(1)+'%', unit:'%'},
-  {id:'tacos',   name:'TACoS',       full:'Total Advertising Cost of Sales', formula:'koszt / sprzedaż całkowita × 100', desc:'Jaki % całej sprzedaży zjada koszt reklamy.', howto:'TACoS rośnie = reklama drożeje albo organic spada.', fields:[{k:'cost',l:'Koszt reklamy (zł)'},{k:'totRev',l:'Sprzedaż całkowita (zł)'}], calc:f=>f.totRev?f.cost/f.totRev*100:null, fmt:v=>v.toFixed(1)+'%', unit:'%'},
-  {id:'roi',     name:'ROI',         full:'Return On Investment',      formula:'(zysk z reklamy − koszt) / koszt × 100', desc:'Czy reklama realnie zarabia — na zysku, nie na sprzedaży.', howto:'ROI 30% = zarobiłeś 30% tego co wydałeś.', fields:[{k:'adsRev',l:'Sprzedaż z reklamy (zł)'},{k:'cost',l:'Koszt reklamy (zł)'},{k:'margin',l:'Marża netto (%)'}], calc:f=>f.cost?((f.adsRev*(f.margin/100))-f.cost)/f.cost*100:null, fmt:v=>v.toFixed(1)+'%', unit:'%'},
-  {id:'beacos',  name:'BE ACoS',     full:'Break-even ACoS',          formula:'≈ marża netto (%)',                   desc:'Max ACoS przy którym jesteś na zero.',            howto:'Jeśli marża 18%, to ACoS 18% to granica opłacalności.', fields:[{k:'margin',l:'Marża netto (%)'}], calc:f=>f.margin||null, fmt:v=>v.toFixed(1)+'%', unit:'%'},
-  {id:'cpc',     name:'CPC',         full:'Cost Per Click',            formula:'koszt / kliknięcia',                  desc:'Ile płacisz za jedno kliknięcie.',               howto:'CPC rośnie = droższa aukcja lub automatyczne licytowanie.', fields:[{k:'cost',l:'Koszt reklamy (zł)'},{k:'clicks',l:'Liczba kliknięć'}], calc:f=>f.clicks?f.cost/f.clicks:null, fmt:v=>v.toFixed(2)+' zł', unit:'zł'},
-  {id:'ctr',     name:'CTR',         full:'Click-Through Rate',        formula:'kliknięcia / wyświetlenia × 100',     desc:'Jak często ludzie klikają w reklamę.',           howto:'CTR spada = oferta mniej klikalna lub słabe kreacje.', fields:[{k:'clicks',l:'Liczba kliknięć'},{k:'impr',l:'Liczba wyświetleń'}], calc:f=>f.impr?f.clicks/f.impr*100:null, fmt:v=>v.toFixed(2)+'%', unit:'%'},
-  {id:'cr',      name:'CR',          full:'Conversion Rate',           formula:'zamówienia / kliknięcia × 100',       desc:'Jak często klik kończy się zakupem.',            howto:'CR spada = problem z ofertą lub jakością ruchu.', fields:[{k:'orders',l:'Liczba zamówień'},{k:'clicks',l:'Liczba kliknięć'}], calc:f=>f.clicks?f.orders/f.clicks*100:null, fmt:v=>v.toFixed(2)+'%', unit:'%'},
-  {id:'cpa',     name:'CPA',         full:'Cost Per Acquisition',      formula:'koszt reklamy / zamówienia',          desc:'Ile kosztuje jedno zamówienie z reklamy.',       howto:'Najprostszy wskaźnik kosztu zakupu.', fields:[{k:'cost',l:'Koszt reklamy (zł)'},{k:'orders',l:'Liczba zamówień'}], calc:f=>f.orders?f.cost/f.orders:null, fmt:v=>v.toFixed(2)+' zł', unit:'zł'},
-  {id:'aov',     name:'AOV',         full:'Average Order Value',       formula:'sprzedaż całkowita / zamówienia',     desc:'Średnia wartość koszyka.',                       howto:'AOV rośnie = droższe koszyki lub skuteczny upsell.', fields:[{k:'totRev',l:'Sprzedaż całkowita (zł)'},{k:'orders',l:'Liczba zamówień'}], calc:f=>f.orders?f.totRev/f.orders:null, fmt:v=>v.toFixed(2)+' zł', unit:'zł'},
-  {id:'adsshare',name:'Udział Ads',  full:'Udział sprzedaży z Ads',   formula:'sprzedaż z Ads / sprzedaż całkowita × 100', desc:'Jaki % całej sprzedaży pochodzi z reklamy.', howto:'Gdy spada a TACoS rośnie = Ads słabiej ciągną organik.', fields:[{k:'adsRev',l:'Sprzedaż z reklamy (zł)'},{k:'totRev',l:'Sprzedaż całkowita (zł)'}], calc:f=>f.totRev?f.adsRev/f.totRev*100:null, fmt:v=>v.toFixed(1)+'%', unit:'%'},
+const KLK_GROUPS = [
+  {
+    label:'Cennik i Marża',
+    items:[
+      {id:'marza',      name:'Marża %',        full:'Marża netto na sprzedaży',           formula:'(cena sprzedaży − koszt zakupu) / cena sprzedaży × 100', desc:'Ile % ceny sprzedaży zostaje jako zysk po odjęciu kosztu towaru.', howto:'Marża 30% = ze 100 zł ceny 30 zł to zysk, 70 zł to koszt.', ex:'cena 120 zł, koszt 80 zł → marża 33,3%', fields:[{k:'price',l:'Cena sprzedaży (zł)'},{k:'cost',l:'Koszt zakupu (zł)'}], calc:f=>f.price?((f.price-f.cost)/f.price*100):null, fmt:v=>v.toFixed(2)+'%'},
+      {id:'narzut',     name:'Narzut %',        full:'Narzut na koszt zakupu',             formula:'(cena sprzedaży − koszt zakupu) / koszt zakupu × 100',   desc:'Ile % kosztów zakupu dodajesz jako zysk przy wycenie.', howto:'Narzut 50% = do kosztu 100 zł dodajesz 50 zł → cena 150 zł.', ex:'cena 150 zł, koszt 100 zł → narzut 50%', fields:[{k:'price',l:'Cena sprzedaży (zł)'},{k:'cost',l:'Koszt zakupu (zł)'}], calc:f=>f.cost?((f.price-f.cost)/f.cost*100):null, fmt:v=>v.toFixed(2)+'%'},
+      {id:'cena_m',     name:'Cena z marży',    full:'Cena minimalna przy zadanej marży',  formula:'koszt zakupu / (1 − marża% / 100)',                      desc:'Jaka cena sprzedaży zapewnia żądaną marżę przy danym koszcie.', howto:'Chcesz marżę 30% przy koszcie 70 zł → cena minimalna 100 zł.', ex:'koszt 70 zł, marża 30% → cena 100 zł', fields:[{k:'cost',l:'Koszt zakupu (zł)'},{k:'margin',l:'Żądana marża (%)'}], calc:f=>f.margin<100&&f.cost?f.cost/(1-f.margin/100):null, fmt:v=>v.toFixed(2)+' zł'},
+      {id:'cena_n',     name:'Cena z narzutu',  full:'Cena przy zadanym narzucie',         formula:'koszt zakupu × (1 + narzut% / 100)',                     desc:'Jaka cena sprzedaży wynika z dodania narzutu do kosztu.', howto:'Koszt 100 zł + narzut 40% → cena 140 zł.', ex:'koszt 100 zł, narzut 40% → cena 140 zł', fields:[{k:'cost',l:'Koszt zakupu (zł)'},{k:'markup',l:'Narzut (%)'}], calc:f=>f.cost?f.cost*(1+f.markup/100):null, fmt:v=>v.toFixed(2)+' zł'},
+      {id:'zysk',       name:'Zysk / szt.',     full:'Zysk jednostkowy na produkcie',      formula:'cena sprzedaży − koszt zakupu',                          desc:'Ile złotych zarabiasz na każdej sprzedanej sztuce.', howto:'Cena 120 zł − koszt 80 zł = 40 zł zysku na sztuce.', ex:'cena 120 zł, koszt 80 zł → zysk 40 zł', fields:[{k:'price',l:'Cena sprzedaży (zł)'},{k:'cost',l:'Koszt zakupu (zł)'}], calc:f=>f.price-f.cost||null, fmt:v=>v.toFixed(2)+' zł'},
+      {id:'koszt_m',    name:'Koszt z marży',   full:'Maks. koszt przy cenie i marży',     formula:'cena × (1 − marża% / 100)',                             desc:'Jaki max koszt możesz mieć, żeby utrzymać marżę przy danej cenie.', howto:'Cena 100 zł, marża 30% → maks. koszt 70 zł.', ex:'cena 100 zł, marża 30% → maks. koszt 70 zł', fields:[{k:'price',l:'Cena sprzedaży (zł)'},{k:'margin',l:'Żądana marża (%)'}], calc:f=>f.price?f.price*(1-f.margin/100):null, fmt:v=>v.toFixed(2)+' zł'},
+    ]
+  },
+  {
+    label:'Reklama',
+    items:[
+      {id:'roas',    name:'ROAS',        full:'Return On Ad Spend',                    formula:'sprzedaż z reklamy / koszt reklamy',              desc:'Ile zł sprzedaży generuje 1 zł wydany na reklamę.', howto:'ROAS 7 = z każdego 1 zł reklamy masz 7 zł sprzedaży.', ex:'koszt 2000, sprzedaż 14 000 → ROAS 7,0', fields:[{k:'adsRev',l:'Sprzedaż z reklamy (zł)'},{k:'cost',l:'Koszt reklamy (zł)'}], calc:f=>f.cost?f.adsRev/f.cost:null, fmt:v=>v.toFixed(2)},
+      {id:'acos',    name:'ACoS',        full:'Advertising Cost of Sales',             formula:'koszt reklamy / sprzedaż z reklamy × 100',        desc:'Jaki % sprzedaży z reklamy zjada koszt reklamy.', howto:'ACoS 15% = z 100 zł sprzedaży 15 zł poszło na reklamę.', ex:'koszt 2000, sprzedaż 14 000 → ACoS 14,3%', fields:[{k:'cost',l:'Koszt reklamy (zł)'},{k:'adsRev',l:'Sprzedaż z reklamy (zł)'}], calc:f=>f.adsRev?f.cost/f.adsRev*100:null, fmt:v=>v.toFixed(1)+'%'},
+      {id:'tacos',   name:'TACoS',       full:'Total Advertising Cost of Sales',       formula:'koszt reklamy / sprzedaż całkowita × 100',        desc:'Jaki % całej sprzedaży (organic + reklama) zjada koszt reklamy.', howto:'TACoS rośnie = reklama drożeje albo organic spada.', ex:'koszt 2000, sprzedaż całk. 25 000 → TACoS 8%', fields:[{k:'cost',l:'Koszt reklamy (zł)'},{k:'totRev',l:'Sprzedaż całkowita (zł)'}], calc:f=>f.totRev?f.cost/f.totRev*100:null, fmt:v=>v.toFixed(1)+'%'},
+      {id:'beacos',  name:'BE ACoS',     full:'Break-even ACoS — próg opłacalności',   formula:'≈ marża netto (%)',                               desc:'Max ACoS przy którym wychodzisz na zero — powyżej tego zaczynasz tracić.', howto:'Jeśli marża 18%, to ACoS 18% to twoja granica.', ex:'marża 18% → BE ACoS ≈ 18%', fields:[{k:'margin',l:'Marża netto (%)'}], calc:f=>f.margin||null, fmt:v=>v.toFixed(1)+'%'},
+      {id:'roi',     name:'ROI reklamy', full:'Return On Investment z reklamy',        formula:'(sprzedaż × marża% − koszt) / koszt × 100',      desc:'Czy reklama realnie zarabia — liczone na zysku, nie na sprzedaży.', howto:'ROI 30% = zarobiłeś 30 gr na każdym wydanym złotym.', ex:'sprzedaż 10k, marża 20%=2000 zysku, koszt 1500 → ROI 33%', fields:[{k:'adsRev',l:'Sprzedaż z reklamy (zł)'},{k:'cost',l:'Koszt reklamy (zł)'},{k:'margin',l:'Marża netto (%)'}], calc:f=>f.cost?((f.adsRev*(f.margin/100))-f.cost)/f.cost*100:null, fmt:v=>v.toFixed(1)+'%'},
+    ]
+  },
+  {
+    label:'Efektywność',
+    items:[
+      {id:'cpc',  name:'CPC',  full:'Cost Per Click — koszt jednego kliknięcia', formula:'koszt reklamy / liczba kliknięć',             desc:'Ile płacisz za jedno kliknięcie w reklamę.', howto:'CPC rośnie = droższa aukcja lub zbyt automatyczne stawki.', ex:'1000 zł / 500 klików → CPC 2,00 zł', fields:[{k:'cost',l:'Koszt reklamy (zł)'},{k:'clicks',l:'Liczba kliknięć'}], calc:f=>f.clicks?f.cost/f.clicks:null, fmt:v=>v.toFixed(2)+' zł'},
+      {id:'ctr',  name:'CTR',  full:'Click-Through Rate — klikalność reklamy',   formula:'kliknięcia / wyświetlenia × 100',             desc:'Jak często ludzie klikają w Twoją reklamę.', howto:'CTR spada = oferta mniej atrakcyjna lub słabe zdjęcia.', ex:'500 klików / 50 000 wyświetleń → CTR 1%', fields:[{k:'clicks',l:'Liczba kliknięć'},{k:'impr',l:'Liczba wyświetleń'}], calc:f=>f.impr?f.clicks/f.impr*100:null, fmt:v=>v.toFixed(2)+'%'},
+      {id:'cr',   name:'CR',   full:'Conversion Rate — współczynnik konwersji',  formula:'zamówienia / kliknięcia × 100',               desc:'Jak często kliknięcie kończy się zakupem.', howto:'CR spada = problem z ofertą, ceną lub jakością ruchu.', ex:'20 zamówień / 500 klików → CR 4%', fields:[{k:'orders',l:'Liczba zamówień'},{k:'clicks',l:'Liczba kliknięć'}], calc:f=>f.clicks?f.orders/f.clicks*100:null, fmt:v=>v.toFixed(2)+'%'},
+      {id:'cpa',  name:'CPA',  full:'Cost Per Acquisition — koszt zamówienia',   formula:'koszt reklamy / liczba zamówień',             desc:'Ile kosztuje jedno zamówienie pozyskane z reklamy.', howto:'Porównaj CPA z AOV i marżą — CPA < zysk z zamówienia.', ex:'1000 zł / 20 zamówień → CPA 50 zł', fields:[{k:'cost',l:'Koszt reklamy (zł)'},{k:'orders',l:'Liczba zamówień'}], calc:f=>f.orders?f.cost/f.orders:null, fmt:v=>v.toFixed(2)+' zł'},
+      {id:'aov',  name:'AOV',  full:'Average Order Value — średnia wartość koszyka', formula:'sprzedaż całkowita / liczba zamówień',     desc:'Ile średnio wydaje jeden klient w jednym zamówieniu.', howto:'AOV rośnie = droższe koszyki lub skuteczny upsell.', ex:'50 000 zł / 400 zamówień → AOV 125 zł', fields:[{k:'totRev',l:'Sprzedaż całkowita (zł)'},{k:'orders',l:'Liczba zamówień'}], calc:f=>f.orders?f.totRev/f.orders:null, fmt:v=>v.toFixed(2)+' zł'},
+    ]
+  },
 ];
+// Flat list for backward compat (klkCalcFrom uses ids)
+const KLK_INDICATORS = KLK_GROUPS.flatMap(g=>g.items);
 
 const KLK_CHEAT = [
   {n:'ROAS',  calcId:'roas',     full:'Return On Ad Spend',         desc:'Ile sprzedaży robi 1 zł reklamy',                               formula:'sprzedaż z reklamy / koszt reklamy',               howto:'ROAS 7 = z 1 zł reklamy masz 7 zł sprzedaży',          ex:'koszt 2000, sprzedaż 14 000 → ROAS 7,0'},
@@ -6690,7 +6723,7 @@ const KLK_CHEAT = [
 ];
 
 let klkMode='zbiorczy';
-let klkUnitActive='roas';
+let klkUnitActive='marza';
 let klkInited=false;
 
 function klkInit(){
@@ -6786,20 +6819,19 @@ function klkCalc(){
 }
 
 function klkBuildUnitSel(){
-  document.getElementById('klkUnitSel').innerHTML=KLK_INDICATORS.map(ind=>
-    `<button class="klk-unit-btn${ind.id===klkUnitActive?' active':''}" onclick="klkSelectUnit('${ind.id}')">${ind.name}</button>`
-  ).join('');
+  document.getElementById('klkUnitSel').innerHTML=KLK_GROUPS.map(g=>`
+    <div>
+      <div class="klk-unit-group-hdr">${g.label}</div>
+      <div class="klk-unit-group-btns">
+        ${g.items.map(ind=>`<button class="klk-unit-btn${ind.id===klkUnitActive?' active':''}" onclick="klkSelectUnit('${ind.id}')">${ind.name}</button>`).join('')}
+      </div>
+    </div>`).join('');
 }
 
 function klkSelectUnit(id){
   klkUnitActive=id;
-  document.querySelectorAll('.klk-unit-btn').forEach(b=>{
-    b.classList.toggle('active', b.textContent===KLK_INDICATORS.find(i=>i.id===id)?.name||b.onclick?.toString().includes(`'${id}'`));
-  });
-  // re-render sel
   document.getElementById('klkUnitSel').querySelectorAll('.klk-unit-btn').forEach(b=>{
-    b.classList.remove('active');
-    if(b.getAttribute('onclick')===`klkSelectUnit('${id}')`) b.classList.add('active');
+    b.classList.toggle('active', b.getAttribute('onclick')===`klkSelectUnit('${id}')`);
   });
   klkRenderUnit();
 }
@@ -6816,20 +6848,35 @@ function klkRenderUnit(){
   ).join('');
 
   document.getElementById('klkUnitForm').innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
-      <div>
-        <div style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text)">${ind.name}</div>
-        <div style="font-size:11px;color:var(--text3)">${ind.full}</div>
-      </div>
+    <div class="klk-unit-header">
+      <div class="klk-unit-name">${ind.name}</div>
+      <div class="klk-unit-full">${ind.full}</div>
+    </div>
+    <div class="klk-formula-box">
+      <div class="klk-formula-label">Wzór</div>
+      <div class="klk-formula-text">${ind.formula}</div>
     </div>
     <div class="klk-unit-inputs">${inputsHtml}</div>
     <div class="klk-unit-result">
-      <div class="klk-unit-result-val" id="kuResult">—</div>
-      <div class="klk-unit-result-lbl">${ind.name}</div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Wynik</div>
+        <div class="klk-unit-result-val" id="kuResult">—</div>
+      </div>
+      <div style="border-left:1px solid var(--border);padding-left:1rem;flex:1">
+        <div class="klk-unit-result-lbl">${ind.name}</div>
+      </div>
     </div>
-    <div class="klk-formula">Wzór: ${ind.formula}</div>
-    <div class="klk-desc">${ind.desc}</div>
-    <div class="klk-howto" style="color:var(--text2)">${ind.howto}</div>
+    <div class="klk-unit-meta">
+      <div class="klk-meta-box">
+        <div class="klk-meta-label">Co to znaczy</div>
+        <div class="klk-meta-text">${ind.desc}</div>
+      </div>
+      <div class="klk-meta-box">
+        <div class="klk-meta-label">Jak czytać</div>
+        <div class="klk-meta-text">${ind.howto}</div>
+      </div>
+    </div>
+    ${ind.ex?`<div style="margin-top:.5rem;font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);padding:.5rem .75rem;border-radius:6px">Przykład: ${ind.ex}</div>`:''}
   `;
 }
 
