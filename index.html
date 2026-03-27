@@ -694,6 +694,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .wk-author{font-family:var(--mono);font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);margin-bottom:.3rem;}
 .wk-years{font-family:var(--mono);font-size:11px;color:var(--text3);}
 .wk-hint{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.35;margin-top:2rem;letter-spacing:.06em;}
+.alert-badge{position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 3px;border-radius:8px;background:#ef4444;font-family:var(--mono);font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;line-height:1;pointer-events:none;box-sizing:border-box;}
 /* Welcome Stats */
 .wk-subtext{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.4;margin-top:1.75rem;text-align:center;line-height:2;letter-spacing:.04em;}
 /* Kalendarz */
@@ -869,7 +870,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn entry-btn active" onclick="showView('entry')" id="navEntry">Data</button>
     <button class="nav-btn" onclick="showView('months')" id="navMonths" style="color:#4d9fff;background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Trend</button>
     <button class="nav-btn" onclick="showView('dashboard')" id="navDashboard" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2)">Dashboard</button>
-    <button class="nav-btn" onclick="showView('insights')" id="navInsights" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Insights</button>
+    <button class="nav-btn" onclick="showView('insights')" id="navInsights" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);position:relative">Insights<span id="alertBadge" class="alert-badge" style="display:none"></span></button>
     <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
     <button class="nav-btn" onclick="showView('importads')" id="navImportAds" style="color:#f472b6;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2)">Import Ads</button>
     <div class="nav-sep"></div>
@@ -2037,7 +2038,12 @@ function showView(v){
   } else if(v==='insights'){
     document.getElementById('viewInsights').classList.add('active');
     document.getElementById('navInsights').classList.add('active');
-    renderInsights();
+    updateAlertBadge();
+    if(calculateAlertCount()>0){
+      insSetFilter('danger', document.querySelector('.ins-filter[data-f="danger"]'));
+    } else {
+      renderInsights();
+    }
   } else if(v==='agent'){
     document.getElementById('viewAgent').classList.add('active');
     document.getElementById('navAgent').classList.add('active');
@@ -3241,6 +3247,7 @@ async function saveAllWithSync(){
   if(activeAcc) renderAccount(activeAcc);
 
   showSaveConfirm(savedKeys, saved, updated, curM, firebaseOk);
+  updateAlertBadge();
 }
 
 // ── Auth state listener ──
@@ -3261,6 +3268,7 @@ auth.onAuthStateChanged(async user => {
       await loadFromFS();
     }
     renderEntry();
+    updateAlertBadge();
   } else {
     currentUser = null;
     _fsLoaded = false;
@@ -3285,6 +3293,53 @@ function signOutUser(){
 const MARZA_DANGER = 10;   // % — marża krytyczna
 const MARZA_WATCH  = 15;   // % — marża obserwacji
 const ROAS_GOOD    = 5;    // ROAS powyżej = przestrzeń na gaz
+
+// ── Alert badge ──
+const ALERT_ROAS_CRIT  = 4;   // ROAS < 4 → krytyczny
+const ALERT_MARZA_CRIT = 15;  // marża < 15% → krytyczna
+const ALERT_DATA_DAYS  = 2;   // brak danych 2+ dni → krytyczny
+
+function calculateAlertCount(){
+  const months=['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
+  const now=new Date();
+  const curM=months[now.getMonth()];
+  const todayNum=now.getDate(); // dzień miesiąca
+  let count=0;
+  Object.keys(AC_META).forEach(k=>{
+    const D=getData(k);
+    const row=D.find(r=>r.m===curM);
+    if(!row||!row.sprzedaz){
+      count++; // brak danych za bieżący miesiąc
+      return;
+    }
+    const prod=getProd(k);
+    const c=calc(row,prod);
+    let critical=false;
+    // ROAS < 4
+    if(c.roasAds!==null && c.roasAds<ALERT_ROAS_CRIT) critical=true;
+    // Marża po reklamie < 15%
+    if(c.mAfter<ALERT_MARZA_CRIT) critical=true;
+    // Brak danych 2+ dni: dzien wpisany + 2 dni >= dziś
+    if(!critical && row.dzien){
+      const dataThrough=effectiveDzien(row.dzien); // dane za dzień N-1
+      if(todayNum-dataThrough>=ALERT_DATA_DAYS) critical=true;
+    }
+    if(critical) count++;
+  });
+  return count;
+}
+
+function updateAlertBadge(){
+  const badge=document.getElementById('alertBadge');
+  if(!badge) return;
+  const n=calculateAlertCount();
+  if(n>0){
+    badge.textContent=n;
+    badge.style.display='flex';
+  } else {
+    badge.style.display='none';
+  }
+}
 
 let insCurrentFilter = 'all';
 
