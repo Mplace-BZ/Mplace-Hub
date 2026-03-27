@@ -762,6 +762,9 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .klk-tip:hover .klk-tip-popup{display:block;}
 .klk-input{font-family:var(--mono);font-size:12px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);outline:none;width:100%;box-sizing:border-box;transition:border-color .15s;}
 .klk-input:focus{border-color:var(--accent);}
+.klk-select{font-family:var(--sans);font-size:12px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);outline:none;width:100%;box-sizing:border-box;transition:border-color .15s;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b91a8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.klk-select:focus{border-color:var(--accent);}
+.klk-sublabel{font-family:var(--mono);font-size:9px;color:var(--text3);opacity:.5;margin-top:3px;line-height:1.4;}
 .klk-results-pri{display:grid;grid-template-columns:repeat(5,1fr);gap:.65rem;margin-bottom:.65rem;}
 .klk-results-sec{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-bottom:1.5rem;}
 @media(max-width:900px){.klk-results-pri{grid-template-columns:repeat(3,1fr);}.klk-results-sec{grid-template-columns:repeat(2,1fr);}}
@@ -1717,6 +1720,41 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
       <div class="klk-input-group"><label class="klk-label">Liczba kliknięć</label><input class="klk-input" id="ki_clicks" type="number" min="0" placeholder="0" oninput="klkCalc()"></div>
       <div class="klk-input-group"><label class="klk-label">Liczba wyświetleń</label><input class="klk-input" id="ki_impr" type="number" min="0" placeholder="0" oninput="klkCalc()"></div>
       <div class="klk-input-group"><label class="klk-label">Liczba zamówień</label><input class="klk-input" id="ki_orders" type="number" min="0" placeholder="0" oninput="klkCalc()"></div>
+      <div class="klk-input-group" style="grid-column:span 2">
+        <label class="klk-label" style="margin-bottom:2px">Kategoria Allegro</label>
+        <div style="display:grid;grid-template-columns:1fr 120px;gap:.5rem;align-items:start">
+          <div>
+            <select class="klk-select" id="ki_algCat" onchange="klkAlgCatChange()">
+              <option value="">— wybierz kategorię —</option>
+              <option value="8">Elektronika</option>
+              <option value="8">RTV i AGD</option>
+              <option value="8">Komputery</option>
+              <option value="8">Telefony i akcesoria</option>
+              <option value="8">Foto i Video</option>
+              <option value="11">Meble</option>
+              <option value="11">Dom i ogród</option>
+              <option value="11">Wyposażenie wnętrz</option>
+              <option value="11">Oświetlenie</option>
+              <option value="9">Materiały budowlane</option>
+              <option value="9">Narzędzia</option>
+              <option value="10">Sport i turystyka</option>
+              <option value="12">Moda i odzież</option>
+              <option value="12">Obuwie</option>
+              <option value="10">Zdrowie i uroda</option>
+              <option value="10">Zabawki i gry</option>
+              <option value="8">Motoryzacja</option>
+              <option value="10">Książki i multimedia</option>
+              <option value="10">Żywność i napoje</option>
+              <option value="8">Inne</option>
+            </select>
+            <div class="klk-sublabel">* prowizje orientacyjne, mogą się różnić w zależności od programu Smart! i warunków umowy</div>
+          </div>
+          <div class="klk-input-group">
+            <label class="klk-label">Prowizja (%)</label>
+            <input class="klk-input" id="ki_comm" type="number" min="0" max="100" step="0.1" placeholder="0" oninput="klkAlgCommChange();klkCalc()">
+          </div>
+        </div>
+      </div>
       <div class="klk-input-group"><label class="klk-label">Marża netto (%)<span class="klk-tip">?<span class="klk-tip-popup">Ile % przychodu zostaje po wszystkich kosztach (towar, prowizje, logistyka, VAT). Wyznacza próg opłacalności reklamy — BE ACoS ≈ marża netto.</span></span></label><input class="klk-input" id="ki_margin" type="number" min="0" max="100" placeholder="0" oninput="klkCalc()"></div>
       <div class="klk-input-group"><label class="klk-label">COGS (zł)<span class="klk-tip">?<span class="klk-tip-popup">Cost Of Goods Sold — koszt towaru sprzedanego: cena zakupu lub produkcji. Nie wlicza prowizji, reklamy ani logistyki. Używany do liczenia marży brutto (GM%).</span></span></label><input class="klk-input" id="ki_cogs" type="number" min="0" placeholder="0" oninput="klkCalc()"></div>
     </div>
@@ -7064,11 +7102,27 @@ function klkAllegroCalc(){
   }).join('');
 }
 
+function klkAlgCatChange(){
+  const sel=document.getElementById('ki_algCat');
+  const inp=document.getElementById('ki_comm');
+  if(!sel||!inp) return;
+  if(sel.value!=='') inp.value=sel.value;
+  klkCalc();
+}
+
+function klkAlgCommChange(){
+  // Reset dropdown when user edits input manually
+  const sel=document.getElementById('ki_algCat');
+  if(sel) sel.value='';
+}
+
 function klkReset(){
-  ['ki_adsRev','ki_totRev','ki_cost','ki_clicks','ki_impr','ki_orders','ki_margin','ki_cogs'].forEach(id=>{
+  ['ki_adsRev','ki_totRev','ki_cost','ki_clicks','ki_impr','ki_orders','ki_margin','ki_cogs','ki_comm'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.value='';
   });
+  const sel=document.getElementById('ki_algCat');
+  if(sel) sel.value='';
   klkCalc();
 }
 
