@@ -694,6 +694,14 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .wk-author{font-family:var(--mono);font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);margin-bottom:.3rem;}
 .wk-years{font-family:var(--mono);font-size:11px;color:var(--text3);}
 .wk-hint{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.35;margin-top:2rem;letter-spacing:.06em;}
+/* Save badge */
+#saveBadge{position:fixed;bottom:16px;right:16px;z-index:100;padding:5px 11px;border-radius:20px;background:#181c26;border:1px solid var(--border2);font-family:var(--mono);font-size:11px;color:var(--text3);opacity:.6;transition:opacity .3s,color .3s,border-color .3s;pointer-events:none;white-space:nowrap;}
+#saveBadge.sb-active{opacity:1;}
+#saveBadge.sb-synced{color:var(--green);border-color:rgba(45,212,160,.3);}
+#saveBadge.sb-warn{color:#f5a623;border-color:rgba(245,166,35,.3);}
+#saveBadge.sb-err{color:#ef4444;border-color:rgba(239,68,68,.3);}
+@keyframes sbPulse{0%,100%{opacity:1}50%{opacity:.3}}
+#saveBadge .sb-dot{display:inline-block;animation:sbPulse 1s ease-in-out infinite;}
 /* Copy buttons */
 .cp-wrap{position:relative;display:inline-flex;align-items:baseline;gap:3px;}
 .cp-btn{opacity:0;background:none;border:none;cursor:pointer;font-size:11px;color:var(--text3);padding:0 2px;line-height:1;transition:opacity .15s;font-family:var(--mono);}
@@ -3240,6 +3248,10 @@ async function saveAllWithSync(){
   msgEl.textContent = '⟳ Zapisywanie...';
   msgEl.classList.add('show');
   setSyncMsg('⟳ Synchronizacja Firebase...', 'syncing');
+  if(typeof setBadgeState==='function') setBadgeState('saving');
+
+  // localStorage saved at this point
+  if(typeof setBadgeState==='function') setBadgeState('local');
 
   // Now sync to Firestore
   let firebaseOk = false;
@@ -3248,9 +3260,11 @@ async function saveAllWithSync(){
       await Promise.all(savedKeys.map(k => saveAccToFS(k)));
       setSyncMsg('✓ Zsynchronizowano', 'ok');
       firebaseOk = true;
+      if(typeof setBadgeState==='function') setBadgeState('synced');
     } catch(e){
       setSyncMsg('✗ Błąd sync — dane w localStorage', 'err');
       console.error('Firebase sync error:', e);
+      if(typeof setBadgeState==='function') setBadgeState('warn');
     }
   }
 
@@ -7841,6 +7855,50 @@ updateWkAgentStatus();
 </script>
 
   <script>
+  // ── Save badge ──
+  let _sbState = null;   // 'local' | 'synced' | 'warn' | 'error'
+  let _sbTs    = null;   // timestamp of last save
+
+  function _sbRelTime(ts){
+    const sec = Math.floor((Date.now()-ts)/1000);
+    if(sec < 60)  return 'przed chwilą';
+    const min = Math.floor(sec/60);
+    if(min < 60)  return min+' min temu';
+    return Math.floor(min/60)+' godz. temu';
+  }
+
+  function _sbRender(){
+    const el = document.getElementById('saveBadge');
+    if(!el || !_sbState) return;
+    el.className = 'sb-active';
+    if(_sbState === 'saving'){
+      el.innerHTML = '<span class="sb-dot">●</span> zapisywanie...';
+      el.classList.add('sb-warn');
+    } else if(_sbState === 'local'){
+      el.textContent = '✓ zapisano lokalnie · '+_sbRelTime(_sbTs);
+      el.classList.remove('sb-synced','sb-warn','sb-err');
+    } else if(_sbState === 'synced'){
+      el.textContent = '✓ zsynchronizowano · '+_sbRelTime(_sbTs);
+      el.classList.add('sb-synced');
+    } else if(_sbState === 'warn'){
+      el.textContent = '⚠ lokalnie · sync failed';
+      el.classList.add('sb-warn');
+    } else if(_sbState === 'error'){
+      el.textContent = '✕ błąd zapisu';
+      el.classList.add('sb-err');
+    }
+    el.style.display = '';
+    if(_sbState !== 'saving') setTimeout(()=>{ el.classList.remove('sb-active'); }, 3000);
+  }
+
+  function setBadgeState(state){
+    _sbState = state;
+    if(state !== 'saving') _sbTs = Date.now();
+    _sbRender();
+  }
+
+  setInterval(()=>{ if(_sbState && _sbState !== 'saving') _sbRender(); }, 30000);
+
   // ── Copy to clipboard ──
   function cpCopy(btn, rawVal){
     if(rawVal==null) return;
@@ -8097,6 +8155,9 @@ self.addEventListener('fetch', e => e.respondWith(
     <div class="backup-status" id="backupStatus"></div>
   </div>
 </div>
+
+<!-- Save badge -->
+<div id="saveBadge" style="display:none"></div>
 
 <!-- Cmd+K Search Modal -->
 <div id="cmdkBackdrop" style="display:none" onclick="if(event.target===this)cmdkClose()">
