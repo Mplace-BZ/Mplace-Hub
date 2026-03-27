@@ -7579,8 +7579,8 @@ updateWkAgentStatus();
       return Math.min(Math.max(c.mAfter/15,0),2)/2;
     }
     let curScores=[],prevScores=[];
-    let totalEomMarza=0,eomCount=0;
     let worstName=null,worstScore=Infinity;
+    let belowBe=0,totalWithRoas=0;
     acKeys.forEach(k=>{
       const D=getData(k);
       const prod=getProd(k);
@@ -7590,9 +7590,10 @@ updateWkAgentStatus();
         const s=scoreAcc(curRow,prod);
         if(s!==null){ curScores.push(s); if(s<worstScore){worstScore=s;worstName=AC_META[k].name;} }
         const c=calc(curRow,prod);
-        const eomRev=estym(curRow);
-        totalEomMarza+=eomRev*(c.mAfter/100);
-        eomCount++;
+        if(c.roasAds!==null&&c.beRoasAds){
+          totalWithRoas++;
+          if(c.roasAds<c.beRoasAds) belowBe++;
+        }
       }
       if(prevRow&&prevRow.sprzedaz){
         const s=scoreAcc(prevRow,prod);
@@ -7605,7 +7606,7 @@ updateWkAgentStatus();
     const healthScore=curAvg!==null?Math.round(curAvg*10*10)/10:null;
     const trend=curAvg!==null&&prevAvg!==null?(curAvg>prevAvg*1.02?'↑':curAvg<prevAvg*0.98?'↓':'→'):null;
     const healthCls=healthScore===null?'':healthScore>=6?'health-good':healthScore>=4?'health-ok':'health-bad';
-    return{healthScore,trend,healthCls,totalEomMarza:eomCount?totalEomMarza:null,worstName};
+    return{healthScore,trend,healthCls,belowBe,totalWithRoas,worstName};
   }
   const wkStats=computeWkStats();
 
@@ -7615,9 +7616,9 @@ updateWkAgentStatus();
   }
   function buildStatsHtml(s){
     const health=s.healthScore!==null?`kondycja portfela ${s.healthScore.toFixed(1)}/10${s.trend?' '+s.trend:''}`:null;
-    const eom=s.totalEomMarza!==null?`prognoza marży EOM ${fmtZl(s.totalEomMarza)}`:null;
+    const be=s.totalWithRoas>0?`kont poniżej BE ROAS: ${s.belowBe}/${s.totalWithRoas}`:null;
     const alert=s.worstName?`sprawdź dziś ${s.worstName} ROAS`:null;
-    const lines=[health,eom,alert].filter(Boolean);
+    const lines=[health,be,alert].filter(Boolean);
     if(!lines.length) return '';
     return `<div class="wk-subtext">${lines.join('<br>')}</div>`;
   }
