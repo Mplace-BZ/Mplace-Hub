@@ -681,6 +681,21 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .btn.primary:hover{background:var(--accent2);}
 .smsg{font-family:var(--mono);font-size:11px;color:var(--green);opacity:0;transition:opacity .3s;}
 .smsg.show{opacity:1;}
+/* Welcome Screen */
+#welcomeOverlay{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center, #13161f 0%, #0a0c10 100%);animation:wkFadeIn .6s ease forwards;cursor:pointer;}
+#welcomeOverlay.hiding{animation:wkFadeOut .5s ease forwards;}
+@keyframes wkFadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes wkFadeOut{from{opacity:1;transform:scale(1);}to{opacity:0;transform:scale(1.02);}}
+.wk-clock{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.12em;margin-bottom:2.5rem;opacity:.6;}
+.wk-body{display:flex;flex-direction:column;align-items:center;max-width:680px;padding:0 2rem;text-align:center;}
+.wk-open-quote{font-family:Georgia,serif;font-size:90px;line-height:.6;color:var(--green);opacity:.25;margin-bottom:.5rem;user-select:none;}
+.wk-quote{font-family:var(--sans);font-size:23px;font-style:italic;color:var(--text);line-height:1.65;margin-bottom:1.5rem;}
+.wk-line{width:60px;height:2px;background:var(--green);margin:0 auto 1rem;opacity:.7;}
+.wk-author{font-family:var(--mono);font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);margin-bottom:.3rem;}
+.wk-years{font-family:var(--mono);font-size:11px;color:var(--text3);}
+.wk-hint{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.35;margin-top:2.5rem;letter-spacing:.06em;}
+.wk-progress{position:absolute;bottom:0;left:0;height:3px;background:var(--green);width:100%;transform-origin:left;animation:wkProgress 5s linear forwards;}
+@keyframes wkProgress{from{width:100%;}to{width:0%;}}
 /* Kalendarz */
 .kal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.25rem;}
 .kal-month{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.75rem;}
@@ -1912,6 +1927,7 @@ function showView(v){
     renderAccount(v);
   }
   window.scrollTo(0,0);
+  try{ localStorage.setItem('lastActiveTab', v); }catch(e){}
 }
 
 
@@ -7235,6 +7251,93 @@ function renderBiznes(){
 
 renderEntry();
 updateWkAgentStatus();
+
+// ═══════════════════════════════════════════════════════════
+// WELCOME SCREEN
+// ═══════════════════════════════════════════════════════════
+(function(){
+  const QUOTES=[
+    {quote:'Twoja praca wypełni dużą część twojego życia i jedynym sposobem na prawdziwe spełnienie jest robienie tego, co uważasz za wielką pracę.',author:'Steve Jobs',years:'1955–2011'},
+    {quote:'Innowacja odróżnia lidera od naśladowcy.',author:'Steve Jobs',years:'1955–2011'},
+    {quote:'Pozostań głodny. Pozostań nierozsądny.',author:'Steve Jobs',years:'1955–2011'},
+    {quote:'Twój czas jest ograniczony, więc nie marnuj go żyjąc cudzym życiem.',author:'Steve Jobs',years:'1955–2011'},
+    {quote:'Jeśli budujesz coś dla długiej perspektywy, podejmij decyzję i zapomnij o kwartalnych wynikach.',author:'Jeff Bezos',years:'ur. 1964'},
+    {quote:'Obsesja na punkcie klienta, a nie konkurencji.',author:'Jeff Bezos',years:'ur. 1964'},
+    {quote:'W biznesie to, co jest niebezpieczne, to nie ryzykowanie.',author:'Jeff Bezos',years:'ur. 1964'},
+    {quote:'Wyobraźnia jest ważniejsza niż wiedza.',author:'Albert Einstein',years:'1879–1955'},
+    {quote:'Szaleństwem jest robić wciąż to samo i oczekiwać innych rezultatów.',author:'Albert Einstein',years:'1879–1955'},
+    {quote:'Nie martw się o swoje trudności z matematyką — mogę Cię zapewnić, że moje są jeszcze większe.',author:'Albert Einstein',years:'1879–1955'},
+    {quote:'Człowiek, który przesunął górę, zaczął od przenoszenia małych kamieni.',author:'Konfucjusz',years:'551–479 p.n.e.'},
+    {quote:'Gdy wiesz co wiesz, a gdy nie wiesz, przyznajesz że nie wiesz — to jest wiedza.',author:'Konfucjusz',years:'551–479 p.n.e.'},
+    {quote:'Wybierz pracę którą kochasz, a nie przepracujesz ani jednego dnia w swoim życiu.',author:'Konfucjusz',years:'551–479 p.n.e.'},
+    {quote:'Cena jest tym co płacisz. Wartość jest tym co otrzymujesz.',author:'Warren Buffett',years:'ur. 1930'},
+    {quote:'Zasada numer jeden: nigdy nie trać pieniędzy. Zasada numer dwa: nigdy nie zapominaj zasady numer jeden.',author:'Warren Buffett',years:'ur. 1930'},
+    {quote:'Ktoś siedzi dziś w cieniu, bo ktoś inny posadził drzewo dawno temu.',author:'Warren Buffett',years:'ur. 1930'},
+    {quote:'Zarządzanie to robienie rzeczy dobrze. Przywództwo to robienie właściwych rzeczy.',author:'Peter Drucker',years:'1909–2005'},
+    {quote:'Nie ma nic tak bezużytecznego jak efektywne robienie rzeczy, które nie powinny być robione wcale.',author:'Peter Drucker',years:'1909–2005'},
+    {quote:'Najlepszym sposobem przewidzenia przyszłości jest jej stworzenie.',author:'Peter Drucker',years:'1909–2005'},
+    {quote:'Kiedy wszystko wydaje się iść przeciwko tobie, pamiętaj że samolot startuje pod wiatr, nie z wiatrem.',author:'Henry Ford',years:'1863–1947'},
+    {quote:'Porażka to tylko okazja, żeby zacząć od nowa, tym razem mądrzej.',author:'Henry Ford',years:'1863–1947'},
+    {quote:'Jeśli zawsze robisz to co zawsze robiłeś, zawsze dostaniesz to co zawsze dostawałeś.',author:'Henry Ford',years:'1863–1947'},
+    {quote:'Sukces to umiejętność przechodzenia od porażki do porażki bez utraty entuzjazmu.',author:'Winston Churchill',years:'1874–1965'},
+    {quote:'Optymista widzi szansę w każdej trudności. Pesymista widzi trudność w każdej szansie.',author:'Winston Churchill',years:'1874–1965'},
+    {quote:'Jedyna rzecz gorsza od bycia niewidomym to mieć wzrok, ale brak wizji.',author:'Helen Keller',years:'1880–1968'},
+    {quote:'Życie jest albo odważną przygodą, albo niczym.',author:'Helen Keller',years:'1880–1968'},
+    {quote:'Działaj tak jakbyś nie mógł się mylić, a potem zrób korektę kiedy popełnisz błąd.',author:'Elon Musk',years:'ur. 1971'},
+    {quote:'Kiedy coś jest wystarczająco ważne, robisz to nawet jeśli szanse nie są po twojej stronie.',author:'Elon Musk',years:'ur. 1971'},
+    {quote:'Nie bój się oddawać tego co dobre na rzecz tego co wielkie.',author:'John D. Rockefeller',years:'1839–1937'},
+    {quote:'Jedyną miarą naszego sukcesu jest to, jak dobrze wywiązujemy się z naszych obowiązków wobec innych.',author:'Nelson Mandela',years:'1918–2013'},
+  ];
+
+  const q=QUOTES[Math.floor(Math.random()*QUOTES.length)];
+
+  const el=document.createElement('div');
+  el.id='welcomeOverlay';
+  el.innerHTML=`
+    <div class="wk-clock" id="wkClock"></div>
+    <div class="wk-body">
+      <div class="wk-open-quote">&ldquo;</div>
+      <div class="wk-quote">${q.quote}</div>
+      <div class="wk-line"></div>
+      <div class="wk-author">${q.author}</div>
+      <div class="wk-years">${q.years}</div>
+    </div>
+    <div class="wk-hint">kliknij gdziekolwiek lub poczekaj 5 sekund</div>
+    <div class="wk-progress"></div>
+  `;
+  document.body.appendChild(el);
+
+  // Live clock
+  function updateClock(){
+    const now=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+    const days=['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
+    const months=['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
+    const txt=`${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} · ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const c=document.getElementById('wkClock');
+    if(c) c.textContent=txt;
+  }
+  updateClock();
+  const clockInt=setInterval(updateClock,1000);
+
+  function dismiss(){
+    clearTimeout(autoTimer);
+    clearInterval(clockInt);
+    el.classList.add('hiding');
+    setTimeout(()=>{
+      el.remove();
+      const last=localStorage.getItem('lastActiveTab')||'dashboard';
+      if(typeof showView==='function') showView(last);
+    },500);
+  }
+
+  const autoTimer=setTimeout(dismiss,5000);
+  el.addEventListener('click',dismiss);
+  document.addEventListener('keydown',function onKey(){
+    document.removeEventListener('keydown',onKey);
+    dismiss();
+  });
+})();
 </script>
 
   <script>
