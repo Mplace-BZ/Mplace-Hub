@@ -695,6 +695,23 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .wk-years{font-family:var(--mono);font-size:11px;color:var(--text3);}
 .wk-hint{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.35;margin-top:2rem;letter-spacing:.06em;}
 .alert-badge{position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 3px;border-radius:8px;background:#ef4444;font-family:var(--mono);font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;line-height:1;pointer-events:none;box-sizing:border-box;}
+/* Cmd+K Search */
+#cmdkBackdrop{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);display:flex;align-items:flex-start;justify-content:center;padding-top:12vh;}
+#cmdkModal{width:100%;max-width:560px;background:#181c26;border:1px solid var(--green);border-radius:12px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.6);}
+#cmdkInput{width:100%;box-sizing:border-box;background:transparent;border:none;border-bottom:1px solid var(--border2);outline:none;padding:16px 20px;font-family:var(--sans);font-size:18px;color:var(--text);caret-color:var(--green);}
+#cmdkInput::placeholder{color:var(--text3);}
+#cmdkList{max-height:400px;overflow-y:auto;}
+.cmdk-row{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;transition:background .1s;}
+.cmdk-row:hover,.cmdk-row.cmdk-active{background:var(--bg3);}
+.cmdk-icon{font-family:var(--mono);font-size:11px;color:var(--text3);width:14px;flex-shrink:0;}
+.cmdk-name{font-family:var(--sans);font-size:14px;color:var(--text);flex:1;}
+.cmdk-name b{color:#fff;}
+.cmdk-tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:2px 7px;border-radius:4px;}
+.cmdk-tag.g-meble{color:#ff6b35;background:rgba(255,107,53,.1);}
+.cmdk-tag.g-luxsen{color:#2dd4a0;background:rgba(45,212,160,.1);}
+.cmdk-tag.g-one{color:#b47fff;background:rgba(180,127,255,.1);}
+.cmdk-tag.g-tab{color:var(--text3);background:var(--bg3);}
+.cmdk-empty{padding:20px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text3);}
 /* Welcome Stats */
 .wk-subtext{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.4;margin-top:1.75rem;text-align:center;line-height:2;letter-spacing:.04em;}
 /* Kalendarz */
@@ -7816,6 +7833,106 @@ updateWkAgentStatus();
 </script>
 
   <script>
+  // ── Cmd+K Global Search ──
+  const CMDK_ITEMS = [
+    {type:'tab', name:'Data',          action:()=>showView('entry')},
+    {type:'tab', name:'Trend',         action:()=>showView('months')},
+    {type:'tab', name:'Dashboard',     action:()=>showView('dashboard')},
+    {type:'tab', name:'Insights',      action:()=>showView('insights')},
+    {type:'tab', name:'Agent',         action:()=>showView('agent')},
+    {type:'tab', name:'Porównaj',      action:()=>showView('compare')},
+    {type:'tab', name:'Import Ads',    action:()=>showView('importads')},
+    {type:'tab', name:'D2D',           action:()=>showView('d2d')},
+    {type:'tab', name:'Symulator',     action:()=>showView('sim')},
+    {type:'tab', name:'Kalendarz',     action:()=>showView('kalendarz')},
+    {type:'tab', name:'Kalkulator',    action:()=>showView('kalkulator')},
+    {type:'tab', name:'Wiedza',        action:()=>showView('wiedza')},
+    {type:'tab', name:'Biznes',        action:()=>showView('biznes')},
+    {type:'tab', name:'Rozliczenie',   action:()=>showView('rozliczenie')},
+    {type:'acc',  name:'MobelKap',       group:'MEBLE',  gcls:'g-meble',  action:()=>showView('MobelKap')},
+    {type:'acc',  name:'Perfekt Cięcie', group:'MEBLE',  gcls:'g-meble',  action:()=>showView('PerfektCiecie')},
+    {type:'acc',  name:'Meble na Czasie',group:'MEBLE',  gcls:'g-meble',  action:()=>showView('MeblenaCzasie')},
+    {type:'acc',  name:'Luxsen',         group:'LUXSEN', gcls:'g-luxsen', action:()=>showView('Luxsen')},
+    {type:'acc',  name:'Semmi',          group:'LUXSEN', gcls:'g-luxsen', action:()=>showView('Semmi')},
+    {type:'acc',  name:'BOTAVIT',        group:'LUXSEN', gcls:'g-luxsen', action:()=>showView('BOTAVIT')},
+    {type:'acc',  name:'Materazzi',      group:'ONE',    gcls:'g-one',    action:()=>showView('Materazzi')},
+    {type:'acc',  name:'MtzzEU',         group:'ONE',    gcls:'g-one',    action:()=>showView('MtzzEU')},
+    {type:'acc',  name:'Ankado24',       group:'ONE',    gcls:'g-one',    action:()=>showView('Ankado24')},
+  ];
+
+  let cmdkActiveIdx = 0;
+
+  function cmdkOpen(){
+    document.getElementById('cmdkBackdrop').style.display='flex';
+    const inp=document.getElementById('cmdkInput');
+    inp.value='';
+    cmdkActiveIdx=0;
+    cmdkRender();
+    setTimeout(()=>inp.focus(),30);
+  }
+
+  function cmdkClose(){
+    document.getElementById('cmdkBackdrop').style.display='none';
+  }
+
+  function cmdkHighlight(text, query){
+    if(!query) return text;
+    const idx=text.toLowerCase().indexOf(query.toLowerCase());
+    if(idx<0) return text;
+    return text.slice(0,idx)+'<b>'+text.slice(idx,idx+query.length)+'</b>'+text.slice(idx+query.length);
+  }
+
+  function cmdkRender(){
+    const q=document.getElementById('cmdkInput').value.trim();
+    const list=document.getElementById('cmdkList');
+    let filtered=CMDK_ITEMS;
+    if(q.length>0){
+      filtered=CMDK_ITEMS.filter(i=>i.name.toLowerCase().includes(q.toLowerCase())||(i.group||'').toLowerCase().includes(q.toLowerCase()));
+    }
+    filtered=filtered.slice(0,8);
+    if(cmdkActiveIdx>=filtered.length) cmdkActiveIdx=0;
+
+    if(filtered.length===0){
+      list.innerHTML=`<div class="cmdk-empty">Nie znaleziono — spróbuj innej frazy</div>`;
+      return;
+    }
+    list.innerHTML=filtered.map((item,i)=>{
+      const icon=item.type==='tab'?'►':'·';
+      const tag=item.type==='acc'
+        ?`<span class="cmdk-tag ${item.gcls}">${item.group}</span>`
+        :`<span class="cmdk-tag g-tab">zakładka</span>`;
+      return `<div class="cmdk-row${i===cmdkActiveIdx?' cmdk-active':''}" onclick="cmdkSelect(${CMDK_ITEMS.indexOf(item)})">
+        <span class="cmdk-icon">${icon}</span>
+        <span class="cmdk-name">${cmdkHighlight(item.name,q)}</span>
+        ${tag}
+      </div>`;
+    }).join('');
+  }
+
+  function cmdkSelect(idx){
+    CMDK_ITEMS[idx].action();
+    cmdkClose();
+  }
+
+  // Keyboard: Cmd+K open, Esc close, arrows + Enter navigate
+  document.addEventListener('keydown',e=>{
+    if((e.metaKey||e.ctrlKey)&&e.key==='k'){
+      e.preventDefault();
+      const bd=document.getElementById('cmdkBackdrop');
+      bd.style.display==='none'?cmdkOpen():cmdkClose();
+      return;
+    }
+    if(document.getElementById('cmdkBackdrop').style.display==='none') return;
+    const q=document.getElementById('cmdkInput').value.trim();
+    let filtered=CMDK_ITEMS.filter(i=>!q||i.name.toLowerCase().includes(q.toLowerCase())||(i.group||'').toLowerCase().includes(q.toLowerCase())).slice(0,8);
+    if(e.key==='Escape'){ cmdkClose(); e.preventDefault(); }
+    else if(e.key==='ArrowDown'){ e.preventDefault(); cmdkActiveIdx=(cmdkActiveIdx+1)%Math.max(filtered.length,1); cmdkRender(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); cmdkActiveIdx=(cmdkActiveIdx-1+Math.max(filtered.length,1))%Math.max(filtered.length,1); cmdkRender(); }
+    else if(e.key==='Enter'&&filtered.length>0){ cmdkSelect(CMDK_ITEMS.indexOf(filtered[cmdkActiveIdx])); }
+  });
+  </script>
+
+  <script>
   // Service Worker — offline support
   if('serviceWorker' in navigator){
     const sw = `
@@ -7959,6 +8076,14 @@ self.addEventListener('fetch', e => e.respondWith(
       <button class="backup-btn close-btn" onclick="hideBackupModal()">Zamknij</button>
     </div>
     <div class="backup-status" id="backupStatus"></div>
+  </div>
+</div>
+
+<!-- Cmd+K Search Modal -->
+<div id="cmdkBackdrop" style="display:none" onclick="if(event.target===this)cmdkClose()">
+  <div id="cmdkModal">
+    <input id="cmdkInput" placeholder="Szukaj zakładki lub konta..." autocomplete="off" oninput="cmdkRender()">
+    <div id="cmdkList"></div>
   </div>
 </div>
 </body>
