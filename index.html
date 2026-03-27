@@ -773,6 +773,35 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .klk-section-hdr{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:.65rem;margin-top:1.5rem;}
 .klk-reset-btn{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;}
 .klk-reset-btn:hover{border-color:#ef4444;color:#ef4444;}
+/* Kalkulator Allegro */
+.alg-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;}
+@media(max-width:700px){.alg-wrap{grid-template-columns:1fr;}}
+.alg-panel{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;}
+.alg-panel-title{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem;}
+.alg-panel-title.cost{color:#ef4444;}
+.alg-panel-title.rev{color:var(--green);}
+.alg-results{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:1rem;}
+@media(max-width:700px){.alg-results{grid-template-columns:repeat(2,1fr);}}
+.alg-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.65rem .8rem;}
+.alg-card-name{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:3px;}
+.alg-card-val{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--text);line-height:1.1;}
+.alg-card-val.green{color:var(--green);}
+.alg-card-val.red{color:#ef4444;}
+.alg-card-val.yellow{color:var(--yellow);}
+.alg-card.accent{border-left:3px solid var(--accent);}
+.alg-card.green-b{border-left:3px solid var(--green);}
+.alg-card.red-b{border-left:3px solid #ef4444;}
+.alg-breakdown{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.alg-breakdown-title{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.65rem;}
+.alg-breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px;color:var(--text2);}
+.alg-breakdown-row:last-child{border-bottom:none;font-weight:500;color:var(--text);}
+.alg-breakdown-row .val{font-family:var(--mono);font-size:12px;}
+.alg-breakdown-row .val.neg{color:#ef4444;}
+.alg-breakdown-row .val.pos{color:var(--green);}
+.alg-beacos-bar{margin-top:.75rem;background:var(--bg3);border-radius:6px;padding:.65rem .8rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
+.alg-beacos-label{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);}
+.alg-beacos-val{font-family:var(--mono);font-size:13px;color:var(--accent);}
+.alg-tip-row{font-size:11px;color:var(--text3);margin-top:.5rem;line-height:1.5;}
 /* Ściąga */
 .klk-cheat-wrap{overflow-x:auto;margin-top:.75rem;}
 .klk-cheat-table{width:100%;border-collapse:collapse;min-width:900px;}
@@ -1639,6 +1668,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   <div class="klk-mode-bar" id="klkTop">
     <button class="klk-mode-btn active" id="klkBtnZbiorczy" onclick="klkSetMode('zbiorczy')">Zbiorczy</button>
     <button class="klk-mode-btn" id="klkBtnJednostkowy" onclick="klkSetMode('jednostkowy')">Jednostkowy</button>
+    <button class="klk-mode-btn" id="klkBtnAllegro" onclick="klkSetMode('allegro')" style="color:#f97316">Allegro ✦</button>
   </div>
 
   <!-- TRYB: ZBIORCZY -->
@@ -1663,6 +1693,60 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 
     <div class="klk-section-hdr">Dodatkowe wskaźniki</div>
     <div class="klk-results-sec" id="klkSec"></div>
+  </div>
+
+  <!-- TRYB: ALLEGRO -->
+  <div id="klkAllegro" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+      <div class="klk-section-hdr" style="margin:0">Dane transakcji</div>
+      <button class="klk-reset-btn" onclick="klkAllegroReset()">✕ Wyczyść</button>
+    </div>
+    <div class="alg-wrap">
+      <!-- KOSZTY -->
+      <div class="alg-panel">
+        <div class="alg-panel-title cost">▼ Koszty</div>
+        <div class="klk-input-group" style="margin-bottom:.6rem">
+          <label class="klk-label">Cena zakupu / produkcji (zł)</label>
+          <input class="klk-input" id="alg_koszt" type="number" min="0" placeholder="0" oninput="klkAllegroCalc()">
+        </div>
+        <div class="klk-input-group" style="margin-bottom:.6rem">
+          <label class="klk-label" style="justify-content:space-between">
+            <span>Prowizja Allegro (%)</span>
+            <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="algProwizjaZl">0,00 zł</span>
+          </label>
+          <input class="klk-input" id="alg_prowizja" type="number" min="0" max="100" step="0.1" placeholder="np. 8" oninput="klkAllegroCalc()">
+        </div>
+        <div class="klk-input-group" style="margin-bottom:.6rem">
+          <label class="klk-label">Wyróżnienie / Reklama Allegro (zł)</label>
+          <input class="klk-input" id="alg_wyroz" type="number" min="0" placeholder="0" oninput="klkAllegroCalc()">
+        </div>
+        <div class="klk-input-group">
+          <label class="klk-label">Koszt dostawy (zł)</label>
+          <input class="klk-input" id="alg_dostawa" type="number" min="0" placeholder="0" oninput="klkAllegroCalc()">
+        </div>
+      </div>
+      <!-- PRZYCHÓD -->
+      <div class="alg-panel">
+        <div class="alg-panel-title rev">▲ Przychód</div>
+        <div class="klk-input-group" style="margin-bottom:.6rem">
+          <label class="klk-label">Cena sprzedaży (zł) — co płaci kupujący</label>
+          <input class="klk-input" id="alg_cena" type="number" min="0" placeholder="0" oninput="klkAllegroCalc()" style="font-size:18px;padding:10px 12px">
+        </div>
+        <div style="margin-top:.75rem;background:var(--bg3);border-radius:8px;padding:.75rem 1rem">
+          <div class="klk-label" style="margin-bottom:.4rem">Minimalna cena (próg 0 zł zysku)</div>
+          <div style="font-family:var(--mono);font-size:16px;color:var(--yellow)" id="algMinCena">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WYNIKI -->
+    <div class="alg-results" id="algResults"></div>
+
+    <!-- ROZLICZENIE SZCZEGÓŁOWE -->
+    <div class="alg-breakdown" id="algBreakdown">
+      <div class="alg-breakdown-title">Rozliczenie szczegółowe</div>
+      <div id="algBreakdownRows"></div>
+    </div>
   </div>
 
   <!-- TRYB: JEDNOSTKOWY -->
@@ -6736,10 +6820,82 @@ function klkInit(){
 
 function klkSetMode(m){
   klkMode=m;
-  document.getElementById('klkZbiorczy').style.display=m==='zbiorczy'?'':'none';
-  document.getElementById('klkJednostkowy').style.display=m==='jednostkowy'?'':'none';
-  document.getElementById('klkBtnZbiorczy').classList.toggle('active',m==='zbiorczy');
-  document.getElementById('klkBtnJednostkowy').classList.toggle('active',m==='jednostkowy');
+  ['zbiorczy','jednostkowy','allegro'].forEach(id=>{
+    document.getElementById('klk'+id.charAt(0).toUpperCase()+id.slice(1)).style.display=m===id?'':'none';
+    document.getElementById('klkBtn'+id.charAt(0).toUpperCase()+id.slice(1)).classList.toggle('active',m===id);
+  });
+  if(m==='allegro') klkAllegroCalc();
+}
+
+function klkAllegroReset(){
+  ['alg_koszt','alg_prowizja','alg_wyroz','alg_dostawa','alg_cena'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  klkAllegroCalc();
+}
+
+function klkAllegroCalc(){
+  const v=id=>parseFloat(document.getElementById(id)?.value)||0;
+  const koszt   = v('alg_koszt');
+  const prowPct = v('alg_prowizja');
+  const wyroz   = v('alg_wyroz');
+  const dostawa = v('alg_dostawa');
+  const cena    = v('alg_cena');
+
+  const prowizjaZl = cena * prowPct / 100;
+  const calKoszty  = koszt + prowizjaZl + wyroz + dostawa;
+  const zysk       = cena - calKoszty;
+  const marza      = cena ? zysk / cena * 100 : null;
+  const narzut     = koszt ? zysk / koszt * 100 : null;
+  const minCena    = koszt + wyroz + dostawa > 0 && prowPct < 100
+                      ? (koszt + wyroz + dostawa) / (1 - prowPct / 100)
+                      : null;
+
+  // prowizja zł inline
+  const pzEl = document.getElementById('algProwizjaZl');
+  if(pzEl) pzEl.textContent = prowizjaZl ? fmtPl(prowizjaZl)+' zł' : '0,00 zł';
+
+  // min cena
+  const mcEl = document.getElementById('algMinCena');
+  if(mcEl) mcEl.textContent = minCena ? fmtPl(minCena)+' zł' : '—';
+
+  function fmtPl(n){ return n.toFixed(2).replace('.',','); }
+  function zyskColor(v){ return v>0?'green':v<0?'red':''; }
+  function marzaColor(m){ if(m===null) return ''; return m>20?'green':m>0?'yellow':'red'; }
+
+  // Karty wyników
+  const cards=[
+    {name:'Zysk netto',     val:zysk,   fmt:v=>fmtPl(v)+' zł',  cls:'accent',  vcls:zyskColor(zysk)},
+    {name:'Marża',          val:marza,  fmt:v=>fmtPl(v)+'%',    cls:'green-b', vcls:marzaColor(marza)},
+    {name:'Narzut',         val:narzut, fmt:v=>fmtPl(v)+'%',    cls:'accent',  vcls:zyskColor(narzut)},
+    {name:'Przychód',       val:cena||null,  fmt:v=>fmtPl(v)+' zł', cls:'', vcls:''},
+    {name:'Całk. koszty',   val:calKoszty||null, fmt:v=>fmtPl(v)+' zł', cls:'', vcls:'red'},
+    {name:'Prowizja Alleg.', val:prowizjaZl||null, fmt:v=>fmtPl(v)+' zł', cls:'', vcls:''},
+  ];
+  document.getElementById('algResults').innerHTML=cards.map(c=>`
+    <div class="alg-card ${c.cls}">
+      <div class="alg-card-name">${c.name}</div>
+      <div class="alg-card-val ${c.vcls}">${c.val!==null?c.fmt(c.val):'—'}</div>
+    </div>`).join('');
+
+  // Rozliczenie szczegółowe
+  const rows=[
+    {label:'Cena sprzedaży',             val:cena,        sign:'+'},
+    {label:'Cena zakupu / produkcja',    val:-koszt,      sign:'−'},
+    {label:`Prowizja Allegro (${prowPct}%)`, val:-prowizjaZl, sign:'−'},
+    {label:'Wyróżnienie / Reklama',      val:-wyroz,      sign:'−'},
+    {label:'Koszt dostawy',              val:-dostawa,    sign:'−'},
+    {label:'Zysk netto',                 val:zysk,        sign:'=', total:true},
+  ];
+  document.getElementById('algBreakdownRows').innerHTML=rows.map(r=>{
+    const disp = r.val!==0||r.total ? fmtPl(Math.abs(r.val))+' zł' : '—';
+    const cls  = r.val>0?'pos':r.val<0?'neg':'';
+    const rowStyle = r.total?'padding-top:.5rem;margin-top:.25rem;border-top:1px solid var(--border2)!important':'';
+    return `<div class="alg-breakdown-row" style="${rowStyle}">
+      <span>${r.sign} ${r.label}</span>
+      <span class="val ${cls}">${disp}</span>
+    </div>`;
+  }).join('');
 }
 
 function klkReset(){
