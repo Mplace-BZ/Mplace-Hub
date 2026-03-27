@@ -358,7 +358,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 
 
 /* ── FIREBASE AUTH ── */
-.auth-bar{display:flex;align-items:center;gap:.75rem;padding:.5rem 1rem;background:var(--bg2);border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;flex-wrap:wrap;}
+.auth-bar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:42px;background:var(--bg2);border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;gap:.75rem;}
 .auth-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);flex-shrink:0;}
 .auth-dot.online{background:var(--green);box-shadow:0 0 6px var(--green);}
 .auth-user{color:var(--text2);}
@@ -710,17 +710,22 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   </div>
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
-  <div class="auth-dot" id="authDot"></div>
-  <span id="authStatusText" style="color:var(--text3)">Łączenie...</span>
-  <span class="auth-user" id="authUserEmail"></span>
-  <button class="auth-btn logout" id="authLogoutBtn" onclick="signOutUser()" style="display:none">Wyloguj</button>
-  <span class="sync-msg" id="syncMsg"></span>
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span></div>
+    <div class="nav-sep"></div>
+    <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <span class="sync-msg" id="syncMsg"></span>
+    <span id="authStatusText" style="color:var(--text3)">Łączenie...</span>
+    <div class="auth-dot" id="authDot"></div>
+    <span class="auth-user" id="authUserEmail"></span>
+    <button class="auth-btn logout" id="authLogoutBtn" onclick="signOutUser()" style="display:none">Wyloguj</button>
+  </div>
 </div>
 
 <div class="topbar">
   <div class="topbar-inner">
-    <div class="brand">MPlace <span>Hub</span></div>
-    <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap;padding-right:10px;border-right:1px solid var(--border2);margin-right:4px"></div>
     <button class="nav-btn entry-btn active" onclick="showView('entry')" id="navEntry">Data</button>
     <button class="nav-btn" onclick="showView('months')" id="navMonths" style="color:#4d9fff;background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Trend</button>
     <button class="nav-btn" onclick="showView('dashboard')" id="navDashboard" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2)">Dashboard</button>
