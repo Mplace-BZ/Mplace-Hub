@@ -956,13 +956,6 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
       <div class="biz-total-card" id="bizTotalCard" style="flex:1;min-height:0;box-sizing:border-box"></div>
     </div>
   </div>
-  <!-- Dolna sekcja: wykres pełna szerokość -->
-  <div class="chart-card" style="margin-bottom:.85rem">
-    <div class="chart-lbl">Mój przychód miesięczny (netto)</div>
-    <div class="chart-title-sm">Historia moich fee · wszystkie grupy</div>
-    <canvas id="bizChart" height="280"></canvas>
-  </div>
-
   <!-- % share table -->
   <div class="tbl-wrap">
     <div class="tbl-hdr">
@@ -975,6 +968,13 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
       </tr></thead>
       <tbody id="bizShareTable"></tbody>
     </table>
+  </div>
+
+  <!-- Wykres na samym dole -->
+  <div class="chart-card" style="margin-top:.85rem">
+    <div class="chart-lbl">Mój przychód miesięczny (netto)</div>
+    <div class="chart-title-sm">Historia moich fee · wszystkie grupy</div>
+    <canvas id="bizChart" height="95"></canvas>
   </div>
 </div>
 </div>
