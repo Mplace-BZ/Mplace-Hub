@@ -695,21 +695,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .wk-years{font-family:var(--mono);font-size:11px;color:var(--text3);}
 .wk-hint{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.35;margin-top:2rem;letter-spacing:.06em;}
 /* Welcome Stats */
-.welcome-stats{display:flex;flex-direction:column;gap:0;margin-top:1.75rem;width:340px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;}
-.welcome-stat-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1rem;}
-.welcome-stat-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.05em;}
-.welcome-stat-value{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text);}
-.welcome-stat-max{font-size:10px;color:var(--text3);font-weight:400;}
-.welcome-stat-trend{font-size:11px;margin-left:4px;}
-.welcome-stat-divider{height:1px;background:rgba(255,255,255,.06);margin:0 .75rem;}
-.health-good .welcome-stat-trend,.health-good{color:#2dd4a0;}
-.health-ok .welcome-stat-trend,.health-ok{color:#f5a623;}
-.health-bad .welcome-stat-trend,.health-bad{color:#ff6b6b;}
-.value-money{color:var(--text);}
-.alert-row{gap:.5rem;padding:.6rem 1rem;}
-.welcome-alert-icon{font-size:12px;flex-shrink:0;}
-.welcome-alert-text{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.03em;}
-.welcome-alert-highlight{color:var(--accent);font-weight:600;}
+.wk-subtext{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.4;margin-top:1.75rem;text-align:center;line-height:2;letter-spacing:.04em;}
 /* Kalendarz */
 .kal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.25rem;}
 .kal-month{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.75rem;}
@@ -7628,27 +7614,12 @@ updateWkAgentStatus();
     return Math.round(n).toLocaleString('pl-PL')+' zł';
   }
   function buildStatsHtml(s){
-    const healthVal=s.healthScore!==null
-      ?`${s.healthScore.toFixed(1)}<span class="welcome-stat-max">/10</span>${s.trend?`<span class="welcome-stat-trend">${s.trend}</span>`:''}`
-      :'—';
-    const alertName=s.worstName||'brak danych';
-    return `
-    <div class="welcome-stats">
-      <div class="welcome-stat-row">
-        <span class="welcome-stat-label">Kondycja portfela</span>
-        <span class="welcome-stat-value ${s.healthCls}">${healthVal}</span>
-      </div>
-      <div class="welcome-stat-divider"></div>
-      <div class="welcome-stat-row">
-        <span class="welcome-stat-label">Prognoza marży EOM</span>
-        <span class="welcome-stat-value value-money">${fmtZl(s.totalEomMarza)}</span>
-      </div>
-      <div class="welcome-stat-divider"></div>
-      <div class="welcome-stat-row alert-row">
-        <span class="welcome-alert-icon">&#9889;</span>
-        <span class="welcome-alert-text">Sprawdź dziś: <span class="welcome-alert-highlight">${alertName} ROAS</span></span>
-      </div>
-    </div>`;
+    const health=s.healthScore!==null?`kondycja portfela ${s.healthScore.toFixed(1)}/10${s.trend?' '+s.trend:''}`:null;
+    const eom=s.totalEomMarza!==null?`prognoza marży EOM ${fmtZl(s.totalEomMarza)}`:null;
+    const alert=s.worstName?`sprawdź dziś ${s.worstName} ROAS`:null;
+    const lines=[health,eom,alert].filter(Boolean);
+    if(!lines.length) return '';
+    return `<div class="wk-subtext">${lines.join('<br>')}</div>`;
   }
 
   const el=document.createElement('div');
