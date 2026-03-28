@@ -1838,10 +1838,10 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
           <input class="klk-input" id="alg_ads_pct" type="number" min="0" max="100" step="0.1" placeholder="np. 4,5" oninput="klkAllegroCalc()">
         </div>
 
-        <!-- Abonament -->
+        <!-- Inne koszty -->
         <div class="klk-input-group">
-          <label class="klk-label">Abonament (zł/mies.)</label>
-          <input class="klk-input" id="alg_abonament" type="number" min="0" placeholder="np. 199" oninput="klkAllegroCalc()">
+          <label class="klk-label">Inne koszty (zł)</label>
+          <input class="klk-input" id="alg_abonament" type="number" min="0" placeholder="np. abonament, zwroty" oninput="klkAllegroCalc()">
         </div>
 
         <!-- Min cena -->
@@ -7088,7 +7088,7 @@ function klkAllegroCalc(){
     ...(wyrozEnabled?[{label:`Wyróżnienie (${wyrozPct.toFixed(2)}%)`, val:-wyrozZl, sign:'−'}]:[]),
     {label:`Dostawa (${dostawaPct}%)`,              val:-dostawaZl,  sign:'−'},
     ...(adsPct?[{label:`Allegro Ads (${adsPct}%)`, val:-adsZl, sign:'−'}]:[]),
-    ...(abonament?[{label:'Abonament',              val:-abonament,  sign:'−'}]:[]),
+    ...(abonament?[{label:'Inne koszty',             val:-abonament,  sign:'−'}]:[]),
     {label:'Zysk netto',                           val:zysk,        sign:'=', total:true},
   ];
   document.getElementById('algBreakdownRows').innerHTML=rows.map(r=>{
