@@ -263,8 +263,22 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .bubble-legend-dot{width:10px;height:10px;border-radius:50%;}
 
 
+/* ── SLIDE DASHBOARD ── */
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0;}
+.dashboard-card{border:1px solid #e5e7eb;border-radius:8px;padding:16px;background:#fff;}
+.dashboard-card .account-name{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.dashboard-card .metric-big{font-size:22px;font-family:'DM Mono',monospace;font-weight:600;margin-bottom:4px;color:#111;}
+.dashboard-card .metric-row{display:flex;justify-content:space-between;font-size:12px;margin:4px 0;color:#374151;}
+.dashboard-card .progress-bar-wrap{background:#f3f4f6;border-radius:4px;height:6px;margin:6px 0;}
+.dashboard-card .progress-bar-fill{height:6px;border-radius:4px;transition:width .3s;}
+.metric-green{color:#16a34a;}.metric-yellow{color:#d97706;}.metric-red{color:#dc2626;}
+
 /* ── PDF REPORT ── */
 @media print {
+  .slide-dashboard{background:#fff !important;color:#111 !important;}
+  .dashboard-card{background:#fff !important;border-color:#e5e7eb !important;}
+  .dashboard-card .metric-big,.dashboard-card .metric-row{color:#111 !important;}
+  .dashboard-card .progress-bar-wrap{background:#e5e7eb !important;}
   .topbar,.save-bar,.btn,.nav-btn,#acAlerts,.sec-num,.tip{display:none!important;}
   body{background:#fff;color:#000;}
   .view{display:block!important;}
@@ -5357,6 +5371,7 @@ async function runSlideReport(selectedKeys, dateFrom, dateTo) {
   }
 
   let dataCtx = `Zakres analizy: ${zakresLabel} (${totalDaysRange} dni kalendarzowych)\n\n`;
+  const accDataArr = [];
 
   Object.entries(filteredGroups).forEach(([gKey, g]) => {
     dataCtx += `=== GRUPA ${gKey} (producent ${g.prod}%) ===\n`;
@@ -5390,6 +5405,8 @@ async function runSlideReport(selectedKeys, dateFrom, dateTo) {
       const Clast    = calc(entries[entries.length-1], prod);
       const missing  = totalDaysRange-entries.length;
       const dataNote = missing>0 ? ` (dane za ${entries.length} z ${totalDaysRange} dni, brak: ${missing} dni)` : ` (${entries.length} dni)`;
+
+      accDataArr.push({ key:k, name:accName, group:gKey, sprzedazSum, adsCostSum, roasAvg, beRoas:Clast.beRoasAds, marzaAvg, wyrozPct, adsPct });
 
       dataCtx += `\n${accName}${dataNote}:\n`;
       dataCtx += `  Sprzedaż łączna: ${Math.round(sprzedazSum).toLocaleString('pl-PL')} zł\n`;
@@ -5428,7 +5445,7 @@ ${SLIDE_REPORT_PROMPT}`;
       })
     });
     const text = await readSSE(resp);
-    openSlideWindow(text, zakresLabel, selectedKeys);
+    openSlideWindow(text, zakresLabel, selectedKeys, accDataArr);
     savePresentationToHistory(text, zakresLabel, selectedKeys);
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:#b47fff">
       <strong style="color:#b47fff">◆ Prezentacja wygenerowana</strong><br>
@@ -5441,26 +5458,33 @@ ${SLIDE_REPORT_PROMPT}`;
   }
 }
 
-function openSlideWindow(aiText, curM, selectedKeys) {
+function openSlideWindow(aiText, curM, selectedKeys, accDataArr) {
   const now = new Date();
   const dateStr = now.toLocaleDateString('pl-PL', {day:'2-digit',month:'long',year:'numeric'});
   const scopeLabel = selectedKeys.length === 9 ? 'Wszystkie konta' : selectedKeys.map(k=>AC_META[k]?.name||k).join(', ');
 
-  // Parse slides from text
-  const slideBlocks = aiText.split(/---SLAJD\s*\d+---/i).filter(s => s.trim());
-
   if(typeof marked !== 'undefined') marked.setOptions({ breaks: true, gfm: true });
 
-  const slidesHtml = slideBlocks.map((block, i) => {
-    // Post-process PUENTA line to add semantic class before marked parses
+  // Helper: render one AI slide block
+  function renderAiSlide(block, num) {
     const pre = block.trim().replace(/\*\*PUENTA:\*\*\s*(.+)/g,
       '<div class="slide-puenta" style="margin-top:1rem;padding:.6rem 1rem;background:#faf5ff;border-left:3px solid #b47fff;font-weight:500;color:#111;font-size:12px;border-radius:0 6px 6px 0">$1</div>');
     const html = (typeof marked !== 'undefined') ? marked.parse(pre) : pre.replace(/\n/g,'<br>');
-    return `<div class="slide-block" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;page-break-inside:avoid;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-      <div class="slide-number" style="font-family:'DM Mono',monospace;font-size:8px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem">SLAJD ${i+1}</div>
+    return `<div class="slide-block" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+      <div class="slide-number" style="font-family:'DM Mono',monospace;font-size:8px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem">SLAJD ${num}</div>
       <div class="slide-title" style="line-height:1.7;color:#374151;font-size:13px">${html}</div>
     </div>`;
-  }).join('');
+  }
+
+  // Parse AI slides
+  const slideBlocks = aiText.split(/---SLAJD\s*[\w\s]+---/i).filter(s => s.trim());
+
+  // Build HTML: slide 1 | dashboard | slides 2+
+  const slide1Html = slideBlocks.length ? renderAiSlide(slideBlocks[0], 1) : '';
+  const restHtml   = slideBlocks.slice(1).map((b, i) => renderAiSlide(b, i+3)).join('');
+
+  // Build dashboard slide (SLAJD 2)
+  const dashHtml = buildDashboardSlide(accDataArr || [], curM, 2);
 
   let overlay = document.getElementById('slideOverlay');
   if (!overlay) {
@@ -5485,7 +5509,7 @@ function openSlideWindow(aiText, curM, selectedKeys) {
         ${dateStr}
       </div>
     </div>
-    ${slidesHtml}
+    ${slide1Html}${dashHtml}${restHtml}
     <div class="slide-action-buttons" style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:.75rem 2rem;display:flex;gap:.75rem;justify-content:flex-end;z-index:801;">
       <button onclick="document.getElementById('slideOverlay').style.display='none'" style="font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid #e5e7eb;background:#f9fafb;color:#6b7280">Zamknij</button>
       <button onclick="downloadSlideHtml('${curM}','${dateStr}')" style="font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid rgba(180,127,255,.3);background:#faf5ff;color:#b47fff">Pobierz .html</button>
@@ -5494,6 +5518,106 @@ function openSlideWindow(aiText, curM, selectedKeys) {
   overlay.appendChild(inner);
   overlay.style.display = 'block';
   overlay.scrollTop = 0;
+
+  // Init Chart.js for dashboard after DOM insert
+  if ((accDataArr||[]).length > 1) {
+    requestAnimationFrame(() => initDashboardChart(accDataArr));
+  }
+}
+
+function buildDashboardSlide(accDataArr, zakresLabel, slajdNum) {
+  if (!accDataArr || !accDataArr.length) return '';
+
+  const GRP_COLORS = { MEBLE:'#ff6b35', LUXSEN:'#2dd4a0', ONE:'#b47fff' };
+
+  // Benchmarks
+  const maxMarza  = Math.max(...accDataArr.map(a => a.marzaAvg));
+  const minWyroz  = Math.min(...accDataArr.map(a => a.wyrozPct));
+  const isSingle  = accDataArr.length === 1;
+
+  const cards = accDataArr.map(a => {
+    const gc = GRP_COLORS[a.group] || '#8b91a8';
+    // Marza color
+    const mc = a.marzaAvg >= 10 ? 'metric-green' : a.marzaAvg >= 7 ? 'metric-yellow' : 'metric-red';
+    // ROAS progress
+    const roasPct = a.beRoas > 0 ? Math.min(a.roasAvg / a.beRoas * 100, 100) : 0;
+    const roasColor = a.roasAvg >= a.beRoas ? '#16a34a' : '#dc2626';
+    // Wyróżnienia arrow
+    const wyrozOk = isSingle ? null : a.wyrozPct <= minWyroz;
+    const wyrozArrow = wyrozOk === null ? '' : wyrozOk ? '<span class="metric-green">↓</span>' : '<span class="metric-red">↑</span>';
+
+    return `<div class="dashboard-card">
+      <div class="account-name" style="color:${gc}">${a.name}</div>
+      <div class="metric-big">${Math.round(a.sprzedazSum).toLocaleString('pl-PL')} <span style="font-size:13px;font-weight:400;color:#6b7280">zł</span></div>
+      <div class="metric-row"><span>Marża</span><span class="${mc}">${a.marzaAvg.toFixed(1)}%</span></div>
+      <div class="metric-row" style="font-size:11px;color:#6b7280"><span>ROAS ${a.roasAvg.toFixed(2)} / BE ${a.beRoas.toFixed(2)}</span></div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${roasPct.toFixed(1)}%;background:${roasColor}"></div></div>
+      <div class="metric-row"><span>Wyróżnienia</span><span>${wyrozArrow} ${a.wyrozPct.toFixed(1)}%</span></div>
+      <div class="metric-row"><span>Ads %</span><span>${a.adsPct.toFixed(1)}%</span></div>
+    </div>`;
+  }).join('');
+
+  const chartH = accDataArr.length <= 2 ? 120 : 160;
+  const chartBlock = accDataArr.length > 1
+    ? `<div style="margin-top:20px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+        <canvas id="dashboardChart" height="${chartH}"></canvas>
+       </div>`
+    : '';
+
+  return `<div class="slide-block slide-dashboard" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+    <div class="slide-number" style="font-family:'DM Mono',monospace;font-size:8px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem">SLAJD ${slajdNum} — DASHBOARD</div>
+    <h2 class="slide-title" style="font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:#111;margin:0 0 4px">WYNIKI NA PIERWSZY RZUT OKA</h2>
+    <p style="font-size:11px;color:#6b7280;margin:0 0 0">Kluczowe metryki okresu ${zakresLabel}</p>
+    <div class="dashboard-grid">${cards}</div>
+    ${chartBlock}
+  </div>`;
+}
+
+function initDashboardChart(accDataArr) {
+  const canvas = document.getElementById('dashboardChart');
+  if (!canvas || typeof Chart === 'undefined') return;
+  const GRP_COLORS = { MEBLE:'#ff6b35', LUXSEN:'#2dd4a0', ONE:'#b47fff' };
+  const labels  = accDataArr.map(a => a.name);
+  const sales   = accDataArr.map(a => Math.round(a.sprzedazSum));
+  const margins = accDataArr.map(a => parseFloat(a.marzaAvg.toFixed(1)));
+  const colors  = accDataArr.map(a => GRP_COLORS[a.group] || '#8b91a8');
+
+  new Chart(canvas, {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Sprzedaż (zł)',
+          data: sales,
+          backgroundColor: colors.map(c => c + 'cc'),
+          borderColor: colors,
+          borderWidth: 1,
+          yAxisID: 'y'
+        },
+        {
+          type: 'line',
+          label: 'Marża (%)',
+          data: margins,
+          borderColor: '#b47fff',
+          backgroundColor: 'rgba(180,127,255,.15)',
+          pointBackgroundColor: '#b47fff',
+          pointRadius: 5,
+          tension: 0.3,
+          yAxisID: 'y2'
+        }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { labels: { font: { family:'DM Mono', size:10 }, color:'#374151' } } },
+      scales: {
+        y:  { ticks: { font:{family:'DM Mono',size:10}, color:'#374151' }, grid:{color:'#f3f4f6'} },
+        y2: { position:'right', ticks:{font:{family:'DM Mono',size:10},color:'#b47fff',callback:v=>v+'%'}, grid:{drawOnChartArea:false} }
+      }
+    }
+  });
 }
 
 function downloadSlideHtml(monthLabel, dateLabel) {
