@@ -803,6 +803,11 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .klk-tip:hover .klk-tip-popup{display:block;}
 .klk-input{font-family:var(--mono);font-size:12px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);outline:none;width:100%;box-sizing:border-box;transition:border-color .15s;}
 .klk-input:focus{border-color:var(--accent);}
+/* Slide table styles */
+.slide-block table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+.slide-block table th,.slide-block table td{border:1px solid #e5e7eb;padding:8px 10px;text-align:left;vertical-align:top;word-break:break-word;}
+.slide-block table th{background:#f9fafb;font-weight:600;font-family:'DM Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:.04em;}
+.slide-block table tr:nth-child(even) td{background:#fafafa;}
 .klk-select{font-family:var(--sans);font-size:12px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);outline:none;width:100%;box-sizing:border-box;transition:border-color .15s;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b91a8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
 .klk-select:focus{border-color:var(--accent);}
 .klk-sublabel{font-family:var(--mono);font-size:9px;color:var(--text3);opacity:.5;margin-top:3px;line-height:1.4;}
@@ -5380,21 +5385,16 @@ function openSlideWindow(aiText, curM, selectedKeys) {
   // Parse slides from text
   const slideBlocks = aiText.split(/---SLAJD\s*\d+---/i).filter(s => s.trim());
 
+  if(typeof marked !== 'undefined') marked.setOptions({ breaks: true, gfm: true });
+
   const slidesHtml = slideBlocks.map((block, i) => {
-    let html = block.trim()
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^# (.+)$/gm, '<h2 style="font-family:\'DM Mono\',monospace;font-size:20px;font-weight:600;color:#111;margin:0 0 .5rem;line-height:1.3">$1</h2>')
-      .replace(/^> (.+)$/gm, '<div style="font-style:italic;color:#6b7280;font-size:12px;margin-bottom:1rem;border-left:3px solid #b47fff;padding-left:.75rem">$1</div>')
-      .replace(/\*\*PUENTA:\*\*\s*(.+)/g, '<div class="slide-puenta" style="margin-top:1rem;padding:.6rem 1rem;background:#faf5ff;border-left:3px solid #b47fff;font-weight:500;color:#111;font-size:12px;border-radius:0 6px 6px 0">$1</div>')
-      .replace(/\|([^|]+)\|([^|]+)\|([^|]*)\|/g, (m,a,b,c) => {
-        if (c !== undefined && c !== '') return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;font-size:11px"><span style="padding:4px 8px;background:#f9fafb;text-align:center">${a.trim()}</span><span style="padding:4px 8px;background:#f9fafb;text-align:center">${b.trim()}</span><span style="padding:4px 8px;background:#f9fafb;text-align:center">${c.trim()}</span></div>`;
-        return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;font-size:11px"><span style="padding:4px 8px;background:#f9fafb;text-align:center">${a.trim()}</span><span style="padding:4px 8px;background:#f9fafb;text-align:center">${b.trim()}</span></div>`;
-      })
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/\n/g, '<br>');
+    // Post-process PUENTA line to add semantic class before marked parses
+    const pre = block.trim().replace(/\*\*PUENTA:\*\*\s*(.+)/g,
+      '<div class="slide-puenta" style="margin-top:1rem;padding:.6rem 1rem;background:#faf5ff;border-left:3px solid #b47fff;font-weight:500;color:#111;font-size:12px;border-radius:0 6px 6px 0">$1</div>');
+    const html = (typeof marked !== 'undefined') ? marked.parse(pre) : pre.replace(/\n/g,'<br>');
     return `<div class="slide-block" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;page-break-inside:avoid;box-shadow:0 1px 3px rgba(0,0,0,.06)">
       <div class="slide-number" style="font-family:'DM Mono',monospace;font-size:8px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem">SLAJD ${i+1}</div>
-      <div class="slide-title" style="line-height:1.7;color:#374151;font-size:13px"><p>${html}</p></div>
+      <div class="slide-title" style="line-height:1.7;color:#374151;font-size:13px">${html}</div>
     </div>`;
   }).join('');
 
@@ -8767,5 +8767,6 @@ self.addEventListener('fetch', e => e.respondWith(
     <div id="cmdkList"></div>
   </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 </body>
 </html>
