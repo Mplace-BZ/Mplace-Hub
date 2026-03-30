@@ -1425,6 +1425,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="generateMTDReport()" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:var(--accent);background:rgba(255,107,53,.08)">Raport MTD</button>
     <button onclick="generateSlideReport()" class="agent-chip" style="border-color:rgba(180,127,255,.4);color:#b47fff;background:rgba(180,127,255,.08)">◆ Prezentacja</button>
     <button onclick="openPDFsModal()" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.07)">PDF's</button>
+    <button onclick="openPDFsPRModal()" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.07)">PDF's PR</button>
   </div>
 
   <!-- Input -->
@@ -5318,9 +5319,10 @@ ${SLIDE_REPORT_PROMPT}`;
     });
     const text = await readSSE(resp);
     openSlideWindow(text, curM, selectedKeys);
+    savePresentationToHistory(text, curM, selectedKeys);
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:#b47fff">
       <strong style="color:#b47fff">◆ Prezentacja wygenerowana</strong><br>
-      <span style="font-size:11px;color:var(--text3)">Ctrl+P = PDF</span>
+      <span style="font-size:11px;color:var(--text3)">Ctrl+P = PDF · zapisano w PDF's PR</span>
     </div>`;
   } catch(err) {
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)">
@@ -5386,6 +5388,74 @@ function openSlideWindow(aiText, curM, selectedKeys) {
   overlay.appendChild(inner);
   overlay.style.display = 'block';
   overlay.scrollTop = 0;
+}
+
+// ── HISTORIA PREZENTACJI ──────────────────────────────────
+const SK_PRESENTATIONS = 'mplace_presentations_history';
+
+function getPresentationsHistory() {
+  try { return JSON.parse(localStorage.getItem(SK_PRESENTATIONS) || '[]'); } catch(e) { return []; }
+}
+
+function savePresentationToHistory(aiText, curM, selectedKeys) {
+  const history = getPresentationsHistory();
+  const now = new Date();
+  const isAll = selectedKeys.length === 9;
+  const scopeLabel = isAll ? 'Wszystkie konta (9)' : selectedKeys.map(k => AC_META[k]?.name || k).join(', ');
+  history.unshift({
+    id: Date.now(),
+    curM,
+    scopeLabel,
+    accounts: selectedKeys,
+    date: now.toLocaleDateString('pl-PL', {day:'2-digit', month:'2-digit', year:'numeric'}),
+    time: now.toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'}),
+    content: aiText
+  });
+  if (history.length > 20) history.splice(20);
+  localStorage.setItem(SK_PRESENTATIONS, JSON.stringify(history));
+}
+
+function openPDFsPRModal() {
+  const history = getPresentationsHistory();
+  const list = document.getElementById('pdfsPRList');
+  if (!history.length) {
+    list.innerHTML = '<div class="pdfs-empty">Brak zapisanych prezentacji.<br>Wygeneruj pierwszą prezentację kliencką.</div>';
+  } else {
+    const short = s => s.length > 40 ? s.slice(0, 40) + '...' : s;
+    list.innerHTML = history.map(p => `
+      <div class="pdfs-item" onclick="openSavedPresentation(${p.id})" style="border-color:rgba(180,127,255,.15)">
+        <div class="pdfs-item-icon">◆</div>
+        <div class="pdfs-item-info">
+          <div class="pdfs-item-title">${p.curM.toUpperCase()} · ${short(p.scopeLabel)}</div>
+          <div class="pdfs-item-meta">${p.date} ${p.time}</div>
+        </div>
+        <div class="pdfs-item-del" onclick="event.stopPropagation();deletePresentation(${p.id})">✕</div>
+      </div>`).join('');
+  }
+  document.getElementById('pdfsPRModal').style.display = 'flex';
+}
+
+function closePDFsPRModal() {
+  document.getElementById('pdfsPRModal').style.display = 'none';
+}
+
+function deletePresentation(id) {
+  const history = getPresentationsHistory().filter(p => p.id !== id);
+  localStorage.setItem(SK_PRESENTATIONS, JSON.stringify(history));
+  openPDFsPRModal();
+}
+
+function clearAllPresentations() {
+  if (!confirm('Usunąć wszystkie zapisane prezentacje?')) return;
+  localStorage.removeItem(SK_PRESENTATIONS);
+  openPDFsPRModal();
+}
+
+function openSavedPresentation(id) {
+  const pres = getPresentationsHistory().find(p => p.id === id);
+  if (!pres) return;
+  closePDFsPRModal();
+  openSlideWindow(pres.content, pres.curM, pres.accounts || []);
 }
 
 // ── HISTORIA RAPORTÓW ──────────────────────────────────────
@@ -8523,6 +8593,19 @@ self.addEventListener('fetch', e => e.respondWith(
     <div class="pdfs-modal-footer">
       <span class="pdfs-clear" onclick="clearAllReports()">usuń wszystkie</span>
       <button onclick="closePDFsModal()" style="font-family:var(--mono);font-size:11px;padding:5px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Zamknij</button>
+    </div>
+  </div>
+</div>
+
+<!-- PDFS PR MODAL -->
+<div class="pdfs-modal-overlay" id="pdfsPRModal" style="display:none" onclick="if(event.target===this)closePDFsPRModal()">
+  <div class="pdfs-modal">
+    <div class="pdfs-modal-title">Zapisane <span style="color:#b47fff">Prezentacje</span></div>
+    <div class="pdfs-modal-sub">Kliknij prezentację aby otworzyć bez wydawania tokenów</div>
+    <div class="pdfs-list" id="pdfsPRList"></div>
+    <div class="pdfs-modal-footer">
+      <span class="pdfs-clear" onclick="clearAllPresentations()">usuń wszystkie</span>
+      <button onclick="closePDFsPRModal()" style="font-family:var(--mono);font-size:11px;padding:5px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Zamknij</button>
     </div>
   </div>
 </div>
