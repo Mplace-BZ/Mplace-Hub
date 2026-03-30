@@ -4464,6 +4464,40 @@ function agentAsk(q){
   input.scrollIntoView({behavior:'smooth', block:'center'});
 }
 
+async function readSSE(response) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let assembled = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const payload = line.slice(6).trim();
+      if (payload === '[DONE]') continue;
+      try {
+        const ev = JSON.parse(payload);
+        if (ev.type === 'content_block_delta' && ev.delta && ev.delta.text) assembled += ev.delta.text;
+      } catch(_){}
+    }
+  }
+  if (buffer.startsWith('data: ')) {
+    const payload = buffer.slice(6).trim();
+    if (payload !== '[DONE]') {
+      try {
+        const ev = JSON.parse(payload);
+        if (ev.type === 'content_block_delta' && ev.delta && ev.delta.text) assembled += ev.delta.text;
+      } catch(_){}
+    }
+  }
+  if (!assembled) throw new Error('Brak treści w odpowiedzi API');
+  return assembled;
+}
+
 function buildAgentContext(){
   const now = new Date();
   const curM = MONTHS[now.getMonth()];
@@ -4590,11 +4624,7 @@ async function agentSend(){
       })
     });
 
-    const data = await resp.json();
-    console.log('Agent API response:', JSON.stringify(data).slice(0,500));
-    // Handle error responses from API
-    if(data.error){ responseEl.innerHTML=`<div class="agent-msg" style="border-left-color:var(--red)"><strong>API Error:</strong> ${data.error.message||JSON.stringify(data.error)}</div>`; btn.disabled=false; btn.textContent='▸ Wyślij'; return; }
-    const text = data.content?.map(b => b.text||'').join('') || 'Brak odpowiedzi. Dane API: '+JSON.stringify(data).slice(0,200);
+    const text = await readSSE(resp);
 
     // Format response: convert markdown-like to HTML
     const html = text
@@ -4859,9 +4889,7 @@ Bądź konkretny jak analityk finansowy. Podawaj liczby. Odpowiedz po polsku.`;
         messages: [{ role: 'user', content: reportPrompt }]
       })
     });
-    const data = await resp.json();
-    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-    const text = data.content?.map(b => b.text||'').join('') || '';
+    const text = await readSSE(resp);
     openReportWindow(text, curM, dayNum, snap, filteredGroups, selectedKeys);
     saveReportToHistory(text, curM, dayNum, snap, filteredGroups, selectedKeys);
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--accent)">
@@ -5708,8 +5736,7 @@ async function adsRunAnalysis() {
         messages:[{role:'user',content:prompt}]
       })
     });
-    const data = await res.json();
-    const text = (data.content||[]).map(b=>b.text||'').join('');
+    const text = await readSSE(res);
 
     // Save to history
     const entry = {
