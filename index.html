@@ -4892,7 +4892,7 @@ STRUKTURA PREZENTACJI (12-16 slajdów):
 ---SLAJD 1---
 # [NAZWA GRUPY/KONT] — PODSUMOWANIE [MIESIĄC] [ROK]
 > [podtytuł kontekstowy, np. "Analiza grupy kont - Allegro PL"]
-Data raportu | Przygotował: Agencja eCom
+Data raportu | Przygotował: Mplace | Sprzedaż online bez przepaleń
 
 ---SLAJD 2---
 # EXECUTIVE SUMMARY — [X] KLUCZOWE OBSERWACJE
@@ -4977,7 +4977,7 @@ Tabela lub lista: Działanie | Konto | Właściciel | Termin
 
 ---SLAJD KOŃCOWY---
 # DZIĘKUJEMY
-[Miesiąc] [Rok] | Agencja eCom
+[Miesiąc] [Rok] | Mplace | Sprzedaż online bez przepaleń
 Następny raport: [szacowana data]
 
 CZEGO NIGDY NIE PISAĆ:
@@ -5284,6 +5284,15 @@ function openReportWindow(aiText, curM, dayNum, snap, groups, selectedKeys) {
 function generateSlideReport() {
   document.querySelectorAll('#slideModal .report-check').forEach(el => el.classList.remove('checked'));
   updateSlideCount();
+  // Default: Od = 1. dzień bieżącego miesiąca, Do = wczoraj
+  const now = new Date();
+  const y = now.getFullYear(), mo = now.getMonth();
+  const firstDay = `${y}-${String(mo+1).padStart(2,'0')}-01`;
+  const yest = new Date(now); yest.setDate(now.getDate()-1);
+  const yesterdayStr = `${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
+  document.getElementById('slideDateFrom').value = firstDay;
+  document.getElementById('slideDateTo').value = yesterdayStr;
+  document.getElementById('slideDateWarning').style.display = 'none';
   document.getElementById('slideModal').style.display = 'flex';
 }
 function closeSlideModal() { document.getElementById('slideModal').style.display = 'none'; }
@@ -5299,16 +5308,20 @@ function toggleSlideCheck(el) { el.classList.toggle('checked'); updateSlideCount
 async function runSelectedSlide() {
   const selected = [...document.querySelectorAll('#slideModal .report-check.checked')].map(el => el.dataset.key);
   if (!selected.length) return;
+  const dateFrom = document.getElementById('slideDateFrom').value;
+  const dateTo = document.getElementById('slideDateTo').value;
+  const warnEl = document.getElementById('slideDateWarning');
+  if (!dateFrom || !dateTo) { warnEl.textContent='Wybierz daty zakresu'; warnEl.style.display='block'; return; }
+  if (dateTo < dateFrom) { warnEl.textContent='Błędny zakres dat — "Do" musi być po "Od"'; warnEl.style.display='block'; return; }
+  const daysDiff = Math.round((new Date(dateTo)-new Date(dateFrom))/86400000)+1;
+  if (daysDiff > 31) { warnEl.textContent=`Zakres ${daysDiff} dni — zalecane max 31 dni`; warnEl.style.display='block'; }
   closeSlideModal();
-  await runSlideReport(selected);
+  await runSlideReport(selected, dateFrom, dateTo);
 }
 
-async function runSlideReport(selectedKeys) {
+async function runSlideReport(selectedKeys, dateFrom, dateTo) {
   const responseEl = document.getElementById('agentResponse');
   const now = new Date();
-  const curM = MONTHS[now.getMonth()];
-  const dayNum = now.getDate();
-  const daysInMonth = DAYS_IN[curM] || 30;
   const accLabel = selectedKeys.length === 9 ? 'wszystkich 9 kont' : selectedKeys.length + ' kont';
 
   responseEl.innerHTML = `<div class="agent-thinking">
@@ -5323,45 +5336,82 @@ async function runSlideReport(selectedKeys) {
     LUXSEN:{ accs:['Luxsen','Semmi','BOTAVIT'], prod:60 },
     ONE:   { accs:['Materazzi','MtzzEU','Ankado24'], prod:55 }
   };
-
   const filteredGroups = {};
   Object.entries(groups).forEach(([gKey, g]) => {
     const filteredAccs = g.accs.filter(k => selectedKeys.includes(k));
     if (filteredAccs.length) filteredGroups[gKey] = {...g, accs: filteredAccs};
   });
 
-  let dataCtx = '';
+  // Date range helpers
+  const dFrom = new Date(dateFrom + 'T00:00:00');
+  const dTo   = new Date(dateTo   + 'T23:59:59');
+  const totalDaysRange = Math.round((new Date(dateTo)-new Date(dateFrom))/86400000)+1;
+  const fmtPL = s => { const [y,m,d]=s.split('-'); return `${d}.${m}.${y}`; };
+  const zakresLabel = `${fmtPL(dateFrom)} — ${fmtPL(dateTo)}`;
+
+  // Load D2D snapshots
+  const allD2D = getD2DData();
+  function entryDate(e) {
+    const mIdx = MONTHS.indexOf(e.m);
+    if (mIdx < 0) return null;
+    const yr = e.savedAt ? new Date(e.savedAt).getFullYear() : now.getFullYear();
+    return new Date(yr, mIdx, e.dzien);
+  }
+
+  let dataCtx = `Zakres analizy: ${zakresLabel} (${totalDaysRange} dni kalendarzowych)\n\n`;
+
   Object.entries(filteredGroups).forEach(([gKey, g]) => {
-    dataCtx += `\n=== GRUPA ${gKey} (producent ${g.prod}%) ===\n`;
+    dataCtx += `=== GRUPA ${gKey} (producent ${g.prod}%) ===\n`;
     g.accs.forEach(k => {
-      const D = getData(k);
       const prod = getProd(k);
-      const cur = D.find(d => d.m === curM);
-      const prev = D.filter(d => d.m !== curM).slice(-3);
-      if (!cur) { dataCtx += `${AC_META[k].name}: brak danych za ${curM}\n`; return; }
-      const C = calc(cur, prod);
-      const est = estym(cur);
-      const effDay = effectiveDzien(cur.dzien || dayNum);
-      dataCtx += `\n${AC_META[k].name}:\n`;
-      dataCtx += `  MTD (dzień wpisu: ${cur.dzien||dayNum}, efektywny dzień: ${effDay}, dni w miesiącu: ${daysInMonth})\n`;
-      dataCtx += `  Sprzedaż MTD: ${Math.round(cur.sprzedaz).toLocaleString('pl-PL')} zł | Est. EOM: ${Math.round(est).toLocaleString('pl-PL')} zł (obliczone przez aplikację)\n`;
-      dataCtx += `  Ads: koszt ${Math.round(cur.adsCost||0).toLocaleString('pl-PL')} zł | ROAS ${(cur.roas||0).toFixed(2)} | BE ROAS ${C.beRoasAds.toFixed(2)} | wartość Ads ${Math.round(cur.wartoscAds||0).toLocaleString('pl-PL')} zł\n`;
-      dataCtx += `  Wyróżnienia: ${Math.round(cur.promoC||0).toLocaleString('pl-PL')} zł (${cur.sprzedaz>0?((cur.promoC||0)/cur.sprzedaz*100).toFixed(1):'0'}%)\n`;
-      dataCtx += `  Marża po reklamie: ${C.mAfter.toFixed(1)}% | ROAS Glob: ${(C.roasGlob||0).toFixed(2)} | Prowizja: ${(cur.commission||0).toFixed(1)}%\n`;
-      if (prev.length) {
-        prev.forEach(d => {
-          const Cp = calc(d, prod);
-          dataCtx += `  ${d.m}: sprzedaż ${Math.round(d.sprzedaz).toLocaleString('pl-PL')} zł | marża ${Cp.mAfter.toFixed(1)}% | wyróżnienia ${d.sprzedaz>0?((d.promoC||0)/d.sprzedaz*100).toFixed(1):'0'}%\n`;
-        });
+      const accName = AC_META[k]?.name || k;
+      const entries = allD2D
+        .filter(s => { if(s.account!==k) return false; const d=entryDate(s); return d&&d>=dFrom&&d<=dTo; })
+        .sort((a,b) => entryDate(a)-entryDate(b));
+
+      if (!entries.length) {
+        dataCtx += `\n${accName}: brak danych D2D w zakresie ${zakresLabel}\n`;
+        return;
+      }
+
+      let sprzedazSum=0, adsCostSum=0, wartoscAdsSum=0, promoCSum=0;
+      let marzaWSum=0, marzaWTot=0;
+      entries.forEach(e => {
+        sprzedazSum  += e.sprzedaz||0;
+        adsCostSum   += e.adsCost||0;
+        wartoscAdsSum+= e.wartoscAds||0;
+        promoCSum    += e.promoC||0;
+        const c = calc(e, prod);
+        if (c.rev>0) { marzaWSum += c.mAfter*(e.sprzedaz||0); marzaWTot += e.sprzedaz||0; }
+      });
+
+      const roasAvg  = adsCostSum>0 ? sprzedazSum/adsCostSum : 0;
+      const marzaAvg = marzaWTot>0  ? marzaWSum/marzaWTot : 0;
+      const wyrozPct = sprzedazSum>0 ? promoCSum/sprzedazSum*100 : 0;
+      const adsPct   = sprzedazSum>0 ? adsCostSum/sprzedazSum*100 : 0;
+      const Clast    = calc(entries[entries.length-1], prod);
+      const missing  = totalDaysRange-entries.length;
+      const dataNote = missing>0 ? ` (dane za ${entries.length} z ${totalDaysRange} dni, brak: ${missing} dni)` : ` (${entries.length} dni)`;
+
+      dataCtx += `\n${accName}${dataNote}:\n`;
+      dataCtx += `  Sprzedaż łączna: ${Math.round(sprzedazSum).toLocaleString('pl-PL')} zł\n`;
+      dataCtx += `  Koszt Ads: ${Math.round(adsCostSum).toLocaleString('pl-PL')} zł | ROAS avg: ${roasAvg.toFixed(2)} | BE ROAS: ${Clast.beRoasAds.toFixed(2)}\n`;
+      dataCtx += `  Marża po reklamie (avg ważona): ${marzaAvg.toFixed(1)}%\n`;
+      dataCtx += `  Wyróżnienia: ${Math.round(promoCSum).toLocaleString('pl-PL')} zł (${wyrozPct.toFixed(1)}% sprzedaży) | Ads %: ${adsPct.toFixed(1)}%\n`;
+      if (entries.length>1) {
+        dataCtx += `  Trend dzienny sprzedaż (zł): `;
+        dataCtx += entries.map(e=>`${e.m.substring(0,3)} ${e.dzien}: ${Math.round(e.sprzedaz||0).toLocaleString('pl-PL')}`).join(' | ');
+        dataCtx += '\n';
       }
     });
+    dataCtx += '\n';
   });
 
-  const isAll = selectedKeys.length === 9;
-  const scopeLabel = isAll ? 'wszystkich 9 kont' : selectedKeys.map(k=>AC_META[k]?.name||k).join(', ');
+  const scopeLabel = selectedKeys.length===9 ? 'wszystkich 9 kont' : selectedKeys.map(k=>AC_META[k]?.name||k).join(', ');
   const slidePrompt = `Wygeneruj prezentację kliencką w formacie slajdów.
-Miesiąc: ${curM} ${now.getFullYear()}, dzień: ${dayNum}/${daysInMonth}.
+Zakres dat: ${zakresLabel} (${totalDaysRange} dni kalendarzowych).
 Konta: ${scopeLabel}.
+UWAGA: W nagłówkach slajdów używaj zakresu "${zakresLabel}" zamiast nazwy miesiąca/MTD.
 
 DANE:
 ${dataCtx}
@@ -5380,8 +5430,8 @@ ${SLIDE_REPORT_PROMPT}`;
       })
     });
     const text = await readSSE(resp);
-    openSlideWindow(text, curM, selectedKeys);
-    savePresentationToHistory(text, curM, selectedKeys);
+    openSlideWindow(text, zakresLabel, selectedKeys);
+    savePresentationToHistory(text, zakresLabel, selectedKeys);
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:#b47fff">
       <strong style="color:#b47fff">◆ Prezentacja wygenerowana</strong><br>
       <span style="font-size:11px;color:var(--text3)">Ctrl+P = PDF · zapisano w PDF PR</span>
@@ -5429,7 +5479,7 @@ function openSlideWindow(aiText, curM, selectedKeys) {
     <div class="slide-viewer-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
       <div>
         <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:#111">M<span style="color:#b47fff">Place</span> Hub</div>
-        <div style="font-size:11px;color:#6b7280">Prezentacja kliencka · ${curM.toUpperCase()} ${now.getFullYear()}</div>
+        <div style="font-size:11px;color:#6b7280">Prezentacja kliencka · ${curM.includes('.')?curM:curM.toUpperCase()+' '+now.getFullYear()}</div>
       </div>
       <div style="text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:#6b7280">
         <div style="display:inline-block;background:#faf5ff;color:#b47fff;border:1px solid rgba(180,127,255,.3);border-radius:4px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;margin-bottom:4px">Prezentacja</div><br>
@@ -8793,6 +8843,17 @@ self.addEventListener('fetch', e => e.respondWith(
       <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="slideSelectedCount">0 kont wybranych</span>
       <span class="report-select-all" onclick="slideSelectAll()">zaznacz wszystkie</span>
       <span class="report-select-all" onclick="slideSelectNone()">odznacz</span>
+    </div>
+
+    <div style="margin-top:.85rem;padding:.65rem .8rem;background:var(--bg3);border:1px solid var(--border2);border-radius:7px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:.5rem;letter-spacing:.06em">ZAKRES DAT</div>
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+        <label style="font-family:var(--mono);font-size:10px;color:var(--text2)">Od:</label>
+        <input type="date" id="slideDateFrom" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none;color-scheme:dark">
+        <label style="font-family:var(--mono);font-size:10px;color:var(--text2)">Do:</label>
+        <input type="date" id="slideDateTo" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none;color-scheme:dark">
+      </div>
+      <div id="slideDateWarning" style="font-family:var(--mono);font-size:9px;color:#f59e0b;margin-top:.4rem;display:none"></div>
     </div>
 
     <div class="report-modal-actions">
