@@ -1,5 +1,30 @@
 # MPlace Hub — instrukcje dla Claude Code
 
+## ⚠️ KRYTYCZNE ZASADY — CZEGO NIE RUSZAĆ
+
+### Agent / Cloudflare Worker / SSE
+- NIE modyfikuj funkcji fetch wysyłającej zapytania do Cloudflare Worker
+- NIE zmieniaj obsługi odpowiedzi SSE (stream reader, chunks, delta.text)
+- NIE zastępuj SSE readera zwykłym response.json()
+- Worker URL: https://red-haze-5f37mplace-agent.contactmplace.workers.dev
+- Worker zawsze zwraca SSE (text/event-stream) — kod MUSI to obsługiwać
+- Jeśli Agent działa poprawnie → nie dotykaj kodu fetch/stream/Worker
+
+### Zapis danych
+- Save = zawsze saveAllWithSync() — nigdy saveAll()
+- Nie modyfikuj logiki zapisu bez wyraźnej instrukcji
+
+### Firebase
+- Flaga _fsLoaded — nie usuwaj, chroni przed nadpisaniem świeżych danych
+- onAuthStateChanged może strzelać wielokrotnie — to normalne, nie "naprawiaj"
+
+### Print CSS
+- Nigdy nie modyfikuj @media print — bez wyjątków
+
+### Playbook
+- PLAYBOOK_SECTIONS musi być zdefiniowany PRZED funkcją openPlaybook()
+- Nie skracaj promptów — wszystkie 100 musi być zachowane w pełnej treści
+
 ## Stack
 - Vanilla JS, jeden plik index.html (~450KB, ~6800 linii)
 - Chart.js 4.4.1 + datalabels plugin
