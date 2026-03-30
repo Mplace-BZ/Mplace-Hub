@@ -2558,49 +2558,87 @@ function renderCompare(){
     </tr>`;
   }).join('');
 
+  // Tooltip helpers (created once, reused)
+  function ensureSparkTip(){
+    let t=document.getElementById('_sparkTip');
+    if(!t){
+      t=document.createElement('div');
+      t.id='_sparkTip';
+      t.style.cssText='position:fixed;z-index:9999;background:#1e2333;border:1px solid rgba(255,255,255,.18);border-radius:5px;padding:3px 8px;font-family:"DM Mono",monospace;font-size:11px;color:#fff;pointer-events:none;opacity:0;transition:opacity .1s;white-space:nowrap';
+      document.body.appendChild(t);
+    }
+    return t;
+  }
+  window._showSparkTip=function(e,val,mon){
+    const t=ensureSparkTip();
+    t.textContent=mon+': '+val;
+    t.style.left=(e.clientX+14)+'px';
+    t.style.top=(e.clientY-28)+'px';
+    t.style.opacity='1';
+  };
+  window._hideSparkTip=function(){
+    const t=document.getElementById('_sparkTip');
+    if(t) t.style.opacity='0';
+  };
+
   // Trend chart HTML (mini sparklines via simple bars)
   const sparklines = data.map(d=>{
-    const spVals=d.D.slice(-6).map(x=>estym(x));
+    const slicedD=d.D.slice(-6);
+    const spVals=slicedD.map(x=>estym(x));
     const maxV=Math.max(...spVals);
     const bars=spVals.map((v,i)=>{
-      const h=maxV>0?Math.round(v/maxV*40):0;
+      const h=maxV>0?Math.round(v/maxV*48):0;
       const isLast=i===spVals.length-1;
-      return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-        <div style="width:18px;height:${h}px;background:${isLast?'var(--accent)':'var(--bg3)'};border-radius:2px;align-self:flex-end;min-height:2px"></div>
-        <div style="font-family:var(--mono);font-size:7px;color:var(--text3)">${d.D.slice(-6)[i]?.m.substring(0,3).toUpperCase()}</div>
+      const mon=slicedD[i]?.m.substring(0,3).toUpperCase()||'';
+      const valFmt=pln(v);
+      // inactive bars: #283044 (5% lighter than var(--bg3)=#1e2333)
+      const barBg=isLast?'var(--accent)':'#283044';
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:default"
+        onmouseenter="_showSparkTip(event,'${valFmt}','${mon}')"
+        onmouseleave="_hideSparkTip()">
+        <div style="width:18px;height:${h}px;background:${barBg};border-radius:2px;align-self:flex-end;min-height:2px"></div>
+        <div style="font-family:var(--mono);font-size:7px;color:var(--text3)">${mon}</div>
       </div>`;
     }).join('');
+
     const mAfter=d.C.mAfter;
     const mColor=mAfter>=15?'var(--green)':mAfter>=10?'var(--yellow)':'var(--red)';
     const roasColor=d.C.roasAds&&d.C.beRoasAds?(d.C.roasAds>=d.C.beRoasAds?'var(--green)':d.C.roasAds>=d.C.beRoasAds*0.85?'var(--yellow)':'var(--red)'):'var(--text)';
     const dvTxt=d.dv!==null?(d.dv>=0?'▲':'▼')+Math.abs(d.dv).toFixed(0)+'%':'—';
     const dvColor=d.dv===null?'var(--text3)':d.dv>=0?'var(--green)':'var(--red)';
     const gBorder=gColors[d.group];
+
     return `<div class="card" style="flex:1;min-width:220px;border-left:3px solid ${gBorder}">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
-        <div>
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:${gBorder};margin-bottom:2px">${d.group}</div>
-          <div style="font-size:13px;font-weight:600;color:var(--text)">${d.name}</div>
-        </div>
-        <div style="font-family:var(--mono);font-size:11px;color:${dvColor};font-weight:600">${dvTxt}</div>
+      <!-- header -->
+      <div style="margin-bottom:.55rem">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:${gBorder};margin-bottom:2px">${d.group}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${d.name}</div>
       </div>
-      <div style="display:flex;align-items:flex-end;gap:3px;height:44px;margin-bottom:.5rem">${bars}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem .6rem">
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Estymacja</div>
-          <div style="font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:500">${pln(d.est)}</div>
-        </div>
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Marża</div>
-          <div style="font-family:var(--mono);font-size:12px;color:${mColor};font-weight:500">${pct(mAfter)}</div>
-        </div>
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">ROAS</div>
-          <div style="font-family:var(--mono);font-size:12px;color:${roasColor};font-weight:500">${xf(d.C.roasAds)}</div>
-        </div>
-        <div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">ACOS</div>
-          <div style="font-family:var(--mono);font-size:12px;color:var(--text2)">${d.C.acosTotal!=null?pct(d.C.acosTotal):'—'}</div>
+      <!-- body: sparkline LEFT | metrics RIGHT -->
+      <div style="display:flex;gap:.65rem;align-items:flex-end">
+        <!-- left: bars full height -->
+        <div style="display:flex;align-items:flex-end;gap:3px;flex-shrink:0">${bars}</div>
+        <!-- right: % badge + 2x2 metrics -->
+        <div style="flex:1;display:flex;flex-direction:column;gap:.25rem">
+          <div style="font-family:var(--mono);font-size:11px;color:${dvColor};font-weight:600;text-align:right;line-height:1">${dvTxt}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.25rem .5rem">
+            <div>
+              <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Estymacja</div>
+              <div style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:500">${pln(d.est)}</div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Marża</div>
+              <div style="font-family:var(--mono);font-size:11px;color:${mColor};font-weight:500">${pct(mAfter)}</div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">ROAS</div>
+              <div style="font-family:var(--mono);font-size:11px;color:${roasColor};font-weight:500">${xf(d.C.roasAds)}</div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">ACOS</div>
+              <div style="font-family:var(--mono);font-size:11px;color:var(--text2)">${d.C.acosTotal!=null?pct(d.C.acosTotal):'—'}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>`;
