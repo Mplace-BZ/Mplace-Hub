@@ -2626,7 +2626,7 @@ function initDashboardExtras(){
       return `<div class="traffic-item">
         <div class="traffic-dot" style="background:${dot}"></div>
         <div class="traffic-name">${ACC_SHORT[a.k]||a.name.slice(0,8)}</div>
-        <div class="traffic-value" style="color:${vc}">${wp.toFixed(1)}%</div>
+        <div class="traffic-value" style="color:${vc}">${wp>0&&wp<1?wp.toFixed(2):wp.toFixed(1)}%</div>
       </div>`;
     }).join('');
   }
