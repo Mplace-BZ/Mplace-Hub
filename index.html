@@ -308,18 +308,16 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
   #reportOverlay .rh { break-inside:avoid; }
 
   /* ── PREZENTACJA — każdy slajd od nowej strony ── */
-  .slide-block {
+  .slide-block + .slide-block {
     page-break-before: always !important;
     break-before: page !important;
+  }
+  .slide-block {
     page-break-inside: auto;
     break-inside: auto;
     padding: 20mm 18mm 16mm 18mm;
     box-sizing: border-box;
     width: 100%;
-  }
-  .slide-block:first-child {
-    page-break-before: avoid !important;
-    break-before: avoid !important;
   }
   .slide-number,
   .slide-title {
