@@ -263,6 +263,28 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .bubble-legend-dot{width:10px;height:10px;border-radius:50%;}
 
 
+/* ── DASHBOARD EXTRAS ── */
+.kpi-summary-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.kpi-tile{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;}
+.kpi-tile--alert{border-color:#f44336;}
+.kpi-tile--fee{border-color:var(--accent);}
+.kpi-label{font-size:10px;font-family:var(--mono);letter-spacing:.08em;color:var(--text3);margin-bottom:6px;text-transform:uppercase;}
+.kpi-value{font-size:24px;font-family:var(--mono);font-weight:600;line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:11px;color:var(--text3);font-family:var(--mono);}
+.dashboard-row-2col{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px;}
+.panel-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;}
+.panel-title{font-size:10px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;}
+.panel-sub{font-size:11px;color:var(--text3);margin-bottom:12px;}
+.traffic-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.traffic-item{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.traffic-dot{width:32px;height:32px;border-radius:50%;}
+.traffic-name{font-size:9px;font-family:var(--mono);text-align:center;color:var(--text3);text-transform:uppercase;}
+.traffic-value{font-size:11px;font-family:var(--mono);font-weight:600;}
+.heatmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.heatmap-cell{border-radius:6px;padding:10px 8px;text-align:center;border:1px solid rgba(255,255,255,.05);}
+.heatmap-name{font-size:9px;font-family:var(--mono);text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:4px;}
+.heatmap-value{font-size:16px;font-family:var(--mono);font-weight:600;}
+
 /* ── SLIDE DASHBOARD ── */
 .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0;}
 .dashboard-card{border:1px solid #e5e7eb;border-radius:8px;padding:16px;background:#fff;}
@@ -1084,6 +1106,58 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
       <span style="color:var(--green)">●</span> rentowne &nbsp;
       <span style="color:var(--yellow)">●</span> do optymalizacji &nbsp;
       <span style="color:var(--red)">●</span> interwencja
+    </div>
+  </div>
+
+  <!-- KPI SUMMARY BAR -->
+  <div class="kpi-summary-bar">
+    <div class="kpi-tile">
+      <div class="kpi-label">Sprzedaż MTD · Agencja</div>
+      <div class="kpi-value" id="kpiTotalSales">—</div>
+      <div class="kpi-sub" id="kpiTotalEOM">est. EOM: —</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">Średni ROAS · 9 Kont</div>
+      <div class="kpi-value" id="kpiAvgRoas">—</div>
+      <div class="kpi-sub" id="kpiRoasRange">min — max</div>
+    </div>
+    <div class="kpi-tile kpi-tile--alert">
+      <div class="kpi-label">Konta w Czerwieni</div>
+      <div class="kpi-value" id="kpiRedAccounts">—</div>
+      <div class="kpi-sub" id="kpiRedNames">—</div>
+    </div>
+    <div class="kpi-tile kpi-tile--fee">
+      <div class="kpi-label">Szacowany Fee · Agencja</div>
+      <div class="kpi-value" id="kpiFee">—</div>
+      <div class="kpi-sub">netto / mies.</div>
+    </div>
+  </div>
+
+  <!-- SEKCJA 2: TRAFFIC LIGHT + RANKING -->
+  <div class="dashboard-row-2col">
+    <div class="panel-box">
+      <div class="panel-title">Wyróżnienia · Status</div>
+      <div class="panel-sub">cel: ≤3% sprzedaży</div>
+      <div class="traffic-grid" id="trafficLightGrid"></div>
+    </div>
+    <div class="panel-box">
+      <div class="panel-title">Sprzedaż MTD · Ranking</div>
+      <div class="panel-sub">wszystkie konta · bieżący miesiąc</div>
+      <canvas id="rankingBarChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- SEKCJA 3: HEATMAP + TREND -->
+  <div class="dashboard-row-2col">
+    <div class="panel-box">
+      <div class="panel-title">Marża · Heatmap</div>
+      <div class="panel-sub">bieżący miesiąc</div>
+      <div class="heatmap-grid" id="heatmapGrid"></div>
+    </div>
+    <div class="panel-box">
+      <div class="panel-title">Trend Sprzedaży · 6 Miesięcy</div>
+      <div class="panel-sub">per grupa: MEBLE · LUXSEN · ONE</div>
+      <canvas id="trendLineChart" height="180"></canvas>
     </div>
   </div>
 
@@ -2151,6 +2225,7 @@ function showView(v){
     document.getElementById('viewDashboard').classList.add('active');
     document.getElementById('navDashboard').classList.add('active');
     renderDashboard();
+    initDashboardExtras();
   } else if(v==='sim'){
     document.getElementById('viewSim').classList.add('active');
     document.getElementById('navSim').classList.add('active');
@@ -2481,6 +2556,165 @@ function toggleCmpAcc(k, btn){
 }
 
 
+
+// ── DASHBOARD EXTRAS ─────────────────────────────────────
+function initDashboardExtras(){
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const ALL_KEYS = Object.keys(AC_META);
+  const GROUPS_DEF = {
+    MEBLE:  { accs:['MobelKap','PerfektCiecie','MeblenaCzasie'], prod:65, color:'#ff6b35' },
+    LUXSEN: { accs:['Luxsen','Semmi','BOTAVIT'],                 prod:60, color:'#2dd4a0' },
+    ONE:    { accs:['Materazzi','MtzzEU','Ankado24'],            prod:55, color:'#b47fff' }
+  };
+  const GRP_OF = {};
+  Object.entries(GROUPS_DEF).forEach(([g,def])=>def.accs.forEach(k=>{GRP_OF[k]=g;}));
+
+  // Collect current-month data per account
+  const accData = ALL_KEYS.map(k=>{
+    const D=getData(k), prod=getProd(k);
+    const last=D.find(d=>d.m===curM)||D[D.length-1];
+    if(!last) return {k, sp:0, est:0, C:null};
+    const C=calc(last,prod), est=estym(last);
+    return {k, name:AC_META[k].name, group:GRP_OF[k]||'', sp:last.sprzedaz||0, est, C, last};
+  }).filter(a=>a.C);
+
+  // ── KPI BAR ──────────────────────────────────────────
+  const totalSales = accData.reduce((s,a)=>s+a.sp, 0);
+  const totalEOM   = accData.reduce((s,a)=>s+a.est, 0);
+  const roasList   = accData.filter(a=>a.C.roasAds>0).map(a=>({roas:a.C.roasAds,sp:a.sp}));
+  const roasWSum   = roasList.reduce((s,a)=>s+a.roas*a.sp, 0);
+  const roasWSp    = roasList.reduce((s,a)=>s+a.sp, 0);
+  const avgRoas    = roasWSp>0 ? roasWSum/roasWSp : 0;
+  const roasVals   = roasList.map(a=>a.roas);
+  const minRoas    = roasVals.length ? Math.min(...roasVals) : 0;
+  const maxRoas    = roasVals.length ? Math.max(...roasVals) : 0;
+  const redAccs    = accData.filter(a=>a.C.roasAds>0&&(a.C.roasAds<a.C.beRoasAds||a.C.mAfter<5));
+
+  // Fee calculation
+  const luxsenMarza = ['Luxsen','Semmi','BOTAVIT'].reduce((s,k)=>{
+    const a=accData.find(x=>x.k===k); return s+(a?a.C.zysk:0);
+  },0);
+  const feeMEBLE   = 7500;
+  const feeLUXSEN  = Math.max(0,luxsenMarza*0.20/1.23);
+  const feeONE     = (3500+3500+2900)/1.23;
+  const totalFee   = feeMEBLE + feeLUXSEN + feeONE;
+
+  const setText = (id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  setText('kpiTotalSales', pln(totalSales));
+  setText('kpiTotalEOM',   'est. EOM: '+pln(totalEOM));
+  setText('kpiAvgRoas',    avgRoas.toFixed(2)+'x');
+  setText('kpiRoasRange',  'min '+minRoas.toFixed(2)+'x — max '+maxRoas.toFixed(2)+'x');
+  setText('kpiRedAccounts', redAccs.length||'0');
+  setText('kpiRedNames',   redAccs.length ? redAccs.map(a=>a.name.slice(0,8)).join(', ') : 'wszystko OK');
+  setText('kpiFee',        pln(Math.round(totalFee)));
+
+  // Color kpi-value for red tile
+  const redEl=document.getElementById('kpiRedAccounts');
+  if(redEl) redEl.style.color=redAccs.length>0?'#f44336':'#4caf50';
+
+  // ── TRAFFIC LIGHT ─────────────────────────────────────
+  const tGrid=document.getElementById('trafficLightGrid');
+  if(tGrid){
+    tGrid.innerHTML=accData.map(a=>{
+      const wp=a.sp>0?((a.last.promoC||0)/a.sp*100):0;
+      const dot=wp<=3?'#4caf50':wp<=6?'#ff9800':'#f44336';
+      const vc=wp<=3?'#4caf50':wp<=6?'#ff9800':'#f44336';
+      return `<div class="traffic-item">
+        <div class="traffic-dot" style="background:${dot}"></div>
+        <div class="traffic-name">${a.name.slice(0,8)}</div>
+        <div class="traffic-value" style="color:${vc}">${wp.toFixed(1)}%</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── RANKING BAR CHART ──────────────────────────────────
+  if(window._rankingChart){ window._rankingChart.destroy(); window._rankingChart=null; }
+  const rankCanvas=document.getElementById('rankingBarChart');
+  if(rankCanvas && typeof Chart!=='undefined'){
+    const GC={'MEBLE':'#ff6b35','LUXSEN':'#2dd4a0','ONE':'#b47fff'};
+    const sorted=[...accData].sort((a,b)=>b.sp-a.sp);
+    window._rankingChart=new Chart(rankCanvas,{
+      type:'bar',
+      data:{
+        labels:sorted.map(a=>a.name),
+        datasets:[{
+          label:'Sprzedaż MTD',
+          data:sorted.map(a=>a.sp),
+          backgroundColor:sorted.map(a=>GC[a.group]||'#8b91a8'),
+          borderRadius:4,
+        }]
+      },
+      options:{
+        indexAxis:'y',responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{ticks:{callback:v=>(v/1000).toFixed(0)+'k zł',color:'#8b91a8',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,.05)'}},
+          y:{ticks:{color:'#e5e7eb',font:{family:'DM Mono',size:10}},grid:{display:false}}
+        }
+      }
+    });
+  }
+
+  // ── HEATMAP ────────────────────────────────────────────
+  const ORDER=['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
+  const hGrid=document.getElementById('heatmapGrid');
+  if(hGrid){
+    hGrid.innerHTML=ORDER.map(k=>{
+      const a=accData.find(x=>x.k===k);
+      const m=a?a.C.mAfter:null;
+      let bg='rgba(139,145,168,.15)';
+      let vc='var(--text)';
+      if(m!==null){
+        if(m>=20)     {bg='rgba(76,175,80,.5)';  vc='#4caf50';}
+        else if(m>=15){bg='rgba(76,175,80,.3)';  vc='#4caf50';}
+        else if(m>=10){bg='rgba(76,175,80,.15)'; vc='#81c784';}
+        else if(m>=5) {bg='rgba(255,152,0,.2)';  vc='#ff9800';}
+        else if(m>=0) {bg='rgba(244,67,54,.3)';  vc='#f44336';}
+        else          {bg='rgba(244,67,54,.6)';  vc='#ef5350';}
+      }
+      return `<div class="heatmap-cell" style="background:${bg}">
+        <div class="heatmap-name">${a?a.name.slice(0,7):k.slice(0,7)}</div>
+        <div class="heatmap-value" style="color:${vc}">${m!==null?m.toFixed(1)+'%':'—'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── TREND LINE CHART ───────────────────────────────────
+  if(window._trendChart){ window._trendChart.destroy(); window._trendChart=null; }
+  const tCanvas=document.getElementById('trendLineChart');
+  if(tCanvas && typeof Chart!=='undefined'){
+    // Last 6 months
+    const curIdx=MONTHS.indexOf(curM);
+    const months6=Array.from({length:6},(_,i)=>MONTHS[(curIdx-5+i+12)%12]);
+    const labels6=months6.map(m=>m.substring(0,3)[0].toUpperCase()+m.substring(1,3));
+    const grpSales=(grpKeys,m)=>{
+      return grpKeys.reduce((s,k)=>{
+        const rec=getData(k).find(d=>d.m===m);
+        return s+(rec?rec.sprzedaz||0:0);
+      },0);
+    };
+    window._trendChart=new Chart(tCanvas,{
+      type:'line',
+      data:{
+        labels:labels6,
+        datasets:[
+          {label:'MEBLE',  data:months6.map(m=>grpSales(['MobelKap','PerfektCiecie','MeblenaCzasie'],m)), borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,.1)',tension:.4,fill:true,pointRadius:4},
+          {label:'LUXSEN', data:months6.map(m=>grpSales(['Luxsen','Semmi','BOTAVIT'],m)),                  borderColor:'#2dd4a0',backgroundColor:'rgba(45,212,160,.1)',tension:.4,fill:true,pointRadius:4},
+          {label:'ONE',    data:months6.map(m=>grpSales(['Materazzi','MtzzEU','Ankado24'],m)),             borderColor:'#b47fff',backgroundColor:'rgba(180,127,255,.1)',tension:.4,fill:true,pointRadius:4}
+        ]
+      },
+      options:{
+        responsive:true,
+        plugins:{legend:{position:'top',labels:{color:'#e5e7eb',font:{family:'DM Mono',size:10}}}},
+        scales:{
+          x:{ticks:{color:'#8b91a8',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,.05)'}},
+          y:{ticks:{callback:v=>(v/1000).toFixed(0)+'k',color:'#8b91a8',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,.05)'}}
+        }
+      }
+    });
+  }
+}
 
 function renderCompare(){
   const accs=[...selectedAccounts];
@@ -3420,6 +3654,7 @@ async function saveAllWithSync(){
 
   showSaveConfirm(savedKeys, saved, updated, curM, firebaseOk);
   updateAlertBadge();
+  if(document.getElementById('viewDashboard')?.classList.contains('active')) initDashboardExtras();
 }
 
 // ── Auth state listener ──
