@@ -2571,6 +2571,7 @@ function initDashboardExtras(){
   };
   const GRP_OF = {};
   Object.entries(GROUPS_DEF).forEach(([g,def])=>def.accs.forEach(k=>{GRP_OF[k]=g;}));
+  const ACC_SHORT = {MobelKap:'MoK',PerfektCiecie:'PeC',MeblenaCzasie:'MnC',Luxsen:'Lux',Semmi:'Sem',BOTAVIT:'BoV',Materazzi:'Mtz',MtzzEU:'mEU',Ankado24:'a24'};
 
   // Collect current-month data per account
   const accData = ALL_KEYS.map(k=>{
@@ -2608,7 +2609,7 @@ function initDashboardExtras(){
   setText('kpiAvgRoas',    avgRoas.toFixed(2)+'x');
   setText('kpiRoasRange',  'min '+minRoas.toFixed(2)+'x — max '+maxRoas.toFixed(2)+'x');
   setText('kpiRedAccounts', redAccs.length||'0');
-  setText('kpiRedNames',   redAccs.length ? redAccs.map(a=>a.name.slice(0,8)).join(', ') : 'wszystko OK');
+  setText('kpiRedNames',   redAccs.length ? redAccs.map(a=>ACC_SHORT[a.k]||a.name.slice(0,8)).join(', ') : 'wszystko OK');
   setText('kpiFee',        pln(Math.round(totalFee)));
 
   // Color kpi-value for red tile
@@ -2624,7 +2625,7 @@ function initDashboardExtras(){
       const vc=wp<=3?'#4caf50':wp<=6?'#ff9800':'#f44336';
       return `<div class="traffic-item">
         <div class="traffic-dot" style="background:${dot}"></div>
-        <div class="traffic-name">${a.name.slice(0,8)}</div>
+        <div class="traffic-name">${ACC_SHORT[a.k]||a.name.slice(0,8)}</div>
         <div class="traffic-value" style="color:${vc}">${wp.toFixed(1)}%</div>
       </div>`;
     }).join('');
@@ -2676,7 +2677,7 @@ function initDashboardExtras(){
         else          {bg='rgba(244,67,54,.6)';  vc='#ef5350';}
       }
       return `<div class="heatmap-cell" style="background:${bg}">
-        <div class="heatmap-name">${a?a.name.slice(0,7):k.slice(0,7)}</div>
+        <div class="heatmap-name">${ACC_SHORT[k]||k.slice(0,7)}</div>
         <div class="heatmap-value" style="color:${vc}">${m!==null?m.toFixed(1)+'%':'—'}</div>
       </div>`;
     }).join('');
