@@ -2609,35 +2609,35 @@ function renderCompare(){
     const gBorder=gColors[d.group];
 
     return `<div class="card" style="flex:1;min-width:220px;border-left:3px solid ${gBorder}">
-      <!-- header -->
-      <div style="margin-bottom:.55rem">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:${gBorder};margin-bottom:2px">${d.group}</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text)">${d.name}</div>
+      <!-- header: group + name + % badge top-right -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.55rem">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:${gBorder};margin-bottom:2px">${d.group}</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${d.name}</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:11px;color:${dvColor};font-weight:600;line-height:1;padding-top:1px">${dvTxt}</div>
       </div>
       <!-- body: sparkline LEFT | metrics RIGHT -->
       <div style="display:flex;gap:1.4rem;align-items:flex-end">
-        <!-- left: bars full height -->
+        <!-- left: bars -->
         <div style="display:flex;align-items:flex-end;gap:3px;flex-shrink:0">${bars}</div>
-        <!-- right: % badge top-right + 2x2 metrics -->
-        <div style="flex:1;display:flex;flex-direction:column;gap:.3rem">
-          <div style="font-family:var(--mono);font-size:11px;color:${dvColor};font-weight:600;text-align:right;line-height:1">${dvTxt}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem .4rem">
-            <div>
-              <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Estymacja</div>
-              <div style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:500">${pln(d.est)}</div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Marża</div>
-              <div style="font-family:var(--mono);font-size:11px;color:${mColor};font-weight:500">${pct(mAfter)}</div>
-            </div>
-            <div>
-              <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">ROAS</div>
-              <div style="font-family:var(--mono);font-size:11px;color:${roasColor};font-weight:500">${xf(d.C.roasAds)}</div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">ACOS</div>
-              <div style="font-family:var(--mono);font-size:11px;color:var(--text2)">${d.C.acosTotal!=null?pct(d.C.acosTotal):'—'}</div>
-            </div>
+        <!-- right: 2x2 metrics, no gap between cols -->
+        <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:.3rem .1rem">
+          <div>
+            <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Estymacja</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:500">${pln(d.est)}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Marża</div>
+            <div style="font-family:var(--mono);font-size:11px;color:${mColor};font-weight:500">${pct(mAfter)}</div>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">ROAS</div>
+            <div style="font-family:var(--mono);font-size:11px;color:${roasColor};font-weight:500">${xf(d.C.roasAds)}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">ACOS</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text2)">${d.C.acosTotal!=null?pct(d.C.acosTotal):'—'}</div>
           </div>
         </div>
       </div>
