@@ -1464,9 +1464,9 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="openPlaybook('BA')" class="agent-chip" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.08)">Biznes</button>
     <div style="flex:1"></div>
     <button onclick="generateMTDReport()" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:#ff6b35;background:rgba(255,107,53,.08)">Raport MTD</button>
-    <button onclick="openPDFsModal()" class="agent-chip" style="border-color:rgba(255,107,53,.3);color:#ff6b35;background:rgba(255,107,53,.07)">PDF's</button>
+    <button onclick="openPDFsModal()" class="agent-chip" style="border-color:rgba(255,107,53,.3);color:#ff6b35;background:rgba(255,107,53,.07)">PDF</button>
     <button onclick="generateSlideReport()" class="agent-chip" style="border-color:rgba(180,127,255,.4);color:#b47fff;background:rgba(180,127,255,.08)">◆ Prezentacja</button>
-    <button onclick="openPDFsPRModal()" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.07)">PDF's PR</button>
+    <button onclick="openPDFsPRModal()" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.07)">PDF PR</button>
   </div>
 
   <!-- Input -->
@@ -5121,7 +5121,7 @@ Bądź konkretny jak analityk finansowy. Podawaj liczby. Odpowiedz po polsku.`;
     saveReportToHistory(text, curM, dayNum, snap, filteredGroups, selectedKeys);
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--accent)">
       <strong style="color:var(--accent)">Raport MTD wygenerowany</strong><br>
-      <span style="font-size:11px;color:var(--text3)">Zapisano w PDF's · Ctrl+P = PDF</span>
+      <span style="font-size:11px;color:var(--text3)">Zapisano w PDF · Ctrl+P = PDF</span>
     </div>`;
   } catch(err) {
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)">
@@ -5363,7 +5363,7 @@ ${SLIDE_REPORT_PROMPT}`;
     savePresentationToHistory(text, curM, selectedKeys);
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:#b47fff">
       <strong style="color:#b47fff">◆ Prezentacja wygenerowana</strong><br>
-      <span style="font-size:11px;color:var(--text3)">Ctrl+P = PDF · zapisano w PDF's PR</span>
+      <span style="font-size:11px;color:var(--text3)">Ctrl+P = PDF · zapisano w PDF PR</span>
     </div>`;
   } catch(err) {
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)">
