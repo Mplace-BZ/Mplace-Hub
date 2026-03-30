@@ -1423,6 +1423,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button onclick="openPlaybook('BA')" class="agent-chip" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.08)">📋 Biznes</button>
     <div style="flex:1"></div>
     <button onclick="generateMTDReport()" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:var(--accent);background:rgba(255,107,53,.08)">📊 Raport MTD</button>
+    <button onclick="generateSlideReport()" class="agent-chip" style="border-color:rgba(180,127,255,.4);color:#b47fff;background:rgba(180,127,255,.08)">◆ Prezentacja</button>
     <button onclick="openPDFsModal()" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.07)">📁 PDF's</button>
   </div>
 
@@ -4530,29 +4531,70 @@ function buildAgentContext(){
     });
   });
 
-  let ctx = `Jesteś wewnętrznym analitykiem agencji e-commerce zarządzającej kontami Allegro.
-Dzisiaj: ${now.toLocaleDateString('pl-PL', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.
-Bieżący miesiąc: ${curM}, dzień: ${now.getDate()}/30.
+  // Build dynamic account structure from GROUPS
+  let structureBlock = 'STRUKTURA KONT (dynamiczna):\n';
+  Object.entries(GROUPS).forEach(([gKey, g]) => {
+    const names = g.accs.map(k => AC_META[k].name).join(', ');
+    const prod = getProd(g.accs[0]);
+    structureBlock += `- Grupa ${gKey} (producent ${prod}%): ${names}\n`;
+  });
 
-FILOZOFIA ANALIZY — tak myśl o danych:
-- MeblenaCzasie = benchmark efektywności grupy MEBLE: wyróżnienia ~3% sprzedaży, Smart jako dźwignia konwersji
-- Konta MEBLE sprzedają ten sam asortyment → kanibalizacja to realny koszt
+  // Find dynamic benchmark per group (highest margin + lowest ads%)
+  let benchmarkBlock = 'BENCHMARK PER GRUPA (dynamiczny — obliczony z danych bieżącego miesiąca):\n';
+  Object.entries(GROUPS).forEach(([gKey, g]) => {
+    const candidates = g.accs.map(k => {
+      const D = getData(k); const prod = getProd(k);
+      const cur = D.find(d => d.m === curM);
+      if (!cur || !cur.sprzedaz) return null;
+      const C = calc(cur, prod);
+      const adsPct = cur.sprzedaz > 0 ? (cur.adsCost||0)/cur.sprzedaz*100 : 100;
+      return { name: AC_META[k].name, mAfter: C.mAfter, adsPct };
+    }).filter(Boolean);
+    if (candidates.length > 1) {
+      const best = candidates.sort((a,b) => (b.mAfter - a.mAfter) || (a.adsPct - b.adsPct))[0];
+      benchmarkBlock += `- ${gKey}: benchmark = ${best.name} (marża ${best.mAfter.toFixed(1)}%, Ads ${best.adsPct.toFixed(1)}%)\n`;
+    } else {
+      benchmarkBlock += `- ${gKey}: tylko 1 konto — benchmark nie dotyczy\n`;
+    }
+  });
+
+  const daysInMonth = DAYS_IN[curM] || 30;
+
+  let ctx = `ROLA:
+Jesteś doradcą e-commerce piszącym profesjonalny raport miesięczny dla klienta agencji.
+Raport jest dokumentem zewnętrznym — idzie bezpośrednio do właściciela konta.
+Ton musi być partnerski, doradczy i konstruktywny.
+
+Dzisiaj: ${now.toLocaleDateString('pl-PL', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}.
+Bieżący miesiąc: ${curM}, dzień: ${now.getDate()}/${daysInMonth}.
+
+DANE WEJŚCIOWE:
+Otrzymujesz dane dla wybranych kont z jednej lub wielu grup (MEBLE / LUXSEN / ONE).
+Konta i ich dane są przekazywane dynamicznie — pracuj wyłącznie na danych które otrzymałeś, nie zakładaj żadnych konkretnych nazw ani wartości.
+
+${structureBlock}
+${benchmarkBlock}
+BENCHMARK — ZASADY:
+- Jeśli w wybranych kontach jest więcej niż jedno konto z tej samej grupy, konto z najwyższą marżą i najniższym % kosztów Ads staje się benchmarkiem grupy.
+- Opisuj dystans pozostałych kont do benchmarku — nigdy odwrotnie.
+- Jeśli wybrano tylko jedno konto — nie stosuj benchmarku, analizuj konto względem jego własnej historii.
+
+FILOZOFIA ANALIZY:
+- Konta w tej samej grupie mogą sprzedawać ten sam asortyment → kanibalizacja to realny koszt
 - Główna dźwignia kosztowa: wyróżnienia poza Ads (promoC), nie Ads — Ads są podobne % na wszystkich kontach
 - Benchmark przepalania: wyróżnienia >5% sprzedaży = sygnał do cięcia
 - Koszt efektywności = (Ads + wyróżnienia) / sprzedaż × 100 — im niższy tym lepiej
 - Marża rosnąca + rosnący ROAS = zdrowy wzrost; marża spada + rosną koszty = przepalanie
-- Efekt zarządzania = różnica vs trend grupy (ile by stracono bez aktywnego zarządzania)
-
-STRUKTURA KONT:
-- Grupa MEBLE (producent 65%): MobelKap, PerfektCiecie, MeblenaCzasie (ten sam asortyment!)
-- Grupa LUXSEN (producent 60%): Luxsen, Semmi, BOTAVIT
-- Grupa ONE (producent 55%): Materazzi, MtzzEU, Ankado24
 
 WZORY:
 - Marża po reklamie = (sprzedaż × (1-producent%) - prowizja - dostawa - Ads - wyróżnienia) / sprzedaż × 100
 - ROAS Ads = wartość sprzedaży z Ads / koszt Ads
 - BE ROAS = 1 / (marża_przed_reklamą / 100)
-- Wyróżnienia % = promoC / sprzedaż × 100 (benchmark MeblenaCzasie: ~3%)
+- Wyróżnienia % = promoC / sprzedaż × 100
+
+WAŻNE — Est. EOM:
+Używaj wartości Est. EOM przekazanych w danych — nie przeliczaj ich samodzielnie.
+Aplikacja już obliczyła Est. EOM poprawnie (z uwzględnieniem liczby dni w miesiącu i efektywnego dnia).
 
 DANE ZBIORCZE ${curM}:
 ${groupSummary}
@@ -4573,7 +4615,7 @@ DANE HISTORYCZNE PER KONTO:
         ctx += `  ${d.m[0].toUpperCase()+d.m.slice(1)}${isCur?' (bieżący, dzień '+(d.dzien||'?')+')':' (pełny)'}:\n`;
         ctx += `    Sprzedaż: ${Math.round(d.sprzedaz).toLocaleString('pl-PL')} zł${isCur?' | Est.EOM: '+Math.round(est).toLocaleString('pl-PL')+' zł':''}\n`;
         ctx += `    Ads: ${Math.round(d.adsCost||0).toLocaleString('pl-PL')} zł (${d.sprzedaz>0?((d.adsCost||0)/d.sprzedaz*100).toFixed(1):'0'}%) | ROAS ${(d.roas||0).toFixed(2)} | BE: ${C.beRoasAds.toFixed(2)}\n`;
-        ctx += `    Wyróżnienia: ${Math.round(d.promoC||0).toLocaleString('pl-PL')} zł (${d.sprzedaz>0?((d.promoC||0)/d.sprzedaz*100).toFixed(1):'0'}%) ← benchmark 3%\n`;
+        ctx += `    Wyróżnienia: ${Math.round(d.promoC||0).toLocaleString('pl-PL')} zł (${d.sprzedaz>0?((d.promoC||0)/d.sprzedaz*100).toFixed(1):'0'}%)\n`;
         ctx += `    Prowizja: ${(d.commission||0).toFixed(1)}% | Dostawa: ${Math.round(d.delivery||0)} zł | Marża: ${C.mAfter.toFixed(1)}% | ROAS Glob: ${(C.roasGlob||0).toFixed(2)}\n`;
         if(d.ss) ctx += `    Super Sprzedawca: ${d.ss} | Qlt: ${d.qlt||'—'}\n`;
       });
@@ -4581,10 +4623,10 @@ DANE HISTORYCZNE PER KONTO:
   });
 
   ctx += `\nSTYL ODPOWIEDZI:
-- Polski, konkretny, liczby zawsze w zł/% 
-- Dla MEBLE: zawsze porównuj między kontami, wskazuj kanibalizację i benchmark MeblenaCzasie
+- Polski, konkretny, liczby zawsze w zł/%
+- Jeśli wiele kont w grupie: porównuj między kontami, wskazuj kanibalizację i dystans do benchmarku
 - Wyróżnienia >5%: zawsze flaguj jako przepalanie z konkretną kwotą oszczędności
-- Rekomendacje: "zmniejsz wyróżnienia X z Y% do 3% = ~Z zł oszczędności/mies."
+- Rekomendacje: "zmniejsz wyróżnienia [konto] z Y% do 3% = ~Z zł oszczędności/mies."
 - Używaj nagłówków`;
   // Inject knowledge base
   ctx += buildWiedzyContext();
@@ -4751,6 +4793,139 @@ function emailAgentResponse() {
 }
 
 
+// ── SLIDE REPORT PROMPT ───────────────────────────────────
+const SLIDE_REPORT_PROMPT = `ROLA: Jesteś doradcą e-commerce tworzącym prezentację kliencką po zakończeniu miesiąca.
+Styl: profesjonalny, konkretny, narracyjny. Każdy slajd to jedna teza poparta liczbami.
+Odbiorca: właściciel konta/kont — nie analityk, nie agencja wewnętrznie.
+
+FORMAT SLAJDÓW:
+Każdy slajd zaczyna się separatorem i tytułem-tezą:
+
+---SLAJD 1---
+# TYTUŁ JAKO TEZA (np. "GDZIE NAPRAWDĘ UCIEKA BUDŻET?")
+> Zdanie kontekstowe lub podtytuł (1 linijka, kursywa)
+
+Treść slajdu
+
+**PUENTA:** Jedno zdanie podsumowujące wniosek z tego slajdu.
+
+---
+
+ZASADY STYLU (OBOWIĄZKOWE):
+
+1. TYTUŁ SLAJDU = TEZA, nie nazwa kategorii
+   DOBRZE: "GDZIE NAPRAWDĘ UCIEKA BUDŻET?"
+   DOBRZE: "SMART TO INWESTYCJA W KONWERSJĘ, NIE DODATKOWY KOSZT"
+   DOBRZE: "ILE PIENIĘDZY MOŻNA ODZYSKAĆ W JEDNYM MIESIĄCU?"
+   ZLE: "Analiza kosztów reklamy"
+   ZLE: "Wyniki per konto"
+
+2. HERO NUMBER — każdy slajd z liczbą musi mieć jedną liczbę wyróżnioną:
+   Format: **~X XXX zł** lub **X,X%** — pogrubiona, osobna linia
+   Przykład: "Potencjał oszczędności grupy:"
+   **~9 610 zł / miesiąc**
+
+3. PUENTA — każdy slajd kończy się jednym zdaniem wniosku po etykiecie **PUENTA:**
+   Przykłady:
+   - "Ads są pod kontrolą — różnicę robią wyróżnienia."
+   - "Konto X osiąga więcej wydając mniej — to model do skopiowania."
+   - "Redukcja wyróżnień to najszybszy sposób na poprawę marży."
+
+4. PORÓWNANIA — format kart 3-kolumnowych gdy porównujesz konta:
+   | KONTO A | KONTO B | KONTO C |
+   | wartość | wartość | wartość |
+   Oznacz benchmark gwiazdką (znak gwiazdki)
+
+5. TON: partnerski, doradczy — bez słów: problem, przepalanie, alarm, krytyczny
+   Zamiast: "konto X przepala budżet"
+   Pisz: "konto X ma największy potencjał optymalizacji kosztowej"
+
+STRUKTURA PREZENTACJI (12-16 slajdów):
+
+---SLAJD 1---
+# [NAZWA GRUPY/KONT] — PODSUMOWANIE [MIESIĄC] [ROK]
+> [podtytuł kontekstowy, np. "Analiza grupy kont - Allegro PL"]
+Data raportu | Przygotował: Agencja eCom
+
+---SLAJD 2---
+# EXECUTIVE SUMMARY — [X] KLUCZOWE OBSERWACJE
+> Najważniejsze wnioski miesiąca w jednym miejscu
+Numerowana lista 3-4 punktów, każdy z liczbą:
+1. **Nazwa obserwacji** — krótki opis z liczbą (np. "+43% m/m przy najniższych kosztach")
+2. ...
+**PUENTA:** Jedno zdanie o głównym kierunku na kolejny miesiąc.
+
+---SLAJD 3---
+# WYNIKI MIESIĄCA — PRZEGLĄD GRUPY
+> Sprzedaż, marża i efektywność w jednym miejscu
+Tabela: Konto | Sprzedaż MTD | Est. EOM | Marża% | ROAS | Wyróżnienia% | Status
+Oznacz benchmark gwiazdką
+**PUENTA:** Jedno zdanie o liderze lub kluczowej różnicy w grupie.
+
+[Dla każdego konta osobny slajd — tylko jeśli więcej niż 1 konto:]
+---SLAJD 4, 5, 6...---
+# [NAZWA KONTA] — [KRÓTKA CHARAKTERYSTYKA, np. "LIDER EFEKTYWNOŚCI" lub "NAJWIĘKSZY POTENCJAŁ OPTYMALIZACJI"]
+> m/m: Sprzedaż [wartość] -> [wartość] ([+/- %])
+Trzy bloki danych:
+- Sprzedaż MTD: X zł | Est. EOM: Y zł
+- Marża: X% | ROAS: X | BE ROAS: X
+- Ads %: X% | Wyróżnienia %: X%
+Dystans do benchmarku: [X pp lub "jest benchmarkiem"]
+**PUENTA:** Jedna obserwacja o tym koncie — co je wyróżnia w tym miesiącu.
+
+---SLAJD [N]---
+# ADS POD KONTROLĄ — RÓŻNICĘ ROBIĄ WYRÓŻNIENIA
+> Rozbicie kosztów reklamy i promocji per konto
+Tabela Ads: Konto | Koszt Ads | Ads % | ROAS Ads | BE ROAS | Ocena
+Tabela Wyróżnienia: Konto | Koszt | Wyróżnienia % | Potencjał oszczędności
+**PUENTA:** Zdanie o tym gdzie jest największa dźwignia kosztowa.
+
+---SLAJD [N+1]---
+# ILE MOŻNA ODZYSKAĆ — POTENCJAŁ OPTYMALIZACJI
+> Szacunkowe oszczędności przy zejściu wyróżnień do poziomu benchmarku
+HERO NUMBER:
+**~[suma] zł / miesiąc**
+łączny potencjał grupy
+Per konto: [Konto A]: ~X zł | [Konto B]: ~X zł
+Założenie: zejście wyróżnień do poziomu benchmarku przy zachowaniu obecnej sprzedaży.
+**PUENTA:** Zdanie o ekwiwalencie — np. "To odpowiednik X transakcji organicznych miesięcznie."
+
+---SLAJD [N+2]---
+# CO DZIAŁA DOBRZE — MOCNE STRONY MIESIĄCA
+> Obserwacje pozytywne per konto
+Min. 2-3 punkty per konto, zaczynaj od lidera.
+Format: [Konto]: obserwacja z liczbą
+**PUENTA:** Zdanie o najsilniejszym sygnale pozytywnym w grupie.
+
+---SLAJD [N+3]---
+# REKOMENDACJE — PRIORYTETY NA [NASTĘPNY MIESIĄC]
+> Konkretne działania z oczekiwanym efektem
+Format każdej rekomendacji:
+**[PILNE/WAŻNE]** Konto — działanie
+-> Efekt: ~X zł/mies. lub ~X pp marży
+-> Uzasadnienie: 1 zdanie z liczbą
+**PUENTA:** Jedno zdanie o łącznym efekcie wszystkich rekomendacji.
+
+---SLAJD [N+4]---
+# PLAN DZIAŁAŃ — [NASTĘPNY TYDZIEŃ/MIESIĄC]
+> Od słów do konkretów
+Tabela lub lista: Działanie | Konto | Właściciel | Termin
+**PUENTA:** Zdanie motywacyjne o kierunku — np. "W [miesiąc] przestajemy walczyć ze sobą i skalujemy sprzedaż na zdrowej strukturze."
+
+---SLAJD KOŃCOWY---
+# DZIĘKUJEMY
+[Miesiąc] [Rok] | Agencja eCom
+Następny raport: [szacowana data]
+
+CZEGO NIGDY NIE PISAĆ:
+- Tytułów opisowych zamiast tez ("Analiza wyróżnień")
+- Slajdów bez puenty
+- Slajdów bez żadnej liczby
+- Słów: problem, przepalanie, alarm, krytyczny, fatalny, katastrofa
+
+Używaj wartości EOM z danych aplikacji — nie obliczaj samodzielnie.
+Liczba slajdów: dostosuj do liczby kont (mniej kont = mniej slajdów per konto).`;
+
 // ── RAPORT MTD ─────────────────────────────────────────────
 function generateMTDReport() {
   // Reset checkboxes
@@ -4832,10 +5007,13 @@ async function runMTDReport(selectedKeys) {
       const prev = D.filter(d => d.m !== curM).slice(-3);
       if (!cur) { dataCtx += `${AC_META[k].name}: brak danych za ${curM}\n`; return; }
       const C = calc(cur, prod);
-      const est = Math.round(cur.sprzedaz * 30 / Math.max(dayNum - 1, 1));
+      const daysInMonth = DAYS_IN[curM] || 30;
+      const effDay = effectiveDzien(cur.dzien || dayNum);
+      const est = estym(cur);
       snap[k] = { C, est, cur, prod };
       dataCtx += `\n${AC_META[k].name}:\n`;
-      dataCtx += `  MTD (dzień ${dayNum}): sprzedaż ${Math.round(cur.sprzedaz).toLocaleString('pl-PL')} zł | est. EOM: ${est.toLocaleString('pl-PL')} zł\n`;
+      dataCtx += `  MTD (dzień wpisu: ${cur.dzien||dayNum}, efektywny dzień: ${effDay}, dni w miesiącu: ${daysInMonth})\n`;
+      dataCtx += `  Sprzedaż MTD: ${Math.round(cur.sprzedaz).toLocaleString('pl-PL')} zł | Est. EOM: ${Math.round(est).toLocaleString('pl-PL')} zł (obliczone przez aplikację — używaj tej wartości)\n`;
       dataCtx += `  Ads: koszt ${Math.round(cur.adsCost||0).toLocaleString('pl-PL')} zł | ROAS ${(cur.roas||0).toFixed(2)} | wartość ${Math.round(cur.wartoscAds||0).toLocaleString('pl-PL')} zł\n`;
       dataCtx += `  Marża po reklamie: ${C.mAfter.toFixed(1)}% | ROAS Glob: ${(C.roasGlob||0).toFixed(2)} | BE ROAS: ${(C.beRoasAds||0).toFixed(2)} | Prowizja: ${(cur.commission||0).toFixed(1)}%\n`;
       if (prev.length) {
@@ -4848,8 +5026,15 @@ async function runMTDReport(selectedKeys) {
   const n = selectedKeys.length;
   const isAll = n === 9;
   const systemPrompt = buildAgentContext();
-  const reportPrompt = `Wygeneruj profesjonalny raport miesięczny MTD (miesiąc: ${curM}, dzień: ${dayNum}/30).
+  const daysInCurMonth = DAYS_IN[curM] || 30;
+  const reportPrompt = `Wygeneruj profesjonalny raport miesięczny MTD (miesiąc: ${curM}, dzień: ${dayNum}/${daysInCurMonth}).
 Raport dotyczy ${isAll ? 'wszystkich 9 kont' : 'wybranych kont: ' + selectedKeys.map(k=>AC_META[k]?.name||k).join(', ')}.
+
+WAŻNE — Est. EOM:
+Używaj wartości Est. EOM przekazanych w danych — nie przeliczaj ich samodzielnie.
+Est. EOM = wartość z pola "Est. EOM" w danych konta (już obliczona przez aplikację z uwzględnieniem poprawnego dnia i liczby dni w miesiącu).
+Sprzedaż MTD = suma sprzedaży z bieżącego miesiąca dla danego konta.
+Nie obliczaj EOM przez własny wzór — aplikacja już to policzyła poprawnie.
 
 DANE DO RAPORTU:
 ${dataCtx}
@@ -5032,6 +5217,177 @@ function openReportWindow(aiText, curM, dayNum, snap, groups, selectedKeys) {
   overlay.scrollTop = 0;
 }
 
+// ── PREZENTACJA (SLIDE REPORT) ────────────────────────────
+function generateSlideReport() {
+  document.querySelectorAll('#slideModal .report-check').forEach(el => el.classList.remove('checked'));
+  updateSlideCount();
+  document.getElementById('slideModal').style.display = 'flex';
+}
+function closeSlideModal() { document.getElementById('slideModal').style.display = 'none'; }
+function updateSlideCount() {
+  const n = document.querySelectorAll('#slideModal .report-check.checked').length;
+  document.getElementById('slideSelectedCount').textContent = n === 0 ? '0 kont wybranych' : n + (n===1?' konto wybrane':n<5?' konta wybrane':' kont wybranych');
+  document.getElementById('slideGoBtn').disabled = n === 0;
+}
+function slideSelectAll() { document.querySelectorAll('#slideModal .report-check').forEach(el => el.classList.add('checked')); updateSlideCount(); }
+function slideSelectNone() { document.querySelectorAll('#slideModal .report-check').forEach(el => el.classList.remove('checked')); updateSlideCount(); }
+function toggleSlideCheck(el) { el.classList.toggle('checked'); updateSlideCount(); }
+
+async function runSelectedSlide() {
+  const selected = [...document.querySelectorAll('#slideModal .report-check.checked')].map(el => el.dataset.key);
+  if (!selected.length) return;
+  closeSlideModal();
+  await runSlideReport(selected);
+}
+
+async function runSlideReport(selectedKeys) {
+  const responseEl = document.getElementById('agentResponse');
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const dayNum = now.getDate();
+  const daysInMonth = DAYS_IN[curM] || 30;
+  const accLabel = selectedKeys.length === 9 ? 'wszystkich 9 kont' : selectedKeys.length + ' kont';
+
+  responseEl.innerHTML = `<div class="agent-thinking">
+    <div class="agent-thinking-dot"></div>
+    <div class="agent-thinking-dot"></div>
+    <div class="agent-thinking-dot"></div>
+    <span style="margin-left:.3rem">Generuję prezentację dla ${accLabel}...</span>
+  </div>`;
+
+  const groups = {
+    MEBLE: { accs:['MobelKap','PerfektCiecie','MeblenaCzasie'], prod:65 },
+    LUXSEN:{ accs:['Luxsen','Semmi','BOTAVIT'], prod:60 },
+    ONE:   { accs:['Materazzi','MtzzEU','Ankado24'], prod:55 }
+  };
+
+  const filteredGroups = {};
+  Object.entries(groups).forEach(([gKey, g]) => {
+    const filteredAccs = g.accs.filter(k => selectedKeys.includes(k));
+    if (filteredAccs.length) filteredGroups[gKey] = {...g, accs: filteredAccs};
+  });
+
+  let dataCtx = '';
+  Object.entries(filteredGroups).forEach(([gKey, g]) => {
+    dataCtx += `\n=== GRUPA ${gKey} (producent ${g.prod}%) ===\n`;
+    g.accs.forEach(k => {
+      const D = getData(k);
+      const prod = getProd(k);
+      const cur = D.find(d => d.m === curM);
+      const prev = D.filter(d => d.m !== curM).slice(-3);
+      if (!cur) { dataCtx += `${AC_META[k].name}: brak danych za ${curM}\n`; return; }
+      const C = calc(cur, prod);
+      const est = estym(cur);
+      const effDay = effectiveDzien(cur.dzien || dayNum);
+      dataCtx += `\n${AC_META[k].name}:\n`;
+      dataCtx += `  MTD (dzień wpisu: ${cur.dzien||dayNum}, efektywny dzień: ${effDay}, dni w miesiącu: ${daysInMonth})\n`;
+      dataCtx += `  Sprzedaż MTD: ${Math.round(cur.sprzedaz).toLocaleString('pl-PL')} zł | Est. EOM: ${Math.round(est).toLocaleString('pl-PL')} zł (obliczone przez aplikację)\n`;
+      dataCtx += `  Ads: koszt ${Math.round(cur.adsCost||0).toLocaleString('pl-PL')} zł | ROAS ${(cur.roas||0).toFixed(2)} | BE ROAS ${C.beRoasAds.toFixed(2)} | wartość Ads ${Math.round(cur.wartoscAds||0).toLocaleString('pl-PL')} zł\n`;
+      dataCtx += `  Wyróżnienia: ${Math.round(cur.promoC||0).toLocaleString('pl-PL')} zł (${cur.sprzedaz>0?((cur.promoC||0)/cur.sprzedaz*100).toFixed(1):'0'}%)\n`;
+      dataCtx += `  Marża po reklamie: ${C.mAfter.toFixed(1)}% | ROAS Glob: ${(C.roasGlob||0).toFixed(2)} | Prowizja: ${(cur.commission||0).toFixed(1)}%\n`;
+      if (prev.length) {
+        prev.forEach(d => {
+          const Cp = calc(d, prod);
+          dataCtx += `  ${d.m}: sprzedaż ${Math.round(d.sprzedaz).toLocaleString('pl-PL')} zł | marża ${Cp.mAfter.toFixed(1)}% | wyróżnienia ${d.sprzedaz>0?((d.promoC||0)/d.sprzedaz*100).toFixed(1):'0'}%\n`;
+        });
+      }
+    });
+  });
+
+  const isAll = selectedKeys.length === 9;
+  const scopeLabel = isAll ? 'wszystkich 9 kont' : selectedKeys.map(k=>AC_META[k]?.name||k).join(', ');
+  const slidePrompt = `Wygeneruj prezentację kliencką w formacie slajdów.
+Miesiąc: ${curM} ${now.getFullYear()}, dzień: ${dayNum}/${daysInMonth}.
+Konta: ${scopeLabel}.
+
+DANE:
+${dataCtx}
+
+${SLIDE_REPORT_PROMPT}`;
+
+  try {
+    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 8192,
+        system: buildAgentContext(),
+        messages: [{ role: 'user', content: slidePrompt }]
+      })
+    });
+    const text = await readSSE(resp);
+    openSlideWindow(text, curM, selectedKeys);
+    responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:#b47fff">
+      <strong style="color:#b47fff">◆ Prezentacja wygenerowana</strong><br>
+      <span style="font-size:11px;color:var(--text3)">Ctrl+P = PDF</span>
+    </div>`;
+  } catch(err) {
+    responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)">
+      <strong>Błąd generowania prezentacji:</strong> ${err.message}
+    </div>`;
+  }
+}
+
+function openSlideWindow(aiText, curM, selectedKeys) {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('pl-PL', {day:'2-digit',month:'long',year:'numeric'});
+  const scopeLabel = selectedKeys.length === 9 ? 'Wszystkie konta' : selectedKeys.map(k=>AC_META[k]?.name||k).join(', ');
+
+  // Parse slides from text
+  const slideBlocks = aiText.split(/---SLAJD\s*\d+---/i).filter(s => s.trim());
+
+  const slidesHtml = slideBlocks.map((block, i) => {
+    let html = block.trim()
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^# (.+)$/gm, '<h2 style="font-family:\'DM Mono\',monospace;font-size:20px;font-weight:600;color:#111;margin:0 0 .5rem;line-height:1.3">$1</h2>')
+      .replace(/^> (.+)$/gm, '<div style="font-style:italic;color:#6b7280;font-size:12px;margin-bottom:1rem;border-left:3px solid #b47fff;padding-left:.75rem">$1</div>')
+      .replace(/\*\*PUENTA:\*\*\s*(.+)/g, '<div style="margin-top:1rem;padding:.6rem 1rem;background:#faf5ff;border-left:3px solid #b47fff;font-weight:500;color:#111;font-size:12px;border-radius:0 6px 6px 0">$1</div>')
+      .replace(/\|([^|]+)\|([^|]+)\|([^|]*)\|/g, (m,a,b,c) => {
+        if (c !== undefined && c !== '') return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;font-size:11px"><span style="padding:4px 8px;background:#f9fafb;text-align:center">${a.trim()}</span><span style="padding:4px 8px;background:#f9fafb;text-align:center">${b.trim()}</span><span style="padding:4px 8px;background:#f9fafb;text-align:center">${c.trim()}</span></div>`;
+        return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;font-size:11px"><span style="padding:4px 8px;background:#f9fafb;text-align:center">${a.trim()}</span><span style="padding:4px 8px;background:#f9fafb;text-align:center">${b.trim()}</span></div>`;
+      })
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>');
+    return `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;page-break-inside:avoid;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem">SLAJD ${i+1}</div>
+      <div style="line-height:1.7;color:#374151;font-size:13px"><p>${html}</p></div>
+    </div>`;
+  }).join('');
+
+  let overlay = document.getElementById('slideOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'slideOverlay';
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = '';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:800;background:#f3f4f6;overflow-y:auto;font-family:"DM Sans",sans-serif;font-size:13px;color:#1f2937;';
+
+  const inner = document.createElement('div');
+  inner.style.cssText = 'max-width:900px;margin:0 auto;padding:2.5rem 2rem 5rem;';
+  inner.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:#111">M<span style="color:#b47fff">Place</span> Hub</div>
+        <div style="font-size:11px;color:#6b7280">Prezentacja kliencka · ${curM.toUpperCase()} ${now.getFullYear()}</div>
+      </div>
+      <div style="text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:#6b7280">
+        <div style="display:inline-block;background:#faf5ff;color:#b47fff;border:1px solid rgba(180,127,255,.3);border-radius:4px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;margin-bottom:4px">Prezentacja</div><br>
+        ${scopeLabel}<br>
+        ${dateStr}
+      </div>
+    </div>
+    ${slidesHtml}
+    <div style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:.75rem 2rem;display:flex;gap:.75rem;justify-content:flex-end;z-index:801;">
+      <button onclick="document.getElementById('slideOverlay').style.display='none'" style="font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid #e5e7eb;background:#f9fafb;color:#6b7280">Zamknij</button>
+      <button onclick="printOverlay('slideOverlay')" style="font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid rgba(180,127,255,.3);background:#faf5ff;color:#b47fff">Drukuj / PDF</button>
+    </div>`;
+  overlay.appendChild(inner);
+  overlay.style.display = 'block';
+  overlay.scrollTop = 0;
+}
+
 // ── HISTORIA RAPORTÓW ──────────────────────────────────────
 const SK_REPORTS = 'mplace_reports_history';
 
@@ -5193,8 +5549,8 @@ function openSavedReport(id) {
   overlay.scrollTop = 0;
 }
 
-function printOverlay() {
-  const overlay = document.getElementById('reportOverlay');
+function printOverlay(overlayId) {
+  const overlay = document.getElementById(overlayId || 'reportOverlay');
   if (!overlay) return;
   const inner = overlay.querySelector('div');
   if (!inner) return;
@@ -8207,6 +8563,46 @@ self.addEventListener('fetch', e => e.respondWith(
     <div class="report-modal-actions">
       <button class="report-modal-cancel" onclick="closeReportModal()">Anuluj</button>
       <button class="report-modal-go" id="reportGoBtn" onclick="runSelectedReport()" disabled>▸ Generuj raport</button>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE REPORT MODAL -->
+<div class="report-modal-overlay" id="slideModal" style="display:none" onclick="if(event.target===this)closeSlideModal()">
+  <div class="report-modal">
+    <div class="report-modal-title">◆ Generuj <span style="color:#b47fff">Prezentację</span></div>
+    <div class="report-modal-sub">Wybierz konta do prezentacji — format slajdów</div>
+
+    <div class="report-group-label" style="color:var(--g-meble)">· MEBLE</div>
+    <div class="report-checks">
+      <div class="report-check" data-key="MobelKap" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>MobelKap</div>
+      <div class="report-check" data-key="PerfektCiecie" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>PerfektCiecie</div>
+      <div class="report-check" data-key="MeblenaCzasie" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>MeblenaCzasie</div>
+    </div>
+
+    <div class="report-group-label" style="color:var(--g-luxsen)">· LUXSEN</div>
+    <div class="report-checks">
+      <div class="report-check" data-key="Luxsen" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Luxsen</div>
+      <div class="report-check" data-key="Semmi" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Semmi</div>
+      <div class="report-check" data-key="BOTAVIT" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>BOTAVIT</div>
+    </div>
+
+    <div class="report-group-label" style="color:var(--g-one)">· ONE</div>
+    <div class="report-checks">
+      <div class="report-check" data-key="Materazzi" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Materazzi</div>
+      <div class="report-check" data-key="MtzzEU" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>MtzzEU</div>
+      <div class="report-check" data-key="Ankado24" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Ankado24</div>
+    </div>
+
+    <div style="display:flex;align-items:center;margin-top:.9rem;gap:.6rem">
+      <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="slideSelectedCount">0 kont wybranych</span>
+      <span class="report-select-all" onclick="slideSelectAll()">zaznacz wszystkie</span>
+      <span class="report-select-all" onclick="slideSelectNone()">odznacz</span>
+    </div>
+
+    <div class="report-modal-actions">
+      <button class="report-modal-cancel" onclick="closeSlideModal()">Anuluj</button>
+      <button class="report-modal-go" id="slideGoBtn" onclick="runSelectedSlide()" disabled style="background:#b47fff;border-color:#b47fff">▸ Generuj prezentację</button>
     </div>
   </div>
 </div>
