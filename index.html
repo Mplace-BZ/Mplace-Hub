@@ -2621,9 +2621,9 @@ function renderCompare(){
       <div style="display:flex;gap:1.4rem;align-items:flex-end">
         <!-- left: bars -->
         <div style="display:flex;align-items:flex-end;gap:3px;flex-shrink:0">${bars}</div>
-        <!-- right: 2x2 metrics, no gap between cols -->
-        <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:.3rem .1rem">
-          <div>
+        <!-- right: 2x2 metrics packed right -->
+        <div style="flex:1;display:grid;grid-template-columns:auto auto;gap:.3rem .6rem;justify-content:end">
+          <div style="text-align:right">
             <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Estymacja</div>
             <div style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:500">${pln(d.est)}</div>
           </div>
@@ -2631,7 +2631,7 @@ function renderCompare(){
             <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Marża</div>
             <div style="font-family:var(--mono);font-size:11px;color:${mColor};font-weight:500">${pct(mAfter)}</div>
           </div>
-          <div>
+          <div style="text-align:right">
             <div style="font-family:var(--mono);font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">ROAS</div>
             <div style="font-family:var(--mono);font-size:11px;color:${roasColor};font-weight:500">${xf(d.C.roasAds)}</div>
           </div>
