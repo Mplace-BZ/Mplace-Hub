@@ -297,6 +297,19 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .dashboard-card .progress-bar-fill{height:6px;border-radius:4px;transition:width .3s;}
 .metric-green{color:#16a34a;}.metric-yellow{color:#d97706;}.metric-red{color:#dc2626;}
 
+/* ── ARKUSZ ── */
+table.arkusz-tbl{width:100%;border-collapse:collapse;font-size:11px;min-width:1200px;}
+table.arkusz-tbl thead th{padding:6px 9px;text-align:right;font-family:var(--mono);font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg);font-weight:400;white-space:nowrap;}
+table.arkusz-tbl thead th:first-child,table.arkusz-tbl thead th:nth-child(2){text-align:left;}
+table.arkusz-tbl thead .arkusz-prod-hdr{color:#ff6b35;background:rgba(255,107,53,.07);border-bottom:2px solid rgba(255,107,53,.4);text-align:center;}
+table.arkusz-tbl tbody tr{border-bottom:1px solid rgba(255,255,255,.03);transition:background .1s;}
+table.arkusz-tbl tbody tr:hover{background:rgba(255,255,255,.03);}
+table.arkusz-tbl tbody td{padding:6px 9px;vertical-align:middle;white-space:nowrap;font-family:var(--mono);font-size:11px;text-align:right;}
+table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-size:10px;}
+.arkusz-konto{text-align:left!important;font-weight:600;font-size:11px!important;padding-left:12px!important;border-right:1px solid rgba(255,255,255,.06);}
+.arkusz-group-hdr td{background:rgba(255,255,255,.02);padding:5px 10px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);border-top:2px solid rgba(255,255,255,.06);}
+.arkusz-acc-sep td{height:6px;background:rgba(255,255,255,.01);border-top:1px dashed rgba(255,255,255,.05);}
+
 /* ── PDF REPORT ── */
 @media print {
   .slide-dashboard{background:#fff !important;color:#111 !important;}
@@ -997,6 +1010,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <button class="nav-btn" onclick="showView('wiedza')" id="navWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza ✦</button>
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
+    <button class="nav-btn" onclick="showView('arkusz')" id="navArkusz" style="color:#94a3b8;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.2)">Arkusz</button>
   </div>
   <div class="topbar-accounts">
     <button class="nav-btn" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2);cursor:default;pointer-events:none">Klienci</button>
@@ -1346,6 +1360,44 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
     <div class="card" id="rozInvoice"></div>
   </div>
 
+</div>
+</div>
+
+<!-- ═══ VIEW: ARKUSZ ═══ -->
+<div class="view" id="viewArkusz">
+<div class="container">
+  <div class="ph">
+    <div class="ph-eyebrow" style="color:#94a3b8">▸ Historia wszystkich kont</div>
+    <div class="ph-title">Arkusz <span style="color:#94a3b8">Danych</span></div>
+    <div class="ph-sub">Zestawienie miesięczne · 9 kont · wszystkie grupy</div>
+  </div>
+  <div class="tbl-wrap" style="overflow-x:auto;border-radius:10px">
+    <table class="arkusz-tbl" id="arkuszTable">
+      <thead>
+        <tr>
+          <th rowspan="2">Data</th>
+          <th rowspan="2">Konto</th>
+          <th colspan="3" class="arkusz-prod-hdr">Produktowa</th>
+          <th rowspan="2">SS</th>
+          <th rowspan="2">Qlt</th>
+          <th rowspan="2">Wartość</th>
+          <th rowspan="2">Koszty</th>
+          <th rowspan="2">Obowiązkowe</th>
+          <th rowspan="2">Dostawa</th>
+          <th rowspan="2">Reklama</th>
+          <th rowspan="2">Udział Adsów</th>
+          <th rowspan="2">Estymacja m-c</th>
+          <th rowspan="2">m/m</th>
+        </tr>
+        <tr>
+          <th>Koszt</th>
+          <th>ROAS</th>
+          <th>Wartość</th>
+        </tr>
+      </thead>
+      <tbody id="arkuszTbody"></tbody>
+    </table>
+  </div>
 </div>
 </div>
 
@@ -2203,7 +2255,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewKalkulator'].forEach(id=>{
+  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewKalkulator','viewArkusz'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -2269,6 +2321,10 @@ function showView(v){
     document.getElementById('viewKalkulator').classList.add('active');
     document.getElementById('navKalkulator').classList.add('active');
     klkInit();
+  } else if(v==='arkusz'){
+    document.getElementById('viewArkusz').classList.add('active');
+    document.getElementById('navArkusz').classList.add('active');
+    renderArkusz();
   } else {
     document.getElementById('viewAccount').classList.add('active');
     document.getElementById('nav'+v)?.classList.add('active');
@@ -2278,6 +2334,70 @@ function showView(v){
   try{ localStorage.setItem('lastActiveTab', v); }catch(e){}
 }
 
+
+// ═══════════════════════════════════════════════════════════
+// ARKUSZ
+// ═══════════════════════════════════════════════════════════
+function renderArkusz(){
+  const GROUPS=[
+    {key:'MEBLE',color:'#ff6b35',rgb:'255,107,53',accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
+    {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160',accs:['Luxsen','Semmi','BOTAVIT']},
+    {key:'ONE',  color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU','Ankado24']},
+  ];
+  let html='';
+  GROUPS.forEach(g=>{
+    html+=`<tr class="arkusz-group-hdr"><td colspan="15" style="color:${g.color};border-top:2px solid rgba(${g.rgb},.25)">── ${g.key} ──</td></tr>`;
+    g.accs.forEach((k,ai)=>{
+      const D=getData(k);
+      if(!D.length) return;
+      const prod=getProd(k);
+      const name=AC_META[k]?.name||k;
+      // oldest→newest
+      D.forEach((d,i)=>{
+        const C=calc(d,prod);
+        const est=estym(d);
+        const origIdx=D.indexOf(d);
+        const dv=mmDelta(D,origIdx);
+        const sp=d.sprzedaz||0;
+        const dostawaPct=sp>0?(d.delivery||0)/sp*100:0;
+        const reklamaPct=C.acosTotal!=null?C.acosTotal:0;
+        const kosztPct=sp>0?((d.commission||0)+dostawaPct+reklamaPct):0;
+        const udzialAdsPct=sp>0?(d.wartoscAds||0)/sp*100:0;
+        // ROAS vs prev month direction
+        const prevD=i>0?D[i-1]:null;
+        const prevRoas=prevD?prevD.roas||0:null;
+        const roasVal=d.roas||0;
+        const roasColor=prevRoas===null?'var(--text)':(roasVal>=prevRoas?'var(--green)':'var(--red)');
+        // Reklama vs prev
+        const prevRek=prevD&&sp>0?(()=>{const pC=calc(prevD,prod);return pC.acosTotal||0;})():null;
+        const rekColor=prevRek===null?'var(--text)':(reklamaPct<=prevRek?'var(--green)':'var(--red)');
+        const dvColor=dv===null?'var(--text3)':(dv>=0?'var(--green)':'var(--red)');
+        const estColor='var(--yellow)';
+        const ssHtml=d.ss==='T'?`<span class="tbadge tbadge-on">T</span>`:d.ss==='N'?`<span class="tbadge tbadge-off">N</span>`:`<span class="tm">—</span>`;
+        const kontoCell=i===0?`<td rowspan="${D.length}" class="arkusz-konto" style="border-left:3px solid ${g.color};color:${g.color}">${name}</td>`:'';
+        html+=`<tr>
+          <td>${d.m[0].toUpperCase()+d.m.slice(1)}</td>
+          ${kontoCell}
+          <td>${sp&&d.adsCost?pln(d.adsCost):'—'}</td>
+          <td style="color:${roasColor}">${roasVal?xf(roasVal):'—'}</td>
+          <td>${d.wartoscAds?pln(d.wartoscAds):'—'}</td>
+          <td style="text-align:center">${ssHtml}</td>
+          <td style="color:var(--text3)">${d.qlt??'—'}</td>
+          <td style="color:var(--green)">${pln(sp)}</td>
+          <td style="color:var(--text2)">${sp?kosztPct.toFixed(2)+'%':'—'}</td>
+          <td style="color:var(--text3)">${pct(d.commission||0)}</td>
+          <td style="color:var(--text3)">${dostawaPct.toFixed(2)}%</td>
+          <td style="color:${rekColor}">${reklamaPct.toFixed(2)}%</td>
+          <td style="color:var(--text3)">${udzialAdsPct.toFixed(2)}%</td>
+          <td style="color:${estColor}">${pln(est)}${d.dzien?'<span style="font-size:9px;color:var(--text3)"> e</span>':''}</td>
+          <td style="color:${dvColor}">${dv===null?'—':(dv>=0?'▲ ':'▼ ')+Math.abs(dv).toFixed(2)+'%'}</td>
+        </tr>`;
+      });
+      if(ai<g.accs.length-1) html+=`<tr class="arkusz-acc-sep"><td colspan="15"></td></tr>`;
+    });
+  });
+  document.getElementById('arkuszTbody').innerHTML=html;
+}
 
 // ═══════════════════════════════════════════════════════════
 // DASHBOARD
