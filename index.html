@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.3</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.4</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6159,25 +6159,31 @@ function buildDashboardSlide(accDataArr, zakresLabel, slajdNum) {
   const minWyroz  = Math.min(...accDataArr.map(a => a.wyrozPct));
   const isSingle  = accDataArr.length === 1;
 
+  const S = {
+    card: 'flex:1;min-width:200px;border:1px solid #e5e7eb;border-radius:8px;padding:16px;background:#fff;box-sizing:border-box;',
+    name: 'font-size:11px;font-family:"DM Mono",monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;',
+    big:  'font-size:24px;font-family:"DM Mono",monospace;font-weight:600;margin-bottom:4px;color:#111;',
+    row:  'display:flex;justify-content:space-between;font-size:12px;margin:4px 0;color:#374151;',
+    rowSm:'display:flex;justify-content:space-between;font-size:11px;margin:4px 0;color:#6b7280;',
+    bar:  'background:#f3f4f6;border-radius:4px;height:6px;margin:6px 0;',
+  };
+  const mColor = v => v >= 10 ? '#16a34a' : v >= 7 ? '#d97706' : '#dc2626';
+  const wyrozColor = v => v > 5 ? '#dc2626' : v > 3 ? '#d97706' : '#16a34a';
+
   const cards = accDataArr.map(a => {
     const gc = GRP_COLORS[a.group] || '#8b91a8';
-    // Marza color
-    const mc = a.marzaAvg >= 10 ? 'metric-green' : a.marzaAvg >= 7 ? 'metric-yellow' : 'metric-red';
-    // ROAS progress
     const roasPct = a.beRoas > 0 ? Math.min(a.roasAvg / a.beRoas * 100, 100) : 0;
     const roasColor = a.roasAvg >= a.beRoas ? '#16a34a' : '#dc2626';
-    // Wyróżnienia arrow
     const wyrozOk = isSingle ? null : a.wyrozPct <= minWyroz;
-    const wyrozArrow = wyrozOk === null ? '' : wyrozOk ? '<span class="metric-green">↓</span>' : '<span class="metric-red">↑</span>';
-
-    return `<div class="dashboard-card">
-      <div class="account-name" style="color:${gc}">${a.name}</div>
-      <div class="metric-big">${Math.round(a.sprzedazSum).toLocaleString('pl-PL')} <span style="font-size:13px;font-weight:400;color:#6b7280">zł</span></div>
-      <div class="metric-row"><span>Marża</span><span class="${mc}">${a.marzaAvg.toFixed(1)}%</span></div>
-      <div class="metric-row" style="font-size:11px;color:#6b7280"><span>ROAS ${a.roasAvg.toFixed(2)} / BE ${a.beRoas.toFixed(2)}</span></div>
-      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${roasPct.toFixed(1)}%;background:${roasColor}"></div></div>
-      <div class="metric-row"><span>Wyróżnienia</span><span>${wyrozArrow} ${a.wyrozPct.toFixed(1)}%</span></div>
-      <div class="metric-row"><span>Ads %</span><span>${a.adsPct.toFixed(1)}%</span></div>
+    const wyrozArrow = wyrozOk === null ? '' : wyrozOk ? '<span style="color:#16a34a">↓</span>' : '<span style="color:#dc2626">↑</span>';
+    return `<div style="${S.card}">
+      <div style="${S.name}color:${gc}">${a.name.toUpperCase()}</div>
+      <div style="${S.big}">${Math.round(a.sprzedazSum).toLocaleString('pl-PL')} <span style="font-size:13px;font-weight:400;color:#6b7280">zł</span></div>
+      <div style="${S.row}"><span>Marża</span><span style="font-weight:600;color:${mColor(a.marzaAvg)}">${a.marzaAvg.toFixed(1)}%</span></div>
+      <div style="${S.rowSm}"><span>ROAS ${a.roasAvg.toFixed(2)} / BE ${a.beRoas.toFixed(2)}</span></div>
+      <div style="${S.bar}"><div style="height:6px;border-radius:4px;width:${roasPct.toFixed(1)}%;background:${roasColor}"></div></div>
+      <div style="${S.row}"><span>Wyróżnienia</span><span style="color:${wyrozColor(a.wyrozPct)}">${wyrozArrow} ${a.wyrozPct.toFixed(1)}%</span></div>
+      <div style="${S.row}"><span>Ads %</span><span style="color:#374151">${a.adsPct.toFixed(1)}%</span></div>
     </div>`;
   }).join('');
 
@@ -6188,11 +6194,11 @@ function buildDashboardSlide(accDataArr, zakresLabel, slajdNum) {
        </div>`
     : '';
 
-  return `<div class="slide-block slide-dashboard" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-    <div class="slide-number" style="font-family:'DM Mono',monospace;font-size:8px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem">SLAJD ${slajdNum} — DASHBOARD</div>
-    <h2 class="slide-title" style="font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:#111;margin:0 0 4px">WYNIKI NA PIERWSZY RZUT OKA</h2>
-    <p style="font-size:11px;color:#6b7280;margin:0 0 0">Kluczowe metryki okresu ${zakresLabel}</p>
-    <div class="dashboard-grid">${cards}</div>
+  return `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+    <div style="font-family:'DM Mono',monospace;font-size:8px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem">SLAJD ${slajdNum} — DASHBOARD</div>
+    <h2 style="font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:#111;margin:0 0 4px">WYNIKI NA PIERWSZY RZUT OKA</h2>
+    <p style="font-size:11px;color:#6b7280;margin:0 0 16px">Kluczowe metryki okresu ${zakresLabel}</p>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;">${cards}</div>
     ${chartBlock}
   </div>`;
 }
