@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.1</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.2</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6079,7 +6079,8 @@ function openSlideWindow(aiText, curM, selectedKeys, accDataArr) {
   function renderAiSlide(block, num) {
     const pre = block.trim().replace(/\*\*PUENTA:\*\*\s*(.+)/g,
       '<div class="slide-puenta" style="margin-top:1rem;padding:.6rem 1rem;background:#faf5ff;border-left:3px solid #b47fff;font-weight:500;color:#111;font-size:12px;border-radius:0 6px 6px 0">$1</div>');
-    const html = (typeof marked !== 'undefined') ? marked.parse(pre) : pre.replace(/\n/g,'<br>');
+    const cleaned = pre.replace(/~~(.+?)~~/g, '$1'); // usuń strikethrough — AI nie powinno przekreślać tekstu
+    const html = (typeof marked !== 'undefined') ? marked.parse(cleaned) : cleaned.replace(/\n/g,'<br>');
     return `<div class="slide-block" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
       <div class="slide-number" style="font-family:'DM Mono',monospace;font-size:8px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem">SLAJD ${num}</div>
       <div class="slide-title" style="line-height:1.7;color:#374151;font-size:13px">${html}</div>
