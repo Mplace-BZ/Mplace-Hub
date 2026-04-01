@@ -81,7 +81,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .block-row.active{background:rgba(255,107,53,.08);border-color:rgba(255,107,53,.25);}
 .block-row.selected-manual{background:rgba(180,127,255,.07);border-color:rgba(180,127,255,.2);}
 .block-row.done{opacity:.45;}
-.block-time{font-family:var(--mono);font-size:10px;color:var(--text3);width:88px;flex-shrink:0;padding-top:1px;}
+.block-time{font-family:var(--mono);font-size:10px;color:var(--text2);width:88px;flex-shrink:0;padding-top:1px;}
 .block-info{flex:1;}
 .block-name{font-size:12px;font-weight:500;color:var(--text);line-height:1.3;}
 .block-tag{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;margin-top:3px;letter-spacing:.06em;}
@@ -424,8 +424,10 @@ let blockEndNotifScheduled = false;
 function startTimer() {
   if (timerRunning) return;
   timerRunning = true;
-  document.getElementById('timerBtn').textContent = '⏸ Pauza';
-  document.getElementById('timerBtn').classList.add('danger');
+  const btn = document.getElementById('timerBtn');
+  btn.textContent = '⏸ Pauza';
+  btn.classList.remove('primary');
+  btn.classList.add('danger');
   timerInterval = setInterval(() => {
     timerSecs++;
     document.getElementById('timerDisplay').textContent = minToHMS(timerSecs);
@@ -437,8 +439,10 @@ function toggleTimer() {
   if (timerRunning) {
     clearInterval(timerInterval);
     timerRunning = false;
-    document.getElementById('timerBtn').textContent = '▶ Start';
-    document.getElementById('timerBtn').classList.remove('danger');
+    const btn = document.getElementById('timerBtn');
+    btn.textContent = '▶ Start';
+    btn.classList.remove('danger');
+    btn.classList.add('primary');
   } else {
     startTimer();
   }
@@ -448,9 +452,11 @@ function resetTimer() {
   clearInterval(timerInterval);
   timerRunning = false;
   timerSecs    = 0;
+  const btn = document.getElementById('timerBtn');
+  btn.textContent = '▶ Start';
+  btn.classList.remove('danger');
+  btn.classList.add('primary');
   document.getElementById('timerDisplay').textContent = '00:00:00';
-  document.getElementById('timerBtn').textContent = '▶ Start';
-  document.getElementById('timerBtn').classList.remove('danger');
 }
 
 function logBlock(silent) {
