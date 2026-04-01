@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.9</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.0</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -5992,7 +5992,18 @@ async function runSlideReport(selectedKeys, dateFrom, dateTo) {
       const missing  = totalDaysRange-entries.length;
       const dataNote = missing>0 ? ` (dane za ${entries.length} z ${totalDaysRange} dni, brak: ${missing} dni)` : ` (${entries.length} dni)`;
 
-      accDataArr.push({ key:k, name:accName, group:gKey, sprzedazSum, adsCostSum, roasAvg, beRoas:Clast.beRoasAds, marzaAvg, wyrozPct, adsPct });
+      // Dashboard cards: use monthly stored data (not D2D sum which would double-count cumulative MTD snapshots)
+      const targetMonth = MONTHS[new Date(dateFrom+'T00:00:00').getMonth()];
+      const monthRec = getData(k).find(d => d.m === targetMonth);
+      const dashSp      = monthRec ? (monthRec.sprzedaz||0) : sprzedazSum;
+      const dashAds     = monthRec ? (monthRec.adsCost||0)  : adsCostSum;
+      const dashRoas    = monthRec ? (monthRec.roas||0)      : roasAvg;
+      const dashPromo   = monthRec ? (monthRec.promoC||0)    : promoCSum;
+      const Cdash       = monthRec ? calc(monthRec, prod)    : Clast;
+      const dashMarza   = monthRec ? Cdash.mAfter            : marzaAvg;
+      const dashWyroz   = dashSp>0  ? dashPromo/dashSp*100   : wyrozPct;
+      const dashAdsPct  = dashSp>0  ? dashAds/dashSp*100     : adsPct;
+      accDataArr.push({ key:k, name:accName, group:gKey, sprzedazSum:dashSp, adsCostSum:dashAds, roasAvg:dashRoas, beRoas:Cdash.beRoasAds, marzaAvg:dashMarza, wyrozPct:dashWyroz, adsPct:dashAdsPct });
 
       dataCtx += `\n${accName}${dataNote}:\n`;
       dataCtx += `  Sprzedaż łączna: ${Math.round(sprzedazSum).toLocaleString('pl-PL')} zł\n`;
