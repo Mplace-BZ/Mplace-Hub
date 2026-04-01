@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.5</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.6</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -5838,14 +5838,24 @@ function openReportWindow(aiText, curM, dayNum, snap, groups, selectedKeys) {
 function generateSlideReport() {
   document.querySelectorAll('#slideModal .report-check').forEach(el => el.classList.remove('checked'));
   updateSlideCount();
-  // Default: Od = 1. dzień bieżącego miesiąca, Do = wczoraj
+  // Default: gdy dzień 1 miesiąca → cały poprzedni miesiąc; inaczej → 1..wczoraj
   const now = new Date();
-  const y = now.getFullYear(), mo = now.getMonth();
-  const firstDay = `${y}-${String(mo+1).padStart(2,'0')}-01`;
   const yest = new Date(now); yest.setDate(now.getDate()-1);
-  const yesterdayStr = `${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
-  document.getElementById('slideDateFrom').value = firstDay;
-  document.getElementById('slideDateTo').value = yesterdayStr;
+  let fromDate, toDate;
+  if(now.getDate() === 1){
+    // 1. dzień miesiąca — raport za poprzedni miesiąc (pełny)
+    const lastOfPrev = new Date(now.getFullYear(), now.getMonth(), 0); // ostatni dzień prev
+    const firstOfPrev = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    fromDate = fmt(firstOfPrev);
+    toDate   = fmt(lastOfPrev);
+  } else {
+    const y = now.getFullYear(), mo = now.getMonth();
+    fromDate = `${y}-${String(mo+1).padStart(2,'0')}-01`;
+    toDate   = `${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
+  }
+  document.getElementById('slideDateFrom').value = fromDate;
+  document.getElementById('slideDateTo').value   = toDate;
   document.getElementById('slideDateWarning').style.display = 'none';
   document.getElementById('slideModal').style.display = 'flex';
 }
