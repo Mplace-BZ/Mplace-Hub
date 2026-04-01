@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.7</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.8</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6495,6 +6495,24 @@ function printOverlay(overlayId) {
   const inner = overlay.querySelector('div');
   if (!inner) return;
 
+  // Clone the content and replace canvas elements with img (preserves Chart.js bitmaps)
+  const clone = inner.cloneNode(true);
+  const origCanvases = inner.querySelectorAll('canvas');
+  const cloneCanvases = clone.querySelectorAll('canvas');
+  origCanvases.forEach((cv, i) => {
+    try {
+      const img = document.createElement('img');
+      img.src = cv.toDataURL('image/png');
+      img.style.cssText = cv.style.cssText;
+      img.style.width = cv.offsetWidth + 'px';
+      img.style.height = cv.offsetHeight + 'px';
+      img.style.display = 'block';
+      if (cloneCanvases[i] && cloneCanvases[i].parentNode) {
+        cloneCanvases[i].parentNode.replaceChild(img, cloneCanvases[i]);
+      }
+    } catch(e) { /* tainting — zostaw canvas */ }
+  });
+
   const iframe = document.createElement('iframe');
   iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:210mm;height:297mm;border:none;';
   document.body.appendChild(iframe);
@@ -6506,7 +6524,7 @@ function printOverlay(overlayId) {
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'DM Sans',sans-serif;font-size:12px;color:#1f2937;background:#fff;padding:1.5cm 2cm;}
-.ro-bar{display:none!important;}
+.ro-bar,.slide-action-buttons{display:none!important;}
 .rh{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:.75rem;margin-bottom:1.5rem;border-bottom:3px solid #ff6b35;}
 .rh-logo{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#111;}
 .rh-logo span{color:#ff6b35;}
@@ -6524,7 +6542,11 @@ tbody td{padding:6px 8px;vertical-align:middle;}
 .ai-body p{margin-bottom:.5rem;}
 .ai-body strong{font-weight:600;color:#111;}
 .rf{margin-top:1.5rem;padding-top:.5rem;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;}
-</style></head><body>${inner.innerHTML}</body></html>`);
+.slide-block{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:1.5rem 2rem;margin-bottom:1.25rem;break-inside:avoid;}
+.dashboard-grid{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;}
+.dashboard-card{flex:1;min-width:140px;background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;padding:12px;}
+img{max-width:100%;height:auto;}
+</style></head><body>${clone.innerHTML}</body></html>`);
   doc.close();
 
   iframe.onload = () => {
