@@ -1374,28 +1374,6 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   </div>
   <div class="tbl-wrap" style="overflow-x:auto;border-radius:10px">
     <table class="arkusz-tbl" id="arkuszTable">
-      <thead>
-        <tr>
-          <th rowspan="2">Data</th>
-          <th rowspan="2">Konto</th>
-          <th colspan="3" class="arkusz-prod-hdr">Produktowa</th>
-          <th rowspan="2">SS</th>
-          <th rowspan="2">Qlt</th>
-          <th rowspan="2">Wartość</th>
-          <th rowspan="2">Koszty</th>
-          <th rowspan="2">Obowiązkowe</th>
-          <th rowspan="2">Dostawa</th>
-          <th rowspan="2">Reklama</th>
-          <th rowspan="2">Udział Adsów</th>
-          <th rowspan="2">Estymacja m-c</th>
-          <th rowspan="2">m/m</th>
-        </tr>
-        <tr>
-          <th>Koszt</th>
-          <th>ROAS</th>
-          <th>Wartość</th>
-        </tr>
-      </thead>
       <tbody id="arkuszTbody"></tbody>
     </table>
   </div>
@@ -2345,10 +2323,29 @@ function renderArkusz(){
     {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160',accs:['Luxsen','Semmi','BOTAVIT']},
     {key:'ONE',  color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU','Ankado24']},
   ];
+  const mkHdr=(g)=>`
+    <tr>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Data</th>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Konto</th>
+      <th colspan="3" class="arkusz-prod-hdr" style="border-top:2px solid rgba(${g.rgb},.5)">Produktowa</th>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">SS</th>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Qlt</th>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Wartość</th>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Koszty</th>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Obowiązkowe</th>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Dostawa</th>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Reklama</th>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Udział Adsów</th>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Estymacja m-c</th>
+      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">m/m</th>
+    </tr>
+    <tr>
+      <th>Koszt</th><th>ROAS</th><th>Wartość</th>
+    </tr>`;
   let html='';
   GROUPS.forEach((g,gi)=>{
     if(gi>0) html+=`<tr class="arkusz-group-spacer"><td colspan="15"></td></tr>`;
-    html+=`<tr class="arkusz-group-hdr"><td colspan="15" style="background:rgba(${g.rgb},.14);border-top:2px solid rgba(${g.rgb},.5);border-bottom:2px solid rgba(${g.rgb},.35);color:${g.color}">${g.key}</td></tr>`;
+    html+=mkHdr(g);
     g.accs.forEach((k,ai)=>{
       const D=getData(k);
       if(!D.length) return;
