@@ -42,7 +42,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 /* LAYOUT */
 .layout{display:grid;grid-template-columns:1fr 340px;gap:0;height:calc(100vh - 48px - 3px - 42px);}
 .col-left{overflow-y:auto;padding:1.25rem 1.5rem;border-right:1px solid var(--border);}
-.col-right{overflow-y:auto;padding:1.25rem;}
+.col-right{overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;}
+.notes-bottom{margin-top:auto;padding-top:1rem;border-top:1px solid var(--border);}
+.mit-opt .mit-num{color:var(--text2);}
+.mit-opt .mit-input{font-size:12px;padding:6px 10px;}
+.opt-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem;margin-top:-.25rem;}
 
 /* MIT */
 .section-title{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem;}
@@ -199,7 +203,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
     </div>
   </div>
 
-  <!-- RIGHT: MIT + timer + notes -->
+  <!-- RIGHT: MIT + optional + timer + notes -->
   <div class="col-right">
     <div class="section-title">3 MIT — priorytety dnia</div>
     <div class="mit-list">
@@ -220,6 +224,25 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
       </div>
     </div>
 
+    <div class="section-title" style="margin-bottom:.35rem">Opcjonalne — jeśli czas pozwoli</div>
+    <div class="mit-list mit-opt">
+      <div class="mit-row">
+        <div class="mit-num">4</div>
+        <input class="mit-input" id="mito1" placeholder="Zadanie opcjonalne..." oninput="saveMITOpt()">
+        <div class="mit-check" id="moc1" onclick="toggleMITOpt(1)"></div>
+      </div>
+      <div class="mit-row">
+        <div class="mit-num">5</div>
+        <input class="mit-input" id="mito2" placeholder="Zadanie opcjonalne..." oninput="saveMITOpt()">
+        <div class="mit-check" id="moc2" onclick="toggleMITOpt(2)"></div>
+      </div>
+      <div class="mit-row">
+        <div class="mit-num">6</div>
+        <input class="mit-input" id="mito3" placeholder="Zadanie opcjonalne..." oninput="saveMITOpt()">
+        <div class="mit-check" id="moc3" onclick="toggleMITOpt(3)"></div>
+      </div>
+    </div>
+
     <div class="section-title">Timer bloku</div>
     <div class="timer-card">
       <div class="timer-project" id="timerProject">brak aktywnego bloku</div>
@@ -231,9 +254,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
       </div>
     </div>
 
-    <div class="section-title" id="notesTitle">Notatka do bloku</div>
-    <textarea class="notes-area" id="notesArea" placeholder="Co robię w tym bloku, co zostało, wnioski..." oninput="autoSaveNote()"></textarea>
-    <button class="save-note-btn" onclick="saveNote()">Zapisz notatkę</button>
+    <div class="notes-bottom">
+      <div class="section-title" id="notesTitle" style="margin-bottom:.5rem">Notatka do bloku</div>
+      <textarea class="notes-area" id="notesArea" placeholder="Co robię w tym bloku, co zostało, wnioski..." oninput="autoSaveNote()"></textarea>
+      <button class="save-note-btn" onclick="saveNote()">Zapisz notatkę</button>
+    </div>
   </div>
 </div>
 
@@ -322,6 +347,8 @@ if (!state.notes)      state.notes = {};
 if (!state.log)        state.log = [];
 if (!state.blocksDone) state.blocksDone = {};
 if (!state.tasks)      state.tasks = {};
+if (!state.mitOpt)     state.mitOpt = ['','',''];
+if (!state.mitOptDone) state.mitOptDone = [false,false,false];
 
 // ── TIME UTILS ───────────────────────────────────────────────────
 function timeToMin(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
@@ -577,6 +604,7 @@ function renderMIT() {
     if (state.mitDone[i-1]) { chk.classList.add('checked'); inp.classList.add('done'); }
     else { chk.classList.remove('checked'); inp.classList.remove('done'); }
   });
+  renderMITOpt();
 }
 function saveMIT() {
   [1,2,3].forEach(i => { state.mit[i-1] = document.getElementById('mit'+i).value; });
@@ -587,6 +615,28 @@ function toggleMIT(i) {
   state.mit[i-1] = document.getElementById('mit'+i).value;
   saveDay(state); renderMIT();
   if (state.mitDone[i-1]) addLog('MIT #'+i+' ✓ '+state.mit[i-1]);
+}
+
+// ── MIT OPCJONALNE (4–6) ─────────────────────────────────────────
+function renderMITOpt() {
+  [1,2,3].forEach(i => {
+    const inp = document.getElementById('mito'+i);
+    const chk = document.getElementById('moc'+i);
+    if (!inp) return;
+    inp.value = state.mitOpt[i-1] || '';
+    if (state.mitOptDone[i-1]) { chk.classList.add('checked'); inp.classList.add('done'); }
+    else { chk.classList.remove('checked'); inp.classList.remove('done'); }
+  });
+}
+function saveMITOpt() {
+  [1,2,3].forEach(i => { state.mitOpt[i-1] = document.getElementById('mito'+i).value; });
+  saveDay(state);
+}
+function toggleMITOpt(i) {
+  state.mitOptDone[i-1] = !state.mitOptDone[i-1];
+  state.mitOpt[i-1] = document.getElementById('mito'+i).value;
+  saveDay(state); renderMITOpt();
+  if (state.mitOptDone[i-1]) addLog('OPT #'+(i+3)+' ✓ '+state.mitOpt[i-1]);
 }
 
 // ── NOTES ────────────────────────────────────────────────────────
