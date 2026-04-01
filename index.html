@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.6</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.7</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -5548,6 +5548,24 @@ function generateMTDReport() {
   // Reset checkboxes
   document.querySelectorAll('#reportModal .report-check').forEach(el => el.classList.remove('checked'));
   updateReportCount();
+  // Default: gdy dzień 1 miesiąca → cały poprzedni miesiąc; inaczej → 1..wczoraj
+  const now = new Date();
+  const yest = new Date(now); yest.setDate(now.getDate()-1);
+  let fromDate, toDate;
+  if(now.getDate() === 1){
+    const lastOfPrev = new Date(now.getFullYear(), now.getMonth(), 0);
+    const firstOfPrev = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    fromDate = fmt(firstOfPrev);
+    toDate   = fmt(lastOfPrev);
+  } else {
+    const y = now.getFullYear(), mo = now.getMonth();
+    fromDate = `${y}-${String(mo+1).padStart(2,'0')}-01`;
+    toDate   = `${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
+  }
+  document.getElementById('reportDateFrom').value = fromDate;
+  document.getElementById('reportDateTo').value   = toDate;
+  document.getElementById('reportDateWarning').style.display = 'none';
   document.getElementById('reportModal').style.display = 'flex';
 }
 
@@ -5580,15 +5598,30 @@ async function runSelectedReport() {
   const selected = [...document.querySelectorAll('#reportModal .report-check.checked')]
     .map(el => el.dataset.key);
   if (!selected.length) return;
+  const dateFrom = document.getElementById('reportDateFrom').value;
+  const dateTo = document.getElementById('reportDateTo').value;
+  const warnEl = document.getElementById('reportDateWarning');
+  if (!dateFrom || !dateTo) { warnEl.textContent='Wybierz daty zakresu'; warnEl.style.display='block'; return; }
+  if (dateTo < dateFrom) { warnEl.textContent='Błędny zakres dat — "Do" musi być po "Od"'; warnEl.style.display='block'; return; }
   closeReportModal();
-  await runMTDReport(selected);
+  await runMTDReport(selected, dateFrom, dateTo);
 }
 
-async function runMTDReport(selectedKeys) {
+async function runMTDReport(selectedKeys, dateFrom, dateTo) {
   const responseEl = document.getElementById('agentResponse');
   const now = new Date();
-  const curM = MONTHS[now.getMonth()];
-  const dayNum = now.getDate();
+  // Determine reference month from dateFrom (or fallback to current month)
+  let curM, dayNum;
+  if(dateFrom){
+    const dtFrom = new Date(dateFrom);
+    curM = MONTHS[dtFrom.getMonth()];
+    // dayNum = last day of the range (limited to days in that month)
+    const dtTo = dateTo ? new Date(dateTo) : new Date(dtFrom.getFullYear(), dtFrom.getMonth()+1, 0);
+    dayNum = dtTo.getDate();
+  } else {
+    curM = MONTHS[now.getMonth()];
+    dayNum = now.getDate();
+  }
   const accLabel = selectedKeys.length === 9 ? 'wszystkich 9 kont' : selectedKeys.length + ' ' + (selectedKeys.length===1?'konta':selectedKeys.length<5?'kont':'kont');
 
   // Loading state
@@ -5644,7 +5677,8 @@ async function runMTDReport(selectedKeys) {
   const isAll = n === 9;
   const systemPrompt = buildAgentContext();
   const daysInCurMonth = DAYS_IN[curM] || 30;
-  const reportPrompt = `Wygeneruj profesjonalny raport miesięczny MTD (miesiąc: ${curM}, dzień: ${dayNum}/${daysInCurMonth}).
+  const dateRangeLabel = dateFrom && dateTo ? ` | zakres: ${dateFrom} – ${dateTo}` : '';
+  const reportPrompt = `Wygeneruj profesjonalny raport miesięczny MTD (miesiąc: ${curM}, dzień: ${dayNum}/${daysInCurMonth}${dateRangeLabel}).
 Raport dotyczy ${isAll ? 'wszystkich 9 kont' : 'wybranych kont: ' + selectedKeys.map(k=>AC_META[k]?.name||k).join(', ')}.
 
 WAŻNE — Est. EOM:
@@ -9477,6 +9511,17 @@ self.addEventListener('fetch', e => e.respondWith(
       <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="reportSelectedCount">0 kont wybranych</span>
       <span class="report-select-all" onclick="reportSelectAll()">zaznacz wszystkie</span>
       <span class="report-select-all" onclick="reportSelectNone()">odznacz</span>
+    </div>
+
+    <div style="margin-top:.85rem;padding:.65rem .8rem;background:var(--bg3);border:1px solid var(--border2);border-radius:7px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:.5rem;letter-spacing:.06em">ZAKRES DAT</div>
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+        <label style="font-family:var(--mono);font-size:10px;color:var(--text2)">Od:</label>
+        <input type="date" id="reportDateFrom" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none;color-scheme:dark">
+        <label style="font-family:var(--mono);font-size:10px;color:var(--text2)">Do:</label>
+        <input type="date" id="reportDateTo" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none;color-scheme:dark">
+      </div>
+      <div id="reportDateWarning" style="font-family:var(--mono);font-size:9px;color:#f59e0b;margin-top:.4rem;display:none"></div>
     </div>
 
     <div class="report-modal-actions">
