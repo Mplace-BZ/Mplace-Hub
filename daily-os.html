@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily OS — MPlace</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0f1117;--bg2:#181c26;--bg3:#1e2333;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --text:#e8eaf0;--text2:#8b91a8;--text3:#4a5068;
+  --accent:#ff6b35;--green:#2dd4a0;--red:#ff4d6a;--yellow:#f5a623;--blue:#4d9fff;--purple:#b47fff;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;min-height:100vh;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:48px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+.brand{font-family:var(--mono);font-size:14px;font-weight:500;letter-spacing:.04em;}
+.brand span{color:var(--accent);}
+.clock{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--text);letter-spacing:.06em;}
+.date-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-align:right;}
+
+/* CURRENT BLOCK BANNER */
+.now-banner{padding:.75rem 1.5rem;display:flex;align-items:center;gap:1rem;border-bottom:1px solid var(--border);}
+.now-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.now-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;}
+.now-name{font-size:15px;font-weight:600;color:var(--text);}
+.now-time{font-family:var(--mono);font-size:11px;color:var(--text2);}
+.now-countdown{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--text2);}
+.now-countdown span{color:var(--accent);font-weight:600;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:1fr 340px;gap:0;height:calc(100vh - 49px - 44px);}
+.col-left{overflow-y:auto;padding:1.25rem 1.5rem;border-right:1px solid var(--border);}
+.col-right{overflow-y:auto;padding:1.25rem;}
+
+/* MIT */
+.section-title{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem;}
+.mit-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem;}
+.mit-row{display:flex;align-items:center;gap:.6rem;}
+.mit-num{font-family:var(--mono);font-size:11px;color:var(--accent);width:16px;flex-shrink:0;}
+.mit-input{flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--sans);font-size:13px;padding:7px 10px;border-radius:6px;outline:none;transition:border-color .15s;}
+.mit-input:focus{border-color:rgba(255,107,53,.4);}
+.mit-input.done{text-decoration:line-through;color:var(--text3);}
+.mit-check{width:18px;height:18px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.mit-check.checked{background:var(--green);border-color:var(--green);}
+.mit-check.checked::after{content:'✓';font-size:11px;color:#0f1117;font-weight:700;}
+
+/* BLOCK TIMER */
+.timer-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1.25rem;}
+.timer-display{font-family:var(--mono);font-size:36px;font-weight:500;color:var(--text);text-align:center;letter-spacing:.06em;margin:8px 0;}
+.timer-project{font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
+.timer-btns{display:flex;gap:.5rem;justify-content:center;}
+.tbtn{font-family:var(--mono);font-size:11px;padding:6px 16px;border-radius:6px;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all .15s;}
+.tbtn:hover{border-color:var(--accent);color:var(--accent);}
+.tbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.tbtn.primary:hover{background:#ff8c5a;}
+.tbtn.danger{border-color:rgba(255,77,106,.3);color:var(--red);}
+
+/* NOTES */
+.notes-area{background:var(--bg3);border:1px solid var(--border);border-radius:6px;width:100%;min-height:90px;resize:vertical;color:var(--text);font-family:var(--sans);font-size:12px;padding:10px;outline:none;line-height:1.6;transition:border-color .15s;}
+.notes-area:focus{border-color:var(--border2);}
+.save-note-btn{margin-top:.4rem;font-family:var(--mono);font-size:10px;padding:4px 12px;border-radius:5px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text3);transition:all .15s;}
+.save-note-btn:hover{color:var(--accent);border-color:rgba(255,107,53,.3);}
+
+/* SCHEDULE */
+.schedule{display:flex;flex-direction:column;gap:3px;}
+.block-row{display:flex;align-items:flex-start;gap:.6rem;padding:7px 10px;border-radius:7px;border:1px solid transparent;cursor:pointer;transition:all .15s;position:relative;}
+.block-row:hover{background:var(--bg3);}
+.block-row.active{background:rgba(255,107,53,.08);border-color:rgba(255,107,53,.25);}
+.block-row.done{opacity:.5;}
+.block-row.upcoming{}
+.block-time{font-family:var(--mono);font-size:10px;color:var(--text3);width:88px;flex-shrink:0;padding-top:1px;}
+.block-info{flex:1;}
+.block-name{font-size:12px;font-weight:500;color:var(--text);line-height:1.3;}
+.block-tag{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;margin-top:3px;letter-spacing:.06em;}
+.tag-deep{background:rgba(77,159,255,.1);color:var(--blue);}
+.tag-ops{background:rgba(45,212,160,.08);color:var(--green);}
+.tag-break{background:rgba(139,145,168,.08);color:var(--text3);}
+.tag-tools{background:rgba(180,127,255,.1);color:var(--purple);}
+.tag-training{background:rgba(245,166,35,.1);color:var(--yellow);}
+.block-done-icon{font-size:12px;color:var(--green);margin-left:auto;padding-top:1px;}
+.block-note-preview{font-size:10px;color:var(--text3);margin-top:3px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
+
+/* LOG */
+.log-list{display:flex;flex-direction:column;gap:.35rem;max-height:180px;overflow-y:auto;}
+.log-entry{font-family:var(--mono);font-size:10px;color:var(--text2);display:flex;gap:.5rem;align-items:baseline;}
+.log-time{color:var(--text3);white-space:nowrap;}
+.log-text{color:var(--text2);}
+
+/* SAVE INDICATOR */
+.saved-flash{position:fixed;bottom:1rem;right:1rem;background:var(--bg2);border:1px solid var(--border2);padding:.4rem .8rem;border-radius:6px;font-family:var(--mono);font-size:10px;color:var(--green);opacity:0;transition:opacity .3s;pointer-events:none;}
+.saved-flash.show{opacity:1;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">M<span>Place</span> <span style="color:var(--text3);font-size:11px">/ Daily OS</span></div>
+  <div style="text-align:center">
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+  <div class="date-label" id="dateLabel"></div>
+</div>
+
+<div class="now-banner" id="nowBanner">
+  <div class="now-dot"></div>
+  <div>
+    <div class="now-label">Teraz</div>
+    <div class="now-name" id="nowName">—</div>
+    <div class="now-time" id="nowTime"></div>
+  </div>
+  <div class="now-countdown" id="nowCountdown"></div>
+</div>
+
+<div class="layout">
+  <!-- LEFT: schedule + log -->
+  <div class="col-left">
+    <div class="section-title" style="margin-bottom:.75rem">Plan dnia</div>
+    <div class="schedule" id="scheduleEl"></div>
+
+    <div style="margin-top:1.5rem">
+      <div class="section-title">Log dnia</div>
+      <div class="log-list" id="logList"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: MIT + timer + notes -->
+  <div class="col-right">
+    <div class="section-title">3 MIT — priorytety dnia</div>
+    <div class="mit-list">
+      <div class="mit-row">
+        <div class="mit-num">1</div>
+        <input class="mit-input" id="mit1" placeholder="Najważniejsze zadanie dnia..." oninput="saveMIT()">
+        <div class="mit-check" id="mc1" onclick="toggleMIT(1)"></div>
+      </div>
+      <div class="mit-row">
+        <div class="mit-num">2</div>
+        <input class="mit-input" id="mit2" placeholder="Drugie zadanie..." oninput="saveMIT()">
+        <div class="mit-check" id="mc2" onclick="toggleMIT(2)"></div>
+      </div>
+      <div class="mit-row">
+        <div class="mit-num">3</div>
+        <input class="mit-input" id="mit3" placeholder="Trzecie zadanie..." oninput="saveMIT()">
+        <div class="mit-check" id="mc3" onclick="toggleMIT(3)"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Timer bloku</div>
+    <div class="timer-card">
+      <div class="timer-project" id="timerProject">brak aktywnego bloku</div>
+      <div class="timer-display" id="timerDisplay">00:00:00</div>
+      <div class="timer-btns">
+        <button class="tbtn primary" id="timerBtn" onclick="toggleTimer()">▶ Start</button>
+        <button class="tbtn danger" onclick="resetTimer()">Reset</button>
+        <button class="tbtn" onclick="logBlock()">Zaloguj ↗</button>
+      </div>
+    </div>
+
+    <div class="section-title" id="notesTitle">Notatka do bloku</div>
+    <textarea class="notes-area" id="notesArea" placeholder="Co robię w tym bloku, co zostało, wnioski..." oninput="autoSaveNote()"></textarea>
+    <button class="save-note-btn" onclick="saveNote()">Zapisz notatkę</button>
+  </div>
+</div>
+
+<div class="saved-flash" id="savedFlash">Zapisano</div>
+
+<script>
+// ── SCHEDULE DEFINITION ────────────────────────────────────────
+const DOW = new Date().getDay(); // 0=nd,1=pn,...,5=pt,6=sb
+const isWeekend = DOW === 0 || DOW === 6;
+
+// Deep work rotation: Mon/Wed/Fri = Luxen first, Tue/Thu = Meble first
+const luxenFirst = DOW === 1 || DOW === 3 || DOW === 5; // Pn/Śr/Pt
+const dw1 = luxenFirst ? 'Deep work — LUXSEN' : 'Deep work — MEBLE';
+const dw2 = luxenFirst ? 'Deep work — MEBLE'  : 'Deep work — LUXSEN';
+
+const BLOCKS = isWeekend ? [
+  { start:'10:00', end:'12:00', name:'Narzędzia / Rozwój',       tag:'tools',    key:'tools1' },
+  { start:'12:00', end:'14:00', name:'Klienci (raporty, oferty)',tag:'ops',      key:'weekend_clients' },
+  { start:'14:00', end:'15:00', name:'Przerwa',                   tag:'break',    key:'break1' },
+  { start:'15:00', end:'19:00', name:'Narzędzia — deep work',    tag:'tools',    key:'tools2' },
+  { start:'19:00', end:'22:00', name:'Luźny rozwój / planowanie',tag:'tools',    key:'tools3' },
+] : [
+  { start:'08:00', end:'09:30', name:'Poranna wieża kontrolna',  tag:'ops',      key:'tower' },
+  { start:'09:30', end:'10:15', name:'Szkolenie Materazzi',      tag:'training', key:'training' },
+  { start:'10:15', end:'10:35', name:'Spacer / reset',           tag:'break',    key:'walk1' },
+  { start:'10:35', end:'13:00', name:dw1,                        tag:'deep',     key:'dw1' },
+  { start:'13:00', end:'15:00', name:dw2,                        tag:'deep',     key:'dw2' },
+  { start:'15:00', end:'16:00', name:'Lunch + spacer',           tag:'break',    key:'lunch' },
+  { start:'16:00', end:'18:00', name:'Utrzymanie (EU, Ankado, suple)', tag:'ops','key':'ops' },
+  { start:'18:00', end:'18:30', name:'Zamknięcie dnia klienckiego', tag:'ops',   key:'close' },
+  { start:'19:00', end:'23:00', name:'Narzędzia / development',  tag:'tools',    key:'tools' },
+];
+
+const TAG_LABELS = { deep:'Deep Work', ops:'Operacyjne', break:'Przerwa', tools:'Narzędzia', training:'Szkolenie' };
+
+// ── STORAGE ────────────────────────────────────────────────────
+const TODAY = new Date().toISOString().slice(0,10);
+const SK = 'mplace_daily_' + TODAY;
+
+function loadDay() {
+  try { return JSON.parse(localStorage.getItem(SK) || '{}'); } catch(e) { return {}; }
+}
+function saveDay(d) { localStorage.setItem(SK, JSON.stringify(d)); }
+let state = loadDay();
+if (!state.mit) state.mit = ['','',''];
+if (!state.mitDone) state.mitDone = [false,false,false];
+if (!state.notes) state.notes = {};
+if (!state.log) state.log = [];
+if (!state.blocksDone) state.blocksDone = {};
+
+// ── TIME UTILS ─────────────────────────────────────────────────
+function timeToMin(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
+function nowMin() { const n=new Date(); return n.getHours()*60+n.getMinutes(); }
+function minToHMS(s) {
+  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function minLeft(endT) {
+  const diff = timeToMin(endT) - nowMin();
+  if (diff <= 0) return 'koniec';
+  const h = Math.floor(diff/60), m = diff%60;
+  return h>0 ? `${h}h ${m}min` : `${m} min`;
+}
+
+// ── CURRENT BLOCK ──────────────────────────────────────────────
+function getCurrentBlock() {
+  const nm = nowMin();
+  return BLOCKS.find(b => nm >= timeToMin(b.start) && nm < timeToMin(b.end)) || null;
+}
+
+// ── RENDER SCHEDULE ────────────────────────────────────────────
+function renderSchedule() {
+  const cur = getCurrentBlock();
+  const nm = nowMin();
+  const el = document.getElementById('scheduleEl');
+  el.innerHTML = BLOCKS.map(b => {
+    const isActive = cur && cur.key === b.key;
+    const isDone   = nm >= timeToMin(b.end);
+    const note     = state.notes[b.key] || '';
+    const doneMark = state.blocksDone[b.key] ? '<span class="block-done-icon">✓</span>' : '';
+    const notePreview = note ? `<div class="block-note-preview">${note.slice(0,60)}</div>` : '';
+    return `<div class="block-row ${isActive?'active':''} ${isDone&&!isActive?'done':''}"
+      onclick="selectBlock('${b.key}')">
+      <div class="block-time">${b.start}–${b.end}</div>
+      <div class="block-info">
+        <div class="block-name">${b.name}</div>
+        <div class="block-tag tag-${b.tag}">${TAG_LABELS[b.tag]||b.tag}</div>
+        ${notePreview}
+      </div>
+      ${doneMark}
+    </div>`;
+  }).join('');
+}
+
+// ── NOW BANNER ─────────────────────────────────────────────────
+function updateNowBanner() {
+  const cur = getCurrentBlock();
+  const nameEl = document.getElementById('nowName');
+  const timeEl = document.getElementById('nowTime');
+  const countEl = document.getElementById('nowCountdown');
+  if (cur) {
+    nameEl.textContent = cur.name;
+    timeEl.textContent = cur.start + ' – ' + cur.end;
+    countEl.innerHTML = 'Zostało: <span>' + minLeft(cur.end) + '</span>';
+    if (!timerRunning && timerProject !== cur.name) {
+      document.getElementById('timerProject').textContent = cur.name;
+      timerProject = cur.name;
+    }
+  } else {
+    const nm = nowMin();
+    const next = BLOCKS.find(b => timeToMin(b.start) > nm);
+    if (next) {
+      nameEl.textContent = 'Brak bloku';
+      timeEl.textContent = '';
+      const diff = timeToMin(next.start) - nm;
+      countEl.innerHTML = `Następny: <span>${next.name}</span> za ${diff} min`;
+    } else {
+      nameEl.textContent = 'Koniec dnia';
+      timeEl.textContent = '';
+      countEl.textContent = 'Dobra robota.';
+    }
+  }
+}
+
+// ── SELECT BLOCK (for notes/timer) ────────────────────────────
+let activeBlockKey = null;
+function selectBlock(key) {
+  activeBlockKey = key;
+  const b = BLOCKS.find(x => x.key === key);
+  if (!b) return;
+  document.getElementById('notesTitle').textContent = 'Notatka: ' + b.name;
+  document.getElementById('notesArea').value = state.notes[key] || '';
+  if (!timerRunning) {
+    document.getElementById('timerProject').textContent = b.name;
+    timerProject = b.name;
+  }
+}
+
+// ── CLOCK ──────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('pl-PL', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function updateDate() {
+  const now = new Date();
+  const days = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
+  document.getElementById('dateLabel').textContent =
+    days[now.getDay()] + ', ' + now.toLocaleDateString('pl-PL',{day:'2-digit',month:'long',year:'numeric'});
+}
+
+// ── MIT ────────────────────────────────────────────────────────
+function renderMIT() {
+  [1,2,3].forEach(i => {
+    const inp = document.getElementById('mit'+i);
+    const chk = document.getElementById('mc'+i);
+    inp.value = state.mit[i-1] || '';
+    if (state.mitDone[i-1]) { chk.classList.add('checked'); inp.classList.add('done'); }
+    else { chk.classList.remove('checked'); inp.classList.remove('done'); }
+  });
+}
+function saveMIT() {
+  [1,2,3].forEach(i => { state.mit[i-1] = document.getElementById('mit'+i).value; });
+  saveDay(state);
+}
+function toggleMIT(i) {
+  state.mitDone[i-1] = !state.mitDone[i-1];
+  state.mit[i-1] = document.getElementById('mit'+i).value;
+  saveDay(state);
+  renderMIT();
+  if (state.mitDone[i-1]) addLog('MIT #'+i+' ukończone: '+state.mit[i-1]);
+}
+
+// ── NOTES ──────────────────────────────────────────────────────
+let noteTimer = null;
+function autoSaveNote() {
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(saveNote, 1200);
+}
+function saveNote() {
+  const key = activeBlockKey || (getCurrentBlock()?.key) || 'general';
+  state.notes[key] = document.getElementById('notesArea').value;
+  saveDay(state);
+  flashSaved();
+  renderSchedule();
+}
+
+// ── TIMER ──────────────────────────────────────────────────────
+let timerRunning = false;
+let timerSecs = 0;
+let timerProject = '';
+let timerInterval = null;
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timerBtn').textContent = '▶ Start';
+    document.getElementById('timerBtn').classList.remove('danger');
+  } else {
+    timerRunning = true;
+    document.getElementById('timerBtn').textContent = '⏸ Pauza';
+    document.getElementById('timerBtn').classList.add('danger');
+    timerInterval = setInterval(() => {
+      timerSecs++;
+      document.getElementById('timerDisplay').textContent = minToHMS(timerSecs);
+    }, 1000);
+  }
+}
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSecs = 0;
+  document.getElementById('timerDisplay').textContent = '00:00:00';
+  document.getElementById('timerBtn').textContent = '▶ Start';
+  document.getElementById('timerBtn').classList.remove('danger');
+}
+function logBlock() {
+  if (timerSecs === 0) return;
+  const proj = timerProject || document.getElementById('timerProject').textContent;
+  addLog(proj + ' — ' + minToHMS(timerSecs));
+  const key = activeBlockKey || getCurrentBlock()?.key;
+  if (key) { state.blocksDone[key] = true; saveDay(state); renderSchedule(); }
+  resetTimer();
+}
+
+// ── LOG ────────────────────────────────────────────────────────
+function addLog(text) {
+  const now = new Date();
+  const t = now.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+  state.log.push({ t, text });
+  saveDay(state);
+  renderLog();
+}
+function renderLog() {
+  const el = document.getElementById('logList');
+  if (!state.log.length) { el.innerHTML = '<div style="color:var(--text3);font-family:var(--mono);font-size:10px">Brak wpisów</div>'; return; }
+  el.innerHTML = [...state.log].reverse().map(e =>
+    `<div class="log-entry"><span class="log-time">${e.t}</span><span class="log-text">${e.text}</span></div>`
+  ).join('');
+}
+
+// ── FLASH ──────────────────────────────────────────────────────
+function flashSaved() {
+  const el = document.getElementById('savedFlash');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1200);
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+updateClock();
+updateDate();
+renderMIT();
+renderLog();
+renderSchedule();
+updateNowBanner();
+
+// Auto-select current block
+const cur = getCurrentBlock();
+if (cur) selectBlock(cur.key);
+
+// Intervals
+setInterval(updateClock, 1000);
+setInterval(() => {
+  updateNowBanner();
+  renderSchedule();
+}, 30000);
+</script>
+</body>
+</html>
