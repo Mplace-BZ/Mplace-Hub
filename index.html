@@ -307,7 +307,8 @@ table.arkusz-tbl tbody tr:hover{background:rgba(255,255,255,.03);}
 table.arkusz-tbl tbody td{padding:6px 9px;vertical-align:middle;white-space:nowrap;font-family:var(--mono);font-size:11px;text-align:right;}
 table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-size:10px;}
 .arkusz-konto{text-align:left!important;font-weight:600;font-size:11px!important;padding-left:12px!important;border-right:1px solid rgba(255,255,255,.06);}
-.arkusz-group-hdr td{background:rgba(255,255,255,.02);padding:5px 10px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);border-top:2px solid rgba(255,255,255,.06);}
+.arkusz-group-hdr td{padding:7px 12px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-family:var(--mono);font-weight:500;}
+.arkusz-group-spacer td{height:18px;background:transparent;border:none;}
 .arkusz-acc-sep td{height:6px;background:rgba(255,255,255,.01);border-top:1px dashed rgba(255,255,255,.05);}
 
 /* ── PDF REPORT ── */
@@ -2345,8 +2346,9 @@ function renderArkusz(){
     {key:'ONE',  color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU','Ankado24']},
   ];
   let html='';
-  GROUPS.forEach(g=>{
-    html+=`<tr class="arkusz-group-hdr"><td colspan="15" style="color:${g.color};border-top:2px solid rgba(${g.rgb},.25)">── ${g.key} ──</td></tr>`;
+  GROUPS.forEach((g,gi)=>{
+    if(gi>0) html+=`<tr class="arkusz-group-spacer"><td colspan="15"></td></tr>`;
+    html+=`<tr class="arkusz-group-hdr"><td colspan="15" style="background:rgba(${g.rgb},.08);border-top:2px solid rgba(${g.rgb},.35);border-bottom:1px solid rgba(${g.rgb},.2);color:${g.color}">${g.key}</td></tr>`;
     g.accs.forEach((k,ai)=>{
       const D=getData(k);
       if(!D.length) return;
