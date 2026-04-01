@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.8</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.9</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6190,7 +6190,7 @@ function initDashboardChart(accDataArr) {
           pointBackgroundColor: '#b47fff',
           pointRadius: 5,
           tension: 0.3,
-          yAxisID: 'y2'
+          xAxisID: 'x2'
         }
       ]
     },
@@ -6200,7 +6200,8 @@ function initDashboardChart(accDataArr) {
       plugins: { legend: { labels: { font: { family:'DM Mono', size:10 }, color:'#374151' } } },
       scales: {
         y:  { ticks: { font:{family:'DM Mono',size:10}, color:'#374151' }, grid:{color:'#f3f4f6'} },
-        y2: { position:'right', ticks:{font:{family:'DM Mono',size:10},color:'#b47fff',callback:v=>v+'%'}, grid:{drawOnChartArea:false} }
+        x:  { ticks: { font:{family:'DM Mono',size:10}, color:'#374151' }, grid:{color:'#f3f4f6'} },
+        x2: { position:'top', ticks:{font:{family:'DM Mono',size:10},color:'#b47fff',callback:v=>v+'%'}, grid:{drawOnChartArea:false} }
       }
     }
   });
