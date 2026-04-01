@@ -3027,16 +3027,21 @@ function renderCompare(){
 // ═══════════════════════════════════════════════════════════
 function renderEntry(){
   const now=new Date();
-  const curM=MONTHS[now.getMonth()];
-  const daysInM=DAYS_IN[curM]||30;
+  const calM=MONTHS[now.getMonth()];
+  const daysInM=DAYS_IN[calM]||30;
   const todayDay=now.getDate();
 
-  document.getElementById('edbMonth').textContent=curM[0].toUpperCase()+curM.slice(1)+' '+now.getFullYear();
   document.getElementById('globalDayOf').textContent='/'+daysInM;
   document.getElementById('entryDateSub').textContent='Dzień dzisiejszy: '+now.toLocaleDateString('pl-PL');
   document.getElementById('globalDay').value=todayDay; // zawsze aktualizuj do dzisiaj
   const effectiveDay=parseInt(document.getElementById('globalDay').value)||todayDay;
   document.getElementById('edbProg').textContent=Math.round(effectiveDay/daysInM*100)+'% (dzień '+effectiveDay+'/'+daysInM+')';
+  // Konwencja -1: dzień 1 → zapis do poprzedniego miesiąca
+  const{m:saveM,isClosing}=getSaveMonth(effectiveDay);
+  const saveLabel=saveM[0].toUpperCase()+saveM.slice(1)+' '+now.getFullYear()+(isClosing?' ↩ zamknięcie':'');
+  document.getElementById('edbMonth').textContent=saveLabel;
+  document.getElementById('edbStatus').style.display=isClosing?'none':'';
+  const curM=saveM;
 
   // Timeline — newest on LEFT
   const allM=new Set();
@@ -3162,21 +3167,34 @@ function updateAuto(k){
 
 document.getElementById('globalDay').addEventListener('input',()=>{
   const now=new Date();
-  const curM=MONTHS[now.getMonth()];
-  const daysInM=DAYS_IN[curM]||30;
+  const calM=MONTHS[now.getMonth()];
+  const daysInM=DAYS_IN[calM]||30;
   const v=parseInt(document.getElementById('globalDay').value)||now.getDate();
   const clamped=Math.max(1,Math.min(v,daysInM));
   const prog=Math.round(clamped/daysInM*100);
   document.getElementById('edbProg').textContent=prog+'% (dzień '+clamped+'/'+daysInM+')';
+  const{m:saveM,isClosing}=getSaveMonth(clamped);
+  document.getElementById('edbMonth').textContent=saveM[0].toUpperCase()+saveM.slice(1)+' '+now.getFullYear()+(isClosing?' ↩ zamknięcie':'');
+  document.getElementById('edbStatus').style.display=isClosing?'none':'';
   Object.keys(AC_META).forEach(updateAuto);
 });
 
 // ═══════════════════════════════════════════════════════════
 // SAVE
 // ═══════════════════════════════════════════════════════════
+// Konwencja -1 dzień: wpis w dniu 1 miesiąca = zamknięcie poprzedniego miesiąca
+function getSaveMonth(dzienGlobal){
+  const now=new Date();
+  const m=now.getMonth();
+  if(dzienGlobal===1){
+    const prevIdx=m===0?11:m-1;
+    return{m:MONTHS[prevIdx],dzien:null,isClosing:true};
+  }
+  return{m:MONTHS[m],dzien:dzienGlobal,isClosing:false};
+}
 function saveAll(){
-  const curM=MONTHS[new Date().getMonth()];
   const dzienGlobal=parseInt(document.getElementById('globalDay').value)||null;
+  const{m:curM,dzien:dzienEff,isClosing}=getSaveMonth(dzienGlobal);
   let saved=0,updated=0;
 
   Object.keys(AC_META).forEach(k=>{
@@ -3197,7 +3215,7 @@ function saveAll(){
       promoC:gN(`e_${k}_promoC`)||0,
       elasticC:0,
       coinsC:gN(`e_${k}_coinsC`)||0,
-      dzien:dzienLocal||dzienGlobal,
+      dzien:isClosing?null:(dzienLocal||dzienEff),
       note:(document.getElementById(`e_${k}_note`)?.value||''). trim(),
       estOver:null,
       savedAt:Date.now(),
@@ -3698,8 +3716,8 @@ function setProd(k, v){
 const _origSaveAll = saveAll;
 async function saveAllWithSync(){
   // First save locally (original logic)
-  const curM = MONTHS[new Date().getMonth()];
   const dzienGlobal = parseInt(document.getElementById('globalDay').value)||null;
+  const{m:curM,dzien:dzienEff,isClosing}=getSaveMonth(dzienGlobal);
   let saved=0, updated=0;
   const savedKeys = [];
 
@@ -3721,7 +3739,7 @@ async function saveAllWithSync(){
       promoC: gN('e_'+k+'_promoC')||0,
       elasticC: 0,
       coinsC: gN('e_'+k+'_coinsC')||0,
-      dzien: dzienLocal||dzienGlobal,
+      dzien: isClosing?null:(dzienLocal||dzienEff),
       note: (document.getElementById('e_'+k+'_note')?.value||'').trim(),
       estOver: null,
       savedAt: Date.now(),
