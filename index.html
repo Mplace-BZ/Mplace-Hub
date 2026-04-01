@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.2</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.3</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -5957,24 +5957,19 @@ async function runSlideReport(selectedKeys, dateFrom, dateTo) {
   }
 
   let dataCtx = `Zakres analizy: ${zakresLabel} (${totalDaysRange} dni kalendarzowych)\n\n`;
-  const accDataArr = [];
 
+  // ── DASHBOARD CARDS: zawsze z danych miesięcznych, niezależnie od D2D ──────
+  const targetMonth = MONTHS[new Date(dateFrom+'T00:00:00').getMonth()];
+  const accDataArr = [];
   Object.entries(filteredGroups).forEach(([gKey, g]) => {
-    dataCtx += `=== GRUPA ${gKey} (producent ${g.prod}%) ===\n`;
     g.accs.forEach(k => {
       const prod = getProd(k);
       const accName = AC_META[k]?.name || k;
-      const entries = allD2D
-        .filter(s => { if(s.account!==k) return false; const d=entryDate(s); return d&&d>=dFrom&&d<=dTo; })
-        .sort((a,b) => entryDate(a)-entryDate(b));
-
-      // Dashboard cards: always use monthly stored data (D2D snapshots store cumulative MTD — summing would multiply)
-      const targetMonth = MONTHS[new Date(dateFrom+'T00:00:00').getMonth()];
       const monthRec = getData(k).find(d => d.m === targetMonth);
       if (monthRec) {
-        const Cdash   = calc(monthRec, prod);
-        const dashSp  = monthRec.sprzedaz||0;
-        const dashAds = monthRec.adsCost||0;
+        const Cdash  = calc(monthRec, prod);
+        const dashSp = monthRec.sprzedaz||0;
+        const dashAds= monthRec.adsCost||0;
         accDataArr.push({
           key:k, name:accName, group:gKey,
           sprzedazSum: dashSp,
@@ -5986,13 +5981,25 @@ async function runSlideReport(selectedKeys, dateFrom, dateTo) {
           adsPct:      dashSp>0 ? dashAds/dashSp*100 : 0
         });
       }
+    });
+  });
+
+  // ── PROMPT CONTEXT: D2D snapshots dla trendów dziennych ─────────────────────
+  Object.entries(filteredGroups).forEach(([gKey, g]) => {
+    dataCtx += `=== GRUPA ${gKey} (producent ${g.prod}%) ===\n`;
+    g.accs.forEach(k => {
+      const prod = getProd(k);
+      const accName = AC_META[k]?.name || k;
+      const entries = allD2D
+        .filter(s => { if(s.account!==k) return false; const d=entryDate(s); return d&&d>=dFrom&&d<=dTo; })
+        .sort((a,b) => entryDate(a)-entryDate(b));
+      const monthRec = getData(k).find(d => d.m === targetMonth);
 
       if (!entries.length) {
-        // No D2D snapshots but monthly record may exist — include basic info in prompt
         if (monthRec) {
           const Cm = calc(monthRec, prod);
-          dataCtx += `\n${accName} (dane miesięczne, brak D2D):\n`;
-          dataCtx += `  Sprzedaż: ${Math.round(monthRec.sprzedaz||0).toLocaleString('pl-PL')} zł | ROAS: ${(monthRec.roas||0).toFixed(2)} | Marża: ${Cm.mAfter.toFixed(1)}%\n`;
+          dataCtx += `\n${accName} (dane miesięczne):\n`;
+          dataCtx += `  Sprzedaż: ${Math.round(monthRec.sprzedaz||0).toLocaleString('pl-PL')} zł | ROAS: ${(monthRec.roas||0).toFixed(2)} | Marża: ${Cm.mAfter.toFixed(1)}% | Wyróżnienia: ${((monthRec.promoC||0)/(monthRec.sprzedaz||1)*100).toFixed(1)}%\n`;
         } else {
           dataCtx += `\n${accName}: brak danych w zakresie ${zakresLabel}\n`;
         }
@@ -6018,11 +6025,17 @@ async function runSlideReport(selectedKeys, dateFrom, dateTo) {
       const missing  = totalDaysRange-entries.length;
       const dataNote = missing>0 ? ` (dane za ${entries.length} z ${totalDaysRange} dni, brak: ${missing} dni)` : ` (${entries.length} dni)`;
 
+      // Dla promptu AI używaj danych miesięcznych (bardziej wiarygodne niż suma D2D)
+      const mRec = getData(k).find(d => d.m === targetMonth);
+      const pSp   = mRec ? mRec.sprzedaz||0 : entries[entries.length-1]?.sprzedaz||0;
+      const pAds  = mRec ? mRec.adsCost||0  : adsCostSum;
+      const pRoas = mRec ? mRec.roas||0      : roasAvg;
+      const pMarza= mRec ? calc(mRec,prod).mAfter : marzaAvg;
+      const pWyroz= pSp>0 ? (mRec?mRec.promoC||0:promoCSum)/pSp*100 : 0;
+      const pAdsPct= pSp>0 ? pAds/pSp*100 : 0;
       dataCtx += `\n${accName}${dataNote}:\n`;
-      dataCtx += `  Sprzedaż łączna: ${Math.round(monthRec?monthRec.sprzedaz:sprzedazSum).toLocaleString('pl-PL')} zł\n`;
-      dataCtx += `  Koszt Ads: ${Math.round(monthRec?monthRec.adsCost||0:adsCostSum).toLocaleString('pl-PL')} zł | ROAS: ${(monthRec?monthRec.roas||0:roasAvg).toFixed(2)} | BE ROAS: ${Clast.beRoasAds.toFixed(2)}\n`;
-      dataCtx += `  Marża po reklamie: ${(monthRec?calc(monthRec,prod).mAfter:marzaAvg).toFixed(1)}%\n`;
-      dataCtx += `  Wyróżnienia: ${Math.round(monthRec?monthRec.promoC||0:promoCSum).toLocaleString('pl-PL')} zł (${(monthRec&&monthRec.sprzedaz>0?(monthRec.promoC||0)/monthRec.sprzedaz*100:wyrozPct).toFixed(1)}% sprzedaży) | Ads %: ${(monthRec&&monthRec.sprzedaz>0?(monthRec.adsCost||0)/monthRec.sprzedaz*100:adsPct).toFixed(1)}%\n`;
+      dataCtx += `  Sprzedaż: ${Math.round(pSp).toLocaleString('pl-PL')} zł | Koszt Ads: ${Math.round(pAds).toLocaleString('pl-PL')} zł | ROAS: ${pRoas.toFixed(2)} | BE ROAS: ${Clast.beRoasAds.toFixed(2)}\n`;
+      dataCtx += `  Marża po reklamie: ${pMarza.toFixed(1)}% | Wyróżnienia: ${pWyroz.toFixed(1)}% | Ads %: ${pAdsPct.toFixed(1)}%\n`;
       if (entries.length>1) {
         dataCtx += `  Trend dzienny sprzedaż (zł): `;
         dataCtx += entries.map(e=>`${e.m.substring(0,3)} ${e.dzien}: ${Math.round(e.sprzedaz||0).toLocaleString('pl-PL')}`).join(' | ');
