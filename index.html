@@ -2355,9 +2355,11 @@ function renderArkusz(){
       // oldest→newest
       D.forEach((d,i)=>{
         const C=calc(d,prod);
-        const est=estym(d);
+        // dzien=1 → za mało danych do estymacji (dzień 1 miesiąca, effectiveDzien=0→1)
+        const earlyEntry=d.dzien===1;
+        const est=earlyEntry?d.sprzedaz:estym(d);
         const origIdx=D.indexOf(d);
-        const dv=mmDelta(D,origIdx);
+        const dv=earlyEntry?null:mmDelta(D,origIdx);
         const sp=d.sprzedaz||0;
         const dostawaPct=sp>0?(d.delivery||0)/sp*100:0;
         const reklamaPct=C.acosTotal!=null?C.acosTotal:0;
@@ -2372,10 +2374,11 @@ function renderArkusz(){
         const prevRek=prevD&&sp>0?(()=>{const pC=calc(prevD,prod);return pC.acosTotal||0;})():null;
         const rekColor=prevRek===null?'var(--text)':(reklamaPct<=prevRek?'var(--green)':'var(--red)');
         const dvColor=dv===null?'var(--text3)':(dv>=0?'var(--green)':'var(--red)');
-        const estColor='var(--yellow)';
         const ssHtml=d.ss==='T'?`<span class="tbadge tbadge-on">T</span>`:d.ss==='N'?`<span class="tbadge tbadge-off">N</span>`:`<span class="tm">—</span>`;
         const kontoCell=i===0?`<td rowspan="${D.length}" class="arkusz-konto" style="border-left:3px solid ${g.color};color:${g.color}">${name}</td>`:'';
-        html+=`<tr>
+        // Estymacja: pokaż tylko gdy jest sensowna (nie dzien=1 i różna od sprzedazy)
+        const showEst=!earlyEntry&&d.dzien&&est!==sp;
+        html+=`<tr${earlyEntry?' style="opacity:.55"':''}>
           <td>${d.m[0].toUpperCase()+d.m.slice(1)}</td>
           ${kontoCell}
           <td>${sp&&d.adsCost?pln(d.adsCost):'—'}</td>
@@ -2389,8 +2392,8 @@ function renderArkusz(){
           <td style="color:var(--text3)">${dostawaPct.toFixed(2)}%</td>
           <td style="color:${rekColor}">${reklamaPct.toFixed(2)}%</td>
           <td style="color:var(--text3)">${udzialAdsPct.toFixed(2)}%</td>
-          <td style="color:${estColor}">${pln(est)}${d.dzien?'<span style="font-size:9px;color:var(--text3)"> e</span>':''}</td>
-          <td style="color:${dvColor}">${dv===null?'—':(dv>=0?'▲ ':'▼ ')+Math.abs(dv).toFixed(2)+'%'}</td>
+          <td style="color:${showEst?'var(--yellow)':'var(--text)'}">${pln(est)}${showEst?'<span style="font-size:9px;color:var(--text3)"> e</span>':''}</td>
+          <td style="color:${dvColor}">${dv===null?'<span class="tm">—</span>':(dv>=0?'▲ ':'▼ ')+Math.abs(dv).toFixed(2)+'%'}</td>
         </tr>`;
       });
       if(ai<g.accs.length-1) html+=`<tr class="arkusz-acc-sep"><td colspan="15"></td></tr>`;
