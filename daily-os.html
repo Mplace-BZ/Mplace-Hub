@@ -43,7 +43,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .layout{display:grid;grid-template-columns:1fr 340px;gap:0;height:calc(100vh - 48px - 3px - 42px);}
 .col-left{overflow-y:auto;padding:1.25rem 1.5rem;border-right:1px solid var(--border);}
 .col-right{overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;}
-.notes-bottom{margin-top:auto;padding-top:1rem;border-top:1px solid var(--border);}
+.notes-bottom{flex:1;display:flex;flex-direction:column;padding-top:1rem;border-top:1px solid var(--border);min-height:0;}
 .mit-opt .mit-num{color:var(--text2);}
 .mit-opt .mit-input{font-size:12px;padding:6px 10px;}
 .opt-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem;margin-top:-.25rem;}
@@ -73,7 +73,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .tbtn.green{border-color:rgba(45,212,160,.3);color:var(--green);}
 
 /* NOTES */
-.notes-area{background:var(--bg3);border:1px solid var(--border);border-radius:6px;width:100%;min-height:90px;resize:vertical;color:var(--text);font-family:var(--sans);font-size:12px;padding:10px;outline:none;line-height:1.6;transition:border-color .15s;}
+.notes-area{background:var(--bg3);border:1px solid var(--border);border-radius:6px;width:100%;min-height:120px;flex:1;resize:none;color:var(--text);font-family:var(--sans);font-size:12px;padding:10px;outline:none;line-height:1.6;transition:border-color .15s;}
 .notes-area:focus{border-color:var(--border2);}
 .save-note-btn{margin-top:.4rem;font-family:var(--mono);font-size:10px;padding:4px 12px;border-radius:5px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text3);transition:all .15s;}
 .save-note-btn:hover{color:var(--accent);border-color:rgba(255,107,53,.3);}
@@ -197,7 +197,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
     <div style="margin-top:1.5rem">
       <div class="log-header">
         <div class="section-title" style="margin-bottom:0">Log dnia</div>
-        <button class="copy-log-btn" onclick="copyLog()">Kopiuj log ↗</button>
       </div>
       <div class="log-list" id="logList"></div>
     </div>
