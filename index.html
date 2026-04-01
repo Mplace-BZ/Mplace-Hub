@@ -299,9 +299,9 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 
 /* ── ARKUSZ ── */
 table.arkusz-tbl{width:100%;border-collapse:collapse;font-size:11px;min-width:1200px;}
-table.arkusz-tbl thead th{padding:6px 9px;text-align:right;font-family:var(--mono);font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg);font-weight:400;white-space:nowrap;}
-table.arkusz-tbl thead th:first-child,table.arkusz-tbl thead th:nth-child(2){text-align:left;}
-table.arkusz-tbl thead .arkusz-prod-hdr{color:#ff6b35;background:rgba(255,107,53,.07);border-bottom:2px solid rgba(255,107,53,.4);text-align:center;}
+table.arkusz-tbl th{padding:6px 9px;text-align:right;font-family:var(--mono);font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg);font-weight:400;white-space:nowrap;}
+table.arkusz-tbl th:first-child,table.arkusz-tbl th.arkusz-th-left{text-align:left;}
+table.arkusz-tbl .arkusz-prod-hdr{color:#ff6b35;background:rgba(255,107,53,.07);border-bottom:2px solid rgba(255,107,53,.4);text-align:center;}
 table.arkusz-tbl tbody tr{border-bottom:1px solid rgba(255,255,255,.03);transition:background .1s;}
 table.arkusz-tbl tbody tr:hover{background:rgba(255,255,255,.03);}
 table.arkusz-tbl tbody td{padding:6px 9px;vertical-align:middle;white-space:nowrap;font-family:var(--mono);font-size:11px;text-align:right;}
@@ -2323,24 +2323,23 @@ function renderArkusz(){
     {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160',accs:['Luxsen','Semmi','BOTAVIT']},
     {key:'ONE',  color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU','Ankado24']},
   ];
+  const bt=(g)=>`border-top:2px solid rgba(${g.rgb},.45)`;
   const mkHdr=(g)=>`
-    <tr>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Data</th>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Konto</th>
-      <th colspan="3" class="arkusz-prod-hdr" style="border-top:2px solid rgba(${g.rgb},.5)">Produktowa</th>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">SS</th>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Qlt</th>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Wartość</th>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Koszty</th>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Obowiązkowe</th>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Dostawa</th>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Reklama</th>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Udział Adsów</th>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">Estymacja m-c</th>
-      <th rowspan="2" style="border-top:2px solid rgba(${g.rgb},.5)">m/m</th>
+    <tr class="arkusz-group-hdr">
+      <td colspan="15" style="background:rgba(${g.rgb},.14);${bt(g)};border-bottom:2px solid rgba(${g.rgb},.35);color:${g.color}">${g.key}</td>
     </tr>
     <tr>
+      <th class="arkusz-th-left">Data</th>
+      <th class="arkusz-th-left">Konto</th>
+      <th colspan="3" class="arkusz-prod-hdr">Produktowa</th>
+      <th>SS</th><th>Qlt</th><th>Wartość</th><th>Koszty</th>
+      <th>Obowiązkowe</th><th>Dostawa</th><th>Reklama</th>
+      <th>Udział Adsów</th><th>Estymacja m-c</th><th>m/m</th>
+    </tr>
+    <tr>
+      <th colspan="2"></th>
       <th>Koszt</th><th>ROAS</th><th>Wartość</th>
+      <th colspan="10"></th>
     </tr>`;
   let html='';
   GROUPS.forEach((g,gi)=>{
