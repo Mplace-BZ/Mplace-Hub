@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.3</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.4</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -3802,18 +3802,29 @@ async function saveAllWithSync(){
 // ── Auth state listener ──
 let _fsLoaded = false; // Load from Firebase only once per session
 
-// Usuwa wpisy z dzien=1 — artefakty zapisu w pierwszym dniu miesiąca przed fix v4.2
-function cleanupDzien1(){
+// Usuwa wpisy z dzien=1 z localStorage I Firebase — artefakty zapisu w dniu 1 miesiąca
+async function cleanupDzien1(){
   let removed=0;
+  const promises=[];
   Object.keys(AC_META).forEach(k=>{
     const D=getData(k);
     const filtered=D.filter(e=>e.dzien!==1);
     if(filtered.length<D.length){
       setData(k,filtered);
       removed+=D.length-filtered.length;
+      // Sync cleaned data to Firestore too
+      if(currentUser && db){
+        promises.push(
+          db.collection('users').doc(currentUser.uid)
+            .collection('accounts').doc(k)
+            .set({rows:filtered},{merge:true})
+            .catch(e=>console.warn('[cleanup] FS sync err',k,e))
+        );
+      }
     }
   });
-  if(removed>0) console.log(`[cleanup] Usunięto ${removed} wpis(ów) z dzien=1`);
+  if(promises.length) await Promise.all(promises);
+  if(removed>0) console.log(`[cleanup] Usunięto ${removed} wpis(ów) z dzien=1 (localStorage + Firestore)`);
 }
 
 auth.onAuthStateChanged(async user => {
@@ -3830,7 +3841,7 @@ auth.onAuthStateChanged(async user => {
       _fsLoaded = true;
       await loadFromFS();
     }
-    cleanupDzien1();
+    await cleanupDzien1();
     renderEntry();
     updateAlertBadge();
   } else {
@@ -4792,7 +4803,7 @@ function renderMonths(){
   function getVal(k, m){
     const D = getData(k);
     const d = D.find(x => x.m === m);
-    if(!d) return null;
+    if(!d || d.dzien===1) return null;
     const prod = getProd(k);
     const C = calc(d, prod);
     const est = estym(d);
