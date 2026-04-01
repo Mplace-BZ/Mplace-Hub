@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily OS v2.1 — MPlace</title>
+<title>Daily OS v2.3 — MPlace</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23181c26'/><text x='50%25' y='72%25' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='22' fill='%23b47fff'>H</text></svg>">
 <style>
@@ -93,6 +93,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
 .block-done-icon{font-size:12px;color:var(--green);margin-left:auto;padding-top:1px;flex-shrink:0;}
 .block-note-preview{font-size:10px;color:var(--text3);margin-top:3px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
 .block-click-hint{font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px;}
+
+/* BLOCK TASKS */
+.block-tasks{margin-top:.5rem;display:flex;flex-direction:column;gap:2px;}
+.btask{display:flex;align-items:center;gap:.4rem;padding:2px 0;}
+.btask-cb{width:13px;height:13px;border-radius:3px;border:1px solid var(--border2);background:var(--bg);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:#0f1117;font-weight:700;transition:all .15s;}
+.btask-cb.checked{background:var(--green);border-color:var(--green);}
+.btask-text{font-size:11px;color:var(--text2);flex:1;line-height:1.4;word-break:break-word;}
+.btask-text.done{text-decoration:line-through;color:var(--text3);}
+.btask-del{font-size:9px;padding:1px 4px;background:transparent;border:none;color:transparent;cursor:pointer;border-radius:3px;flex-shrink:0;transition:color .1s;}
+.btask:hover .btask-del{color:var(--text3);}
+.btask-del:hover{color:var(--red)!important;}
+.btask-add{display:flex;align-items:center;margin-top:4px;}
+.btask-input{flex:1;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text3);font-family:var(--sans);font-size:11px;padding:2px 0 3px;outline:none;transition:border-color .15s;}
+.btask-input:focus{border-color:rgba(255,107,53,.3);color:var(--text);}
+.btask-input::placeholder{color:var(--text3);}
+.task-count{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:3px;background:var(--bg3);color:var(--text3);margin-left:.4rem;flex-shrink:0;letter-spacing:.04em;}
+.task-count.all-done{color:var(--green);background:rgba(45,212,160,.08);}
 
 /* LOG */
 .log-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;}
@@ -304,6 +321,7 @@ if (!state.mitDone)    state.mitDone = [false,false,false];
 if (!state.notes)      state.notes = {};
 if (!state.log)        state.log = [];
 if (!state.blocksDone) state.blocksDone = {};
+if (!state.tasks)      state.tasks = {};
 
 // ── TIME UTILS ───────────────────────────────────────────────────
 function timeToMin(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
@@ -375,15 +393,44 @@ function renderSchedule() {
     const isDone   = nm >= timeToMin(b.end);
     const isManual = activeBlockKey === b.key && !isActive;
     const note     = state.notes[b.key] || '';
+    const tasks    = state.tasks[b.key] || [];
     const doneMark = state.blocksDone[b.key] ? '<span class="block-done-icon">✓</span>' : '';
     const notePreview = note ? `<div class="block-note-preview">${note.slice(0,60)}</div>` : '';
+
+    // task count badge
+    const doneCount  = tasks.filter(t => t.done).length;
+    const countBadge = tasks.length > 0
+      ? `<span class="task-count${doneCount===tasks.length?' all-done':''}">${doneCount}/${tasks.length}</span>`
+      : '';
+
+    // task rows
+    const taskRows = tasks.map((t, i) =>
+      `<div class="btask">
+        <div class="btask-cb${t.done?' checked':''}" onclick="toggleTask('${b.key}',${i},event)">${t.done?'✓':''}</div>
+        <span class="btask-text${t.done?' done':''}">${t.text.replace(/</g,'&lt;')}</span>
+        <button class="btask-del" onclick="deleteTask('${b.key}',${i},event)">✕</button>
+      </div>`
+    ).join('');
+
+    const taskSection = `<div class="block-tasks" onclick="event.stopPropagation()">
+      ${taskRows}
+      <div class="btask-add">
+        <input class="btask-input" placeholder="+ dodaj zadanie"
+          onclick="event.stopPropagation()"
+          onkeydown="if(event.key==='Enter'&&this.value.trim()){addTask('${b.key}',this.value);this.value='';event.stopPropagation();}">
+      </div>
+    </div>`;
+
     return `<div class="block-row ${isActive?'active':''} ${isManual?'selected-manual':''} ${isDone&&!isActive?'done':''}"
       onclick="selectBlock('${b.key}',true)">
       <div class="block-time">${b.start}–${b.end}</div>
       <div class="block-info">
-        <div class="block-name">${b.name}</div>
+        <div style="display:flex;align-items:center;gap:.3rem">
+          <div class="block-name">${b.name}</div>${countBadge}
+        </div>
         <div class="block-tag tag-${b.tag}">${TAG_LABELS[b.tag]||b.tag}</div>
         ${notePreview}
+        ${taskSection}
       </div>
       ${doneMark}
     </div>`;
@@ -588,6 +635,30 @@ function flashMsg(msg, color, duration) {
   el.style.color = color || 'var(--green)';
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), duration || 1400);
+}
+
+// ── BLOCK TASKS ──────────────────────────────────────────────────
+function addTask(key, text) {
+  text = text.trim();
+  if (!text) return;
+  if (!state.tasks[key]) state.tasks[key] = [];
+  state.tasks[key].push({ text, done: false });
+  saveDay(state);
+  renderSchedule();
+}
+function toggleTask(key, idx, e) {
+  if (e) e.stopPropagation();
+  if (!state.tasks[key] || !state.tasks[key][idx]) return;
+  state.tasks[key][idx].done = !state.tasks[key][idx].done;
+  saveDay(state);
+  renderSchedule();
+}
+function deleteTask(key, idx, e) {
+  if (e) e.stopPropagation();
+  if (!state.tasks[key]) return;
+  state.tasks[key].splice(idx, 1);
+  saveDay(state);
+  renderSchedule();
 }
 
 // ── SCHEDULE EDITOR ──────────────────────────────────────────────
