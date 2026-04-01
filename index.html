@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.4</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v4.5</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1012,6 +1012,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
     <button class="nav-btn" onclick="showView('arkusz')" id="navArkusz" style="color:#94a3b8;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.2)">Arkusz</button>
+    <button class="nav-btn" onclick="showView('wyniki')" id="navWyniki" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Wyniki</button>
   </div>
   <div class="topbar-accounts">
     <button class="nav-btn" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2);cursor:default;pointer-events:none">Klienci</button>
@@ -1375,6 +1376,22 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   <div class="tbl-wrap" style="overflow-x:auto;border-radius:10px">
     <table class="arkusz-tbl" id="arkuszTable">
       <tbody id="arkuszTbody"></tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══ VIEW: WYNIKI ═══ -->
+<div class="view" id="viewWyniki">
+<div class="container">
+  <div class="ph">
+    <div class="ph-eyebrow" style="color:#e879f9">▸ Metryki finansowe · miesięcznie</div>
+    <div class="ph-title">Wyniki <span style="color:#e879f9">Finansowe</span></div>
+    <div class="ph-sub">Przychód · Zysk · Marża · Reklama · ROAS · ACOS · 9 kont</div>
+  </div>
+  <div class="tbl-wrap" style="overflow-x:auto;border-radius:10px">
+    <table class="arkusz-tbl" id="wynikTable">
+      <tbody id="wynikTbody"></tbody>
     </table>
   </div>
 </div>
@@ -2234,7 +2251,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewKalkulator','viewArkusz'].forEach(id=>{
+  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -2304,6 +2321,10 @@ function showView(v){
     document.getElementById('viewArkusz').classList.add('active');
     document.getElementById('navArkusz').classList.add('active');
     renderArkusz();
+  } else if(v==='wyniki'){
+    document.getElementById('viewWyniki').classList.add('active');
+    document.getElementById('navWyniki').classList.add('active');
+    renderWyniki();
   } else {
     document.getElementById('viewAccount').classList.add('active');
     document.getElementById('nav'+v)?.classList.add('active');
@@ -2398,6 +2419,86 @@ function renderArkusz(){
     });
   });
   document.getElementById('arkuszTbody').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════
+// WYNIKI
+// ═══════════════════════════════════════════════════════════
+function renderWyniki(){
+  const GROUPS=[
+    {key:'MEBLE', color:'#ff6b35',rgb:'255,107,53', accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
+    {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160', accs:['Luxsen','Semmi','BOTAVIT']},
+    {key:'ONE',   color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU','Ankado24']},
+  ];
+  const NC=13; // total columns
+  const bt=(g)=>`border-top:2px solid rgba(${g.rgb},.45)`;
+  const mkHdr=(g)=>`
+    <tr class="arkusz-group-hdr">
+      <td colspan="${NC}" style="background:rgba(${g.rgb},.14);${bt(g)};border-bottom:2px solid rgba(${g.rgb},.35);color:${g.color}">${g.key}</td>
+    </tr>
+    <tr>
+      <th class="arkusz-th-left">Data</th>
+      <th class="arkusz-th-left">Konto</th>
+      <th>Przychód</th>
+      <th>Zysk</th>
+      <th>Marża %</th>
+      <th>Koszty platf.</th>
+      <th>Budżet Ads</th>
+      <th>Wyróżnienia</th>
+      <th>Reklama łącz.</th>
+      <th>ACOS</th>
+      <th>ROAS</th>
+      <th>ROAS Glob</th>
+      <th>Estymacja EOM</th>
+    </tr>`;
+
+  const clr=(v,good,ok)=>v>=good?'var(--green)':v>=ok?'var(--yellow)':'var(--red)';
+
+  let html='';
+  GROUPS.forEach((g,gi)=>{
+    if(gi>0) html+=`<tr class="arkusz-group-spacer"><td colspan="${NC}"></td></tr>`;
+    html+=mkHdr(g);
+    g.accs.forEach((k,ai)=>{
+      const D=getData(k);
+      if(!D.length) return;
+      const prod=getProd(k);
+      const name=AC_META[k]?.name||k;
+      D.forEach((d,i)=>{
+        if(d.dzien===1) return; // skip bogus day-1 entries
+        const C=calc(d,prod);
+        const est=estym(d);
+        const sp=d.sprzedaz||0;
+        const isEst=d.dzien&&est!==sp;
+        // Colors
+        const mColor=clr(C.mAfter,10,5);
+        const zykColor=C.zysk>=0?'var(--green)':'var(--red)';
+        const roasColor=C.roasAds&&C.beRoasAds?(C.roasAds>=C.beRoasAds?'var(--green)':C.roasAds>=C.beRoasAds*.85?'var(--yellow)':'var(--red)'):'var(--text)';
+        const acosColor=C.acosTotal!=null?clr(100-C.acosTotal,80,70):'var(--text3)'; // lower acos = better
+        const roasGColor=C.roasGlob>=5?'var(--green)':C.roasGlob>=3?'var(--yellow)':'var(--red)';
+        const estColor=isEst?'var(--yellow)':'var(--text)';
+        // Platform costs %
+        const platfPct=sp>0?(((d.commission||0)+(d.delivery||0)/sp*100)):0;
+        const kontoCell=i===0?`<td rowspan="${D.filter(e=>e.dzien!==1).length}" class="arkusz-konto" style="border-left:3px solid ${g.color};color:${g.color}">${name}</td>`:'';
+        html+=`<tr>
+          <td>${d.m[0].toUpperCase()+d.m.slice(1)}</td>
+          ${kontoCell}
+          <td style="color:var(--green)">${pln(sp)}</td>
+          <td style="color:${zykColor}">${pln(C.zysk)}</td>
+          <td style="color:${mColor};font-weight:500">${pct(C.mAfter)}</td>
+          <td style="color:var(--text3)">${platfPct.toFixed(2)}%</td>
+          <td style="color:var(--text2)">${d.adsCost?pln(d.adsCost):'—'}</td>
+          <td style="color:var(--text3)">${d.promoC?pln(d.promoC):'—'}</td>
+          <td style="color:var(--text2)">${sp>0?pln(C.totalAds):'—'}</td>
+          <td style="color:${acosColor}">${C.acosTotal!=null?C.acosTotal.toFixed(2)+'%':'—'}</td>
+          <td style="color:${roasColor};font-weight:500">${C.roasAds!=null?xf(C.roasAds):'—'}</td>
+          <td style="color:${roasGColor}">${C.roasGlob!=null?xf(C.roasGlob):'—'}</td>
+          <td style="color:${estColor}">${pln(est)}${isEst?'<span style="font-size:9px;color:var(--text3)"> e</span>':''}</td>
+        </tr>`;
+      });
+      if(ai<g.accs.length-1) html+=`<tr class="arkusz-acc-sep"><td colspan="${NC}"></td></tr>`;
+    });
+  });
+  document.getElementById('wynikTbody').innerHTML=html;
 }
 
 // ═══════════════════════════════════════════════════════════
