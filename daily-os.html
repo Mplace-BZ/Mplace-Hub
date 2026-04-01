@@ -257,7 +257,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13
     <div class="notes-bottom">
       <div class="section-title" id="notesTitle" style="margin-bottom:.5rem">Notatka do bloku</div>
       <textarea class="notes-area" id="notesArea" placeholder="Co robię w tym bloku, co zostało, wnioski..." oninput="autoSaveNote()"></textarea>
-      <button class="save-note-btn" onclick="saveNote()">Zapisz notatkę</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.4rem">
+        <button class="save-note-btn" style="margin-top:0" onclick="saveNote()">Zapisz notatkę</button>
+        <button class="copy-log-btn" onclick="copyLog()">Kopiuj log ↗</button>
+      </div>
     </div>
   </div>
 </div>
