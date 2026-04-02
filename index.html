@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.17</title>
+<title>MPlace Hub v5.18</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.17</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.18</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6102,6 +6102,8 @@ ${SLIDE_REPORT_PROMPT}`;
   }
 }
 
+let _shareMeta = null;
+
 function openSlideWindow(aiText, curM, selectedKeys, accDataArr) {
   const now = new Date();
   const dateStr = now.toLocaleDateString('pl-PL', {day:'2-digit',month:'long',year:'numeric'});
@@ -6136,6 +6138,8 @@ function openSlideWindow(aiText, curM, selectedKeys, accDataArr) {
   let dashHtml = '';
   try { dashHtml = buildDashboardSlide(accDataArr || [], curM, 2); } catch(e){ console.error('buildDashboardSlide error:', e, e.stack); }
 
+  _shareMeta = { curM, dateStr };
+
   let overlay = document.getElementById('slideOverlay');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -6164,6 +6168,7 @@ function openSlideWindow(aiText, curM, selectedKeys, accDataArr) {
       <button onclick="document.getElementById('slideOverlay').style.display='none'" style="font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid #e5e7eb;background:#f9fafb;color:#6b7280">Zamknij</button>
       <button onclick="downloadSlideHtml('${curM}','${dateStr}')" style="font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid rgba(180,127,255,.3);background:#faf5ff;color:#b47fff">Pobierz .html</button>
       <button onclick="printOverlay('slideOverlay')" style="font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid rgba(180,127,255,.3);background:#faf5ff;color:#b47fff">Drukuj / PDF</button>
+      <button id="sharePresentationBtn" onclick="sharePresentation(this)" style="font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid rgba(45,212,160,.3);background:rgba(45,212,160,.07);color:#2dd4a0">Udostępnij link</button>
     </div>`;
   overlay.appendChild(inner);
   overlay.style.display = 'block';
@@ -6398,6 +6403,34 @@ ${slidesInner}
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+async function sharePresentation(btn) {
+  const overlay = document.getElementById('slideOverlay');
+  if (!overlay || !_shareMeta) return;
+  const blocks = overlay.querySelectorAll('.slide-block');
+  let slidesInner = '';
+  blocks.forEach(b => { slidesInner += b.outerHTML; });
+  const orig = btn.textContent;
+  btn.textContent = 'Zapisuję...';
+  btn.disabled = true;
+  try {
+    const id = Date.now().toString();
+    await firebase.firestore().collection('publicPresentations').doc(id).set({
+      html: slidesInner,
+      scope: _shareMeta.curM,
+      date: _shareMeta.dateStr,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    const url = `https://mplace-bz.github.io/Mplace-Hub/view.html?id=${id}`;
+    await navigator.clipboard.writeText(url);
+    btn.textContent = '✓ Link skopiowany';
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
+  } catch(err) {
+    console.error('sharePresentation:', err);
+    btn.textContent = 'Błąd — sprawdź reguły Firestore';
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3500);
+  }
 }
 
 // ── HISTORIA PREZENTACJI ──────────────────────────────────
