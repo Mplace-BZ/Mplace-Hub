@@ -3701,8 +3701,16 @@ function importJSON(event){
           if(AC_META[k]) setProd(k, backup.producers[k]);
         });
       }
-      showBackupStatus('✓ Zaimportowano dane dla '+imported+' kont — odświeżam...', 'ok');
-      setTimeout(()=>{ hideBackupModal(); renderEntry(); }, 1500);
+      showBackupStatus('✓ Zaimportowano dane dla '+imported+' kont — synchronizuję z Firebase...', 'ok');
+      // Push imported data to Firestore so Firebase doesn't overwrite it on next auth
+      if(currentUser && typeof saveAccToFS === 'function'){
+        Promise.all(Object.keys(backup.accounts).filter(k=>AC_META[k]).map(k=>saveAccToFS(k)))
+          .then(()=>{ showBackupStatus('✓ Zaimportowano i zsynchronizowano z Firebase ('+imported+' kont)', 'ok'); })
+          .catch(()=>{ showBackupStatus('✓ Zaimportowano lokalnie — sync Firebase nieudany', 'ok'); });
+      }
+      // Reset Firebase loaded flag so next auth doesn't overwrite fresh import
+      window._fsLoaded = true;
+      setTimeout(()=>{ hideBackupModal(); renderEntry(); }, 2000);
     } catch(err){
       showBackupStatus('✗ Błąd odczytu pliku: '+err.message, 'err');
     }
