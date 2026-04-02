@@ -3754,7 +3754,7 @@ const db   = firebase.firestore();
     try{ d=JSON.parse(raw); } catch(e){ return; }
     let changed=false;
     d.forEach(e=>{
-      if(e.m==='marzec' && e.savedDay==='2.04.2026'){ e.m='kwiecień'; changed=true; fixed++; }
+      if(e.m==='marzec' && e.savedDay && (e.savedDay==='2.04.2026'||e.savedDay==='02.04.2026')){ e.m='kwiecień'; changed=true; fixed++; }
     });
     if(changed) localStorage.setItem('adshub3_'+k, JSON.stringify(d));
   });
