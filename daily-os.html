@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily OS v2.3 — MPlace</title>
+<title>Daily OS v2.5 — MPlace</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23181c26'/><text x='50%25' y='72%25' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='22' fill='%23b47fff'>H</text></svg>">
 <style>
@@ -493,6 +493,7 @@ function selectBlock(key, autoStart) {
 // ── TIMER ────────────────────────────────────────────────────────
 let timerRunning  = false;
 let timerSecs     = 0;
+let timerStart    = null;
 let timerProject  = '';
 let timerInterval = null;
 let blockEndNotifScheduled = false;
@@ -504,10 +505,11 @@ function startTimer() {
   btn.textContent = '⏸ Pauza';
   btn.classList.remove('primary');
   btn.classList.add('danger');
+  timerStart = Date.now() - timerSecs * 1000;
   timerInterval = setInterval(() => {
-    timerSecs++;
+    timerSecs = Math.floor((Date.now() - timerStart) / 1000);
     document.getElementById('timerDisplay').textContent = minToHMS(timerSecs);
-  }, 1000);
+  }, 500);
   scheduleBlockEndNotif();
 }
 
