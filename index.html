@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.16</title>
+<title>MPlace Hub v5.17</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.16</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.17</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -5236,7 +5236,7 @@ DANE HISTORYCZNE PER KONTO:
         const isCur = d.m === curM;
         ctx += `  ${d.m[0].toUpperCase()+d.m.slice(1)}${isCur?' (bieżący, dzień '+(d.dzien||'?')+')':' (pełny)'}:\n`;
         ctx += `    Sprzedaż: ${Math.round(d.sprzedaz).toLocaleString('pl-PL')} zł${isCur?' | Est.EOM: '+Math.round(est).toLocaleString('pl-PL')+' zł':''}\n`;
-        ctx += `    Ads: ${Math.round(d.adsCost||0).toLocaleString('pl-PL')} zł (${d.sprzedaz>0?((d.adsCost||0)/d.sprzedaz*100).toFixed(1):'0'}%) | ROAS ${(d.roas||0).toFixed(2)} | BE: ${C.beRoasAds.toFixed(2)}\n`;
+        ctx += `    Ads: ${Math.round(d.adsCost||0).toLocaleString('pl-PL')} zł (${d.sprzedaz>0?((d.adsCost||0)/d.sprzedaz*100).toFixed(1):'0'}%) | ROAS ${(d.roas||0).toFixed(2)} | BE: ${C.beRoasAds!=null?C.beRoasAds.toFixed(2):'n/d'}\n`;
         ctx += `    Wyróżnienia: ${Math.round(d.promoC||0).toLocaleString('pl-PL')} zł (${d.sprzedaz>0?((d.promoC||0)/d.sprzedaz*100).toFixed(1):'0'}%)\n`;
         ctx += `    Prowizja: ${(d.commission||0).toFixed(1)}% | Dostawa: ${Math.round(d.delivery||0)} zł | Marża: ${C.mAfter.toFixed(1)}% | ROAS Glob: ${(C.roasGlob||0).toFixed(2)}\n`;
         if(d.ss) ctx += `    Super Sprzedawca: ${d.ss} | Qlt: ${d.qlt||'—'}\n`;
@@ -5807,7 +5807,7 @@ function openReportWindow(aiText, curM, dayNum, snap, groups, selectedKeys) {
         <td style="color:#8b91a8">${Math.round(est).toLocaleString('pl-PL')} zł</td>
         <td style="color:${mColor};font-weight:600">${C.mAfter.toFixed(1)}%</td>
         <td>${(cur.roas||0).toFixed(2)}</td>
-        <td style="color:#8b91a8">${C.beRoasAds.toFixed(2)}</td>
+        <td style="color:#8b91a8">${C.beRoasAds!=null?C.beRoasAds.toFixed(2):'—'}</td>
         <td style="font-size:14px">${status}</td>
       </tr>`;
     });
@@ -6530,7 +6530,7 @@ function saveReportToHistory(aiText, curM, dayNum, snap, groups, selectedKeys) {
       const {C, est, cur} = snap[k];
       const status = C.mAfter>=10?'✅':C.mAfter>=0?'⚠️':'🔴';
       const mColor2 = C.mAfter>=10?'#2dd4a0':C.mAfter>=0?'#f5a623':'#ff4d6a';
-      accRows += `<tr><td><span style="color:${gColor};font-size:9px">${gKey}</span><br><strong>${AC_META[k].name}</strong></td><td>${Math.round(cur.sprzedaz||0).toLocaleString('pl-PL')} zł</td><td style="color:#8b91a8">${Math.round(est).toLocaleString('pl-PL')} zł</td><td style="color:${mColor2};font-weight:600">${C.mAfter.toFixed(1)}%</td><td>${(cur.roas||0).toFixed(2)}</td><td style="color:#8b91a8">${C.beRoasAds.toFixed(2)}</td><td style="font-size:14px">${status}</td></tr>`;
+      accRows += `<tr><td><span style="color:${gColor};font-size:9px">${gKey}</span><br><strong>${AC_META[k].name}</strong></td><td>${Math.round(cur.sprzedaz||0).toLocaleString('pl-PL')} zł</td><td style="color:#8b91a8">${Math.round(est).toLocaleString('pl-PL')} zł</td><td style="color:${mColor2};font-weight:600">${C.mAfter.toFixed(1)}%</td><td>${(cur.roas||0).toFixed(2)}</td><td style="color:#8b91a8">${C.beRoasAds!=null?C.beRoasAds.toFixed(2):'—'}</td><td style="font-size:14px">${status}</td></tr>`;
     });
   });
 
