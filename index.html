@@ -3281,7 +3281,7 @@ document.getElementById('globalDay').addEventListener('input',()=>{
 // ═══════════════════════════════════════════════════════════
 // SAVE
 // ═══════════════════════════════════════════════════════════
-/function getSaveMonth(dzienGlobal){
+function getSaveMonth(dzienGlobal){
   const now=new Date();
   const m=now.getMonth();
   return{m:MONTHS[m],dzien:dzienGlobal,isClosing:false};
