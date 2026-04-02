@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.8</title>
+<title>MPlace Hub v5.9</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.8</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.9</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1102,6 +1102,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 
   <div class="save-bar">
     <button class="btn primary" onclick="saveAllWithSync()">▸ Zapisz wszystkie wpisy</button>
+    <button id="closingToggle" class="btn" onclick="toggleClosingMode()" style="color:var(--text3);border-color:var(--border)" title="Zamknięcie poprzedniego miesiąca">↩ Zamknięcie</button>
     <button class="btn" onclick="showBackupModal()" style="color:var(--green);border-color:rgba(45,212,160,.3)">🛡 Backup</button>
     <button class="btn" onclick="exportCSV()">↗ Eksport CSV</button>
     <button class="btn" onclick="saveSnapshotD2D()" style="color:#b47fff;border-color:rgba(180,127,255,.3)">📊 Zapisz do D2D</button>
@@ -3281,10 +3282,28 @@ document.getElementById('globalDay').addEventListener('input',()=>{
 // ═══════════════════════════════════════════════════════════
 // SAVE
 // ═══════════════════════════════════════════════════════════
+let _closingMode = false;
+function toggleClosingMode(){
+  _closingMode = !_closingMode;
+  const btn = document.getElementById('closingToggle');
+  const now = new Date();
+  const prevM = MONTHS[(now.getMonth()+11)%12];
+  if(_closingMode){
+    btn.style.color = 'var(--yellow)';
+    btn.style.borderColor = 'var(--yellow-bd)';
+    btn.style.background = 'var(--yellow-bg)';
+    btn.textContent = '↩ Zamknięcie: ' + prevM;
+  } else {
+    btn.style.color = 'var(--text3)';
+    btn.style.borderColor = 'var(--border)';
+    btn.style.background = '';
+    btn.textContent = '↩ Zamknięcie';
+  }
+}
 function getSaveMonth(dzienGlobal){
   const now=new Date();
-  const m=now.getMonth();
-  return{m:MONTHS[m],dzien:dzienGlobal,isClosing:false};
+  const m=_closingMode?(now.getMonth()+11)%12:now.getMonth();
+  return{m:MONTHS[m],dzien:dzienGlobal,isClosing:_closingMode};
 }
 function saveAll(){
   const dzienGlobal=parseInt(document.getElementById('globalDay').value)||null;
