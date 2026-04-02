@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.10</title>
+<title>MPlace Hub v5.11</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.10</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.11</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6128,6 +6128,9 @@ function openSlideWindow(aiText, curM, selectedKeys, accDataArr) {
   const slide1Html = slideBlocks.length ? renderAiSlide(slideBlocks[0], 1) : '';
   const restHtml   = slideBlocks.slice(1).map((b, i) => renderAiSlide(b, i+3)).join('');
 
+  // Build m/m comparison table injected into slide 1
+  const mmTableHtml = buildMoMTable(accDataArr || [], curM);
+
   // Build dashboard slide (SLAJD 2)
   const dashHtml = buildDashboardSlide(accDataArr || [], curM, 2);
 
@@ -6154,7 +6157,7 @@ function openSlideWindow(aiText, curM, selectedKeys, accDataArr) {
         ${dateStr}
       </div>
     </div>
-    ${slide1Html}${dashHtml}${restHtml}
+    ${slide1Html}${mmTableHtml}${dashHtml}${restHtml}
     <div class="slide-action-buttons" style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:.75rem 2rem;display:flex;gap:.75rem;justify-content:flex-end;z-index:801;">
       <button onclick="document.getElementById('slideOverlay').style.display='none'" style="font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid #e5e7eb;background:#f9fafb;color:#6b7280">Zamknij</button>
       <button onclick="downloadSlideHtml('${curM}','${dateStr}')" style="font-family:'DM Mono',monospace;font-size:11px;padding:7px 18px;border-radius:6px;cursor:pointer;border:1px solid rgba(180,127,255,.3);background:#faf5ff;color:#b47fff">Pobierz .html</button>
@@ -6168,6 +6171,75 @@ function openSlideWindow(aiText, curM, selectedKeys, accDataArr) {
   if ((accDataArr||[]).length > 1) {
     requestAnimationFrame(() => initDashboardChart(accDataArr));
   }
+}
+
+function buildMoMTable(accDataArr, zakresLabel) {
+  if (!accDataArr || !accDataArr.length) return '';
+
+  // Determine current and previous month from zakresLabel "DD.MM.YYYY — DD.MM.YYYY"
+  let curMonthIdx = -1;
+  try {
+    const datePart = (zakresLabel||'').split('—')[0].trim();
+    const [,mm] = datePart.split('.');
+    if (mm) curMonthIdx = parseInt(mm,10) - 1;
+  } catch(e) {}
+  if (curMonthIdx < 0) return '';
+
+  const curM  = MONTHS[curMonthIdx];
+  const prevM = MONTHS[(curMonthIdx + 11) % 12];
+
+  const GRP_C = { MEBLE:'#ff6b35', LUXSEN:'#2dd4a0', ONE:'#b47fff' };
+  const delta = (curr, prev) => prev > 0 ? ((curr - prev) / prev * 100) : null;
+  const fmt   = v => v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '—';
+  const dColor = v => v == null ? '#6b7280' : v >= 0 ? '#16a34a' : '#dc2626';
+  const pln   = v => Math.round(v).toLocaleString('pl-PL') + ' zł';
+
+  const rows = accDataArr.map(a => {
+    const prod = getProd(a.key);
+    const prevRec = getData(a.key).find(d => d.m === prevM);
+    const curRec  = getData(a.key).find(d => d.m === curM);
+    if (!curRec) return '';
+    const Ccur  = calc(curRec, prod);
+    const Cprev = prevRec ? calc(prevRec, prod) : null;
+    const gc    = GRP_C[a.group] || '#8b91a8';
+
+    const dSp   = delta(curRec.sprzedaz||0, prevRec?.sprzedaz||0);
+    const dM    = Cprev ? (Ccur.mAfter - Cprev.mAfter) : null;
+    const dR    = delta(curRec.roas||0, prevRec?.roas||0);
+
+    const td = 'padding:7px 10px;border-bottom:1px solid #f3f4f6;font-size:12px;font-family:"DM Mono",monospace';
+    return `<tr>
+      <td style="${td};font-weight:600;color:${gc};font-size:11px">${a.name}</td>
+      <td style="${td};text-align:right">${pln(curRec.sprzedaz||0)}</td>
+      <td style="${td};text-align:right;color:#6b7280">${prevRec ? pln(prevRec.sprzedaz||0) : '—'}</td>
+      <td style="${td};text-align:right;font-weight:600;color:${dColor(dSp)}">${fmt(dSp)}</td>
+      <td style="${td};text-align:right">${Ccur.mAfter.toFixed(1)}%</td>
+      <td style="${td};text-align:right;color:${dColor(dM)}">${dM != null ? fmt(dM).replace('%','pp') : '—'}</td>
+      <td style="${td};text-align:right">${(curRec.roas||0).toFixed(2)}x</td>
+      <td style="${td};text-align:right;color:${dColor(dR)}">${fmt(dR)}</td>
+    </tr>`;
+  }).join('');
+
+  const thStyle = 'padding:7px 10px;font-size:10px;font-family:"DM Mono",monospace;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;font-weight:600;border-bottom:2px solid #e5e7eb;white-space:nowrap';
+  const curLabel = curM.charAt(0).toUpperCase() + curM.slice(1);
+  const prevLabel = prevM.charAt(0).toUpperCase() + prevM.slice(1);
+
+  return `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.5rem 2rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem">WYNIKI ${curLabel.toUpperCase()} vs ${prevLabel.toUpperCase()}</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="${thStyle};text-align:left">Konto</th>
+        <th style="${thStyle};text-align:right">Sprzedaż ${curLabel}</th>
+        <th style="${thStyle};text-align:right">Sprzedaż ${prevLabel}</th>
+        <th style="${thStyle};text-align:right">Δ m/m</th>
+        <th style="${thStyle};text-align:right">Marża%</th>
+        <th style="${thStyle};text-align:right">Δ marża</th>
+        <th style="${thStyle};text-align:right">ROAS</th>
+        <th style="${thStyle};text-align:right">Δ ROAS</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
 }
 
 function buildDashboardSlide(accDataArr, zakresLabel, slajdNum) {
