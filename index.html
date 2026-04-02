@@ -6428,8 +6428,8 @@ async function sharePresentation(btn) {
     setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
   } catch(err) {
     console.error('sharePresentation:', err);
-    btn.textContent = 'Błąd — sprawdź reguły Firestore';
-    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3500);
+    btn.textContent = 'Błąd: ' + (err.code || err.message || 'nieznany');
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 5000);
   }
 }
 
