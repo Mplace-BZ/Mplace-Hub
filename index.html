@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.23</title>
+<title>MPlace Hub v5.24</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.23</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.24</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -3197,19 +3197,19 @@ function renderEntryCard(k,dotColor,curM){
     <div class="aec-body">
       <!-- ROW A: z panelu Allegro Ads -->
       <div class="fr fr-a" style="margin-bottom:.4rem">
-        <div class="fw"><label>Koszt Ads (zł)</label><input type="number" id="e_${k}_adsC" placeholder="5 341" value="${pfV('adsCost')}" oninput="updateAuto('${k}')"></div>
-        <div class="fw"><label>ROAS kampanii</label><input type="number" step="0.01" id="e_${k}_roas" placeholder="6.11" value="${pfV('roas')}"></div>
-        <div class="fw"><label>Wartość Ads (zł)</label><input type="number" id="e_${k}_wartoscAds" placeholder="32 619" value="${pfV('wartoscAds')}" oninput="updateAuto('${k}')"></div>
+        <div class="fw"><label>Koszt Ads (zł)</label><input type="number" min="0" max="999999" id="e_${k}_adsC" placeholder="5 341" value="${pfV('adsCost')}" oninput="updateAuto('${k}')"></div>
+        <div class="fw"><label>ROAS kampanii</label><input type="number" step="0.01" min="0" max="99" id="e_${k}_roas" placeholder="6.11" value="${pfV('roas')}"></div>
+        <div class="fw"><label>Wartość Ads (zł)</label><input type="number" min="0" max="9999999" id="e_${k}_wartoscAds" placeholder="32 619" value="${pfV('wartoscAds')}" oninput="updateAuto('${k}')"></div>
         <div class="fw"><label>SS</label><select id="e_${k}_ss"><option value="" ${ss===''?'selected':''}>—</option><option value="T" ${ss==='T'?'selected':''}>T</option><option value="N" ${ss==='N'?'selected':''}>N</option></select></div>
-        <div class="fw"><label>Qlt</label><input type="number" id="e_${k}_qlt" placeholder="340" value="${pfV('qlt')}"></div>
-        <div class="fw"><label>Sprzedaż brutto (zł)</label><input type="number" id="e_${k}_sp" placeholder="79 175" value="${pfV('sprzedaz')}" oninput="updateAuto('${k}')"></div>
-        <div class="fw"><label>Prowizja Allegro %</label><input type="number" step="0.1" id="e_${k}_comm" placeholder="11.1" value="${pfV('commission')}"></div>
+        <div class="fw"><label>Qlt</label><input type="number" min="0" max="500" id="e_${k}_qlt" placeholder="340" value="${pfV('qlt')}"></div>
+        <div class="fw"><label>Sprzedaż brutto (zł)</label><input type="number" min="0" max="9999999" id="e_${k}_sp" placeholder="79 175" value="${pfV('sprzedaz')}" oninput="updateAuto('${k}')"></div>
+        <div class="fw"><label>Prowizja Allegro %</label><input type="number" step="0.1" min="0" max="30" id="e_${k}_comm" placeholder="11.1" value="${pfV('commission')}"></div>
       </div>
       <!-- ROW B: z Trade Analytics (niebieski) -->
       <div class="fr fr-b">
-        <div class="fw bi"><label>Dostawa (zł)</label><input type="number" id="e_${k}_del" placeholder="3 971" value="${pfV('delivery')}" oninput="updateAuto('${k}')"></div>
-        <div class="fw bi"><label>Wyróżnienia % (zł)</label><input type="number" id="e_${k}_promoC" placeholder="4 449" value="${pfV('promoC')}" oninput="updateAuto('${k}')"></div>
-        <div class="fw bi"><label>Monety (zł)</label><input type="number" id="e_${k}_coinsC" placeholder="0" value="${pfV('coinsC')}" oninput="updateAuto('${k}')"></div>
+        <div class="fw bi"><label>Dostawa (zł)</label><input type="number" min="0" max="999999" id="e_${k}_del" placeholder="3 971" value="${pfV('delivery')}" oninput="updateAuto('${k}')"></div>
+        <div class="fw bi"><label>Wyróżnienia % (zł)</label><input type="number" min="0" max="999999" id="e_${k}_promoC" placeholder="4 449" value="${pfV('promoC')}" oninput="updateAuto('${k}')"></div>
+        <div class="fw bi"><label>Monety (zł)</label><input type="number" min="0" max="999999" id="e_${k}_coinsC" placeholder="0" value="${pfV('coinsC')}" oninput="updateAuto('${k}')"></div>
         <div class="fw bi"><label title="Wpisujesz dzień np. 20 = dane za 19 zakończony">Dzień wpisu <span style="color:var(--yellow);font-size:9px">(−1 auto)</span></label><input type="number" id="e_${k}_dzien" placeholder="globalny" value=""></div>
       </div>
       <!-- NOTATKA -->
@@ -3263,6 +3263,19 @@ function updateAuto(k){
     const est=Math.round(sp*(DAYS_IN[curM]||30)/ed);
     set('ea_est_'+k,pln(est)+` (za dzień ${ed})`);
   } else {set('ea_est_'+k,'—');}
+
+  // Inline field warnings
+  const roas=gN(`e_${k}_roas`)||0;
+  const commV=gN(`e_${k}_comm`)||0;
+  const warns=[];
+  if(roas>50) warns.push('ROAS '+roas+' > 50 — literówka?');
+  if(commV>30) warns.push('Prowizja '+commV+'% > 30% — literówka?');
+  if(sp>0&&sp<500) warns.push('Sprzedaż '+sp+' zł — niska kwota, literówka?');
+  if(adsC>sp&&sp>0) warns.push('Koszt Ads ('+adsC+') > sprzedaż ('+sp+')');
+  if(promoC>sp*0.3&&sp>0) warns.push('Wyróżnienia > 30% sprzedaży');
+  let wEl=document.getElementById('ea_warn_'+k);
+  if(!wEl){wEl=document.createElement('div');wEl.id='ea_warn_'+k;wEl.style.cssText='color:#f5a623;font-size:10px;font-family:var(--mono);margin-top:4px';const auto=document.getElementById('eAuto_'+k);if(auto)auto.after(wEl);}
+  wEl.innerHTML=warns.length?warns.map(w=>'&#9889; '+w).join('<br>'):'';
 }
 
 document.getElementById('globalDay').addEventListener('input',()=>{
@@ -3308,6 +3321,24 @@ function getSaveMonth(dzienGlobal){
 function saveAll(){
   const dzienGlobal=parseInt(document.getElementById('globalDay').value)||null;
   const{m:curM,dzien:dzienEff,isClosing}=getSaveMonth(dzienGlobal);
+
+  // Pre-save validation
+  const warnings=[];
+  Object.keys(AC_META).forEach(k=>{
+    const sp=gN(`e_${k}_sp`),adsC=gN(`e_${k}_adsC`);
+    if(!sp&&!adsC) return;
+    const name=AC_META[k].name;
+    const roas=gN(`e_${k}_roas`)||0;
+    const comm=gN(`e_${k}_comm`)||0;
+    const promoC=gN(`e_${k}_promoC`)||0;
+    if(sp>0&&sp<500) warnings.push(name+': sprzedaż '+sp+' zł — literówka?');
+    if(comm>30) warnings.push(name+': prowizja '+comm+'% > 30%');
+    if(roas>50) warnings.push(name+': ROAS '+roas+' > 50');
+    if(adsC>sp&&sp>0) warnings.push(name+': koszt Ads > sprzedaż');
+    if(promoC>sp*0.3&&sp>0) warnings.push(name+': wyróżnienia > 30% sprzedaży');
+  });
+  if(warnings.length>0&&!confirm('Uwaga — podejrzane wartości:\n\n'+warnings.join('\n')+'\n\nZapisać mimo to?')) return;
+
   let saved=0,updated=0;
 
   Object.keys(AC_META).forEach(k=>{
