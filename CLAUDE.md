@@ -72,7 +72,7 @@
 ## Wiedza — kategorie
 - slownik (#a78bfa fioletowy), benchmark (żółty), artykul (niebieski), zasady (pomarańczowy/accent)
 - klient (#2dd4a0 teal), rynek (#4d9fff niebieski), sezonowosc (#b47fff fioletowy)
-- produkt (#f5a623 żółty), casestudy (#e879f9 różowy), rozne (#8b91a8 szary)
+- produkt (#f5a623 żółty), casestudy (#e879f9 różowy), kalendarz (#f97316 pomarańczowy), rozne (#8b91a8 szary)
 - Stara kategoria `inne` zachowana w CAT_LABELS dla wstecznej kompatybilności; nowe wpisy używają `rozne`
 
 ## Prezentacje klienckie (Slide Report)
