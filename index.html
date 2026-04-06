@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.20</title>
+<title>MPlace Hub v5.21</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.20</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.21</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6244,7 +6244,7 @@ function buildMoMTable(accDataArr, zakresLabel) {
   const curLabel = curM.charAt(0).toUpperCase() + curM.slice(1);
   const prevLabel = prevM.charAt(0).toUpperCase() + prevM.slice(1);
 
-  return `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.5rem 2rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+  return `<div class="slide-block" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.5rem 2rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
     <div style="font-family:'DM Mono',monospace;font-size:10px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem">WYNIKI ${curLabel.toUpperCase()} vs ${prevLabel.toUpperCase()}</div>
     <table style="width:100%;border-collapse:collapse">
       <thead><tr>
@@ -6305,70 +6305,33 @@ function buildDashboardSlide(accDataArr, zakresLabel, slajdNum) {
   if (accDataArr.length > 1) {
     const maxSales = Math.max(...accDataArr.map(a => a.sprzedazSum));
     const marginVals = accDataArr.map(a => parseFloat((a.marzaAvg||0).toFixed(1)));
-    const minM = Math.min(...marginVals);
-    const maxM = Math.max(...marginVals);
-    const mRange = maxM - minM || 1;
 
     const legend = `<div style="display:flex;gap:20px;justify-content:center;margin-bottom:14px;font-size:11px;font-family:'DM Mono',monospace;color:#374151">
       <span><span style="display:inline-block;width:12px;height:12px;background:#ff6b35cc;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Sprzedaż (zł)</span>
-      <span><span style="display:inline-block;width:12px;height:3px;background:#b47fff;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Marża (%)</span>
+      <span><span style="display:inline-block;width:8px;height:8px;background:#b47fff;border-radius:50%;vertical-align:middle;margin-right:4px"></span>Marża (%)</span>
     </div>`;
-
-    // Margin scale labels
-    const mSteps = 5;
-    const mStep = mRange / (mSteps - 1);
-    let mScaleHtml = '<div style="display:flex;justify-content:space-between;font-size:9px;font-family:\'DM Mono\',monospace;color:#b47fff;margin-bottom:8px;padding-left:100px">';
-    for (let i = 0; i < mSteps; i++) {
-      mScaleHtml += `<span>${(minM + mStep * i).toFixed(1)}%</span>`;
-    }
-    mScaleHtml += '</div>';
 
     const barRows = accDataArr.map((a, idx) => {
       const gc = GRP_COLORS[a.group] || '#8b91a8';
       const pct = maxSales > 0 ? (a.sprzedazSum / maxSales * 100) : 0;
-      const mPct = mRange > 0 ? ((marginVals[idx] - minM) / mRange * 100) : 50;
       const salesFmt = Math.round(a.sprzedazSum).toLocaleString('pl-PL');
-      return `<div style="display:flex;align-items:center;margin-bottom:8px;position:relative">
+      const mVal = marginVals[idx];
+      return `<div style="display:flex;align-items:center;margin-bottom:10px">
         <div style="width:100px;flex-shrink:0;font-size:11px;font-family:'DM Mono',monospace;font-weight:600;color:#374151;text-align:right;padding-right:12px">${a.name}</div>
-        <div style="flex:1;position:relative;height:28px">
+        <div style="flex:1;position:relative;height:28px;background:#f9fafb;border-radius:4px">
           <div style="position:absolute;top:0;left:0;height:28px;width:${pct.toFixed(1)}%;background:${gc}cc;border-radius:4px"></div>
-          <div style="position:absolute;top:0;left:${pct.toFixed(1)}%;margin-left:6px;font-size:10px;font-family:'DM Mono',monospace;color:#6b7280;line-height:28px;white-space:nowrap">${salesFmt}</div>
-          <div style="position:absolute;top:50%;left:${mPct.toFixed(1)}%;transform:translate(-50%,-50%);width:10px;height:10px;background:#b47fff;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #b47fff;z-index:2"></div>
+          <div style="position:absolute;top:0;right:0;font-size:10px;font-family:'DM Mono',monospace;color:#6b7280;line-height:28px;padding-right:8px;white-space:nowrap">${salesFmt}</div>
         </div>
+        <div style="width:60px;flex-shrink:0;text-align:center;font-size:11px;font-family:'DM Mono',monospace;color:#b47fff;font-weight:600">${mVal.toFixed(1)}%</div>
       </div>`;
     }).join('');
 
-    // Connecting line for margin dots (SVG inline)
-    const svgH = accDataArr.length * 36;
-    const points = accDataArr.map((a, idx) => {
-      const mPct = mRange > 0 ? ((marginVals[idx] - minM) / mRange * 100) : 50;
-      const y = idx * 36 + 14;
-      return `${mPct},${y}`;
-    }).join(' ');
-
-    const svgLine = `<svg style="position:absolute;top:0;left:100px;right:0;height:${svgH}px;pointer-events:none;z-index:1" viewBox="0 0 100 ${svgH}" preserveAspectRatio="none">
-      <polyline points="${points}" fill="none" stroke="#b47fff" stroke-width="1.5" stroke-opacity="0.5"/>
-    </svg>`;
-
-    // Sales scale at bottom
-    const sSteps = 6;
-    let sScaleHtml = '<div style="display:flex;justify-content:space-between;font-size:9px;font-family:\'DM Mono\',monospace;color:#6b7280;padding-left:100px;margin-top:4px">';
-    for (let i = 0; i < sSteps; i++) {
-      const v = Math.round(maxSales / (sSteps - 1) * i);
-      sScaleHtml += `<span>${v.toLocaleString('pl-PL')}</span>`;
-    }
-    sScaleHtml += '</div>';
-
-    chartBlock = `<div style="margin-top:20px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px;position:relative">
-      ${legend}${mScaleHtml}
-      <div style="position:relative">
-        ${svgLine}${barRows}
-      </div>
-      ${sScaleHtml}
+    chartBlock = `<div style="margin-top:20px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+      ${legend}${barRows}
     </div>`;
   }
 
-  return `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+  return `<div class="slide-block" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
     <div style="font-family:'DM Mono',monospace;font-size:8px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem">SLAJD ${slajdNum} — DASHBOARD</div>
     <h2 style="font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:#111;margin:0 0 4px">WYNIKI NA PIERWSZY RZUT OKA</h2>
     <p style="font-size:11px;color:#6b7280;margin:0 0 16px">Kluczowe metryki okresu ${zakresLabel}</p>
