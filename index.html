@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.28</title>
+<title>MPlace Hub v5.29</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -677,6 +677,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .wk-cat.sezonowosc{color:#b47fff;border-color:rgba(180,127,255,.3);background:rgba(180,127,255,.08);}
 .wk-cat.produkt{color:#f5a623;border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.08);}
 .wk-cat.casestudy{color:#e879f9;border-color:rgba(232,121,249,.3);background:rgba(232,121,249,.08);}
+.wk-cat.kalendarz{color:#f97316;border-color:rgba(249,115,22,.3);background:rgba(249,115,22,.08);}
 .wk-entry{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.6rem;transition:border-color .15s;}
 .wk-entry:hover{border-color:var(--border2);}
 .wk-entry-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;flex-wrap:wrap;}
@@ -834,6 +835,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .kal-day.camp-black{background:rgba(55,65,81,.7);color:#9ca3af;}
 .kal-day.camp-xmas{background:rgba(239,68,68,.22);color:#fca5a5;}
 .kal-day.camp-winter{background:rgba(59,130,246,.22);color:#93c5fd;}
+.kal-day.camp-holiday{background:rgba(239,68,68,.35);color:#fca5a5;font-weight:600;}
 .kal-legend{display:flex;flex-wrap:wrap;gap:.6rem 1.25rem;margin-bottom:1.25rem;}
 .kal-legend-item{display:flex;align-items:center;gap:.4rem;font-size:11px;color:var(--text2);}
 .kal-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
@@ -997,7 +999,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.28</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.29</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1719,6 +1721,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
       <div class="wk-cat sezonowosc" onclick="selectWkCat('sezonowosc',this)">· Sezonowość</div>
       <div class="wk-cat produkt" onclick="selectWkCat('produkt',this)">· Produkt</div>
       <div class="wk-cat casestudy" onclick="selectWkCat('casestudy',this)">· Case Study</div>
+      <div class="wk-cat kalendarz" onclick="selectWkCat('kalendarz',this)">· Kalendarz</div>
       <div class="wk-cat rozne" onclick="selectWkCat('rozne',this)">· Różne</div>
     </div>
     <!-- File drop zone -->
@@ -1880,7 +1883,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   <div style="margin-bottom:1rem">
     <div class="ph-eyebrow" style="color:#f97316">► KAMPANIE 2026</div>
     <div class="ph-title">Kalendarz <span style="color:var(--green)">✦</span></div>
-    <div class="ph-sub">Allegro Days · Smart! Weeks · Black Weeks · Xmas</div>
+    <div class="ph-sub">Allegro Days · Smart! Weeks · Black Weeks · Xmas · Święta</div>
   </div>
   <div class="kal-legend">
     <div class="kal-legend-item"><div class="kal-legend-dot" style="background:rgba(249,115,22,.55)"></div>Allegro Days</div>
@@ -1888,6 +1891,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <div class="kal-legend-item"><div class="kal-legend-dot" style="background:rgba(55,65,81,.9)"></div>Black Weeks</div>
     <div class="kal-legend-item"><div class="kal-legend-dot" style="background:rgba(239,68,68,.45)"></div>Xmas</div>
     <div class="kal-legend-item"><div class="kal-legend-dot" style="background:rgba(59,130,246,.45)"></div>Winter Sale</div>
+    <div class="kal-legend-item"><div class="kal-legend-dot" style="background:rgba(239,68,68,.55)"></div>Święta / Dni wolne</div>
     <div class="kal-legend-item"><div class="kal-legend-dot" style="border:1px solid #fff;background:transparent"></div>Dzisiaj</div>
   </div>
   <div class="kal-grid" id="kalGrid"></div>
@@ -6942,7 +6946,7 @@ function filterWk(cat, el) {
   renderWkList();
 }
 
-const CAT_LABELS = { slownik:'Słownik', benchmark:'Benchmark', artykul:'Artykuł', zasady:'Zasady', klient:'Klient', rynek:'Rynek', sezonowosc:'Sezonowość', produkt:'Produkt', casestudy:'Case Study', inne:'Inne', rozne:'Różne' };
+const CAT_LABELS = { slownik:'Słownik', benchmark:'Benchmark', artykul:'Artykuł', zasady:'Zasady', klient:'Klient', rynek:'Rynek', sezonowosc:'Sezonowość', produkt:'Produkt', casestudy:'Case Study', kalendarz:'Kalendarz', inne:'Inne', rozne:'Różne' };
 
 function renderWkList() {
   const entries = getWiedza();
@@ -6996,7 +7000,7 @@ let _kpProposals = [];
 const KP_TAG_COLORS = {
   slownik:'#a78bfa', benchmark:'#f5a623', artykul:'#4d9fff', zasady:'#ff6b35',
   klient:'#2dd4a0', rynek:'#4d9fff', sezonowosc:'#b47fff', produkt:'#f5a623',
-  casestudy:'#e879f9', rozne:'#8b91a8', inne:'#8b91a8'
+  casestudy:'#e879f9', kalendarz:'#f97316', rozne:'#8b91a8', inne:'#8b91a8'
 };
 
 async function proposeKnowledgeEntries(reportText) {
@@ -8615,10 +8619,22 @@ function renderKalendar(){
     [11,2,30,'camp-black'],
     // Xmas
     [12,1,26,'camp-xmas'],
+    // Święta i dni wolne 2026
+    [1,1,1,'camp-holiday'],   // Nowy Rok
+    [1,6,6,'camp-holiday'],   // Trzech Króli
+    [4,5,6,'camp-holiday'],   // Wielkanoc + Poniedziałek Wielkanocny
+    [5,1,1,'camp-holiday'],   // Święto Pracy
+    [5,3,3,'camp-holiday'],   // Konstytucja 3 Maja
+    [5,24,24,'camp-holiday'], // Zielone Świątki
+    [6,4,4,'camp-holiday'],   // Boże Ciało
+    [8,15,15,'camp-holiday'], // Wniebowzięcie NMP
+    [11,1,1,'camp-holiday'],  // Wszystkich Świętych
+    [11,11,11,'camp-holiday'],// Niepodległości / Dzień Singla
+    [12,24,26,'camp-holiday'],// Wigilia + Boże Narodzenie
   ];
 
   // Build lookup: key = "M-D" => cssClass (priority order: days < winter < smart < black < xmas)
-  const PRIORITY = ['camp-days','camp-winter','camp-smart','camp-black','camp-xmas'];
+  const PRIORITY = ['camp-days','camp-winter','camp-smart','camp-black','camp-xmas','camp-holiday'];
   const dayMap = {};
   CAMPAIGNS.forEach(([m,s,e,cls])=>{
     for(let d=s;d<=e;d++){
