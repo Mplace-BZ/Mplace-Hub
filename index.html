@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.24</title>
+<title>MPlace Hub v5.25</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.24</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.25</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -3198,12 +3198,12 @@ function renderEntryCard(k,dotColor,curM){
       <!-- ROW A: z panelu Allegro Ads -->
       <div class="fr fr-a" style="margin-bottom:.4rem">
         <div class="fw"><label>Koszt Ads (zł)</label><input type="number" min="0" max="999999" id="e_${k}_adsC" placeholder="5 341" value="${pfV('adsCost')}" oninput="updateAuto('${k}')"></div>
-        <div class="fw"><label>ROAS kampanii</label><input type="number" step="0.01" min="0" max="99" id="e_${k}_roas" placeholder="6.11" value="${pfV('roas')}"></div>
+        <div class="fw"><label>ROAS kampanii</label><input type="number" step="0.01" min="0" max="99" id="e_${k}_roas" placeholder="6.11" value="${pfV('roas')}" oninput="updateAuto('${k}')"></div>
         <div class="fw"><label>Wartość Ads (zł)</label><input type="number" min="0" max="9999999" id="e_${k}_wartoscAds" placeholder="32 619" value="${pfV('wartoscAds')}" oninput="updateAuto('${k}')"></div>
         <div class="fw"><label>SS</label><select id="e_${k}_ss"><option value="" ${ss===''?'selected':''}>—</option><option value="T" ${ss==='T'?'selected':''}>T</option><option value="N" ${ss==='N'?'selected':''}>N</option></select></div>
         <div class="fw"><label>Qlt</label><input type="number" min="0" max="500" id="e_${k}_qlt" placeholder="340" value="${pfV('qlt')}"></div>
         <div class="fw"><label>Sprzedaż brutto (zł)</label><input type="number" min="0" max="9999999" id="e_${k}_sp" placeholder="79 175" value="${pfV('sprzedaz')}" oninput="updateAuto('${k}')"></div>
-        <div class="fw"><label>Prowizja Allegro %</label><input type="number" step="0.1" min="0" max="30" id="e_${k}_comm" placeholder="11.1" value="${pfV('commission')}"></div>
+        <div class="fw"><label>Prowizja Allegro %</label><input type="number" step="0.1" min="0" max="30" id="e_${k}_comm" placeholder="11.1" value="${pfV('commission')}" oninput="updateAuto('${k}')"></div>
       </div>
       <!-- ROW B: z Trade Analytics (niebieski) -->
       <div class="fr fr-b">
