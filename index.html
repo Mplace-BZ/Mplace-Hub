@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.19</title>
+<title>MPlace Hub v5.20</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -979,7 +979,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.19</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.20</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -5563,7 +5563,7 @@ Format każdej rekomendacji:
 ---SLAJD [N+4]---
 # PLAN DZIAŁAŃ — [NASTĘPNY TYDZIEŃ/MIESIĄC]
 > Od słów do konkretów
-Tabela lub lista: Działanie | Konto | Właściciel | Termin
+Tabela lub lista: Działanie | Konto | Oczekiwany efekt
 **PUENTA:** Zdanie motywacyjne o kierunku — np. "W [miesiąc] przestajemy walczyć ze sobą i skalujemy sprzedaż na zdrowej strukturze."
 
 ---SLAJD KOŃCOWY---
@@ -6190,10 +6190,7 @@ function openSlideWindow(aiText, curM, selectedKeys, accDataArr) {
   overlay.style.display = 'block';
   overlay.scrollTop = 0;
 
-  // Init Chart.js for dashboard after DOM insert
-  if ((accDataArr||[]).length > 1) {
-    requestAnimationFrame(() => initDashboardChart(accDataArr));
-  }
+  // Dashboard chart is now pure HTML — no Chart.js init needed
 }
 
 function buildMoMTable(accDataArr, zakresLabel) {
@@ -6303,12 +6300,73 @@ function buildDashboardSlide(accDataArr, zakresLabel, slajdNum) {
     </div>`;
   }).join('');
 
-  const chartH = accDataArr.length <= 2 ? 120 : 160;
-  const chartBlock = accDataArr.length > 1
-    ? `<div style="margin-top:20px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
-        <canvas id="dashboardChart" height="${chartH}"></canvas>
-       </div>`
-    : '';
+  // Pure HTML/CSS horizontal bar chart (no Canvas — works in view.html)
+  let chartBlock = '';
+  if (accDataArr.length > 1) {
+    const maxSales = Math.max(...accDataArr.map(a => a.sprzedazSum));
+    const marginVals = accDataArr.map(a => parseFloat((a.marzaAvg||0).toFixed(1)));
+    const minM = Math.min(...marginVals);
+    const maxM = Math.max(...marginVals);
+    const mRange = maxM - minM || 1;
+
+    const legend = `<div style="display:flex;gap:20px;justify-content:center;margin-bottom:14px;font-size:11px;font-family:'DM Mono',monospace;color:#374151">
+      <span><span style="display:inline-block;width:12px;height:12px;background:#ff6b35cc;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Sprzedaż (zł)</span>
+      <span><span style="display:inline-block;width:12px;height:3px;background:#b47fff;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Marża (%)</span>
+    </div>`;
+
+    // Margin scale labels
+    const mSteps = 5;
+    const mStep = mRange / (mSteps - 1);
+    let mScaleHtml = '<div style="display:flex;justify-content:space-between;font-size:9px;font-family:\'DM Mono\',monospace;color:#b47fff;margin-bottom:8px;padding-left:100px">';
+    for (let i = 0; i < mSteps; i++) {
+      mScaleHtml += `<span>${(minM + mStep * i).toFixed(1)}%</span>`;
+    }
+    mScaleHtml += '</div>';
+
+    const barRows = accDataArr.map((a, idx) => {
+      const gc = GRP_COLORS[a.group] || '#8b91a8';
+      const pct = maxSales > 0 ? (a.sprzedazSum / maxSales * 100) : 0;
+      const mPct = mRange > 0 ? ((marginVals[idx] - minM) / mRange * 100) : 50;
+      const salesFmt = Math.round(a.sprzedazSum).toLocaleString('pl-PL');
+      return `<div style="display:flex;align-items:center;margin-bottom:8px;position:relative">
+        <div style="width:100px;flex-shrink:0;font-size:11px;font-family:'DM Mono',monospace;font-weight:600;color:#374151;text-align:right;padding-right:12px">${a.name}</div>
+        <div style="flex:1;position:relative;height:28px">
+          <div style="position:absolute;top:0;left:0;height:28px;width:${pct.toFixed(1)}%;background:${gc}cc;border-radius:4px"></div>
+          <div style="position:absolute;top:0;left:${pct.toFixed(1)}%;margin-left:6px;font-size:10px;font-family:'DM Mono',monospace;color:#6b7280;line-height:28px;white-space:nowrap">${salesFmt}</div>
+          <div style="position:absolute;top:50%;left:${mPct.toFixed(1)}%;transform:translate(-50%,-50%);width:10px;height:10px;background:#b47fff;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #b47fff;z-index:2"></div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Connecting line for margin dots (SVG inline)
+    const svgH = accDataArr.length * 36;
+    const points = accDataArr.map((a, idx) => {
+      const mPct = mRange > 0 ? ((marginVals[idx] - minM) / mRange * 100) : 50;
+      const y = idx * 36 + 14;
+      return `${mPct},${y}`;
+    }).join(' ');
+
+    const svgLine = `<svg style="position:absolute;top:0;left:100px;right:0;height:${svgH}px;pointer-events:none;z-index:1" viewBox="0 0 100 ${svgH}" preserveAspectRatio="none">
+      <polyline points="${points}" fill="none" stroke="#b47fff" stroke-width="1.5" stroke-opacity="0.5"/>
+    </svg>`;
+
+    // Sales scale at bottom
+    const sSteps = 6;
+    let sScaleHtml = '<div style="display:flex;justify-content:space-between;font-size:9px;font-family:\'DM Mono\',monospace;color:#6b7280;padding-left:100px;margin-top:4px">';
+    for (let i = 0; i < sSteps; i++) {
+      const v = Math.round(maxSales / (sSteps - 1) * i);
+      sScaleHtml += `<span>${v.toLocaleString('pl-PL')}</span>`;
+    }
+    sScaleHtml += '</div>';
+
+    chartBlock = `<div style="margin-top:20px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px;position:relative">
+      ${legend}${mScaleHtml}
+      <div style="position:relative">
+        ${svgLine}${barRows}
+      </div>
+      ${sScaleHtml}
+    </div>`;
+  }
 
   return `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
     <div style="font-family:'DM Mono',monospace;font-size:8px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem">SLAJD ${slajdNum} — DASHBOARD</div>
@@ -6319,53 +6377,7 @@ function buildDashboardSlide(accDataArr, zakresLabel, slajdNum) {
   </div>`;
 }
 
-function initDashboardChart(accDataArr) {
-  const canvas = document.getElementById('dashboardChart');
-  if (!canvas || typeof Chart === 'undefined') return;
-  const GRP_COLORS = { MEBLE:'#ff6b35', LUXSEN:'#2dd4a0', ONE:'#b47fff' };
-  const labels  = accDataArr.map(a => a.name);
-  const sales   = accDataArr.map(a => Math.round(a.sprzedazSum));
-  const margins = accDataArr.map(a => parseFloat((a.marzaAvg||0).toFixed(1)));
-  const colors  = accDataArr.map(a => GRP_COLORS[a.group] || '#8b91a8');
-
-  new Chart(canvas, {
-    data: {
-      labels,
-      datasets: [
-        {
-          type: 'bar',
-          label: 'Sprzedaż (zł)',
-          data: sales,
-          backgroundColor: colors.map(c => c + 'cc'),
-          borderColor: colors,
-          borderWidth: 1,
-          yAxisID: 'y'
-        },
-        {
-          type: 'line',
-          label: 'Marża (%)',
-          data: margins,
-          borderColor: '#b47fff',
-          backgroundColor: 'rgba(180,127,255,.15)',
-          pointBackgroundColor: '#b47fff',
-          pointRadius: 5,
-          tension: 0.3,
-          xAxisID: 'x2'
-        }
-      ]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      plugins: { legend: { labels: { font: { family:'DM Mono', size:10 }, color:'#374151' } } },
-      scales: {
-        y:  { ticks: { font:{family:'DM Mono',size:10}, color:'#374151' }, grid:{color:'#f3f4f6'} },
-        x:  { ticks: { font:{family:'DM Mono',size:10}, color:'#374151' }, grid:{color:'#f3f4f6'} },
-        x2: { position:'top', ticks:{font:{family:'DM Mono',size:10},color:'#b47fff',callback:v=>v+'%'}, grid:{drawOnChartArea:false} }
-      }
-    }
-  });
-}
+// initDashboardChart removed — dashboard chart is now pure HTML/CSS
 
 function downloadSlideHtml(monthLabel, dateLabel) {
   const overlay = document.getElementById('slideOverlay');
