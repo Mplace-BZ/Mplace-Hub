@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.56</title>
+<title>MPlace Hub v5.57</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -971,6 +971,22 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .kb-slot{border:1px dashed rgba(239,68,68,.25);border-radius:6px;padding:6px 10px;cursor:pointer;text-align:center;background:rgba(239,68,68,.02);transition:border-color .2s;}
 .kb-slot:hover{border-color:rgba(239,68,68,.5);}
 .kb-slot.done{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.04);}
+.dzis-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;gap:10px;align-items:flex-start;transition:all .2s;cursor:pointer;}
+.dzis-card:hover{border-color:var(--border2);}
+.dzis-card.done{opacity:.4;text-decoration:line-through;}
+.dzis-card.done .dzis-check{background:#2dd4a0;border-color:#2dd4a0;}
+.dzis-check{width:18px;height:18px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.dzis-card.done .dzis-check::after{content:'✓';color:#fff;font-size:11px;font-weight:700;}
+.dzis-pilne{border-left:3px solid #ef4444;animation:dzisPulse 2s ease-in-out infinite;}
+.dzis-wazne{border-left:3px solid #f5a623;}
+.dzis-info{border-left:3px solid #4d9fff;}
+@keyframes dzisPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}50%{box-shadow:0 0 8px 0 rgba(239,68,68,.15)}}
+.dzis-progress{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:1rem;}
+.dzis-progress-bar{height:100%;background:linear-gradient(90deg,#ef4444,#2dd4a0);border-radius:4px;transition:width .5s ease;}
+.dzis-stats{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem;}
+.dzis-stat{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;flex:1;min-width:120px;text-align:center;}
+.dzis-stat-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--text);}
+.dzis-stat-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
 </style>
 
   <!-- PWA Manifest -->
@@ -1002,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.56</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.57</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1143,12 +1159,32 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 <!-- ═══ VIEW: DZIŚ ═══ -->
 <div class="view" id="viewDzis">
 <div class="container" style="max-width:900px">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem">
-    <div style="width:40px;height:40px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(239,68,68,.4)"><svg width="16" height="18" viewBox="0 0 12 14" fill="none"><path d="M2 1L11 7L2 13V1Z" fill="#fff"/></svg></div>
-    <div>
-      <div class="ph-title" style="margin:0;line-height:1.2" id="dzisTitle">Dziś</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--text3)" id="dzisDate"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:36px;height:36px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(239,68,68,.4)"><svg width="14" height="16" viewBox="0 0 12 14" fill="none"><path d="M2 1L11 7L2 13V1Z" fill="#fff"/></svg></div>
+      <div>
+        <div class="ph-title" style="margin:0;line-height:1.2">Dziś</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3)" id="dzisDate"></div>
+      </div>
     </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div id="dzisTimer" style="font-family:var(--mono);font-size:13px;color:var(--text3)"></div>
+      <button onclick="generateDzisRefresh()" style="font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:4px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.06);color:#ef4444;cursor:pointer">Odśwież</button>
+    </div>
+  </div>
+
+  <div id="dzisStats" class="dzis-stats" style="display:none"></div>
+  <div id="dzisProgressWrap" style="display:none">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3)" id="dzisProgressLabel">0 / 23</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3)" id="dzisProgressPct">0%</span>
+    </div>
+    <div class="dzis-progress"><div class="dzis-progress-bar" id="dzisProgressBar" style="width:0%"></div></div>
+  </div>
+
+  <div id="dzisDYK" style="display:none;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-size:11px;color:#a78bfa">
+    <span style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px">Did you know?</span>
+    <span id="dzisDYKText"></span>
   </div>
 
   <div id="dzisLoading" style="display:none;align-items:center;gap:.75rem;padding:1.5rem;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:10px;margin-bottom:1.5rem">
@@ -1157,6 +1193,11 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   </div>
 
   <div id="dzisContent"></div>
+
+  <div id="dzisFooter" style="display:none;margin-top:1.5rem;display:flex;gap:.5rem">
+    <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Kopiuj</button>
+    <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Drukuj</button>
+  </div>
 </div>
 </div>
 
@@ -9623,6 +9664,11 @@ function aaShowHistoryEntry(id) {
 // ═══════════════════════════════════════════════════════════
 // DZIŚ — Centrum Dowodzenia
 // ═══════════════════════════════════════════════════════════
+const DZIS_CACHE_KEY = 'dzisCache';
+const DZIS_DONE_KEY = 'dzisDone';
+const DZIS_STREAK_KEY = 'dzisStreak';
+let _dzisTimerInterval = null;
+
 async function generateDzis() {
   const content = document.getElementById('dzisContent');
   const loading = document.getElementById('dzisLoading');
@@ -9631,13 +9677,24 @@ async function generateDzis() {
   const now = new Date();
   const dayNames = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
   const monthNames = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
+  const todayStr = now.toLocaleDateString('pl-PL');
   dateEl.textContent = `${dayNames[now.getDay()]}, ${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} · Dzień ${now.getDate()}/${DAYS_IN[MONTHS[now.getMonth()]]||30}`;
 
-  // Check cache — don't regenerate if already done today
-  const cacheKey = 'dzisCache';
-  const cached = JSON.parse(localStorage.getItem(cacheKey) || '{}');
-  if (cached.date === now.toLocaleDateString('pl-PL') && cached.html) {
-    content.innerHTML = cached.html;
+  // Start timer
+  dzisStartTimer();
+
+  // Did you know — random from Wiedza
+  const wEntries = getWiedza();
+  if (wEntries.length) {
+    const rnd = wEntries[Math.floor(Math.random() * wEntries.length)];
+    document.getElementById('dzisDYKText').textContent = rnd.title + ' — ' + rnd.content.substring(0, 120) + '...';
+    document.getElementById('dzisDYK').style.display = 'block';
+  }
+
+  // Check cache
+  const cached = JSON.parse(localStorage.getItem(DZIS_CACHE_KEY) || '{}');
+  if (cached.date === todayStr && cached.tasks) {
+    dzisRenderTasks(cached.tasks, cached.summary);
     return;
   }
 
@@ -9645,74 +9702,34 @@ async function generateDzis() {
   content.innerHTML = '';
 
   try {
-    // Gather all available context
     const lastAnalyses = JSON.parse(localStorage.getItem('aaHistory') || '[]').slice(-3);
     const lastKanibalizacja = JSON.parse(localStorage.getItem('kbHistory') || '[]').slice(-1);
-    const wiedza = getWiedza();
-
-    // Build comprehensive prompt
-    let prompt = `Jesteś moim partnerem biznesowym. Przygotuj mi PLAN DNIA — dokładnie 23 konkretne zadania.\n\n`;
-    prompt += `Dzisiaj: ${dayNames[now.getDay()]}, ${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()}\n`;
-    prompt += `Dzień ${now.getDate()} miesiąca (dane za 1-${now.getDate()-1})\n\n`;
-
-    // Current account data
-    prompt += `STAN KONT (bieżący miesiąc):\n`;
     const curM = MONTHS[now.getMonth()];
+
+    let prompt = `Przygotuj plan dnia — dokładnie 23 zadania.\n`;
+    prompt += `Dzisiaj: ${dayNames[now.getDay()]}, ${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()}, dzień ${now.getDate()} miesiąca\n\n`;
+
+    prompt += `STAN KONT:\n`;
     Object.keys(AC_META).forEach(k => {
       const d = getData(k).find(r => r.m === curM);
       if (!d) return;
-      const prod = getProd(k);
-      const C = calc(d, prod);
-      prompt += `${AC_META[k].name} (${AC_META[k].group}): Sprzedaż ${Math.round(d.sprzedaz||0).toLocaleString('pl-PL')} zł | Marża ${C.mAfter.toFixed(1)}% | ROAS ${(d.roas||0).toFixed(2)} | BE ROAS ${C.beRoasAds?C.beRoasAds.toFixed(2):'—'} | Ads% ${C.acosAds?C.acosAds.toFixed(1):'—'}% | Wyróżn. ${d.sprzedaz>0?((d.promoC||0)/d.sprzedaz*100).toFixed(1):'0'}%\n`;
+      const prod = getProd(k); const C = calc(d, prod);
+      prompt += `${AC_META[k].name} (${AC_META[k].group}): Sprzedaż ${Math.round(d.sprzedaz||0)} zł | Marża ${C.mAfter.toFixed(1)}% | ROAS ${(d.roas||0).toFixed(2)} | BE ${C.beRoasAds?C.beRoasAds.toFixed(2):'—'} | Ads% ${C.acosAds?C.acosAds.toFixed(1):'—'}% | Wyróżn. ${d.sprzedaz>0?((d.promoC||0)/d.sprzedaz*100).toFixed(1):'0'}%\n`;
+      if (C.mAfter < 5) prompt += `  ALERT: marża krytycznie niska!\n`;
+      if (d.roas && C.beRoasAds && d.roas < C.beRoasAds) prompt += `  ALERT: ROAS poniżej BE — Ads generują stratę\n`;
     });
 
-    // Insights/alerts
-    prompt += `\nALERTY SYSTEMU:\n`;
-    Object.keys(AC_META).forEach(k => {
-      const d = getData(k).find(r => r.m === curM);
-      if (!d) return;
-      const prod = getProd(k);
-      const C = calc(d, prod);
-      if (C.mAfter < 5) prompt += `🔴 ${AC_META[k].name}: marża ${C.mAfter.toFixed(1)}% — krytycznie niska\n`;
-      else if (C.mAfter < 8) prompt += `🟡 ${AC_META[k].name}: marża ${C.mAfter.toFixed(1)}% — poniżej celu\n`;
-      if (d.roas && C.beRoasAds && d.roas < C.beRoasAds) prompt += `🔴 ${AC_META[k].name}: ROAS ${d.roas.toFixed(2)} < BE ${C.beRoasAds.toFixed(2)} — Ads generują stratę\n`;
-    });
+    if (lastAnalyses.length) { prompt += `\nOstatnie analizy: ${lastAnalyses.map(a=>a.konto+' ('+a.okres+')').join(', ')}\n`; }
+    if (lastKanibalizacja.length) { prompt += `Ostatnia kanibalizacja: ${lastKanibalizacja[0].date}\n`; }
 
-    // Last analyses summary
-    if (lastAnalyses.length) {
-      prompt += `\nOSTATNIE ANALIZY OFERT:\n`;
-      lastAnalyses.forEach(a => {
-        prompt += `- ${a.konto} (${a.okres}): analiza dostępna\n`;
-      });
-    }
-
-    if (lastKanibalizacja.length) {
-      prompt += `\nOSTATNIA KANIBALIZACJA: analiza z ${lastKanibalizacja[0].date} — ${lastKanibalizacja[0].tableHtml ? 'dostępna' : 'brak tabeli'}\n`;
-    }
-
-    // Calendar context
-    const holidays = [];
-    const campDays = [];
-    for (let d = now.getDate(); d <= Math.min(now.getDate() + 7, 30); d++) {
-      const key = `${now.getMonth()+1}-${d}`;
-      // Check if holiday or campaign day (simplified)
-    }
-
-    prompt += `\nZASADY:\n`;
-    prompt += `- Dokładnie 23 zadania — nie więcej, nie mniej (23 to moja liczba)\n`;
-    prompt += `- Każde zadanie: [PILNE/WAŻNE/INFO] + konkretne działanie + konto/aukcja + oczekiwany efekt\n`;
-    prompt += `- Sortuj od najważniejszego do najmniej pilnego\n`;
-    prompt += `- Uwzględnij: alerty, kanibalizację, optymalizację Ads, wyróżnienia, sezonowość\n`;
-    prompt += `- Jeśli jest święto/długi weekend — uwzględnij w priorytetach\n`;
-    prompt += `- Zadania muszą być WYKONALNE DZIŚ — nie "monitoruj przez tydzień"\n`;
-    prompt += `- Podawaj konkretne numery aukcji, kwoty, procenty\n`;
-    prompt += `- Na końcu: 1-zdaniowe podsumowanie dnia\n\n`;
-    prompt += `FORMAT ODPOWIEDZI:\n`;
-    prompt += `Każde zadanie w formacie:\n`;
-    prompt += `**[N]. [PILNE/WAŻNE/INFO] Tytuł zadania**\n`;
-    prompt += `Konto: [nazwa] | Oczekiwany efekt: [konkretna kwota lub %]\n`;
-    prompt += `Opis: 1-2 zdania co zrobić\n\n`;
-    prompt += `Na końcu:\n**PODSUMOWANIE DNIA:** 1 zdanie\n`;
+    prompt += `\nOdpowiedz TYLKO w JSON (bez markdown, bez tekstu przed/po):\n`;
+    prompt += `{"tasks":[{"priority":"PILNE","title":"...","konto":"...","efekt":"...","opis":"..."}],"summary":"1 zdanie"}\n\n`;
+    prompt += `ZASADY:\n`;
+    prompt += `- Dokładnie 23 zadania, priority: PILNE (1-5), WAŻNE (6-15), INFO (16-23)\n`;
+    prompt += `- Sortuj od najważniejszego\n`;
+    prompt += `- Każde zadanie: konkretne, wykonalne dziś, z liczbami\n`;
+    prompt += `- Uwzględnij alerty, kanibalizację, optymalizację Ads, wyróżnienia, sezonowość\n`;
+    prompt += `- summary: 1 motywacyjne zdanie o dniu\n`;
 
     const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
       method: 'POST',
@@ -9724,21 +9741,27 @@ async function generateDzis() {
         messages: [{ role: 'user', content: prompt }]
       })
     });
-    const text = await readSSE(resp);
-    const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+    const raw = await readSSE(resp);
+    const clean = raw.replace(/```json|```/g, '').trim();
+    let parsed;
+    try { parsed = JSON.parse(clean); } catch(e) {
+      // Fallback: show as markdown if JSON fails
+      const html = (typeof marked !== 'undefined') ? marked.parse(raw) : raw.replace(/\n/g,'<br>');
+      content.innerHTML = `<div class="agent-md" style="font-size:13px;line-height:1.7">${html}</div>`;
+      window._aaLastText = raw;
+      loading.style.display = 'none';
+      return;
+    }
 
-    content.innerHTML = `<div class="agent-md" style="font-size:13px;line-height:1.7">${html}</div>
-      <div style="display:flex;gap:.5rem;margin-top:1rem">
-        <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Kopiuj</button>
-        <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Drukuj</button>
-        <button onclick="generateDzisRefresh()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.06);color:#ef4444;cursor:pointer">Odśwież plan</button>
-      </div>`;
+    const tasks = parsed.tasks || [];
+    const summary = parsed.summary || '';
 
     // Cache
-    window._aaLastText = text;
-    window._aaLastHtml = html;
-    window._aaLastMeta = { konto: 'Plan Dnia', okres: now.toLocaleDateString('pl-PL'), date: now.toLocaleString('pl-PL') };
-    localStorage.setItem(cacheKey, JSON.stringify({ date: now.toLocaleDateString('pl-PL'), html: content.innerHTML }));
+    localStorage.setItem(DZIS_CACHE_KEY, JSON.stringify({ date: todayStr, tasks, summary }));
+    window._aaLastText = tasks.map((t,i) => `${i+1}. [${t.priority}] ${t.title}\nKonto: ${t.konto} | Efekt: ${t.efekt}\n${t.opis}`).join('\n\n') + '\n\nPODSUMOWANIE: ' + summary;
+    window._aaLastMeta = { konto: 'Plan Dnia', okres: todayStr, date: now.toLocaleString('pl-PL') };
+
+    dzisRenderTasks(tasks, summary);
 
   } catch(err) {
     content.innerHTML = `<div style="color:var(--red);font-size:12px">Błąd: ${err.message}</div>`;
@@ -9746,8 +9769,92 @@ async function generateDzis() {
   loading.style.display = 'none';
 }
 
+function dzisRenderTasks(tasks, summary) {
+  const content = document.getElementById('dzisContent');
+  const todayStr = new Date().toLocaleDateString('pl-PL');
+  const doneSet = new Set(JSON.parse(localStorage.getItem(DZIS_DONE_KEY + '_' + todayStr) || '[]'));
+
+  // Stats
+  const streak = parseInt(localStorage.getItem(DZIS_STREAK_KEY) || '0');
+  const pilne = tasks.filter(t => t.priority === 'PILNE').length;
+  const wazne = tasks.filter(t => t.priority === 'WAŻNE').length;
+  const info = tasks.filter(t => t.priority === 'INFO').length;
+  const done = doneSet.size;
+
+  document.getElementById('dzisStats').style.display = 'flex';
+  document.getElementById('dzisStats').innerHTML = `
+    <div class="dzis-stat"><div class="dzis-stat-val" style="color:#ef4444">${pilne}</div><div class="dzis-stat-label">Pilne</div></div>
+    <div class="dzis-stat"><div class="dzis-stat-val" style="color:#f5a623">${wazne}</div><div class="dzis-stat-label">Ważne</div></div>
+    <div class="dzis-stat"><div class="dzis-stat-val" style="color:#4d9fff">${info}</div><div class="dzis-stat-label">Info</div></div>
+    <div class="dzis-stat"><div class="dzis-stat-val" style="color:#2dd4a0">${done}/${tasks.length}</div><div class="dzis-stat-label">Zrobione</div></div>
+    <div class="dzis-stat"><div class="dzis-stat-val">${streak}</div><div class="dzis-stat-label">Seria dni</div></div>`;
+
+  // Progress
+  document.getElementById('dzisProgressWrap').style.display = 'block';
+  const pct = tasks.length > 0 ? Math.round(done / tasks.length * 100) : 0;
+  document.getElementById('dzisProgressLabel').textContent = `${done} / ${tasks.length}`;
+  document.getElementById('dzisProgressPct').textContent = pct + '%';
+  document.getElementById('dzisProgressBar').style.width = pct + '%';
+
+  // Cards
+  const priorityCls = { PILNE: 'dzis-pilne', 'WAŻNE': 'dzis-wazne', INFO: 'dzis-info' };
+  content.innerHTML = tasks.map((t, i) => {
+    const isDone = doneSet.has(i);
+    return `<div class="dzis-card ${priorityCls[t.priority]||''} ${isDone?'done':''}" onclick="dzisToggle(${i})">
+      <div class="dzis-check"></div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+          <span style="font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:3px;background:${t.priority==='PILNE'?'rgba(239,68,68,.15);color:#ef4444':t.priority==='WAŻNE'?'rgba(245,166,35,.15);color:#f5a623':'rgba(77,159,255,.15);color:#4d9fff'}">${t.priority}</span>
+          <span style="font-size:12px;font-weight:600;color:var(--text)">${t.title}</span>
+        </div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${t.konto||''} ${t.efekt?'→ '+t.efekt:''}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:3px;line-height:1.4">${t.opis||''}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  if (summary) {
+    content.innerHTML += `<div style="margin-top:1rem;padding:12px 16px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:8px;font-size:12px;color:var(--text);font-style:italic">${summary}</div>`;
+  }
+
+  document.getElementById('dzisFooter').style.display = 'flex';
+}
+
+function dzisToggle(idx) {
+  const todayStr = new Date().toLocaleDateString('pl-PL');
+  const key = DZIS_DONE_KEY + '_' + todayStr;
+  const doneSet = new Set(JSON.parse(localStorage.getItem(key) || '[]'));
+  if (doneSet.has(idx)) doneSet.delete(idx); else doneSet.add(idx);
+  localStorage.setItem(key, JSON.stringify([...doneSet]));
+
+  // Update streak
+  if (doneSet.size >= 20) {
+    const streak = parseInt(localStorage.getItem(DZIS_STREAK_KEY) || '0') + 1;
+    localStorage.setItem(DZIS_STREAK_KEY, String(streak));
+  }
+
+  // Re-render
+  const cached = JSON.parse(localStorage.getItem(DZIS_CACHE_KEY) || '{}');
+  if (cached.tasks) dzisRenderTasks(cached.tasks, cached.summary);
+}
+
+function dzisStartTimer() {
+  if (_dzisTimerInterval) clearInterval(_dzisTimerInterval);
+  const start = Date.now();
+  const timerEl = document.getElementById('dzisTimer');
+  _dzisTimerInterval = setInterval(() => {
+    const elapsed = Math.round((Date.now() - start) / 1000);
+    const h = Math.floor(elapsed / 3600);
+    const m = Math.floor((elapsed % 3600) / 60);
+    const s = elapsed % 60;
+    if (timerEl) timerEl.textContent = (h > 0 ? h + ':' : '') + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }, 1000);
+}
+
 function generateDzisRefresh() {
-  localStorage.removeItem('dzisCache');
+  localStorage.removeItem(DZIS_CACHE_KEY);
+  const todayStr = new Date().toLocaleDateString('pl-PL');
+  localStorage.removeItem(DZIS_DONE_KEY + '_' + todayStr);
   generateDzis();
 }
 
