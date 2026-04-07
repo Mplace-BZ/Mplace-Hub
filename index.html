@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.34</title>
+<title>MPlace Hub v5.35</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -999,7 +999,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.34</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.35</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1945,8 +1945,12 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   </div>
 
   <div style="margin-bottom:1rem">
-    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Twoje uwagi / obserwacje</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-family:var(--mono)">Twoje uwagi / obserwacje</div>
+      <button onclick="aaSaveTemplate()" style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.06);color:#38bdf8;cursor:pointer">+ zapisz jako szablon</button>
+    </div>
     <textarea id="aaUwagi" placeholder="Wpisz swoje spostrzeżenia — co zauważyłeś, jakie masz wątpliwości, jaki kontekst (święta, sezon, zmiany). Agent uwzględni to w analizie." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:80px;box-sizing:border-box;line-height:1.5"></textarea>
+    <div id="aaTemplates" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
   </div>
 
   <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.5rem">
@@ -2412,6 +2416,7 @@ function showView(v){
     document.getElementById('viewAnaliza').classList.add('active');
     document.getElementById('navAnaliza').classList.add('active');
     aaRenderHistory();
+    aaRenderTemplates();
   } else if(v==='kalkulator'){
     document.getElementById('viewKalkulator').classList.add('active');
     document.getElementById('navKalkulator').classList.add('active');
@@ -9128,6 +9133,45 @@ function aaDownloadHtml() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+// ── Szablony uwag ──
+const AA_TEMPLATES_KEY = 'aaTemplates';
+function aaGetTemplates() { try { return JSON.parse(localStorage.getItem(AA_TEMPLATES_KEY) || '[]'); } catch(e) { return []; } }
+function aaSaveTemplates(t) { localStorage.setItem(AA_TEMPLATES_KEY, JSON.stringify(t)); }
+
+function aaSaveTemplate() {
+  const text = document.getElementById('aaUwagi').value.trim();
+  if (!text) { alert('Wpisz uwagi żeby zapisać szablon'); return; }
+  const label = prompt('Nazwa szablonu (krótka, np. "Święta kwiecień")');
+  if (!label) return;
+  const templates = aaGetTemplates();
+  templates.push({ id: Date.now(), label, text });
+  aaSaveTemplates(templates);
+  aaRenderTemplates();
+}
+
+function aaUseTemplate(id) {
+  const t = aaGetTemplates().find(t => t.id === id);
+  if (t) document.getElementById('aaUwagi').value = t.text;
+}
+
+function aaDeleteTemplate(id, e) {
+  e.stopPropagation();
+  const templates = aaGetTemplates().filter(t => t.id !== id);
+  aaSaveTemplates(templates);
+  aaRenderTemplates();
+}
+
+function aaRenderTemplates() {
+  const container = document.getElementById('aaTemplates');
+  if (!container) return;
+  const templates = aaGetTemplates();
+  if (!templates.length) { container.innerHTML = ''; return; }
+  container.innerHTML = templates.map(t => `<button onclick="aaUseTemplate(${t.id})" style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px" title="${t.text.substring(0,100)}...">
+    ${t.label}
+    <span onclick="aaDeleteTemplate(${t.id},event)" style="color:var(--text3);font-size:12px;margin-left:2px;line-height:1" title="Usuń szablon">×</span>
+  </button>`).join('');
 }
 
 function aaRenderHistory() {
