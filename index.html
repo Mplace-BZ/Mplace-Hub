@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.38</title>
+<title>MPlace Hub v5.39</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -999,7 +999,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.38</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.39</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -8941,14 +8941,24 @@ async function aaParseFile(file, type) {
           resolve({ type:'ads', kampanie, totKoszt, totSprzedaz, totRoas: totKoszt > 0 ? totSprzedaz / totKoszt : 0, zgnile, kosztZgnile: zgnile.reduce((s,a)=>s+a.koszt,0), gwiazdy });
 
         } else if (type === 'sprzedaz') {
-          const ws = wb.Sheets[wb.SheetNames[1]] || wb.Sheets[wb.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(ws, { defval: 0 });
+          // Try each sheet — find one with 'Nazwa oferty' or 'Liczba wizyt' header
+          let rows = [];
+          for (const sn of wb.SheetNames) {
+            const ws = wb.Sheets[sn];
+            const r = XLSX.utils.sheet_to_json(ws, { defval: 0 });
+            if (r.length && r[0] && Object.keys(r[0]).some(k => k.includes('Nazwa oferty') || k.includes('Liczba wizyt'))) { rows = r; break; }
+          }
+          if (!rows.length) { rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: 0 }); }
+          // Flexible column matching
+          const fk = (row, ...names) => { for (const n of names) { for (const k of Object.keys(row)) { if (k.includes(n)) return row[k]; } } return 0; };
           const oferty = rows.map(row => ({
-            oferta: (row['Nazwa oferty'] || '').substring(0, 60),
-            wizyty: parseInt(row['Liczba wizyt'] || 0),
-            transakcje: parseInt(row['Transakcje'] || 0),
-            konwersja: parseFloat(row['Konwersja'] || 0),
-            koszyk: parseInt(row['Dodania do koszyka'] || 0)
+            oferta: String(fk(row, 'Nazwa oferty', 'Nazwa ofer') || '').substring(0, 60),
+            id: String(fk(row, 'ID oferty') || ''),
+            wizyty: parseInt(fk(row, 'Liczba wizyt', 'wizyt')) || 0,
+            transakcje: parseInt(fk(row, 'Transakcje', 'transakcj')) || 0,
+            konwersja: parseFloat(String(fk(row, 'Konwersja', 'konwersj')).replace('%','').replace(',','.')) || 0,
+            koszyk: parseInt(fk(row, 'Dodania do koszyka', 'koszyka')) || 0,
+            polubienia: parseInt(fk(row, 'Polubienia', 'polubien')) || 0
           })).filter(o => o.wizyty > 0).sort((a, b) => b.wizyty - a.wizyty);
           const totWizyty = oferty.reduce((s, o) => s + o.wizyty, 0);
           const totTransakcje = oferty.reduce((s, o) => s + o.transakcje, 0);
@@ -8957,14 +8967,28 @@ async function aaParseFile(file, type) {
           resolve({ type:'sprzedaz', oferty: oferty.slice(0,50), totWizyty, totTransakcje, srKonwersja: totWizyty > 0 ? totTransakcje / totWizyty : 0, martwePunkty: martwePunkty.slice(0,10), porzuconeKoszyki: porzuconeKoszyki.slice(0,10) });
 
         } else if (type === 'konwersja') {
-          const ws = wb.Sheets[wb.SheetNames[2]] || wb.Sheets[wb.SheetNames[1]] || wb.Sheets[wb.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(ws, { defval: 0 });
+          // Try each sheet — find one with sales/transaction data; handle header offset (row 3)
+          let rows = [];
+          for (const sn of wb.SheetNames) {
+            const ws = wb.Sheets[sn];
+            // Try with range offset for files where header is in row 3
+            for (const rangeOpt of [{ defval: 0 }, { defval: 0, range: 2 }]) {
+              const r = XLSX.utils.sheet_to_json(ws, rangeOpt);
+              if (r.length && r[0] && Object.keys(r[0]).some(k => k.includes('Wartość sprzedaży') || k.includes('cena oferty') || k.includes('Liczba trans'))) { rows = r; break; }
+            }
+            if (rows.length) break;
+          }
+          if (!rows.length) { rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: 0 }); }
+          const fk = (row, ...names) => { for (const n of names) { for (const k of Object.keys(row)) { if (k.includes(n)) return row[k]; } } return 0; };
           const oferty = rows.map(row => ({
-            oferta: (row['Produkt'] || row['Nazwa oferty'] || '').substring(0, 60),
-            transakcje: parseInt(row['Liczba transakcji'] || row['Transakcje'] || 0),
-            sztuki: parseInt(row['Sprzedane sztuki'] || row['Liczba sztuk'] || 0),
-            cena: parseFloat(row['Śr. cena oferty'] || row['Cena'] || 0),
-            wartosc: parseFloat(row['Wartość sprzedaży'] || 0)
+            oferta: String(fk(row, 'Nazwa ofert', 'Produkt', 'Nazwa ofer') || '').substring(0, 60),
+            transakcje: parseInt(fk(row, 'Liczba trans', 'transakcj', 'Transakcje')) || 0,
+            sztuki: parseInt(fk(row, 'Sprzedane', 'sztuk')) || 0,
+            cena: parseFloat(String(fk(row, 'cena oferty', 'Cena')).replace(/[^\d.,]/g,'').replace(',','.')) || 0,
+            wartosc: parseFloat(String(fk(row, 'Wartość sprzedaży', 'Wartość sprze')).replace(/[^\d.,]/g,'').replace(',','.')) || 0,
+            promowanie: String(fk(row, 'Opcje prom', 'promow') || '----'),
+            kategoria: String(fk(row, 'Kategoria', 'kategor') || ''),
+            podkategoria: String(fk(row, 'Podkategoria 1', 'Podkategor') || '')
           })).filter(o => o.transakcje > 0 || o.wartosc > 0).sort((a, b) => b.wartosc - a.wartosc);
           resolve({ type:'konwersja', oferty: oferty.slice(0,40), totWartosc: oferty.reduce((s,o)=>s+o.wartosc,0) });
         }
@@ -8996,7 +9020,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja) {
     p += `\n== RAPORT 2: ODWIEDZINY I KONWERSJA ==\n`;
     p += `${sprzedaz.totWizyty} wizyt | ${sprzedaz.totTransakcje} transakcji | Konwersja: ${(sprzedaz.srKonwersja * 100).toFixed(2)}%\n\n`;
     p += `Top oferty:\n`;
-    sprzedaz.oferty.slice(0,15).forEach(o => { p += `  ${o.oferta} | Wizyty:${o.wizyty} Trans:${o.transakcje} Konw:${(o.konwersja*100).toFixed(1)}% Koszyk:${o.koszyk}\n`; });
+    sprzedaz.oferty.slice(0,15).forEach(o => { p += `  ${o.id?'['+o.id+'] ':''}${o.oferta} | Wizyty:${o.wizyty} Trans:${o.transakcje} Konw:${o.konwersja > 1 ? o.konwersja.toFixed(1) : (o.konwersja*100).toFixed(1)}% Koszyk:${o.koszyk} Polubienia:${o.polubienia||0}\n`; });
     if (sprzedaz.martwePunkty.length) { p += `\nMARTWE PUNKTY (>=10 wizyt, 0 transakcji):\n`; sprzedaz.martwePunkty.forEach(o => { p += `  ${o.oferta} | ${o.wizyty} wizyt\n`; }); }
     if (sprzedaz.porzuconeKoszyki.length) { p += `\nPORZUCONE KOSZYKI:\n`; sprzedaz.porzuconeKoszyki.forEach(o => { p += `  ${o.oferta} | Koszyk:${o.koszyk} Wizyty:${o.wizyty}\n`; }); }
   }
@@ -9004,7 +9028,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja) {
   if (konwersja) {
     p += `\n== RAPORT 3: WYNIKI SPRZEDAŻY ==\n`;
     p += `Łączna sprzedaż: ${konwersja.totWartosc.toFixed(0)} zł\n\nTop oferty:\n`;
-    konwersja.oferty.slice(0,15).forEach(o => { p += `  ${o.oferta} | Trans:${o.transakcje} Wartość:${o.wartosc.toFixed(0)}zł Cena:${o.cena.toFixed(0)}zł\n`; });
+    konwersja.oferty.slice(0,15).forEach(o => { p += `  ${o.oferta} | Trans:${o.transakcje} Szt:${o.sztuki} Wartość:${o.wartosc.toFixed(0)}zł Cena:${o.cena.toFixed(0)}zł Promo:[${o.promowanie}] ${o.kategoria?'Kat:'+o.kategoria:''}\n`; });
   }
 
   p += `\n== ZADANIE ==\n`;
