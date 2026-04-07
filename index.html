@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.48</title>
+<title>MPlace Hub v5.49</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -968,6 +968,9 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .kp-btn-dismiss{background:none;border:none;color:var(--text3,#6b7280);font-size:11px;cursor:pointer;}
 .date-quick-btn{font-family:var(--mono);font-size:9px;letter-spacing:.04em;padding:3px 8px;border-radius:4px;border:1px solid var(--border2,#2a2b35);background:var(--bg2,#1a1b23);color:var(--text2,#9ca3af);cursor:pointer;transition:all .15s;}
 .date-quick-btn:hover{border-color:var(--accent,#ff6b35);color:var(--accent,#ff6b35);background:rgba(255,107,53,.08);}
+.kb-slot{border:1px dashed rgba(239,68,68,.25);border-radius:6px;padding:6px 10px;cursor:pointer;text-align:center;background:rgba(239,68,68,.02);transition:border-color .2s;}
+.kb-slot:hover{border-color:rgba(239,68,68,.5);}
+.kb-slot.done{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.04);}
 </style>
 
   <!-- PWA Manifest -->
@@ -999,7 +1002,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.48</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.49</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1028,6 +1031,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <button class="nav-btn" onclick="showView('kalendarz')" id="navKalendarz" style="color:#f97316;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2)">Kalendarz</button>
     <button class="nav-btn" onclick="showView('analiza')" id="navAnaliza" style="color:#4d9fff;background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Analiza</button>
     <button class="nav-btn" onclick="showView('screener')" id="navScreener" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Screener</button>
+    <button class="nav-btn" onclick="showView('kanibalizator')" id="navKanibalizator" style="color:#ef4444;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)">Kanibalizator</button>
     <button class="nav-btn" onclick="showView('kalkulator')" id="navKalkulator" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Kalkulator</button>
     <div class="nav-sep"></div>
     <button class="nav-btn" onclick="showView('wiedza')" id="navWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza ✦</button>
@@ -1991,6 +1995,74 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 </div>
 
+<!-- ═══ VIEW: KANIBALIZATOR ═══ -->
+<div class="view" id="viewKanibalizator">
+<div class="container" style="max-width:1100px">
+  <div style="margin-bottom:1rem">
+    <div class="ph-eyebrow" style="color:#ef4444">► KANIBALIZACJA MIĘDZY KONTAMI</div>
+    <div class="ph-title">Kanibalizator <span style="color:#ef4444">◆</span></div>
+    <div class="ph-sub">Wgraj raporty z 3 kont MEBLE → wykryj nakładanie produktów → zoptymalizuj podział</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--g-meble,#ff6b35);margin-bottom:6px;font-weight:600">MobelKap (MK)</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div class="kb-slot" onclick="document.getElementById('kbF_mk_ads').click()"><input type="file" id="kbF_mk_ads" accept=".xlsx" style="display:none" onchange="kbFile('mk','ads',this)"><span id="kbN_mk_ads" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Ads XLSX</span></div>
+        <div class="kb-slot" onclick="document.getElementById('kbF_mk_sp').click()"><input type="file" id="kbF_mk_sp" accept=".xlsx" style="display:none" onchange="kbFile('mk','sprzedaz',this)"><span id="kbN_mk_sp" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Sprzedaż XLSX</span></div>
+        <div class="kb-slot" onclick="document.getElementById('kbF_mk_kn').click()"><input type="file" id="kbF_mk_kn" accept=".xlsx" style="display:none" onchange="kbFile('mk','konwersja',this)"><span id="kbN_mk_kn" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Konwersja XLSX</span></div>
+      </div>
+      <div style="margin-top:6px"><div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">WYRÓŻNIENIA (numery aukcji)</div>
+      <textarea id="kbWyr_mk" rows="2" placeholder="17565030433&#10;17617165511" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:10px;font-family:var(--mono);resize:vertical;box-sizing:border-box"></textarea></div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--g-meble,#ff6b35);margin-bottom:6px;font-weight:600">Perfekt Cięcie (PC)</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div class="kb-slot" onclick="document.getElementById('kbF_pc_ads').click()"><input type="file" id="kbF_pc_ads" accept=".xlsx" style="display:none" onchange="kbFile('pc','ads',this)"><span id="kbN_pc_ads" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Ads XLSX</span></div>
+        <div class="kb-slot" onclick="document.getElementById('kbF_pc_sp').click()"><input type="file" id="kbF_pc_sp" accept=".xlsx" style="display:none" onchange="kbFile('pc','sprzedaz',this)"><span id="kbN_pc_sp" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Sprzedaż XLSX</span></div>
+        <div class="kb-slot" onclick="document.getElementById('kbF_pc_kn').click()"><input type="file" id="kbF_pc_kn" accept=".xlsx" style="display:none" onchange="kbFile('pc','konwersja',this)"><span id="kbN_pc_kn" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Konwersja XLSX</span></div>
+      </div>
+      <div style="margin-top:6px"><div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">WYRÓŻNIENIA (numery aukcji)</div>
+      <textarea id="kbWyr_pc" rows="2" placeholder="12840113580&#10;11516146737" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:10px;font-family:var(--mono);resize:vertical;box-sizing:border-box"></textarea></div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--g-meble,#ff6b35);margin-bottom:6px;font-weight:600">Meble na Czasie (MnC)</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div class="kb-slot" onclick="document.getElementById('kbF_mnc_ads').click()"><input type="file" id="kbF_mnc_ads" accept=".xlsx" style="display:none" onchange="kbFile('mnc','ads',this)"><span id="kbN_mnc_ads" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Ads XLSX</span></div>
+        <div class="kb-slot" onclick="document.getElementById('kbF_mnc_sp').click()"><input type="file" id="kbF_mnc_sp" accept=".xlsx" style="display:none" onchange="kbFile('mnc','sprzedaz',this)"><span id="kbN_mnc_sp" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Sprzedaż XLSX</span></div>
+        <div class="kb-slot" onclick="document.getElementById('kbF_mnc_kn').click()"><input type="file" id="kbF_mnc_kn" accept=".xlsx" style="display:none" onchange="kbFile('mnc','konwersja',this)"><span id="kbN_mnc_kn" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Konwersja XLSX</span></div>
+      </div>
+      <div style="margin-top:6px"><div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">WYRÓŻNIENIA (numery aukcji)</div>
+      <textarea id="kbWyr_mnc" rows="2" placeholder="18040805229&#10;18019543227" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:10px;font-family:var(--mono);resize:vertical;box-sizing:border-box"></textarea></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:1rem">
+    <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">USUNIĘTE WYRÓŻNIENIA (historia zmian)</div>
+    <textarea id="kbWyrRemoved" rows="2" placeholder="Tutaj przenieś numery aukcji po usunięciu wyróżnień..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:10px;font-family:var(--mono);resize:vertical;box-sizing:border-box"></textarea>
+  </div>
+
+  <div style="margin-bottom:1rem">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Uwagi / kontekst</div>
+    <textarea id="kbUwagi" placeholder="Okres raportu, co się zmieniło, na co zwrócić uwagę..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:50px;box-sizing:border-box"></textarea>
+  </div>
+
+  <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.5rem">
+    <button id="kbRunBtn" onclick="kbRun()" style="font-family:var(--mono);font-size:12px;padding:10px 24px;border-radius:8px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.12);color:#ef4444;cursor:pointer;font-weight:500">▸ Analizuj kanibalizację</button>
+    <button onclick="kbReset()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">↺ Resetuj</button>
+    <div id="kbFileCount" style="font-size:10px;color:var(--text3);font-family:var(--mono)">0 / 9 plików</div>
+  </div>
+
+  <div id="kbThinking" style="display:none;align-items:center;gap:.75rem;padding:1rem;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:8px;margin-bottom:1.5rem">
+    <div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div>
+    <div id="kbThinkingText" style="font-size:12px;color:#ef4444;font-family:var(--mono)">Analizuję...</div>
+  </div>
+
+  <div id="kbTable" style="margin-bottom:1.5rem"></div>
+  <div id="kbResult"></div>
+</div>
+</div>
+
 <!-- ═══ VIEW: SCREENER ═══ -->
 <div class="view" id="viewScreener">
 <div class="container" style="max-width:860px">
@@ -2392,7 +2464,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewScreener','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
+  ['viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewKanibalizator','viewScreener','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -2459,6 +2531,9 @@ function showView(v){
     document.getElementById('navAnaliza').classList.add('active');
     aaRenderHistory();
     aaRenderTemplates();
+  } else if(v==='kanibalizator'){
+    document.getElementById('viewKanibalizator').classList.add('active');
+    document.getElementById('navKanibalizator').classList.add('active');
   } else if(v==='screener'){
     document.getElementById('viewScreener').classList.add('active');
     document.getElementById('navScreener').classList.add('active');
@@ -9495,6 +9570,294 @@ function aaShowHistoryEntry(id) {
 }
 
 // ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// KANIBALIZATOR — wykrywanie kanibalizacji między kontami MEBLE
+// ═══════════════════════════════════════════════════════════
+const KB_KONTA = ['mk','pc','mnc'];
+const KB_KONTA_NAMES = { mk:'MobelKap', pc:'Perfekt Cięcie', mnc:'Meble na Czasie' };
+const KB_KONTA_KEYS = { mk:'MobelKap', pc:'PerfektCiecie', mnc:'MeblenaCzasie' };
+const KB_TYPES = ['ads','sprzedaz','konwersja'];
+window._kbFiles = {};
+KB_KONTA.forEach(k => KB_TYPES.forEach(t => { window._kbFiles[k+'_'+t] = null; }));
+
+function kbFile(konto, type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const key = konto + '_' + (type === 'sprzedaz' ? 'sp' : type === 'konwersja' ? 'kn' : type);
+  window._kbFiles[konto+'_'+type] = file;
+  const nameEl = document.getElementById('kbN_'+konto+'_'+(type==='sprzedaz'?'sp':type==='konwersja'?'kn':'ads'));
+  const slotEl = nameEl?.closest('.kb-slot');
+  if (nameEl) { nameEl.textContent = file.name.length > 20 ? file.name.substring(0,17)+'...' : file.name; nameEl.style.color = '#34d399'; }
+  if (slotEl) slotEl.classList.add('done');
+  kbUpdateCount();
+}
+
+function kbUpdateCount() {
+  const count = Object.values(window._kbFiles).filter(f => f).length;
+  const el = document.getElementById('kbFileCount');
+  if (el) { el.textContent = count + ' / 9 plików'; el.style.color = count >= 3 ? '#34d399' : 'var(--text3)'; }
+}
+
+function kbReset() {
+  Object.keys(window._kbFiles).forEach(k => { window._kbFiles[k] = null; });
+  KB_KONTA.forEach(k => {
+    ['ads','sp','kn'].forEach(t => {
+      const fi = document.getElementById('kbF_'+k+'_'+t); if (fi) fi.value = '';
+      const nm = document.getElementById('kbN_'+k+'_'+t); if (nm) { nm.textContent = t==='ads'?'Ads XLSX':t==='sp'?'Sprzedaż XLSX':'Konwersja XLSX'; nm.style.color = ''; }
+      const sl = nm?.closest('.kb-slot'); if (sl) sl.classList.remove('done');
+    });
+    const w = document.getElementById('kbWyr_'+k); if (w) w.value = '';
+  });
+  document.getElementById('kbWyrRemoved').value = '';
+  document.getElementById('kbUwagi').value = '';
+  document.getElementById('kbTable').innerHTML = '';
+  document.getElementById('kbResult').innerHTML = '';
+  document.getElementById('kbThinking').style.display = 'none';
+  kbUpdateCount();
+}
+
+function kbParseWyroznienia(konto) {
+  const el = document.getElementById('kbWyr_'+konto);
+  if (!el) return [];
+  return el.value.split(/[\n,;\s]+/).map(s => s.trim()).filter(s => s.length > 5);
+}
+
+async function kbRun() {
+  const btn = document.getElementById('kbRunBtn');
+  const thinking = document.getElementById('kbThinking');
+  const thinkingText = document.getElementById('kbThinkingText');
+  const uwagi = document.getElementById('kbUwagi').value.trim();
+
+  const hasAnyFile = Object.values(window._kbFiles).some(f => f);
+  if (!hasAnyFile) { alert('Wgraj przynajmniej raporty Ads dla 2 kont.'); return; }
+
+  btn.disabled = true;
+  thinking.style.display = 'flex';
+  document.getElementById('kbTable').innerHTML = '';
+  document.getElementById('kbResult').innerHTML = '';
+
+  try {
+    thinkingText.textContent = 'Ładuję parser XLSX...';
+    await aaLoadSheetJS();
+
+    // Parse all uploaded files
+    const data = {};
+    for (const konto of KB_KONTA) {
+      data[konto] = { ads: null, sprzedaz: null, konwersja: null, wyroznienia: kbParseWyroznienia(konto) };
+      for (const type of KB_TYPES) {
+        if (window._kbFiles[konto+'_'+type]) {
+          thinkingText.textContent = `Czytam ${KB_KONTA_NAMES[konto]} — ${type}...`;
+          data[konto][type] = await aaParseFile(window._kbFiles[konto+'_'+type], type);
+        }
+      }
+    }
+
+    thinkingText.textContent = 'Matchuję produkty po SKU...';
+
+    // Build per-auction merged data per konto
+    const kontoAukcje = {};
+    for (const konto of KB_KONTA) {
+      kontoAukcje[konto] = {};
+      // Ads data
+      if (data[konto].ads) {
+        data[konto].ads.kampanie.forEach(k => k.aukcje.forEach(a => {
+          if (!a.nr) return;
+          if (!kontoAukcje[konto][a.nr]) kontoAukcje[konto][a.nr] = { nr: a.nr, oferta: a.oferta, sku: '' };
+          const obj = kontoAukcje[konto][a.nr];
+          obj.kosztAds = (obj.kosztAds||0) + a.koszt;
+          obj.sprzedazAds = (obj.sprzedazAds||0) + a.sprzedaz;
+          obj.wysw = (obj.wysw||0) + a.wysw;
+          obj.klik = (obj.klik||0) + a.klik;
+          obj.sztukiAds = (obj.sztukiAds||0) + (a.sztuki||0);
+        }));
+      }
+      // Sprzedaż data (match by ID)
+      if (data[konto].sprzedaz) {
+        data[konto].sprzedaz.oferty.forEach(o => {
+          const id = o.id || '';
+          if (!id) return;
+          if (!kontoAukcje[konto][id]) kontoAukcje[konto][id] = { nr: id, oferta: o.oferta, sku: '' };
+          const obj = kontoAukcje[konto][id];
+          obj.wizyty = o.wizyty;
+          obj.transakcje = o.transakcje;
+          obj.konwersja = o.konwersja;
+          obj.koszyk = o.koszyk;
+          obj.ulubione = o.ulubione || 0;
+          if (!obj.oferta && o.oferta) obj.oferta = o.oferta;
+        });
+      }
+      // Konwersja data (match by oferta name — less reliable but adds SKU/cena)
+      if (data[konto].konwersja) {
+        data[konto].konwersja.oferty.forEach(o => {
+          // Try to find matching auction by name
+          const matchNr = Object.keys(kontoAukcje[konto]).find(nr => {
+            const a = kontoAukcje[konto][nr];
+            return a.oferta && o.oferta && a.oferta.substring(0,30) === o.oferta.substring(0,30);
+          });
+          if (matchNr) {
+            kontoAukcje[konto][matchNr].cena = o.cena;
+            kontoAukcje[konto][matchNr].wartoscSprzedazy = o.wartosc;
+            kontoAukcje[konto][matchNr].promowanie = o.promowanie;
+            kontoAukcje[konto][matchNr].kategoria = o.kategoria;
+          }
+        });
+      }
+      // Mark wyróżnienia
+      data[konto].wyroznienia.forEach(nr => {
+        if (kontoAukcje[konto][nr]) kontoAukcje[konto][nr].wyroznienie = true;
+      });
+      // Compute ROAS per auction
+      Object.values(kontoAukcje[konto]).forEach(a => {
+        a.roas = a.kosztAds > 0 ? (a.sprzedazAds||0) / a.kosztAds : 0;
+        a.ctr = a.wysw > 0 ? a.klik / a.wysw * 100 : 0;
+      });
+    }
+
+    // Match products across accounts by SKU (sygnatura) or oferta name
+    thinkingText.textContent = 'Szukam kanibalizacji...';
+    const skuMap = {}; // sku → [{konto, nr, data}]
+    for (const konto of KB_KONTA) {
+      Object.values(kontoAukcje[konto]).forEach(a => {
+        // Use first 35 chars of oferta as matching key (products have same/similar names)
+        const matchKey = (a.oferta||'').substring(0,35).toLowerCase().replace(/\s+/g,' ').trim();
+        if (!matchKey || matchKey.length < 10) return;
+        if (!skuMap[matchKey]) skuMap[matchKey] = [];
+        skuMap[matchKey].push({ konto, ...a });
+      });
+    }
+
+    // Filter: only products on 2+ accounts
+    const kanibalizowane = Object.entries(skuMap)
+      .filter(([key, entries]) => {
+        const unikatKonta = new Set(entries.map(e => e.konto));
+        return unikatKonta.size >= 2;
+      })
+      .sort((a, b) => {
+        const totalA = a[1].reduce((s, e) => s + (e.kosztAds||0), 0);
+        const totalB = b[1].reduce((s, e) => s + (e.kosztAds||0), 0);
+        return totalB - totalA;
+      });
+
+    const unikatowe = Object.entries(skuMap)
+      .filter(([key, entries]) => new Set(entries.map(e => e.konto)).size === 1);
+
+    // Build HTML table
+    let tableHtml = '';
+    if (kanibalizowane.length) {
+      tableHtml += `<div style="font-family:var(--mono);font-size:10px;color:#ef4444;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">KANIBALIZACJA — ${kanibalizowane.length} produktów na 2+ kontach</div>`;
+      tableHtml += `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono);margin-bottom:1.5rem">`;
+      tableHtml += `<thead><tr style="border-bottom:2px solid var(--border)">
+        <th style="padding:6px 8px;text-align:left;color:var(--text3);font-size:9px">PRODUKT</th>
+        <th style="padding:6px 8px;text-align:center;color:var(--text3);font-size:9px">KONTO</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--text3);font-size:9px">CENA</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--text3);font-size:9px">WIZYTY</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--text3);font-size:9px">SPRZED.</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--text3);font-size:9px">KONW.</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--text3);font-size:9px">KOSZT ADS</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--text3);font-size:9px">ROAS</th>
+        <th style="padding:6px 8px;text-align:center;color:var(--text3);font-size:9px">WYR.</th>
+        <th style="padding:6px 8px;text-align:center;color:var(--text3);font-size:9px">STATUS</th>
+      </tr></thead><tbody>`;
+
+      kanibalizowane.forEach(([key, entries]) => {
+        const maxSprzedaz = Math.max(...entries.map(e => e.transakcje||e.sztukiAds||0));
+        entries.forEach((e, i) => {
+          const sp = e.transakcje || e.sztukiAds || 0;
+          const isLeader = sp === maxSprzedaz && sp > 0;
+          const isLoser = sp === 0 && (e.kosztAds||0) > 0;
+          const rowColor = isLeader ? 'rgba(45,212,160,.08)' : isLoser ? 'rgba(239,68,68,.08)' : '';
+          const statusIcon = isLeader ? '<span style="color:#2dd4a0">LIDER</span>' : isLoser ? '<span style="color:#ef4444">TNIJ</span>' : '<span style="color:#f5a623">?</span>';
+          const borderTop = i === 0 ? 'border-top:2px solid var(--border);' : '';
+          tableHtml += `<tr style="${borderTop}background:${rowColor}">
+            <td style="padding:5px 8px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px">${i===0 ? e.oferta : ''}</td>
+            <td style="padding:5px 8px;text-align:center;font-size:10px;color:var(--g-meble)">${KB_KONTA_NAMES[e.konto]?.substring(0,2)||e.konto}</td>
+            <td style="padding:5px 8px;text-align:right">${e.cena ? e.cena.toFixed(0)+'zł' : '—'}</td>
+            <td style="padding:5px 8px;text-align:right">${e.wizyty||'—'}</td>
+            <td style="padding:5px 8px;text-align:right;font-weight:600">${sp||'0'}</td>
+            <td style="padding:5px 8px;text-align:right">${e.konwersja ? e.konwersja.toFixed(1)+'%' : '—'}</td>
+            <td style="padding:5px 8px;text-align:right">${(e.kosztAds||0).toFixed(0)} zł</td>
+            <td style="padding:5px 8px;text-align:right;font-weight:600;color:${e.roas>=7?'#2dd4a0':e.roas>0?'#f5a623':'#ef4444'}">${e.roas.toFixed(2)}</td>
+            <td style="padding:5px 8px;text-align:center">${e.wyroznienie ? '<span style="color:#f5a623">W</span>' : '—'}</td>
+            <td style="padding:5px 8px;text-align:center">${statusIcon}</td>
+          </tr>`;
+        });
+      });
+      tableHtml += `</tbody></table></div>`;
+    } else {
+      tableHtml = `<div style="font-size:12px;color:var(--text3);padding:1rem">Nie znaleziono kanibalizacji — produkty nie nakładają się między kontami.</div>`;
+    }
+    document.getElementById('kbTable').innerHTML = tableHtml;
+
+    // Build AI prompt
+    thinkingText.textContent = 'Agent AI analizuje kanibalizację...';
+    let prompt = `Analizujesz KANIBALIZACJĘ między 3 kontami Allegro grupy MEBLE:\n`;
+    prompt += `MobelKap (MK) | Perfekt Cięcie (PC) | Meble na Czasie (MnC)\n`;
+    prompt += `Te 3 konta należą do jednego klienta i sprzedają te same produkty.\n\n`;
+
+    // BE ROAS per konto
+    KB_KONTA.forEach(k => {
+      const key = KB_KONTA_KEYS[k];
+      const prod = getProd(key);
+      const curMonth = MONTHS[new Date().getMonth()];
+      const curData = getData(key).find(d => d.m === curMonth);
+      const C = curData ? calc(curData, prod) : null;
+      prompt += `${KB_KONTA_NAMES[k]}: BE ROAS ${C && C.beRoasAds ? C.beRoasAds.toFixed(2) : '~6'}\n`;
+    });
+
+    if (uwagi) prompt += `\nUWAGI MENEDŻERA:\n${uwagi}\n`;
+
+    if (kanibalizowane.length) {
+      prompt += `\n== PRODUKTY NA 2+ KONTACH (KANIBALIZACJA) — ${kanibalizowane.length} produktów ==\n\n`;
+      kanibalizowane.forEach(([key, entries]) => {
+        prompt += `PRODUKT: ${entries[0].oferta}\n`;
+        entries.forEach(e => {
+          const sp = e.transakcje || e.sztukiAds || 0;
+          prompt += `  ${KB_KONTA_NAMES[e.konto]} [${e.nr}]: Cena:${e.cena||'?'}zł Wizyty:${e.wizyty||'?'} Sprzedano:${sp} Konw:${e.konwersja?e.konwersja.toFixed(1)+'%':'?'} KosztAds:${(e.kosztAds||0).toFixed(0)}zł ROAS:${e.roas.toFixed(2)} Wyróżnienie:${e.wyroznienie?'TAK':'nie'}\n`;
+        });
+        prompt += '\n';
+      });
+    }
+
+    prompt += `\n== ZADANIE ==\n`;
+    prompt += `Wygeneruj RAPORT KANIBALIZACJI w 6 sekcjach. Konkretne numery aukcji. Po polsku.\n\n`;
+    prompt += `1. DIAGNOZA — skala kanibalizacji: ile produktów na 2+ kontach, łączny koszt nakładania, ile można zaoszczędzić\n`;
+    prompt += `2. LIDERZY — per produkt: który konto zostawić (najlepsza konwersja/ROAS/sprzedaż) i dlaczego\n`;
+    prompt += `3. WYŁĄCZ — konkretne [nr aukcji] na konkretnym koncie do wyłączenia Ads/wyróżnień z uzasadnieniem\n`;
+    prompt += `4. WYRÓŻNIENIA — które wyróżnienia kanibalizują (ten sam produkt wyróżniony na 2 kontach) → usuń na słabszym\n`;
+    prompt += `5. BUDŻET — jak przesunąć oszczędzony budżet: z którego konta na które, na jakie produkty\n`;
+    prompt += `6. PLAN DZIAŁAŃ — 5 kroków: [PILNE/WAŻNE] Co → Które konto/aukcja → Efekt w zł\n`;
+
+    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 8192,
+        system: buildAgentContext(),
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const text = await readSSE(resp);
+    const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+    const now = new Date();
+
+    document.getElementById('kbResult').innerHTML = `<div class="agent-msg" style="border-left-color:#ef4444">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+        <strong style="color:#ef4444">Raport Kanibalizacji — Grupa MEBLE</strong>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${now.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}</span>
+      </div>
+      <div class="agent-md">${html}</div>
+    </div>`;
+
+  } catch(err) {
+    document.getElementById('kbResult').innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)"><strong>Błąd:</strong> ${err.message}</div>`;
+    console.error('Kanibalizator error:', err);
+  }
+  btn.disabled = false;
+  thinking.style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════
 // SCREENER — chat z Agentem + screenshoty
 // ═══════════════════════════════════════════════════════════
 window._scrImages = [];
@@ -10669,6 +11032,7 @@ updateWkAgentStatus();
     {type:'tab', name:'Kalendarz',     action:()=>showView('kalendarz')},
     {type:'tab', name:'Analiza Ofert', action:()=>showView('analiza')},
     {type:'tab', name:'Screener',      action:()=>showView('screener')},
+    {type:'tab', name:'Kanibalizator', action:()=>showView('kanibalizator')},
     {type:'tab', name:'Kalkulator',    action:()=>showView('kalkulator')},
     {type:'tab', name:'Wiedza',        action:()=>showView('wiedza')},
     {type:'tab', name:'Biznes',        action:()=>showView('biznes')},
