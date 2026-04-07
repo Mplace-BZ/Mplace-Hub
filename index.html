@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.57</title>
+<title>MPlace Hub v5.58</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.57</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.58</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1054,6 +1054,8 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <button class="nav-btn" onclick="showView('sim')" id="navSim" style="color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2)">Symulator</button>
     <button class="nav-btn" onclick="showView('kalendarz')" id="navKalendarz" style="color:#f97316;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2)">Kalendarz</button>
     <button class="nav-btn" onclick="showView('wiedza')" id="navWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza ✦</button>
+    <div class="nav-sep"></div>
+    <button class="nav-btn" onclick="showView('pong')" id="navPong" style="color:#2dd4a0;background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2);font-size:10px">Game</button>
     <div class="nav-sep"></div>
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
@@ -2132,6 +2134,20 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 </div>
 
+<!-- ═══ VIEW: PONG ═══ -->
+<div class="view" id="viewPong">
+<div class="container" style="max-width:700px;text-align:center">
+  <div style="margin-bottom:1rem">
+    <div class="ph-title" style="font-size:16px">Pong <span style="color:#2dd4a0">1972</span></div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">Strzałki ↑↓ lub mysz · Pierwszy do 7 wygrywa · ESC = pauza</div>
+  </div>
+  <canvas id="pongCanvas" width="600" height="400" style="background:#000;border-radius:8px;border:1px solid var(--border);cursor:none;display:block;margin:0 auto"></canvas>
+  <div style="margin-top:.75rem;display:flex;gap:.5rem;justify-content:center">
+    <button onclick="pongStart()" style="font-family:var(--mono);font-size:10px;padding:5px 14px;border-radius:5px;border:1px solid rgba(45,212,160,.3);background:rgba(45,212,160,.08);color:#2dd4a0;cursor:pointer">Nowa gra</button>
+  </div>
+</div>
+</div>
+
 <!-- ═══ VIEW: SCREENER ═══ -->
 <div class="view" id="viewScreener">
 <div class="container" style="max-width:860px">
@@ -2533,7 +2549,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewKanibalizator','viewScreener','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
+  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewKanibalizator','viewPong','viewScreener','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -2609,6 +2625,10 @@ function showView(v){
     document.getElementById('navKanibalizator').classList.add('active');
     kbLoadWyroznienia();
     kbRenderHistory();
+  } else if(v==='pong'){
+    document.getElementById('viewPong').classList.add('active');
+    document.getElementById('navPong').classList.add('active');
+    pongStart();
   } else if(v==='screener'){
     document.getElementById('viewScreener').classList.add('active');
     document.getElementById('navScreener').classList.add('active');
@@ -10245,6 +10265,90 @@ function kbDeleteHistoryEntry(id) {
   window._kbHistory = window._kbHistory.filter(h => String(h.id) !== String(id));
   localStorage.setItem(KB_HIST_KEY, JSON.stringify(window._kbHistory));
   kbRenderHistory();
+}
+
+// ═══════════════════════════════════════════════════════════
+// PONG — klasyk Atari 1972
+// ═══════════════════════════════════════════════════════════
+let _pongAnim = null;
+function pongStart() {
+  if (_pongAnim) cancelAnimationFrame(_pongAnim);
+  const canvas = document.getElementById('pongCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const paddleH = 60, paddleW = 8, ballR = 6;
+  let p1y = H/2 - paddleH/2, p2y = H/2 - paddleH/2;
+  let bx = W/2, by = H/2, bvx = 4, bvy = 3;
+  let score1 = 0, score2 = 0, paused = false;
+  const maxScore = 7;
+
+  // Controls
+  let mouseY = H/2;
+  const keys = {};
+  const onKey = e => { keys[e.key] = e.type === 'keydown'; if (e.key === 'Escape') paused = !paused; };
+  const onMouse = e => { const rect = canvas.getBoundingClientRect(); mouseY = (e.clientY - rect.top) * (H / rect.height); };
+  document.addEventListener('keydown', onKey);
+  document.addEventListener('keyup', onKey);
+  canvas.addEventListener('mousemove', onMouse);
+
+  function draw() {
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    // Center line
+    ctx.setLineDash([4, 8]); ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke(); ctx.setLineDash([]);
+    // Scores
+    ctx.fillStyle = '#555'; ctx.font = '48px "DM Mono",monospace';
+    ctx.textAlign = 'center'; ctx.fillText(score1, W/4, 60); ctx.fillText(score2, 3*W/4, 60);
+    // Paddles
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(12, p1y, paddleW, paddleH);
+    ctx.fillRect(W - 12 - paddleW, p2y, paddleW, paddleH);
+    // Ball
+    ctx.beginPath(); ctx.arc(bx, by, ballR, 0, Math.PI*2); ctx.fill();
+    // Game over
+    if (score1 >= maxScore || score2 >= maxScore) {
+      ctx.fillStyle = '#2dd4a0'; ctx.font = '24px "DM Mono",monospace';
+      ctx.fillText(score1 >= maxScore ? 'WYGRAŁEŚ!' : 'AI WYGRYWA', W/2, H/2);
+      ctx.font = '12px "DM Mono",monospace'; ctx.fillStyle = '#666';
+      ctx.fillText('Kliknij "Nowa gra"', W/2, H/2 + 30);
+      return;
+    }
+    if (paused) {
+      ctx.fillStyle = '#f5a623'; ctx.font = '18px "DM Mono",monospace';
+      ctx.fillText('PAUZA', W/2, H/2); ctx.font = '11px "DM Mono",monospace'; ctx.fillStyle = '#666';
+      ctx.fillText('ESC = kontynuuj', W/2, H/2 + 24);
+    }
+  }
+
+  function update() {
+    if (paused || score1 >= maxScore || score2 >= maxScore) { draw(); _pongAnim = requestAnimationFrame(update); return; }
+    // Player 1 — mouse or keys
+    if (keys['ArrowUp']) p1y -= 5;
+    if (keys['ArrowDown']) p1y += 5;
+    p1y += (mouseY - paddleH/2 - p1y) * 0.12;
+    p1y = Math.max(0, Math.min(H - paddleH, p1y));
+    // AI — follows ball with delay
+    const aiSpeed = 2.5 + Math.random() * 0.5;
+    const aiTarget = by - paddleH/2 + (Math.random()-0.5) * 20;
+    if (p2y + paddleH/2 < aiTarget) p2y += aiSpeed;
+    if (p2y + paddleH/2 > aiTarget) p2y -= aiSpeed;
+    p2y = Math.max(0, Math.min(H - paddleH, p2y));
+    // Ball
+    bx += bvx; by += bvy;
+    if (by - ballR <= 0 || by + ballR >= H) bvy = -bvy;
+    // Paddle collision
+    if (bx - ballR <= 20 && by >= p1y && by <= p1y + paddleH) { bvx = Math.abs(bvx); bvy += (by - p1y - paddleH/2) * 0.1; }
+    if (bx + ballR >= W - 20 && by >= p2y && by <= p2y + paddleH) { bvx = -Math.abs(bvx); bvy += (by - p2y - paddleH/2) * 0.1; }
+    // Score
+    if (bx < 0) { score2++; bx = W/2; by = H/2; bvx = 4; bvy = (Math.random()-0.5)*6; }
+    if (bx > W) { score1++; bx = W/2; by = H/2; bvx = -4; bvy = (Math.random()-0.5)*6; }
+    // Speed up
+    bvx *= 1.0005;
+    draw();
+    _pongAnim = requestAnimationFrame(update);
+  }
+  update();
 }
 
 // ═══════════════════════════════════════════════════════════
