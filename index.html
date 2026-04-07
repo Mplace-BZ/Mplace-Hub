@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.53</title>
+<title>MPlace Hub v5.54</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1002,7 +1002,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.53</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.54</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2050,7 +2050,8 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 
   <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.5rem">
     <button id="kbRunBtn" onclick="kbRun()" style="font-family:var(--mono);font-size:12px;padding:10px 24px;border-radius:8px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.12);color:#ef4444;cursor:pointer;font-weight:500">▸ Analizuj kanibalizację</button>
-    <button onclick="kbReset()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">↺ Resetuj</button>
+    <button onclick="kbClearFiles()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">↺ Wyczyść pliki</button>
+    <button onclick="kbReset()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid rgba(239,68,68,.3);background:transparent;color:#ef4444;cursor:pointer">Resetuj wszystko</button>
     <div id="kbFileCount" style="font-size:10px;color:var(--text3);font-family:var(--mono)">0 / 9 plików</div>
   </div>
 
@@ -2061,6 +2062,11 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 
   <div id="kbTable" style="margin-bottom:1.5rem"></div>
   <div id="kbResult"></div>
+
+  <div id="kbHistoryWrap" style="margin-top:1.5rem;display:none">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.75rem;font-family:var(--mono)">Historia kanibalizacji</div>
+    <div id="kbHistory"></div>
+  </div>
 </div>
 </div>
 
@@ -2535,6 +2541,8 @@ function showView(v){
   } else if(v==='kanibalizator'){
     document.getElementById('viewKanibalizator').classList.add('active');
     document.getElementById('navKanibalizator').classList.add('active');
+    kbLoadWyroznienia();
+    kbRenderHistory();
   } else if(v==='screener'){
     document.getElementById('viewScreener').classList.add('active');
     document.getElementById('navScreener').classList.add('active');
@@ -9594,8 +9602,40 @@ const KB_KONTA = ['mk','pc','mnc'];
 const KB_KONTA_NAMES = { mk:'MobelKap', pc:'Perfekt Cięcie', mnc:'Meble na Czasie' };
 const KB_KONTA_KEYS = { mk:'MobelKap', pc:'PerfektCiecie', mnc:'MeblenaCzasie' };
 const KB_TYPES = ['ads','sprzedaz','konwersja'];
+const KB_WYR_KEY = 'kbWyroznienia';
+const KB_HIST_KEY = 'kbHistory';
 window._kbFiles = {};
+window._kbHistory = JSON.parse(localStorage.getItem(KB_HIST_KEY) || '[]');
 KB_KONTA.forEach(k => KB_TYPES.forEach(t => { window._kbFiles[k+'_'+t] = null; }));
+
+// Load saved wyróżnienia on init
+function kbLoadWyroznienia() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(KB_WYR_KEY) || '{}');
+    KB_KONTA.forEach(k => {
+      const el = document.getElementById('kbWyr_'+k);
+      if (el && saved[k]) el.value = saved[k];
+    });
+    const rem = document.getElementById('kbWyrRemoved');
+    if (rem && saved._removed) rem.value = saved._removed;
+  } catch(e) {}
+}
+
+function kbSaveWyroznienia() {
+  const data = {};
+  KB_KONTA.forEach(k => {
+    const el = document.getElementById('kbWyr_'+k);
+    if (el) data[k] = el.value;
+  });
+  const rem = document.getElementById('kbWyrRemoved');
+  if (rem) data._removed = rem.value;
+  localStorage.setItem(KB_WYR_KEY, JSON.stringify(data));
+}
+
+// Auto-save wyróżnienia on input
+document.addEventListener('input', e => {
+  if (e.target.id?.startsWith('kbWyr')) kbSaveWyroznienia();
+});
 
 function kbFile(konto, type, input) {
   const file = input.files[0];
@@ -9615,7 +9655,7 @@ function kbUpdateCount() {
   if (el) { el.textContent = count + ' / 9 plików'; el.style.color = count >= 3 ? '#34d399' : 'var(--text3)'; }
 }
 
-function kbReset() {
+function kbClearFiles() {
   Object.keys(window._kbFiles).forEach(k => { window._kbFiles[k] = null; });
   KB_KONTA.forEach(k => {
     ['ads','sp','kn'].forEach(t => {
@@ -9623,13 +9663,21 @@ function kbReset() {
       const nm = document.getElementById('kbN_'+k+'_'+t); if (nm) { nm.textContent = t==='ads'?'Ads XLSX':t==='sp'?'Sprzedaż XLSX':'Konwersja XLSX'; nm.style.color = ''; }
       const sl = nm?.closest('.kb-slot'); if (sl) sl.classList.remove('done');
     });
+  });
+  document.getElementById('kbTable').innerHTML = '';
+  document.getElementById('kbResult').innerHTML = '';
+  document.getElementById('kbThinking').style.display = 'none';
+  kbUpdateCount();
+}
+
+function kbReset() {
+  kbClearFiles();
+  KB_KONTA.forEach(k => {
     const w = document.getElementById('kbWyr_'+k); if (w) w.value = '';
   });
   document.getElementById('kbWyrRemoved').value = '';
   document.getElementById('kbUwagi').value = '';
-  document.getElementById('kbTable').innerHTML = '';
-  document.getElementById('kbResult').innerHTML = '';
-  document.getElementById('kbThinking').style.display = 'none';
+  localStorage.removeItem(KB_WYR_KEY);
   kbUpdateCount();
 }
 
@@ -9885,12 +9933,55 @@ async function kbRun() {
       <button onclick="aaDownloadHtml()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.06);color:#ef4444;cursor:pointer">Pobierz .html</button>
     </div>`;
 
+    // Save to history
+    const entry = { id: Date.now(), date: now.toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}), aiHtml: html, tableHtml: document.getElementById('kbTable').innerHTML };
+    window._kbHistory.push(entry);
+    if (window._kbHistory.length > 10) window._kbHistory = window._kbHistory.slice(-10);
+    localStorage.setItem(KB_HIST_KEY, JSON.stringify(window._kbHistory));
+    kbRenderHistory();
+
   } catch(err) {
     document.getElementById('kbResult').innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)"><strong>Błąd:</strong> ${err.message}</div>`;
     console.error('Kanibalizator error:', err);
   }
   btn.disabled = false;
   thinking.style.display = 'none';
+}
+
+function kbRenderHistory() {
+  const wrap = document.getElementById('kbHistoryWrap');
+  const container = document.getElementById('kbHistory');
+  if (!wrap || !container) return;
+  if (!window._kbHistory.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  container.innerHTML = window._kbHistory.slice().reverse().slice(0,5).map(h => `
+    <div style="border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+      <div onclick="kbShowHistoryEntry('${h.id}')" style="cursor:pointer;flex:1"><span style="font-size:12px;color:var(--text);font-weight:500">Kanibalizacja MEBLE</span><br><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">${h.date}</span></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span onclick="kbShowHistoryEntry('${h.id}')" style="font-size:11px;color:#ef4444;font-family:var(--mono);cursor:pointer">pokaż</span>
+        <span onclick="kbDeleteHistoryEntry('${h.id}')" style="font-size:14px;color:var(--text3);cursor:pointer;line-height:1" title="Usuń">×</span>
+      </div>
+    </div>`).join('');
+}
+
+function kbShowHistoryEntry(id) {
+  const entry = window._kbHistory.find(h => String(h.id) === String(id));
+  if (!entry) return;
+  if (entry.tableHtml) document.getElementById('kbTable').innerHTML = entry.tableHtml;
+  document.getElementById('kbResult').innerHTML = `<div class="agent-msg" style="border-left-color:#ef4444">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+      <strong style="color:#ef4444">Kanibalizacja MEBLE</strong>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${entry.date}</span>
+    </div>
+    <div class="agent-md">${entry.aiHtml}</div>
+  </div>`;
+  document.getElementById('kbResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function kbDeleteHistoryEntry(id) {
+  window._kbHistory = window._kbHistory.filter(h => String(h.id) !== String(id));
+  localStorage.setItem(KB_HIST_KEY, JSON.stringify(window._kbHistory));
+  kbRenderHistory();
 }
 
 // ═══════════════════════════════════════════════════════════
