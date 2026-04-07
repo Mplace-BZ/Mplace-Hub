@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.29</title>
+<title>MPlace Hub v5.30</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -999,7 +999,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.29</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.30</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -5739,7 +5739,57 @@ async function runSelectedReport() {
   await runMTDReport(selected, dateFrom, dateTo);
 }
 
-async function runMTDReport(selectedKeys, dateFrom, dateTo) {
+async function runBatchReports() {
+  const dateFrom = document.getElementById('reportDateFrom').value;
+  const dateTo = document.getElementById('reportDateTo').value;
+  const warnEl = document.getElementById('reportDateWarning');
+  if (!dateFrom || !dateTo) { warnEl.textContent='Wybierz daty zakresu'; warnEl.style.display='block'; return; }
+  if (dateTo < dateFrom) { warnEl.textContent='Błędny zakres dat — "Do" musi być po "Od"'; warnEl.style.display='block'; return; }
+  closeReportModal();
+
+  const keys = Object.keys(AC_META);
+  const total = keys.length;
+  const responseEl = document.getElementById('agentResponse');
+  const allProposals = [];
+  let completed = 0, failed = 0;
+
+  for (let i = 0; i < total; i++) {
+    const k = keys[i];
+    const name = AC_META[k].name;
+    completed = i + 1;
+
+    responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--accent)">
+      <strong style="color:var(--accent)">Batch: ${completed}/${total}</strong> — ${name}<br>
+      <div style="background:var(--bg3);border-radius:4px;height:6px;margin-top:8px;overflow:hidden">
+        <div style="height:6px;background:var(--accent);border-radius:4px;width:${(completed/total*100).toFixed(0)}%;transition:width .3s"></div>
+      </div>
+      <span style="font-size:10px;color:var(--text3);margin-top:4px;display:block">${failed ? failed+' błędów · ' : ''}${allProposals.length} propozycji Wiedzy zebranych</span>
+    </div>`;
+
+    try {
+      const text = await runMTDReport([k], dateFrom, dateTo, true);
+      if (text) {
+        const proposals = await proposeKnowledgeEntries(text, true).catch(() => []);
+        if (proposals && proposals.length) allProposals.push(...proposals);
+      }
+    } catch(e) {
+      console.warn('Batch error for', k, e);
+      failed++;
+    }
+  }
+
+  responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--green,#2dd4a0)">
+    <strong style="color:var(--green,#2dd4a0)">Batch zakończony: ${total - failed}/${total} raportów</strong><br>
+    <span style="font-size:11px;color:var(--text3)">${allProposals.length} propozycji Wiedzy · raporty zapisane w historii</span>
+  </div>`;
+
+  if (allProposals.length > 0) {
+    _kpProposals = allProposals;
+    showKnowledgePopup();
+  }
+}
+
+async function runMTDReport(selectedKeys, dateFrom, dateTo, batchMode=false) {
   const responseEl = document.getElementById('agentResponse');
   const now = new Date();
   // Determine reference month from dateFrom (or fallback to current month)
@@ -5756,13 +5806,15 @@ async function runMTDReport(selectedKeys, dateFrom, dateTo) {
   }
   const accLabel = selectedKeys.length === 9 ? 'wszystkich 9 kont' : selectedKeys.length + ' ' + (selectedKeys.length===1?'konta':selectedKeys.length<5?'kont':'kont');
 
-  // Loading state
-  responseEl.innerHTML = `<div class="agent-thinking">
-    <div class="agent-thinking-dot"></div>
-    <div class="agent-thinking-dot"></div>
-    <div class="agent-thinking-dot"></div>
-    <span style="margin-left:.3rem">Generuję raport MTD dla ${accLabel}...</span>
-  </div>`;
+  // Loading state (skip in batch mode — batch has its own progress)
+  if (!batchMode) {
+    responseEl.innerHTML = `<div class="agent-thinking">
+      <div class="agent-thinking-dot"></div>
+      <div class="agent-thinking-dot"></div>
+      <div class="agent-thinking-dot"></div>
+      <span style="margin-left:.3rem">Generuję raport MTD dla ${accLabel}...</span>
+    </div>`;
+  }
 
   // Build raw data snapshot — only selected accounts
   const snap = {};
@@ -5858,6 +5910,10 @@ Bądź konkretny jak analityk finansowy. Podawaj liczby. Odpowiedz po polsku.`;
       })
     });
     const text = await readSSE(resp);
+    if (batchMode) {
+      saveReportToHistory(text, curM, dayNum, snap, filteredGroups, selectedKeys);
+      return text;
+    }
     openReportWindow(text, curM, dayNum, snap, filteredGroups, selectedKeys);
     saveReportToHistory(text, curM, dayNum, snap, filteredGroups, selectedKeys);
     responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--accent)">
@@ -7003,7 +7059,7 @@ const KP_TAG_COLORS = {
   casestudy:'#e879f9', kalendarz:'#f97316', rozne:'#8b91a8', inne:'#8b91a8'
 };
 
-async function proposeKnowledgeEntries(reportText) {
+async function proposeKnowledgeEntries(reportText, accumulate=false) {
   const knowledgePrompt = `Przeczytałeś raport MTD. Zaproponuj max 2 wpisy do bazy wiedzy agencji.
 
 ZASADY:
@@ -7034,10 +7090,14 @@ ${reportText}`;
   const raw = await readSSE(resp);
   const clean = raw.replace(/```json|```/g, '').trim();
   const parsed = JSON.parse(clean);
-  if (!parsed.proposals || !parsed.proposals.length) return;
+  if (!parsed.proposals || !parsed.proposals.length) return parsed.proposals || [];
 
+  if (accumulate) {
+    return parsed.proposals;
+  }
   _kpProposals = parsed.proposals;
   showKnowledgePopup();
+  return parsed.proposals;
 }
 
 function showKnowledgePopup() {
@@ -9967,6 +10027,7 @@ self.addEventListener('fetch', e => e.respondWith(
     <div class="report-modal-actions">
       <button class="report-modal-cancel" onclick="closeReportModal()">Anuluj</button>
       <button class="report-modal-go" id="reportGoBtn" onclick="runSelectedReport()" disabled>▸ Generuj raport</button>
+      <button class="report-modal-go" onclick="runBatchReports()" style="background:var(--accent,#ff6b35);border-color:var(--accent,#ff6b35);color:#fff;opacity:.9">▸ Batch — 9 kont</button>
     </div>
   </div>
 </div>
