@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.32</title>
+<title>MPlace Hub v5.33</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -999,7 +999,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.32</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.33</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1900,51 +1900,72 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <!-- ═══ VIEW: ANALIZA OFERT ═══ -->
 <div class="view" id="viewAnaliza">
-<div class="container">
+<div class="container" style="max-width:860px">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow" style="color:#4d9fff">► ANALIZA DANYCH ALLEGRO</div>
-    <div class="ph-title">Analiza <span style="color:#4d9fff">Ofert</span></div>
-    <div class="ph-sub">Wklej 3 raporty z Allegro + swoje uwagi → Agent przeanalizuje i da rekomendacje</div>
+    <div class="ph-eyebrow" style="color:#38bdf8">► ANALIZA DANYCH ALLEGRO</div>
+    <div class="ph-title">Analiza <span style="color:#38bdf8">Ofert</span></div>
+    <div class="ph-sub">Wgraj 3 raporty Allegro + wpisz uwagi → Agent wskaże co pushować, co ciąć, co poprawić</div>
   </div>
 
-  <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">
-    <div style="flex:1;min-width:200px">
-      <label style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px">Konto</label>
-      <select id="analizaKonto" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;border-radius:6px;outline:none">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Konto</div>
+      <select id="aaKonto" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;font-family:var(--mono)">
         <option value="">— wybierz konto —</option>
+        <optgroup label="MEBLE"><option value="MobelKap">MobelKap</option><option value="PerfektCiecie">Perfekt Cięcie</option><option value="MeblenaCzasie">Meble na Czasie</option></optgroup>
+        <optgroup label="LUXSEN"><option value="Luxsen">Luxsen</option><option value="Semmi">Semmi</option><option value="BOTAVIT">BOTAVIT</option></optgroup>
+        <optgroup label="ONE"><option value="Materazzi">Materazzi</option><option value="MtzzEU">MtzzEU</option><option value="Ankado24">Ankado24</option></optgroup>
       </select>
     </div>
-    <div style="flex:1;min-width:200px">
-      <label style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px">Okres raportu</label>
-      <input type="text" id="analizaOkres" placeholder="np. marzec 2026, 01-31.03.2026" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;border-radius:6px;outline:none;box-sizing:border-box">
+    <div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Okres raportu</div>
+      <input id="aaOkres" type="text" placeholder="np. 01.04 – 06.04.2026" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;font-family:var(--mono);box-sizing:border-box">
     </div>
   </div>
 
-  <div style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem">
-    <div>
-      <label style="font-family:var(--mono);font-size:9px;color:#4d9fff;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px">1. Allegro Ads — statystyki ofert</label>
-      <textarea id="analizaAds" rows="6" placeholder="Wklej dane z XLSX (Ctrl+C z Excela → Ctrl+V tutaj)..." style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:10px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box"></textarea>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1rem">
+    <div id="aaSlot1" onclick="document.getElementById('aaFile1').click()" style="border:1px dashed rgba(56,189,248,.3);border-radius:8px;padding:1rem;cursor:pointer;text-align:center;background:rgba(56,189,248,.03);transition:border-color .2s">
+      <input type="file" id="aaFile1" accept=".xlsx" style="display:none" onchange="aaHandleFile(1,this)">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#38bdf8;margin-bottom:.3rem;font-family:var(--mono)">Raport 1</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:.25rem">Allegro Ads</div>
+      <div id="aaFile1Name" style="font-size:10px;color:var(--text3);font-family:var(--mono)">statystyki_oferty_*.xlsx</div>
     </div>
-    <div>
-      <label style="font-family:var(--mono);font-size:9px;color:#2dd4a0;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px">2. Wynik sprzedaży konta</label>
-      <textarea id="analizaSprzedaz" rows="6" placeholder="Wklej dane z raportu sprzedaży..." style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:10px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box"></textarea>
+    <div id="aaSlot2" onclick="document.getElementById('aaFile2').click()" style="border:1px dashed rgba(56,189,248,.3);border-radius:8px;padding:1rem;cursor:pointer;text-align:center;background:rgba(56,189,248,.03);transition:border-color .2s">
+      <input type="file" id="aaFile2" accept=".xlsx" style="display:none" onchange="aaHandleFile(2,this)">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#38bdf8;margin-bottom:.3rem;font-family:var(--mono)">Raport 2</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:.25rem">Wynik sprzedaży</div>
+      <div id="aaFile2Name" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Raport_*.xlsx</div>
     </div>
-    <div>
-      <label style="font-family:var(--mono);font-size:9px;color:#f5a623;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px">3. Wynik konwersji konta</label>
-      <textarea id="analizaKonwersja" rows="6" placeholder="Wklej dane z raportu konwersji..." style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:10px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box"></textarea>
-    </div>
-    <div>
-      <label style="font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px">Twoje uwagi i obserwacje</label>
-      <textarea id="analizaUwagi" rows="4" placeholder="Co zauważyłeś? Na co zwrócić uwagę? Jakie masz pytania?" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;padding:10px;border-radius:6px;outline:none;resize:vertical;box-sizing:border-box"></textarea>
+    <div id="aaSlot3" onclick="document.getElementById('aaFile3').click()" style="border:1px dashed rgba(56,189,248,.3);border-radius:8px;padding:1rem;cursor:pointer;text-align:center;background:rgba(56,189,248,.03);transition:border-color .2s">
+      <input type="file" id="aaFile3" accept=".xlsx" style="display:none" onchange="aaHandleFile(3,this)">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#38bdf8;margin-bottom:.3rem;font-family:var(--mono)">Raport 3</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:.25rem">Wynik konwersji</div>
+      <div id="aaFile3Name" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Raport_*.xlsx</div>
     </div>
   </div>
 
-  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem">
-    <button id="analizaBtn" onclick="runAnaliza()" style="font-family:var(--mono);font-size:12px;padding:10px 24px;border-radius:8px;border:1px solid rgba(77,159,255,.4);background:rgba(77,159,255,.12);color:#4d9fff;cursor:pointer;font-weight:500;letter-spacing:.04em">▸ Analizuj z Agentem</button>
-    <span id="analizaStatus" style="font-family:var(--mono);font-size:10px;color:var(--text3)"></span>
+  <div style="margin-bottom:1rem">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Twoje uwagi / obserwacje</div>
+    <textarea id="aaUwagi" placeholder="Wpisz swoje spostrzeżenia — co zauważyłeś, jakie masz wątpliwości, jaki kontekst (święta, sezon, zmiany). Agent uwzględni to w analizie." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:80px;box-sizing:border-box;line-height:1.5"></textarea>
   </div>
 
-  <div id="analizaResponse"></div>
+  <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.5rem">
+    <button id="aaRunBtn" onclick="aaRunAnalysis()" style="font-family:var(--mono);font-size:12px;padding:10px 24px;border-radius:8px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.12);color:#38bdf8;cursor:pointer;font-weight:500;letter-spacing:.04em">▸ Analizuj z AI</button>
+    <button onclick="aaReset()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">↺ Resetuj</button>
+    <div id="aaFileCount" style="font-size:10px;color:var(--text3);font-family:var(--mono)">0 / 3 plików</div>
+  </div>
+
+  <div id="aaThinking" style="display:none;align-items:center;gap:.75rem;padding:1rem;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.15);border-radius:8px;margin-bottom:1.5rem">
+    <div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div>
+    <div id="aaThinkingText" style="font-size:12px;color:#38bdf8;font-family:var(--mono)">Analizuję...</div>
+  </div>
+
+  <div id="aaResult"></div>
+
+  <div id="aaHistoryWrap" style="margin-top:1.5rem;display:none">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.75rem;font-family:var(--mono)">Historia analiz</div>
+    <div id="aaHistory"></div>
+  </div>
 </div>
 </div>
 
@@ -2390,7 +2411,7 @@ function showView(v){
   } else if(v==='analiza'){
     document.getElementById('viewAnaliza').classList.add('active');
     document.getElementById('navAnaliza').classList.add('active');
-    initAnalizaKonta();
+    aaRenderHistory();
   } else if(v==='kalkulator'){
     document.getElementById('viewKalkulator').classList.add('active');
     document.getElementById('navKalkulator').classList.add('active');
@@ -8808,65 +8829,212 @@ function renderKalendar(){
 }
 
 // ═══════════════════════════════════════════════════════════
+// ANALIZA OFERT — 3-raport XLSX optimizer
 // ═══════════════════════════════════════════════════════════
-// ANALIZA OFERT
-// ═══════════════════════════════════════════════════════════
-function initAnalizaKonta() {
-  const sel = document.getElementById('analizaKonto');
-  if (sel.options.length <= 1) {
-    Object.keys(AC_META).forEach(k => {
-      const opt = document.createElement('option');
-      opt.value = k;
-      opt.textContent = AC_META[k].name + ' (' + AC_META[k].group + ')';
-      sel.appendChild(opt);
-    });
-  }
+window._aaFiles = { 1: null, 2: null, 3: null };
+window._aaHistory = JSON.parse(localStorage.getItem('aaHistory') || '[]');
+
+function aaHandleFile(slot, input) {
+  const file = input.files[0];
+  if (!file) return;
+  window._aaFiles[slot] = file;
+  const nameEl = document.getElementById('aaFile' + slot + 'Name');
+  const slotEl = document.getElementById('aaSlot' + slot);
+  nameEl.textContent = file.name.length > 28 ? file.name.substring(0, 25) + '...' : file.name;
+  nameEl.style.color = '#34d399';
+  slotEl.style.borderColor = 'rgba(52,211,153,.5)';
+  slotEl.style.background = 'rgba(52,211,153,.04)';
+  aaUpdateCount();
 }
 
-async function runAnaliza() {
-  const konto = document.getElementById('analizaKonto').value;
-  const okres = document.getElementById('analizaOkres').value.trim();
-  const ads = document.getElementById('analizaAds').value.trim();
-  const sprzedaz = document.getElementById('analizaSprzedaz').value.trim();
-  const konwersja = document.getElementById('analizaKonwersja').value.trim();
-  const uwagi = document.getElementById('analizaUwagi').value.trim();
-  const responseEl = document.getElementById('analizaResponse');
-  const statusEl = document.getElementById('analizaStatus');
+function aaUpdateCount() {
+  const count = [1,2,3].filter(i => window._aaFiles[i]).length;
+  const el = document.getElementById('aaFileCount');
+  if (el) { el.textContent = count + ' / 3 plików'; el.style.color = count === 3 ? '#34d399' : 'var(--text3)'; }
+}
 
-  if (!konto) { alert('Wybierz konto'); return; }
-  if (!ads && !sprzedaz && !konwersja) { alert('Wklej przynajmniej jeden raport'); return; }
+function aaReset() {
+  [1,2,3].forEach(i => {
+    window._aaFiles[i] = null;
+    const fi = document.getElementById('aaFile' + i); if (fi) fi.value = '';
+    const fn = document.getElementById('aaFile' + i + 'Name');
+    if (fn) { fn.textContent = ['','statystyki_oferty_*.xlsx','Raport_*.xlsx','Raport_*.xlsx'][i]; fn.style.color = ''; }
+    const sl = document.getElementById('aaSlot' + i);
+    if (sl) { sl.style.borderColor = ''; sl.style.background = ''; }
+  });
+  const u = document.getElementById('aaUwagi'); if (u) u.value = '';
+  const o = document.getElementById('aaOkres'); if (o) o.value = '';
+  const k = document.getElementById('aaKonto'); if (k) k.value = '';
+  const r = document.getElementById('aaResult'); if (r) r.innerHTML = '';
+  const t = document.getElementById('aaThinking'); if (t) t.style.display = 'none';
+  aaUpdateCount();
+}
 
-  const kontoName = AC_META[konto]?.name || konto;
-  const btn = document.getElementById('analizaBtn');
+async function aaLoadSheetJS() {
+  if (window.XLSX) return;
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function aaParseFile(file, type) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+        if (type === 'ads') {
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(ws, { defval: 0 });
+          const kampMap = {};
+          rows.forEach(row => {
+            const kamp = row['Nazwa kampanii'] || row['Nazwa kamp'] || Object.values(row)[0] || '?';
+            const oferta = (row['Tytuł klikniętej oferty'] || row['Tytuł kliknięt'] || '').substring(0, 60);
+            const nr = row['Numer klikniętej oferty'] || row['Numer kliknięt'] || '';
+            const koszt = parseFloat(row['Koszt(PLN)'] || row['Koszt'] || 0);
+            const sprzedazVal = parseFloat(row['Wartość sprzedaży(PLN)'] || row['Wartość sprze'] || 0);
+            const wysw = parseInt(row['Wyświetlenia'] || 0);
+            const klik = parseInt(row['Kliknięcia'] || 0);
+            const cpc = parseFloat(row['CPC(PLN)'] || row['CPC'] || 0);
+            if (!kampMap[kamp]) kampMap[kamp] = { kampania: kamp, koszt:0, sprzedaz:0, wysw:0, klik:0, aukcje:[] };
+            kampMap[kamp].koszt += koszt;
+            kampMap[kamp].sprzedaz += sprzedazVal;
+            kampMap[kamp].wysw += wysw;
+            kampMap[kamp].klik += klik;
+            kampMap[kamp].aukcje.push({ nr, oferta, koszt, sprzedaz: sprzedazVal, wysw, klik, cpc,
+              roas: koszt > 0 ? sprzedazVal / koszt : 0,
+              ctr: wysw > 0 ? klik / wysw * 100 : 0 });
+          });
+          const kampanie = Object.values(kampMap).map(k => ({
+            ...k, roas: k.koszt > 0 ? k.sprzedaz / k.koszt : 0, ctr: k.wysw > 0 ? k.klik / k.wysw * 100 : 0,
+            aukcje: k.aukcje.sort((a, b) => b.koszt - a.koszt)
+          })).sort((a, b) => b.sprzedaz - a.sprzedaz);
+          const totKoszt = kampanie.reduce((s, k) => s + k.koszt, 0);
+          const totSprzedaz = kampanie.reduce((s, k) => s + k.sprzedaz, 0);
+          const zgnile = kampanie.flatMap(k => k.aukcje).filter(a => a.koszt >= 30 && a.sprzedaz === 0).sort((a, b) => b.koszt - a.koszt);
+          const gwiazdy = kampanie.flatMap(k => k.aukcje).filter(a => a.roas >= 7 && a.sprzedaz > 0).sort((a, b) => b.roas - a.roas);
+          resolve({ type:'ads', kampanie, totKoszt, totSprzedaz, totRoas: totKoszt > 0 ? totSprzedaz / totKoszt : 0, zgnile, kosztZgnile: zgnile.reduce((s,a)=>s+a.koszt,0), gwiazdy });
+
+        } else if (type === 'sprzedaz') {
+          const ws = wb.Sheets[wb.SheetNames[1]] || wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(ws, { defval: 0 });
+          const oferty = rows.map(row => ({
+            oferta: (row['Nazwa oferty'] || '').substring(0, 60),
+            wizyty: parseInt(row['Liczba wizyt'] || 0),
+            transakcje: parseInt(row['Transakcje'] || 0),
+            konwersja: parseFloat(row['Konwersja'] || 0),
+            koszyk: parseInt(row['Dodania do koszyka'] || 0)
+          })).filter(o => o.wizyty > 0).sort((a, b) => b.wizyty - a.wizyty);
+          const totWizyty = oferty.reduce((s, o) => s + o.wizyty, 0);
+          const totTransakcje = oferty.reduce((s, o) => s + o.transakcje, 0);
+          const martwePunkty = oferty.filter(o => o.wizyty >= 10 && o.transakcje === 0);
+          const porzuconeKoszyki = oferty.filter(o => o.koszyk > 0 && o.transakcje === 0);
+          resolve({ type:'sprzedaz', oferty: oferty.slice(0,50), totWizyty, totTransakcje, srKonwersja: totWizyty > 0 ? totTransakcje / totWizyty : 0, martwePunkty: martwePunkty.slice(0,10), porzuconeKoszyki: porzuconeKoszyki.slice(0,10) });
+
+        } else if (type === 'konwersja') {
+          const ws = wb.Sheets[wb.SheetNames[2]] || wb.Sheets[wb.SheetNames[1]] || wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(ws, { defval: 0 });
+          const oferty = rows.map(row => ({
+            oferta: (row['Produkt'] || row['Nazwa oferty'] || '').substring(0, 60),
+            transakcje: parseInt(row['Liczba transakcji'] || row['Transakcje'] || 0),
+            sztuki: parseInt(row['Sprzedane sztuki'] || row['Liczba sztuk'] || 0),
+            cena: parseFloat(row['Śr. cena oferty'] || row['Cena'] || 0),
+            wartosc: parseFloat(row['Wartość sprzedaży'] || 0)
+          })).filter(o => o.transakcje > 0 || o.wartosc > 0).sort((a, b) => b.wartosc - a.wartosc);
+          resolve({ type:'konwersja', oferty: oferty.slice(0,40), totWartosc: oferty.reduce((s,o)=>s+o.wartosc,0) });
+        }
+      } catch (err) { reject(err); }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja) {
+  let p = `Analizujesz 3 raporty Allegro dla konta ${konto} za okres ${okres}.\n\n`;
+  if (uwagi) p += `UWAGI MENEDŻERA:\n${uwagi}\n\n`;
+
+  p += `== RAPORT 1: ALLEGRO ADS ==\n`;
+  p += `Łącznie: Koszt ${ads.totKoszt.toFixed(0)} zł | Sprzedaż ${ads.totSprzedaz.toFixed(0)} zł | ROAS ${ads.totRoas.toFixed(2)}\n`;
+  p += `Przepalone (>=30 zł, 0 sprzedaży): ${ads.zgnile.length} aukcji = ${ads.kosztZgnile.toFixed(0)} zł\n\n`;
+  p += `Kampanie:\n`;
+  ads.kampanie.forEach(k => {
+    const flag = k.roas === 0 && k.koszt > 0 ? 'ZATRZYMAJ' : k.roas < 4 ? 'TNIJ' : k.roas < 7 ? 'TRZYMAJ' : 'SKALUJ';
+    p += `  [${flag}] ${k.kampania} | Koszt:${k.koszt.toFixed(0)}zł Sprzedaż:${k.sprzedaz.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}%\n`;
+    k.aukcje.slice(0, 5).forEach(a => {
+      p += `    [${a.nr}] ${a.oferta} | ${a.koszt.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} CTR:${a.ctr.toFixed(2)}%\n`;
+    });
+  });
+  if (ads.zgnile.length) { p += `\nMARTWE AUKCJE:\n`; ads.zgnile.slice(0,15).forEach(a => { p += `  [${a.nr}] ${a.oferta} | Przepalono: ${a.koszt.toFixed(0)} zł\n`; }); }
+  if (ads.gwiazdy.length) { p += `\nGWIAZDY (ROAS>=7):\n`; ads.gwiazdy.slice(0,8).forEach(a => { p += `  [${a.nr}] ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł\n`; }); }
+
+  if (sprzedaz) {
+    p += `\n== RAPORT 2: ODWIEDZINY I KONWERSJA ==\n`;
+    p += `${sprzedaz.totWizyty} wizyt | ${sprzedaz.totTransakcje} transakcji | Konwersja: ${(sprzedaz.srKonwersja * 100).toFixed(2)}%\n\n`;
+    p += `Top oferty:\n`;
+    sprzedaz.oferty.slice(0,15).forEach(o => { p += `  ${o.oferta} | Wizyty:${o.wizyty} Trans:${o.transakcje} Konw:${(o.konwersja*100).toFixed(1)}% Koszyk:${o.koszyk}\n`; });
+    if (sprzedaz.martwePunkty.length) { p += `\nMARTWE PUNKTY (>=10 wizyt, 0 transakcji):\n`; sprzedaz.martwePunkty.forEach(o => { p += `  ${o.oferta} | ${o.wizyty} wizyt\n`; }); }
+    if (sprzedaz.porzuconeKoszyki.length) { p += `\nPORZUCONE KOSZYKI:\n`; sprzedaz.porzuconeKoszyki.forEach(o => { p += `  ${o.oferta} | Koszyk:${o.koszyk} Wizyty:${o.wizyty}\n`; }); }
+  }
+
+  if (konwersja) {
+    p += `\n== RAPORT 3: WYNIKI SPRZEDAŻY ==\n`;
+    p += `Łączna sprzedaż: ${konwersja.totWartosc.toFixed(0)} zł\n\nTop oferty:\n`;
+    konwersja.oferty.slice(0,15).forEach(o => { p += `  ${o.oferta} | Trans:${o.transakcje} Wartość:${o.wartosc.toFixed(0)}zł Cena:${o.cena.toFixed(0)}zł\n`; });
+  }
+
+  p += `\n== ZADANIE ==\n`;
+  p += `Wygeneruj RAPORT REKOMENDACJI w 6 sekcjach. Konkretne liczby. Po polsku.\n`;
+  p += `1. DIAGNOZA (4-5 zdań) — ogólna ocena konta\n`;
+  p += `2. ZATRZYMAJ TERAZ — aukcje/kampanie do pauzowania: [numer] nazwa | przepalono X zł | powód\n`;
+  p += `3. SKALUJ — aukcje do zwiększenia budżetu: nazwa | ROAS | o ile % zwiększyć | szac. dodatkowy przychód\n`;
+  p += `4. MARTWE PUNKTY — oferty z ruchem bez konwersji: co naprawić (cena? zdjęcia? opis?)\n`;
+  p += `5. WYRÓŻNIENIA I PROMOWANIE — które mają sens a które są stratą\n`;
+  p += `6. PLAN TYGODNIA — 5 działań: [PILNE/WAŻNE] Co → Gdzie → Efekt w zł → Czas\n`;
+  return p;
+}
+
+async function aaRunAnalysis() {
+  const btn = document.getElementById('aaRunBtn');
+  const thinking = document.getElementById('aaThinking');
+  const thinkingText = document.getElementById('aaThinkingText');
+  const konto = document.getElementById('aaKonto').value;
+  const okres = document.getElementById('aaOkres').value.trim();
+  const uwagi = document.getElementById('aaUwagi').value.trim();
+
+  if (!konto) { alert('Wybierz konto.'); return; }
+  const hasFiles = [1,2,3].some(i => window._aaFiles[i]);
+  if (!hasFiles) { alert('Wgraj przynajmniej 1 raport.'); return; }
+
   btn.disabled = true;
-  btn.textContent = 'Analizuję...';
-  responseEl.innerHTML = `<div class="agent-thinking">
-    <div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div>
-    <span style="margin-left:.3rem">Analizuję dane ${kontoName}${okres ? ' za ' + okres : ''}...</span>
-  </div>`;
-
-  let dataBlock = '';
-  if (ads) dataBlock += `\n=== ALLEGRO ADS — STATYSTYKI OFERT ===\n${ads}\n`;
-  if (sprzedaz) dataBlock += `\n=== WYNIK SPRZEDAŻY KONTA ===\n${sprzedaz}\n`;
-  if (konwersja) dataBlock += `\n=== WYNIK KONWERSJI KONTA ===\n${konwersja}\n`;
-
-  const analizaPrompt = `Przeanalizuj dane z raportów Allegro dla konta ${kontoName}${okres ? ' za okres ' + okres : ''}.
-
-DANE Z RAPORTÓW:
-${dataBlock}
-${uwagi ? 'UWAGI UŻYTKOWNIKA:\n' + uwagi + '\n' : ''}
-ZADANIE:
-1. PODSUMOWANIE — co widzisz w danych (3-5 kluczowych obserwacji z liczbami)
-2. TOP OFERTY — które oferty performują najlepiej i dlaczego (ROAS, konwersja, wolumen)
-3. PROBLEMY — oferty z niskim ROAS, wysokim CPC, niską konwersją — podaj nazwy i liczby
-4. OPTYMALIZACJA ADS — co zmienić w kampaniach (budżety, stawki, CPC, frazy, miejsca emisji)
-5. CO PUSHOWAĆ — które produkty skalować (wysoka konwersja + dobra marża)
-6. CO CIĄĆ — które oferty/kampanie wyłączyć lub ograniczyć (koszt bez zwrotu)
-7. REKOMENDACJE — 5 konkretnych działań z priorytetem [PILNE/WAŻNE] i oczekiwanym efektem
-
-Bądź konkretny — podawaj nazwy ofert, numery aukcji, kwoty w zł. Odpowiedz po polsku.`;
+  thinking.style.display = 'flex';
+  document.getElementById('aaResult').innerHTML = '';
 
   try {
+    thinkingText.textContent = 'Ładuję parser XLSX...';
+    await aaLoadSheetJS();
+
+    let adsData = null, sprzedazData = null, konwersjaData = null;
+
+    if (window._aaFiles[1]) {
+      thinkingText.textContent = 'Czytam Raport 1 — Allegro Ads...';
+      adsData = await aaParseFile(window._aaFiles[1], 'ads');
+    }
+    if (window._aaFiles[2]) {
+      thinkingText.textContent = 'Czytam Raport 2 — Wynik sprzedaży...';
+      sprzedazData = await aaParseFile(window._aaFiles[2], 'sprzedaz');
+    }
+    if (window._aaFiles[3]) {
+      thinkingText.textContent = 'Czytam Raport 3 — Wynik konwersji...';
+      konwersjaData = await aaParseFile(window._aaFiles[3], 'konwersja');
+    }
+
+    thinkingText.textContent = 'Agent AI analizuje raporty...';
+    const kontoName = AC_META[konto]?.name || konto;
+    const prompt = aaBuildPrompt(kontoName, okres || 'bieżący', uwagi, adsData || {totKoszt:0,totSprzedaz:0,totRoas:0,kampanie:[],zgnile:[],kosztZgnile:0,gwiazdy:[]}, sprzedazData, konwersjaData);
+
     const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -8874,26 +9042,60 @@ Bądź konkretny — podawaj nazwy ofert, numery aukcji, kwoty w zł. Odpowiedz 
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
         system: buildAgentContext(),
-        messages: [{ role: 'user', content: analizaPrompt }]
+        messages: [{ role: 'user', content: prompt }]
       })
     });
     const text = await readSSE(resp);
     const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
     const now = new Date();
-    responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:#4d9fff">
+
+    document.getElementById('aaResult').innerHTML = `<div class="agent-msg" style="border-left-color:#38bdf8">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
-        <strong style="color:#4d9fff">Analiza: ${kontoName}${okres ? ' — ' + okres : ''}</strong>
+        <strong style="color:#38bdf8">Analiza: ${kontoName} — ${okres || 'bieżący'}</strong>
         <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${now.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}</span>
       </div>
       <div class="agent-md">${html}</div>
     </div>`;
+
+    // Save to history
+    const entry = { id: Date.now(), konto: kontoName, okres: okres || 'bieżący',
+      date: now.toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}), aiHtml: html };
+    window._aaHistory.push(entry);
+    if (window._aaHistory.length > 20) window._aaHistory = window._aaHistory.slice(-20);
+    localStorage.setItem('aaHistory', JSON.stringify(window._aaHistory));
+    aaRenderHistory();
+
   } catch(err) {
-    responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)">
-      <strong>Błąd analizy:</strong> ${err.message}
-    </div>`;
+    document.getElementById('aaResult').innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)"><strong>Błąd analizy:</strong> ${err.message}</div>`;
   }
   btn.disabled = false;
-  btn.textContent = '▸ Analizuj z Agentem';
+  thinking.style.display = 'none';
+}
+
+function aaRenderHistory() {
+  const wrap = document.getElementById('aaHistoryWrap');
+  const container = document.getElementById('aaHistory');
+  if (!wrap || !container) return;
+  if (!window._aaHistory.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  container.innerHTML = window._aaHistory.slice().reverse().slice(0,5).map(h => `
+    <div onclick="aaShowHistoryEntry('${h.id}')" style="border:1px solid var(--border);border-radius:6px;padding:8px 12px;cursor:pointer;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;transition:border-color .2s">
+      <div><span style="font-size:12px;color:var(--text);font-weight:500">${h.konto} — ${h.okres}</span><br><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">${h.date}</span></div>
+      <span style="font-size:11px;color:#38bdf8;font-family:var(--mono)">pokaż</span>
+    </div>`).join('');
+}
+
+function aaShowHistoryEntry(id) {
+  const entry = window._aaHistory.find(h => String(h.id) === String(id));
+  if (!entry) return;
+  document.getElementById('aaResult').innerHTML = `<div class="agent-msg" style="border-left-color:#38bdf8">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+      <strong style="color:#38bdf8">Analiza: ${entry.konto} — ${entry.okres}</strong>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${entry.date}</span>
+    </div>
+    <div class="agent-md">${entry.aiHtml}</div>
+  </div>`;
+  document.getElementById('aaResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // KALKULATOR
