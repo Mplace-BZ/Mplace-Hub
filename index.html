@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.43</title>
+<title>MPlace Hub v5.44</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -999,7 +999,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.43</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.44</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -8936,25 +8936,31 @@ async function aaParseFile(file, type) {
     reader.onload = e => {
       try {
         const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+        // Parse PLN values: "1,06 PLN" → 1.06, "0,00 PLN" → 0, "36,42 PLN" → 36.42
+        const pln = v => parseFloat(String(v || 0).replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
+        const pct = v => parseFloat(String(v || 0).replace('%', '').replace(',', '.')) || 0;
+
         if (type === 'ads') {
           const ws = wb.Sheets[wb.SheetNames[0]];
           const rows = XLSX.utils.sheet_to_json(ws, { defval: 0 });
           const kampMap = {};
           rows.forEach(row => {
-            const kamp = row['Nazwa kampanii'] || row['Nazwa kamp'] || Object.values(row)[0] || '?';
-            const oferta = (row['Tytuł klikniętej oferty'] || row['Tytuł kliknięt'] || '').substring(0, 60);
-            const nr = row['Numer klikniętej oferty'] || row['Numer kliknięt'] || '';
-            const koszt = parseFloat(row['Koszt(PLN)'] || row['Koszt'] || 0);
-            const sprzedazVal = parseFloat(row['Wartość sprzedaży(PLN)'] || row['Wartość sprze'] || 0);
-            const wysw = parseInt(row['Wyświetlenia'] || 0);
-            const klik = parseInt(row['Kliknięcia'] || 0);
-            const cpc = parseFloat(row['CPC(PLN)'] || row['CPC'] || 0);
+            const fk = (...names) => { for (const n of names) { for (const k of Object.keys(row)) { if (k.includes(n)) return row[k]; } } return 0; };
+            const kamp = String(fk('Nazwa kampanii', 'Nazwa kamp') || Object.values(row)[0] || '?');
+            const oferta = String(fk('Tytuł klikniętej', 'Tytuł kliknięt') || '').substring(0, 60);
+            const nr = String(fk('Numer klikniętej', 'Numer kliknięt') || '');
+            const koszt = pln(fk('Koszt'));
+            const sprzedazVal = pln(fk('Wartość sprzedaży', 'Wartość sprze'));
+            const wysw = parseInt(fk('Wyświetlenia', 'Wyświetl')) || 0;
+            const klik = parseInt(fk('Kliknięcia', 'Kliknięc')) || 0;
+            const cpc = pln(fk('CPC'));
+            const miejsce = String(fk('Miejsce emisji', 'Miejsce emi') || '');
             if (!kampMap[kamp]) kampMap[kamp] = { kampania: kamp, koszt:0, sprzedaz:0, wysw:0, klik:0, aukcje:[] };
             kampMap[kamp].koszt += koszt;
             kampMap[kamp].sprzedaz += sprzedazVal;
             kampMap[kamp].wysw += wysw;
             kampMap[kamp].klik += klik;
-            kampMap[kamp].aukcje.push({ nr, oferta, koszt, sprzedaz: sprzedazVal, wysw, klik, cpc,
+            kampMap[kamp].aukcje.push({ nr, oferta, koszt, sprzedaz: sprzedazVal, wysw, klik, cpc, miejsce,
               roas: koszt > 0 ? sprzedazVal / koszt : 0,
               ctr: wysw > 0 ? klik / wysw * 100 : 0 });
           });
@@ -9038,7 +9044,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja) {
     const flag = k.roas === 0 && k.koszt > 0 ? 'ZATRZYMAJ' : k.roas < 4 ? 'TNIJ' : k.roas < 7 ? 'TRZYMAJ' : 'SKALUJ';
     p += `  [${flag}] ${k.kampania} | Koszt:${k.koszt.toFixed(0)}zł Sprzedaż:${k.sprzedaz.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}%\n`;
     k.aukcje.slice(0, 5).forEach(a => {
-      p += `    [${a.nr}] ${a.oferta} | ${a.koszt.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} CTR:${a.ctr.toFixed(2)}%\n`;
+      p += `    [${a.nr}] ${a.oferta} | Koszt:${a.koszt.toFixed(1)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} CTR:${a.ctr.toFixed(2)}%${a.miejsce?' ['+a.miejsce+']':''}\n`;
     });
   });
   if (ads.zgnile.length) { p += `\nMARTWE AUKCJE:\n`; ads.zgnile.slice(0,15).forEach(a => { p += `  [${a.nr}] ${a.oferta} | Przepalono: ${a.koszt.toFixed(0)} zł\n`; }); }
