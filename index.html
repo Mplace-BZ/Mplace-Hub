@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.47</title>
+<title>MPlace Hub v5.48</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -999,7 +999,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.47</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.48</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -8936,9 +8936,20 @@ async function aaParseFile(file, type) {
     reader.onload = e => {
       try {
         const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-        // Parse PLN values: "1,06 PLN" → 1.06, "0,00 PLN" → 0, "36,42 PLN" → 36.42
-        const pln = v => parseFloat(String(v || 0).replace(/[^\d.,-]/g, '').replace(',', '.')) || 0;
-        const pct = v => parseFloat(String(v || 0).replace('%', '').replace(',', '.')) || 0;
+        // Parse PLN values: "1 234,56 PLN" → 1234.56, "1.234,56 PLN" → 1234.56
+        const pln = v => {
+          let s = String(v || 0);
+          s = s.replace(/PLN/gi, '').trim();
+          s = s.replace(/\s/g, ''); // remove spaces (thousands sep)
+          // Handle European: 1.234,56 → remove dots before comma
+          if (s.includes(',') && s.includes('.')) s = s.replace(/\./g, '');
+          s = s.replace(',', '.');
+          return parseFloat(s) || 0;
+        };
+        const pct = v => {
+          let s = String(v || 0).replace('%', '').replace(',', '.').trim();
+          return parseFloat(s) || 0;
+        };
 
         if (type === 'ads') {
           const ws = wb.Sheets[wb.SheetNames[0]];
@@ -9010,8 +9021,9 @@ async function aaParseFile(file, type) {
             id: String(fk(row, 'ID oferty') || ''),
             wizyty: parseInt(fk(row, 'Liczba wizyt', 'wizyt')) || 0,
             transakcje: parseInt(fk(row, 'Transakcje', 'transakcj')) || 0,
-            konwersja: parseFloat(String(fk(row, 'Konwersja', 'konwersj')).replace('%','').replace(',','.')) || 0,
+            konwersja: (() => { let v = parseFloat(String(fk(row, 'Konwersja', 'konwersj')).replace('%','').replace(',','.')); return v > 1 ? v : v * 100; })() || 0,
             koszyk: parseInt(fk(row, 'Dodania do koszyka', 'koszyka')) || 0,
+            ulubione: parseInt(fk(row, 'ulubionych', 'Dodane do ulubionych', 'ulubionych')) || 0,
             polubienia: parseInt(fk(row, 'Polubienia', 'polubien')) || 0
           })).filter(o => o.wizyty > 0).sort((a, b) => b.wizyty - a.wizyty);
           const totWizyty = oferty.reduce((s, o) => s + o.wizyty, 0);
@@ -9026,7 +9038,7 @@ async function aaParseFile(file, type) {
           for (const sn of wb.SheetNames) {
             const ws = wb.Sheets[sn];
             // Try with range offset for files where header is in row 3
-            for (const rangeOpt of [{ defval: 0 }, { defval: 0, range: 2 }]) {
+            for (const rangeOpt of [{ defval: 0 }, { defval: 0, range: 2 }, { defval: 0, range: 3 }]) {
               const r = XLSX.utils.sheet_to_json(ws, rangeOpt);
               if (r.length && r[0] && Object.keys(r[0]).some(k => k.includes('Wartość sprzedaży') || k.includes('cena oferty') || k.includes('Liczba trans'))) { rows = r; break; }
             }
@@ -9052,8 +9064,10 @@ async function aaParseFile(file, type) {
   });
 }
 
-function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja) {
-  let p = `Analizujesz 3 raporty Allegro dla konta ${konto} za okres ${okres}.\n\n`;
+function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas) {
+  const be = beRoas || 6;
+  let p = `Analizujesz 3 raporty Allegro dla konta ${konto} za okres ${okres}.\n`;
+  p += `BE ROAS tego konta: ${be.toFixed(2)} (próg rentowności — poniżej tej wartości reklama generuje stratę)\n\n`;
   if (uwagi) p += `UWAGI MENEDŻERA:\n${uwagi}\n\n`;
 
   p += `== RAPORT 1: ALLEGRO ADS ==\n`;
@@ -9069,15 +9083,51 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja) {
   });
   if (ads.zgnile.length) { p += `\nMARTWE AUKCJE (koszt>=30zł, 0 sprzedaży, ROAS=0):\n`; ads.zgnile.slice(0,15).forEach(a => { p += `  [${a.nr}] ${a.oferta} | Przepalono: ${a.koszt.toFixed(0)} zł\n`; }); }
   // Aukcje poniżej BE ROAS — mają sprzedaż ale generują stratę
-  const podBe = ads.kampanie.flatMap(k => k.aukcje).filter(a => a.roas > 0 && a.roas < 5 && a.koszt >= 30).sort((a, b) => b.koszt - a.koszt);
-  if (podBe.length) { p += `\nPONIŻEJ PROGU RENTOWNOŚCI (ROAS>0 ale <5, koszt>=30zł — generują stratę):\n`; podBe.slice(0,10).forEach(a => { p += `  [${a.nr}] ${a.oferta} | Koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} → TNIJ stawkę lub zatrzymaj\n`; }); }
-  if (ads.gwiazdy.length) { p += `\nGWIAZDY (ROAS>=7):\n`; ads.gwiazdy.slice(0,8).forEach(a => { p += `  [${a.nr}] ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł\n`; }); }
+  const allAukcje = ads.kampanie.flatMap(k => k.aukcje);
+  const podBe = allAukcje.filter(a => a.roas > 0 && a.roas < be && a.koszt >= 30).sort((a, b) => b.koszt - a.koszt);
+  if (podBe.length) { p += `\nPONIŻEJ BE ROAS ${be.toFixed(2)} (ROAS>0 ale poniżej progu rentowności, koszt>=30zł):\n`; podBe.slice(0,10).forEach(a => { p += `  [${a.nr}] ${a.oferta} | Koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} (BE:${be.toFixed(2)}) → TNIJ\n`; }); }
+  if (ads.gwiazdy.length) { p += `\nGWIAZDY (ROAS>=${be.toFixed(0)}+):\n`; ads.gwiazdy.slice(0,10).forEach(a => { p += `  [${a.nr}] ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł${a.miejsce?' ['+a.miejsce+']':''}\n`; }); }
+
+  // Cross-campaign: ta sama aukcja w wielu kampaniach
+  const nrMap = {};
+  ads.kampanie.forEach(k => k.aukcje.forEach(a => {
+    if (!a.nr) return;
+    if (!nrMap[a.nr]) nrMap[a.nr] = [];
+    nrMap[a.nr].push({ kampania: k.kampania, koszt: a.koszt, sprzedaz: a.sprzedaz, roas: a.roas, miejsce: a.miejsce });
+  }));
+  const duplikaty = Object.entries(nrMap).filter(([nr, entries]) => entries.length > 1);
+  if (duplikaty.length) {
+    p += `\nAUKCJE W WIELU KAMPANIACH (potencjalna kanibalizacja — ta sama oferta licytuje w różnych kampaniach):\n`;
+    duplikaty.slice(0, 8).forEach(([nr, entries]) => {
+      p += `  [${nr}] — pojawia się w ${entries.length} kampaniach:\n`;
+      entries.forEach(e => { p += `    ${e.kampania} | Koszt:${e.koszt.toFixed(0)}zł Sprzedaż:${e.sprzedaz.toFixed(0)}zł ROAS:${e.roas.toFixed(2)}${e.miejsce?' ['+e.miejsce+']':''}\n`; });
+    });
+  }
+
+  // Placement performance summary
+  const placements = {};
+  allAukcje.forEach(a => {
+    const m = a.miejsce || 'Nieznane';
+    if (!placements[m]) placements[m] = { koszt: 0, sprzedaz: 0, klik: 0, wysw: 0 };
+    placements[m].koszt += a.koszt;
+    placements[m].sprzedaz += a.sprzedaz;
+    placements[m].klik += a.klik;
+    placements[m].wysw += a.wysw;
+  });
+  if (Object.keys(placements).length > 1) {
+    p += `\nPORÓWNANIE MIEJSC EMISJI:\n`;
+    Object.entries(placements).forEach(([m, d]) => {
+      const roas = d.koszt > 0 ? d.sprzedaz / d.koszt : 0;
+      const ctr = d.wysw > 0 ? d.klik / d.wysw * 100 : 0;
+      p += `  ${m} | Koszt:${d.koszt.toFixed(0)}zł Sprzedaż:${d.sprzedaz.toFixed(0)}zł ROAS:${roas.toFixed(2)} CTR:${ctr.toFixed(2)}%\n`;
+    });
+  }
 
   if (sprzedaz) {
     p += `\n== RAPORT 2: ODWIEDZINY I KONWERSJA ==\n`;
     p += `${sprzedaz.totWizyty} wizyt | ${sprzedaz.totTransakcje} transakcji | Konwersja: ${(sprzedaz.srKonwersja * 100).toFixed(2)}%\n\n`;
     p += `Top oferty:\n`;
-    sprzedaz.oferty.slice(0,15).forEach(o => { p += `  ${o.id?'['+o.id+'] ':''}${o.oferta} | Wizyty:${o.wizyty} Trans:${o.transakcje} Konw:${o.konwersja > 1 ? o.konwersja.toFixed(1) : (o.konwersja*100).toFixed(1)}% Koszyk:${o.koszyk} Polubienia:${o.polubienia||0}\n`; });
+    sprzedaz.oferty.slice(0,20).forEach(o => { p += `  ${o.id?'['+o.id+'] ':''}${o.oferta} | Wizyty:${o.wizyty} Trans:${o.transakcje} Konw:${o.konwersja.toFixed(1)}% Koszyk:${o.koszyk} Ulubione:${o.ulubione||0} Polubienia:${o.polubienia||0}\n`; });
     if (sprzedaz.martwePunkty.length) { p += `\nMARTWE PUNKTY (>=10 wizyt, 0 transakcji):\n`; sprzedaz.martwePunkty.forEach(o => { p += `  ${o.oferta} | ${o.wizyty} wizyt\n`; }); }
     if (sprzedaz.porzuconeKoszyki.length) { p += `\nPORZUCONE KOSZYKI:\n`; sprzedaz.porzuconeKoszyki.forEach(o => { p += `  ${o.oferta} | Koszyk:${o.koszyk} Wizyty:${o.wizyty}\n`; }); }
   }
@@ -9089,14 +9139,16 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja) {
   }
 
   p += `\n== ZADANIE ==\n`;
-  p += `Wygeneruj RAPORT REKOMENDACJI w 6 sekcjach. Konkretne liczby. Po polsku.\n`;
-  p += `1. DIAGNOZA (4-5 zdań) — ogólna ocena konta\n`;
+  p += `BE ROAS tego konta: ${be.toFixed(2)} — używaj tej wartości jako progu rentowności.\n`;
+  p += `Wygeneruj RAPORT REKOMENDACJI w 8 sekcjach. Konkretne liczby. Po polsku.\n\n`;
+  p += `1. DIAGNOZA (4-5 zdań) — ogólna ocena konta, ROAS vs BE ROAS, marża, główne problemy\n`;
   p += `2. ZATRZYMAJ TERAZ — aukcje z koszt>=30zł i ROAS=0: [numer] nazwa | przepalono X zł | powód\n`;
-  p += `3. TNIJ STAWKĘ — aukcje z ROAS>0 ale PONIŻEJ progu rentowności (~5-7): [numer] nazwa | koszt X zł | ROAS X | ile tracisz na każdej złotówce\n`;
-  p += `4. SKALUJ — aukcje do zwiększenia budżetu: nazwa | ROAS | o ile % zwiększyć | szac. dodatkowy przychód\n`;
-  p += `5. MARTWE PUNKTY — oferty z ruchem bez konwersji: co naprawić (cena? zdjęcia? opis?)\n`;
-  p += `6. WYRÓŻNIENIA I PROMOWANIE — które mają sens a które są stratą\n`;
-  p += `7. PLAN TYGODNIA — 5 działań: [PILNE/WAŻNE] Co → Gdzie → Efekt w zł → Czas\n`;
+  p += `3. TNIJ STAWKĘ — aukcje z ROAS>0 ale PONIŻEJ BE ROAS ${be.toFixed(2)}: [numer] nazwa | koszt X zł | ROAS X vs BE ${be.toFixed(2)} | ile tracisz\n`;
+  p += `4. SKALUJ — aukcje z ROAS powyżej BE ROAS: nazwa | ROAS | o ile % zwiększyć | szac. dodatkowy przychód\n`;
+  p += `5. KANIBALIZACJA — aukcje które pojawiają się w wielu kampaniach: która kampania jest lepsza, którą wyłączyć\n`;
+  p += `6. MARTWE PUNKTY — oferty z ruchem bez konwersji: co naprawić (cena? zdjęcia? opis? obserwowane/koszyk?)\n`;
+  p += `7. PLACEMENT — który typ emisji (Wyniki wyszukiwania vs Strona produktu) działa lepiej, rekomendacja alokacji\n`;
+  p += `8. PLAN TYGODNIA — 5 działań: [PILNE/WAŻNE] Co → Gdzie → Efekt w zł → Czas\n`;
   return p;
 }
 
@@ -9137,7 +9189,13 @@ async function aaRunAnalysis() {
 
     thinkingText.textContent = 'Agent AI analizuje raporty...';
     const kontoName = AC_META[konto]?.name || konto;
-    const prompt = aaBuildPrompt(kontoName, okres || 'bieżący', uwagi, adsData || {totKoszt:0,totSprzedaz:0,totRoas:0,kampanie:[],zgnile:[],kosztZgnile:0,gwiazdy:[]}, sprzedazData, konwersjaData);
+    // Calculate actual BE ROAS for this account
+    const prod = getProd(konto);
+    const curMonth = MONTHS[new Date().getMonth()];
+    const curData = getData(konto).find(d => d.m === curMonth);
+    const C = curData ? calc(curData, prod) : null;
+    const beRoas = C && C.beRoasAds ? C.beRoasAds : 6; // fallback 6 if no data
+    const prompt = aaBuildPrompt(kontoName, okres || 'bieżący', uwagi, adsData || {totKoszt:0,totSprzedaz:0,totRoas:0,kampanie:[],zgnile:[],kosztZgnile:0,gwiazdy:[]}, sprzedazData, konwersjaData, beRoas);
 
     const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
       method: 'POST',
