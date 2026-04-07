@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.58</title>
+<title>MPlace Hub v5.59</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.58</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.59</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1055,7 +1055,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <button class="nav-btn" onclick="showView('kalendarz')" id="navKalendarz" style="color:#f97316;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2)">Kalendarz</button>
     <button class="nav-btn" onclick="showView('wiedza')" id="navWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza ✦</button>
     <div class="nav-sep"></div>
-    <button class="nav-btn" onclick="showView('pong')" id="navPong" style="color:#2dd4a0;background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2);font-size:10px">Game</button>
+    <button class="nav-btn" onclick="showView('pong')" id="navPong" style="color:#ef4444;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);font-size:10px">&#x1F47E; Game</button>
     <div class="nav-sep"></div>
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
@@ -9424,7 +9424,8 @@ function aaCopyResult(btn) {
 }
 
 function aaPrintResult() {
-  if (!window._aaLastHtml) return;
+  if (!window._aaLastHtml && !window._aaLastText) return;
+  const printHtml = window._aaLastHtml || (typeof marked !== 'undefined' ? marked.parse(window._aaLastText) : window._aaLastText.replace(/\n/g,'<br>'));
   const m = window._aaLastMeta || {};
   const w = window.open('', '_blank');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Analiza ${m.konto||''} — ${m.okres||''}</title>
@@ -9434,7 +9435,7 @@ function aaPrintResult() {
     strong{color:#111}table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px}th,td{border:1px solid #e5e7eb;padding:6px 8px;text-align:left}
     th{background:#f9fafb;font-family:'DM Mono',monospace;font-size:11px}ul,ol{padding-left:1.2rem}li{margin:.2rem 0}
     .header{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;margin-bottom:1rem;border-bottom:1px solid #e5e7eb;padding-bottom:.5rem}</style></head>
-    <body><div class="header">Analiza: ${m.konto||''} — ${m.okres||''} | ${m.date||''} | MPlace Hub</div>${window._aaLastHtml}</body></html>`);
+    <body><div class="header">${m.konto||'Raport'} — ${m.okres||''} | ${m.date||''} | MPlace Hub</div>${printHtml}</body></html>`);
   w.document.close();
   setTimeout(() => { w.print(); }, 300);
 }
