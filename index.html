@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.45</title>
+<title>MPlace Hub v5.46</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -999,7 +999,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.45</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.46</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -8945,18 +8945,34 @@ async function aaParseFile(file, type) {
           const rows = XLSX.utils.sheet_to_json(ws, { defval: 0 });
           const kampMap = {};
           rows.forEach(row => {
-            const fk = (...names) => { for (const n of names) { for (const k of Object.keys(row)) { if (k.includes(n)) return row[k]; } } return 0; };
-            const kamp = String(fk('Nazwa kampanii', 'Nazwa kamp') || Object.values(row)[0] || '?');
-            const oferta = String(fk('Tytuł klikniętej', 'Tytuł kliknięt') || '').substring(0, 60);
-            const nr = String(fk('Numer klikniętej', 'Numer kliknięt') || '');
-            const koszt = pln(fk('Koszt'));
-            const sprzedazVal = pln(fk('Wartość sprzedaży', 'Wartość sprze'));
-            const wysw = parseInt(fk('Wyświetlenia', 'Wyświetl')) || 0;
-            const klik = parseInt(fk('Kliknięcia', 'Kliknięc')) || 0;
-            const cpc = pln(fk('CPC'));
-            const roasFile = pln(fk('ROAS'));
-            const sztuki = parseInt(fk('Liczba sprzedanych', 'Liczba sprze')) || 0;
-            const miejsce = String(fk('Miejsce emisji', 'Miejsce emi') || '');
+            // Precise column matching — order matters, most specific first
+            const keys = Object.keys(row);
+            const col = (exact, ...partials) => {
+              // Try exact match first
+              if (row[exact] !== undefined) return row[exact];
+              // Then partial includes
+              for (const p of partials) {
+                const found = keys.find(k => k.includes(p));
+                if (found !== undefined) return row[found];
+              }
+              return 0;
+            };
+            const kamp = String(col('Nazwa kampanii', 'Nazwa kamp') || Object.values(row)[0] || '?');
+            const oferta = String(col('Tytuł klikniętej oferty', 'Tytuł kliknięt') || '').substring(0, 60);
+            const nr = String(col('Numer klikniętej oferty', 'Numer kliknięt') || '');
+            const koszt = pln(col('Koszt(PLN)', 'Koszt('));
+            const sprzedazVal = pln(col('Wartość sprzedaży(PLN)', 'Wartość sprzedaży', 'Wartość sprze'));
+            const wysw = parseInt(col('Wyświetlenia', 'Wyświetl')) || 0;
+            const klik = parseInt(col('Kliknięcia', 'Kliknięc')) || 0;
+            const cpc = pln(col('CPC(PLN)', 'CPC('));
+            const roasFile = pln(col('ROAS(PLN)', 'ROAS('));
+            const sztuki = parseInt(col('Liczba sprzedanych sztuk', 'Liczba sprzedanych')) || 0;
+            const miejsce = String(col('Miejsce emisji', 'Miejsce emi') || '');
+            // Debug: log first 3 rows to verify parsing
+            if (Object.keys(kampMap).length === 0 && kampMap.constructor === Object) {
+              console.log('[Ads Parser] Headers:', keys.join(' | '));
+              console.log('[Ads Parser] Row 1:', { nr, koszt, sprzedaz: sprzedazVal, roasFile, sztuki, cpc, miejsce });
+            }
             if (!kampMap[kamp]) kampMap[kamp] = { kampania: kamp, koszt:0, sprzedaz:0, wysw:0, klik:0, aukcje:[] };
             kampMap[kamp].koszt += koszt;
             kampMap[kamp].sprzedaz += sprzedazVal;
@@ -8972,8 +8988,10 @@ async function aaParseFile(file, type) {
           })).sort((a, b) => b.sprzedaz - a.sprzedaz);
           const totKoszt = kampanie.reduce((s, k) => s + k.koszt, 0);
           const totSprzedaz = kampanie.reduce((s, k) => s + k.sprzedaz, 0);
-          const zgnile = kampanie.flatMap(k => k.aukcje).filter(a => a.koszt >= 20 && a.sprzedaz === 0 && a.roas === 0).sort((a, b) => b.koszt - a.koszt);
-          const gwiazdy = kampanie.flatMap(k => k.aukcje).filter(a => a.roas >= 7 && a.sprzedaz > 0).sort((a, b) => b.roas - a.roas);
+          const zgnile = kampanie.flatMap(k => k.aukcje).filter(a => a.koszt >= 30 && a.sprzedaz === 0 && a.roas === 0).sort((a, b) => b.koszt - a.koszt);
+          const gwiazdy = kampanie.flatMap(k => k.aukcje).filter(a => a.roas >= 7 && (a.sprzedaz > 0 || a.sztuki > 0)).sort((a, b) => b.roas - a.roas);
+          console.log('[Ads Parser] Summary:', { kampanie: kampanie.length, totKoszt: totKoszt.toFixed(2), totSprzedaz: totSprzedaz.toFixed(2), zgnile: zgnile.length, gwiazdy: gwiazdy.length });
+          console.log('[Ads Parser] Top 5 by koszt:', kampanie.flatMap(k=>k.aukcje).sort((a,b)=>b.koszt-a.koszt).slice(0,5).map(a=>({nr:a.nr,koszt:a.koszt,sprzedaz:a.sprzedaz,roas:a.roas,sztuki:a.sztuki})));
           resolve({ type:'ads', kampanie, totKoszt, totSprzedaz, totRoas: totKoszt > 0 ? totSprzedaz / totKoszt : 0, zgnile, kosztZgnile: zgnile.reduce((s,a)=>s+a.koszt,0), gwiazdy });
 
         } else if (type === 'sprzedaz') {
