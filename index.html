@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.33</title>
+<title>MPlace Hub v5.34</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -999,7 +999,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.33</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.34</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9049,12 +9049,21 @@ async function aaRunAnalysis() {
     const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
     const now = new Date();
 
+    window._aaLastText = text;
+    window._aaLastHtml = html;
+    window._aaLastMeta = { konto: kontoName, okres: okres || 'bieżący', date: now.toLocaleString('pl-PL') };
+
     document.getElementById('aaResult').innerHTML = `<div class="agent-msg" style="border-left-color:#38bdf8">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
         <strong style="color:#38bdf8">Analiza: ${kontoName} — ${okres || 'bieżący'}</strong>
         <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${now.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}</span>
       </div>
       <div class="agent-md">${html}</div>
+    </div>
+    <div style="display:flex;gap:.5rem;margin-top:.75rem">
+      <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Kopiuj tekst</button>
+      <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Drukuj / PDF</button>
+      <button onclick="aaDownloadHtml()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.06);color:#38bdf8;cursor:pointer">Pobierz .html</button>
     </div>`;
 
     // Save to history
@@ -9070,6 +9079,55 @@ async function aaRunAnalysis() {
   }
   btn.disabled = false;
   thinking.style.display = 'none';
+}
+
+function aaCopyResult(btn) {
+  if (!window._aaLastText) return;
+  navigator.clipboard.writeText(window._aaLastText).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Skopiowano';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+}
+
+function aaPrintResult() {
+  if (!window._aaLastHtml) return;
+  const m = window._aaLastMeta || {};
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Analiza ${m.konto||''} — ${m.okres||''}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'DM Sans',sans-serif;font-size:13px;color:#111;max-width:800px;margin:2rem auto;padding:0 2rem;line-height:1.7}
+    h1,h2,h3{font-family:'DM Mono',monospace;font-weight:600;color:#111;margin:1.2rem 0 .4rem}h1{font-size:18px}h2{font-size:15px}h3{font-size:13px}
+    strong{color:#111}table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px}th,td{border:1px solid #e5e7eb;padding:6px 8px;text-align:left}
+    th{background:#f9fafb;font-family:'DM Mono',monospace;font-size:11px}ul,ol{padding-left:1.2rem}li{margin:.2rem 0}
+    .header{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;margin-bottom:1rem;border-bottom:1px solid #e5e7eb;padding-bottom:.5rem}</style></head>
+    <body><div class="header">Analiza: ${m.konto||''} — ${m.okres||''} | ${m.date||''} | MPlace Hub</div>${window._aaLastHtml}</body></html>`);
+  w.document.close();
+  setTimeout(() => { w.print(); }, 300);
+}
+
+function aaDownloadHtml() {
+  if (!window._aaLastHtml) return;
+  const m = window._aaLastMeta || {};
+  const content = `<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Analiza ${m.konto||''} — ${m.okres||''}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'DM Sans',sans-serif;font-size:13px;color:#111;max-width:800px;margin:2rem auto;padding:0 2rem;line-height:1.7;background:#fff}
+    h1,h2,h3{font-family:'DM Mono',monospace;font-weight:600;color:#111;margin:1.2rem 0 .4rem}h1{font-size:18px}h2{font-size:15px}h3{font-size:13px}
+    strong{color:#111}table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px}th,td{border:1px solid #e5e7eb;padding:6px 8px;text-align:left}
+    th{background:#f9fafb;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+    ul,ol{padding-left:1.2rem}li{margin:.2rem 0}
+    .header{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;margin-bottom:1rem;border-bottom:1px solid #e5e7eb;padding-bottom:.5rem}</style></head>
+    <body><div class="header">Analiza: ${m.konto||''} — ${m.okres||''} | ${m.date||''} | MPlace Hub</div>${window._aaLastHtml}</body></html>`;
+  const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Analiza_${(m.konto||'').replace(/\s+/g,'-')}_${(m.okres||'').replace(/[\s\.]/g,'-')}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 function aaRenderHistory() {
