@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.51</title>
+<title>MPlace Hub v5.52</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1002,7 +1002,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.51</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.52</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1018,27 +1018,28 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 <div class="topbar">
   <div class="topbar-inner">
     <button class="nav-btn" onclick="showView('dashboard')" id="navDashboard" style="color:#f87171;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2)">Dashboard</button>
-    <button class="nav-btn" onclick="showView('agent')" id="navAgent" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Agent ✦</button>
-    <div class="nav-sep"></div>
     <button class="nav-btn entry-btn active" onclick="showView('entry')" id="navEntry">Data</button>
-    <button class="nav-btn" onclick="showView('months')" id="navMonths" style="color:#4d9fff;background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Trend</button>
-    <button class="nav-btn" onclick="showView('insights')" id="navInsights" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);position:relative">Insights<span id="alertBadge" class="alert-badge" style="display:none"></span></button>
-    <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:var(--blue);background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Porównaj</button>
+    <div class="nav-sep"></div>
+    <button class="nav-btn" onclick="showView('agent')" id="navAgent" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Agent ✦</button>
+    <button class="nav-btn" onclick="showView('analiza')" id="navAnaliza" style="color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2)">Analiza</button>
+    <button class="nav-btn" onclick="showView('kanibalizator')" id="navKanibalizator" style="color:#ef4444;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)">Kanibalizator</button>
+    <button class="nav-btn" onclick="showView('screener')" id="navScreener" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Screener</button>
     <button class="nav-btn" onclick="showView('importads')" id="navImportAds" style="color:#f472b6;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2)">Import Ads</button>
     <div class="nav-sep"></div>
+    <button class="nav-btn" onclick="showView('months')" id="navMonths" style="color:#4d9fff;background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Trend</button>
+    <button class="nav-btn" onclick="showView('insights')" id="navInsights" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);position:relative">Insights<span id="alertBadge" class="alert-badge" style="display:none"></span></button>
+    <button class="nav-btn" onclick="showView('compare')" id="navCompare" style="color:#2dd4a0;background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2)">Porównaj</button>
     <button class="nav-btn" onclick="showView('d2d')" id="navD2d" style="color:#b47fff;background:rgba(180,127,255,.08);border:1px solid rgba(180,127,255,.2)">D2D</button>
-    <button class="nav-btn" onclick="showView('sim')" id="navSim" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Symulator</button>
-    <button class="nav-btn" onclick="showView('kalendarz')" id="navKalendarz" style="color:#f97316;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2)">Kalendarz</button>
-    <button class="nav-btn" onclick="showView('analiza')" id="navAnaliza" style="color:#4d9fff;background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Analiza</button>
-    <button class="nav-btn" onclick="showView('screener')" id="navScreener" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Screener</button>
-    <button class="nav-btn" onclick="showView('kanibalizator')" id="navKanibalizator" style="color:#ef4444;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)">Kanibalizator</button>
-    <button class="nav-btn" onclick="showView('kalkulator')" id="navKalkulator" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Kalkulator</button>
+    <button class="nav-btn" onclick="showView('wyniki')" id="navWyniki" style="color:#f472b6;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2)">Wyniki</button>
+    <button class="nav-btn" onclick="showView('arkusz')" id="navArkusz" style="color:#94a3b8;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.2)">Arkusz</button>
     <div class="nav-sep"></div>
+    <button class="nav-btn" onclick="showView('kalkulator')" id="navKalkulator" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Kalkulator</button>
+    <button class="nav-btn" onclick="showView('sim')" id="navSim" style="color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2)">Symulator</button>
+    <button class="nav-btn" onclick="showView('kalendarz')" id="navKalendarz" style="color:#f97316;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2)">Kalendarz</button>
     <button class="nav-btn" onclick="showView('wiedza')" id="navWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza ✦</button>
+    <div class="nav-sep"></div>
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
-    <button class="nav-btn" onclick="showView('arkusz')" id="navArkusz" style="color:#94a3b8;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.2)">Arkusz</button>
-    <button class="nav-btn" onclick="showView('wyniki')" id="navWyniki" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Wyniki</button>
   </div>
   <div class="topbar-accounts">
     <button class="nav-btn" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2);cursor:default;pointer-events:none">Klienci</button>
