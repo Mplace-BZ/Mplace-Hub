@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.60</title>
+<title>MPlace Hub v5.61</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.60</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.61</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1057,7 +1057,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <div class="nav-sep"></div>
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
-    <button onclick="showView('pong')" id="navPong" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0 4px;opacity:.5;transition:opacity .2s" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='.5'" title="Pong">&#x1F47E;</button>
+    <button onclick="pongOpen()" id="navPong" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0 4px;opacity:.5;transition:opacity .2s" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='.5'" title="Pong">&#x1F47E;</button>
   </div>
   <div class="topbar-accounts">
     <button class="nav-btn" style="color:var(--green);background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2);cursor:default;pointer-events:none">Klienci</button>
@@ -2133,18 +2133,17 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 </div>
 
-<!-- ═══ VIEW: PONG ═══ -->
-<div class="view" id="viewPong">
-<div class="container" style="max-width:700px;text-align:center">
-  <div style="margin-bottom:1rem">
-    <div class="ph-title" style="font-size:16px">Pong <span style="color:#2dd4a0">1972</span></div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">Strzałki ↑↓ lub mysz · Pierwszy do 7 wygrywa · ESC = pauza</div>
+<!-- PONG OVERLAY -->
+<div id="pongOverlay" style="display:none;position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;flex-direction:column">
+  <div style="text-align:center">
+    <div style="font-family:var(--mono);font-size:14px;color:#fff;margin-bottom:8px">Pong <span style="color:#2dd4a0">1972</span></div>
+    <canvas id="pongCanvas" width="600" height="400" style="background:#000;border-radius:8px;border:1px solid #333;cursor:none;display:block"></canvas>
+    <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
+      <span style="font-family:var(--mono);font-size:9px;color:#666">↑↓ lub mysz · ESC = pauza</span>
+      <button onclick="pongStart()" style="font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;border:1px solid #333;background:transparent;color:#2dd4a0;cursor:pointer">Nowa gra</button>
+      <button onclick="pongClose()" style="font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;border:1px solid #333;background:transparent;color:#ef4444;cursor:pointer">Zamknij</button>
+    </div>
   </div>
-  <canvas id="pongCanvas" width="600" height="400" style="background:#000;border-radius:8px;border:1px solid var(--border);cursor:none;display:block;margin:0 auto"></canvas>
-  <div style="margin-top:.75rem;display:flex;gap:.5rem;justify-content:center">
-    <button onclick="pongStart()" style="font-family:var(--mono);font-size:10px;padding:5px 14px;border-radius:5px;border:1px solid rgba(45,212,160,.3);background:rgba(45,212,160,.08);color:#2dd4a0;cursor:pointer">Nowa gra</button>
-  </div>
-</div>
 </div>
 
 <!-- ═══ VIEW: SCREENER ═══ -->
@@ -2548,7 +2547,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewKanibalizator','viewPong','viewScreener','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
+  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewKanibalizator','viewScreener','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -2624,10 +2623,6 @@ function showView(v){
     document.getElementById('navKanibalizator').classList.add('active');
     kbLoadWyroznienia();
     kbRenderHistory();
-  } else if(v==='pong'){
-    document.getElementById('viewPong').classList.add('active');
-    document.getElementById('navPong').classList.add('active');
-    pongStart();
   } else if(v==='screener'){
     document.getElementById('viewScreener').classList.add('active');
     document.getElementById('navScreener').classList.add('active');
@@ -10271,6 +10266,14 @@ function kbDeleteHistoryEntry(id) {
 // PONG — klasyk Atari 1972
 // ═══════════════════════════════════════════════════════════
 let _pongAnim = null;
+function pongOpen() {
+  document.getElementById('pongOverlay').style.display = 'flex';
+  pongStart();
+}
+function pongClose() {
+  if (_pongAnim) { cancelAnimationFrame(_pongAnim); _pongAnim = null; }
+  document.getElementById('pongOverlay').style.display = 'none';
+}
 function pongStart() {
   if (_pongAnim) cancelAnimationFrame(_pongAnim);
   const canvas = document.getElementById('pongCanvas');
