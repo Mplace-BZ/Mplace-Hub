@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.37</title>
+<title>MPlace Hub v5.38</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -999,7 +999,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.37</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.38</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1966,6 +1966,22 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   </div>
 
   <div id="aaResult"></div>
+
+  <div id="aaChatWrap" style="display:none;margin-top:1.25rem;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+    <div style="padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+      <span style="color:#38bdf8;font-size:12px">◆</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase">Dopytaj Agenta</span>
+      <span style="font-size:10px;color:var(--text3);margin-left:auto">Wklej screenshot (Ctrl+V) lub napisz pytanie</span>
+    </div>
+    <div id="aaChatMessages" style="max-height:500px;overflow-y:auto;padding:12px 14px"></div>
+    <div style="padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end">
+      <div style="flex:1;position:relative">
+        <div id="aaChatImagePreview" style="display:none;margin-bottom:6px"></div>
+        <textarea id="aaChatInput" rows="2" placeholder="Pytanie do Agenta o tę analizę... (Ctrl+V = wklej screenshot)" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:none;box-sizing:border-box;line-height:1.4"></textarea>
+      </div>
+      <button onclick="aaChatSend()" style="font-family:var(--mono);font-size:11px;padding:8px 16px;border-radius:6px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.12);color:#38bdf8;cursor:pointer;white-space:nowrap;flex-shrink:0">Wyślij</button>
+    </div>
+  </div>
 
   <div id="aaHistoryWrap" style="margin-top:1.5rem;display:none">
     <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.75rem;font-family:var(--mono)">Historia analiz</div>
@@ -9079,6 +9095,7 @@ async function aaRunAnalysis() {
     if (window._aaHistory.length > 20) window._aaHistory = window._aaHistory.slice(-20);
     localStorage.setItem('aaHistory', JSON.stringify(window._aaHistory));
     aaRenderHistory();
+    aaShowChat();
 
   } catch(err) {
     document.getElementById('aaResult').innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)"><strong>Błąd analizy:</strong> ${err.message}</div>`;
@@ -9173,6 +9190,116 @@ function aaRenderTemplates() {
     ${t.label}
     <span onclick="aaDeleteTemplate(${t.id},event)" style="color:var(--text3);font-size:12px;margin-left:2px;line-height:1" title="Usuń szablon">×</span>
   </button>`).join('');
+}
+
+// ── Chat pod analizą ──
+window._aaChatImage = null;
+window._aaChatHistory = [];
+
+document.addEventListener('paste', function(e) {
+  const input = document.getElementById('aaChatInput');
+  if (!input || document.activeElement !== input) return;
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault();
+      const file = item.getAsFile();
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const base64 = ev.target.result.split(',')[1];
+        const mediaType = item.type;
+        window._aaChatImage = { base64, mediaType };
+        const preview = document.getElementById('aaChatImagePreview');
+        if (preview) {
+          preview.style.display = 'block';
+          preview.innerHTML = `<div style="display:flex;align-items:center;gap:6px;padding:4px 8px;background:var(--bg3);border-radius:4px;font-size:10px;color:var(--text3);font-family:var(--mono)">
+            <img src="${ev.target.result}" style="max-height:40px;border-radius:3px">
+            Screenshot wklejony
+            <span onclick="aaChatRemoveImage()" style="cursor:pointer;color:var(--text3);font-size:14px">×</span>
+          </div>`;
+        }
+      };
+      reader.readAsDataURL(file);
+      break;
+    }
+  }
+});
+
+document.addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && document.activeElement?.id === 'aaChatInput') {
+    e.preventDefault();
+    aaChatSend();
+  }
+});
+
+function aaChatRemoveImage() {
+  window._aaChatImage = null;
+  const preview = document.getElementById('aaChatImagePreview');
+  if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
+}
+
+async function aaChatSend() {
+  const input = document.getElementById('aaChatInput');
+  const q = input.value.trim();
+  if (!q && !window._aaChatImage) return;
+
+  const messagesEl = document.getElementById('aaChatMessages');
+  const hasImage = !!window._aaChatImage;
+
+  // Show user message
+  let userHtml = `<div style="margin-bottom:10px;text-align:right"><div style="display:inline-block;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:8px;padding:8px 12px;max-width:80%;text-align:left">`;
+  if (hasImage) userHtml += `<img src="data:${window._aaChatImage.mediaType};base64,${window._aaChatImage.base64}" style="max-width:100%;max-height:200px;border-radius:4px;margin-bottom:4px;display:block">`;
+  if (q) userHtml += `<span style="font-size:12px;color:var(--text)">${q}</span>`;
+  userHtml += `</div></div>`;
+  messagesEl.innerHTML += userHtml;
+
+  // Build content blocks
+  const contentBlocks = [];
+  if (hasImage) {
+    contentBlocks.push({ type: 'image', source: { type: 'base64', media_type: window._aaChatImage.mediaType, data: window._aaChatImage.base64 } });
+  }
+  const contextNote = window._aaLastText ? `\nKontekst — poprzednia analiza tego konta:\n${window._aaLastText.substring(0, 3000)}\n\n` : '';
+  contentBlocks.push({ type: 'text', text: contextNote + (q || 'Co widzisz na tym screenshocie? Jak to się odnosi do analizy?') });
+
+  // Clear input
+  input.value = '';
+  aaChatRemoveImage();
+
+  // Show thinking
+  messagesEl.innerHTML += `<div id="aaChatThinking" style="margin-bottom:10px"><div class="agent-thinking" style="justify-content:flex-start"><div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div></div></div>`;
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  try {
+    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 4096,
+        system: buildAgentContext(),
+        messages: [{ role: 'user', content: contentBlocks }]
+      })
+    });
+    const text = await readSSE(resp);
+    const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+
+    const thinkEl = document.getElementById('aaChatThinking');
+    if (thinkEl) thinkEl.remove();
+
+    messagesEl.innerHTML += `<div style="margin-bottom:10px"><div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;max-width:90%"><div class="agent-md" style="font-size:12px;line-height:1.6">${html}</div></div></div>`;
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  } catch(err) {
+    const thinkEl = document.getElementById('aaChatThinking');
+    if (thinkEl) thinkEl.remove();
+    messagesEl.innerHTML += `<div style="margin-bottom:10px;color:var(--red);font-size:11px">Błąd: ${err.message}</div>`;
+  }
+}
+
+// Show chat after analysis completes
+function aaShowChat() {
+  const wrap = document.getElementById('aaChatWrap');
+  if (wrap) { wrap.style.display = 'block'; document.getElementById('aaChatMessages').innerHTML = ''; }
 }
 
 function aaRenderHistory() {
