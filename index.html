@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.63</title>
+<title>MPlace Hub v5.64</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.63</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.64</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9422,14 +9422,36 @@ function aaPrintResult() {
   const printHtml = window._aaLastHtml || (typeof marked !== 'undefined' ? marked.parse(window._aaLastText) : window._aaLastText.replace(/\n/g,'<br>'));
   const m = window._aaLastMeta || {};
   const w = window.open('', '_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Analiza ${m.konto||''} — ${m.okres||''}</title>
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${m.konto||'Raport'} — ${m.okres||''}</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>body{font-family:'DM Sans',sans-serif;font-size:13px;color:#111;max-width:800px;margin:2rem auto;padding:0 2rem;line-height:1.7}
-    h1,h2,h3{font-family:'DM Mono',monospace;font-weight:600;color:#111;margin:1.2rem 0 .4rem}h1{font-size:18px}h2{font-size:15px}h3{font-size:13px}
-    strong{color:#111}table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px}th,td{border:1px solid #e5e7eb;padding:6px 8px;text-align:left}
-    th{background:#f9fafb;font-family:'DM Mono',monospace;font-size:11px}ul,ol{padding-left:1.2rem}li{margin:.2rem 0}
-    .header{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;margin-bottom:1rem;border-bottom:1px solid #e5e7eb;padding-bottom:.5rem}</style></head>
-    <body><div class="header">${m.konto||'Raport'} — ${m.okres||''} | ${m.date||''} | MPlace Hub</div>${printHtml}</body></html>`);
+    <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;font-size:12px;color:#1f2937;max-width:820px;margin:0 auto;padding:1.5rem 2rem;line-height:1.6}
+    .header{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;padding-bottom:8px;border-bottom:2px solid #111;margin-bottom:1.25rem;display:flex;justify-content:space-between}
+    h1{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:#111;margin:1.5rem 0 .5rem;padding:6px 10px;background:#f3f4f6;border-left:4px solid #ef4444;border-radius:0 4px 4px 0}
+    h2{font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:#111;margin:1.2rem 0 .4rem;padding:4px 8px;background:#faf5ff;border-left:3px solid #b47fff;border-radius:0 3px 3px 0}
+    h3{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:#374151;margin:1rem 0 .3rem}
+    p{margin:.4rem 0}
+    strong{color:#111;font-weight:700}
+    em{color:#6b7280;font-style:italic}
+    ul,ol{padding-left:1.4rem;margin:.4rem 0}
+    li{margin:.25rem 0;padding-left:4px}
+    li::marker{color:#ef4444}
+    table{width:100%;border-collapse:collapse;margin:10px 0;font-size:11px}
+    th{background:#f9fafb;font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;text-align:left;border:1px solid #e5e7eb;font-weight:700}
+    td{padding:5px 8px;border:1px solid #e5e7eb;vertical-align:top}
+    tr:nth-child(even) td{background:#fafafa}
+    blockquote{border-left:3px solid #b47fff;padding:6px 12px;margin:8px 0;background:#faf5ff;font-style:italic;color:#6b7280;border-radius:0 4px 4px 0}
+    hr{border:none;border-top:1px solid #e5e7eb;margin:1rem 0}
+    code{font-family:'DM Mono',monospace;font-size:11px;background:#f3f4f6;padding:1px 4px;border-radius:3px}
+    .footer{margin-top:1.5rem;padding-top:8px;border-top:2px solid #111;font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;text-align:center}
+    @media print{body{padding:1rem}h1{break-before:auto;page-break-after:avoid}table{page-break-inside:avoid}}
+    </style></head>
+    <body>
+    <div class="header"><span>${m.konto||'Raport'} — ${m.okres||''}</span><span>${m.date||''}</span></div>
+    ${printHtml}
+    <div class="footer">MPlace Hub · mplace-bz.github.io/Mplace-Hub · ${m.date||''}</div>
+    </body></html>`);
   w.document.close();
   setTimeout(() => { w.print(); }, 300);
 }
@@ -9438,15 +9460,26 @@ function aaDownloadHtml() {
   if (!window._aaLastHtml) return;
   const m = window._aaLastMeta || {};
   const content = `<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Analiza ${m.konto||''} — ${m.okres||''}</title>
+    <title>${m.konto||'Raport'} — ${m.okres||''}</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>body{font-family:'DM Sans',sans-serif;font-size:13px;color:#111;max-width:800px;margin:2rem auto;padding:0 2rem;line-height:1.7;background:#fff}
-    h1,h2,h3{font-family:'DM Mono',monospace;font-weight:600;color:#111;margin:1.2rem 0 .4rem}h1{font-size:18px}h2{font-size:15px}h3{font-size:13px}
-    strong{color:#111}table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px}th,td{border:1px solid #e5e7eb;padding:6px 8px;text-align:left}
-    th{background:#f9fafb;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-    ul,ol{padding-left:1.2rem}li{margin:.2rem 0}
-    .header{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;margin-bottom:1rem;border-bottom:1px solid #e5e7eb;padding-bottom:.5rem}</style></head>
-    <body><div class="header">Analiza: ${m.konto||''} — ${m.okres||''} | ${m.date||''} | MPlace Hub</div>${window._aaLastHtml}</body></html>`;
+    <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;font-size:12px;color:#1f2937;max-width:820px;margin:0 auto;padding:2rem;line-height:1.6;background:#fff}
+    .header{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;padding-bottom:8px;border-bottom:2px solid #111;margin-bottom:1.25rem;display:flex;justify-content:space-between}
+    h1{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:#111;margin:1.5rem 0 .5rem;padding:6px 10px;background:#f3f4f6;border-left:4px solid #ef4444;border-radius:0 4px 4px 0}
+    h2{font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:#111;margin:1.2rem 0 .4rem;padding:4px 8px;background:#faf5ff;border-left:3px solid #b47fff;border-radius:0 3px 3px 0}
+    h3{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:#374151;margin:1rem 0 .3rem}
+    p{margin:.4rem 0}strong{color:#111;font-weight:700}em{color:#6b7280}
+    ul,ol{padding-left:1.4rem;margin:.4rem 0}li{margin:.25rem 0;padding-left:4px}li::marker{color:#ef4444}
+    table{width:100%;border-collapse:collapse;margin:10px 0;font-size:11px}
+    th{background:#f9fafb;font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;text-align:left;border:1px solid #e5e7eb;font-weight:700}
+    td{padding:5px 8px;border:1px solid #e5e7eb;vertical-align:top}tr:nth-child(even) td{background:#fafafa}
+    blockquote{border-left:3px solid #b47fff;padding:6px 12px;margin:8px 0;background:#faf5ff;font-style:italic;color:#6b7280;border-radius:0 4px 4px 0}
+    hr{border:none;border-top:1px solid #e5e7eb;margin:1rem 0}
+    code{font-family:'DM Mono',monospace;font-size:11px;background:#f3f4f6;padding:1px 4px;border-radius:3px}
+    .footer{margin-top:1.5rem;padding-top:8px;border-top:2px solid #111;font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;text-align:center}
+    </style></head>
+    <body><div class="header"><span>${m.konto||'Raport'} — ${m.okres||''}</span><span>${m.date||''}</span></div>${window._aaLastHtml}<div class="footer">MPlace Hub · ${m.date||''}</div></body></html>`;
   const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
