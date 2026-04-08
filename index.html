@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.84</title>
+<title>MPlace Hub v5.85</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.84</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.85</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2109,8 +2109,8 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <div style="display:grid;grid-template-columns:1fr;gap:.75rem">
       <div id="aaSlot4" onclick="document.getElementById('aaFile4').click()" style="border:1px dashed rgba(245,166,35,.3);border-radius:8px;padding:10px 14px;cursor:pointer;text-align:center;background:rgba(245,166,35,.03);transition:border-color .2s">
         <input type="file" id="aaFile4" accept=".xlsx" style="display:none" onchange="aaHandleFile(4,this)">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#f5a623;margin-bottom:.3rem;font-family:var(--mono)">Ads 30 dni</div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:.2rem">Statystyki Ads za ostatnie 30 dni — Agent porówna z bieżącym okresem</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#f5a623;margin-bottom:.3rem;font-family:var(--mono)">Ads 30d (kontekst)</div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:.2rem">Kontekst historyczny — Agent weryfikuje czy słabe wyniki to sezon czy problem strukturalny</div>
         <div id="aaFile4Name" style="font-size:10px;color:var(--text3);font-family:var(--mono)">statystyki_oferty_30dni.xlsx</div>
       </div>
     </div>
@@ -9420,7 +9420,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += '\n';
   }
 
-  p += `== RAPORT 1: ALLEGRO ADS ==\n`;
+  p += `== RAPORT GŁÓWNY: ALLEGRO ADS (bieżący okres — opieraj na tym decyzje) ==\n`;
   p += `Łącznie: Koszt ${ads.totKoszt.toFixed(0)} zł | Sprzedaż ${ads.totSprzedaz.toFixed(0)} zł | ROAS ${ads.totRoas.toFixed(2)}\n`;
   p += `Przepalone (>=30 zł, 0 sprzedaży): ${ads.zgnile.length} aukcji = ${ads.kosztZgnile.toFixed(0)} zł\n\n`;
   p += `Kampanie (sortowane po koszcie malejąco):\n`;
@@ -9502,11 +9502,11 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
 
   // Ads 30d context — historical comparison
   if (ads30d && ads30d.kampanie) {
-    p += `\n== KONTEKST HISTORYCZNY — ADS 30 DNI ==\n`;
+    p += `\n== KONTEKST 30 DNI (weryfikacja — NIE opieraj decyzji wyłącznie na tych danych) ==\n`;
     p += `Łącznie 30d: Koszt ${ads30d.totKoszt.toFixed(0)} zł | Sprzedaż ${ads30d.totSprzedaz.toFixed(0)} zł | ROAS ${ads30d.totRoas.toFixed(2)}\n`;
-    p += `WAŻNE: Porównaj ROAS per aukcja: bieżący okres vs 30 dni.\n`;
-    p += `Jeśli aukcja ma ROAS=0 w bieżącym okresie ale ROAS>=${be.toFixed(0)} za 30 dni → NIE wyłączaj, oznacz jako "efekt sezonowy".\n`;
-    p += `Jeśli aukcja ma ROAS=0 zarówno za bieżący jak i 30 dni → WYŁĄCZ.\n\n`;
+    p += `ZASADA: Główny okres (14d) = decyzja. 30d = weryfikacja.\n`;
+    p += `Jeśli główny ROAS < BE ale 30d ROAS > BE → efekt sezonowy, NIE wyłączaj.\n`;
+    p += `Jeśli główny ROAS < 3 I 30d ROAS < 3 → strukturalnie martwa, WYŁĄCZ.\n\n`;
     // Build per-auction 30d lookup
     const all30d = ads30d.kampanie.flatMap(k => k.aukcje);
     // Show top auctions by cost with 30d ROAS
@@ -9525,7 +9525,9 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   p += `C) ROAS < 3 = WYŁĄCZ natychmiast (groźne). ROAS 3-4 = poważne ostrzeżenie. ROAS 4-BE = optymalizuj stawkę. ROAS > BE = OK.\n`;
   p += `D) Aukcja z 1-2 transakcjami i wysokim ROAS = PRZYPADEK, nie gwiazda. Minimum 3 transakcje żeby rekomendować skalowanie.\n`;
   p += `E) Wysoki CTR + niska sprzedaż = problem z ofertą (cena/zdjęcia), NIE z kampanią. Sprawdź czy ruch migruje do konkurencji.\n`;
-  p += `F) Porównaj ROAS 30d z ROAS 7d — jeśli 30d > BE ale 7d < BE = efekt sezonowy, NIE wyłączaj.\n\n`;
+  p += `F) Dane główne = 14 dni (lub bieżący okres). Dane 30d = kontekst historyczny. Opieraj decyzje na GŁÓWNYCH danych, 30d jako weryfikacja.\n`;
+  p += `G) Jeśli ROAS główny < BE ale ROAS 30d > BE = efekt sezonowy, NIE wyłączaj.\n`;
+  p += `H) Jeśli ROAS główny < 3 I ROAS 30d < 3 = strukturalnie martwa, WYŁĄCZ.\n\n`;
   p += `RAPORT w 8 sekcjach. Konkretne liczby. Po polsku.\n\n`;
   p += `1. DIAGNOZA — ile dokładnie tracisz na Ads miesięcznie (kwota w zł), ROAS vs BE, marża\n`;
   p += `2. WYŁĄCZ (ROAS < 3 lub ROAS=0 przy koszt>=30zł) — groźne, natychmiast: [numer] | koszt X zł | ROAS X | strata X zł/mies.\n`;
