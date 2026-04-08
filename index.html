@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.81</title>
+<title>MPlace Hub v5.82</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.81</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.82</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9286,15 +9286,34 @@ async function aaParseFile(file, type) {
           })).sort((a, b) => b.sprzedaz - a.sprzedaz);
           const totKoszt = kampanie.reduce((s, k) => s + k.koszt, 0);
           const totSprzedaz = kampanie.reduce((s, k) => s + k.sprzedaz, 0);
-          const zgnile = kampanie.flatMap(k => k.aukcje).filter(a => a.koszt >= 30 && a.sprzedaz === 0 && a.roas === 0).sort((a, b) => b.koszt - a.koszt);
+          // ── AGREGACJA PER AUKCJA (suma across ALL campaigns) ──
           const allAukcjeFlat = kampanie.flatMap(k => k.aukcje);
-          // Gwiazdy: ROAS >= BE, ALE minimum 3 transakcje lub koszt >50zł (unikaj szumu 1 transakcji)
-          const gwiazdy = allAukcjeFlat.filter(a => a.roas >= 7 && (a.sztuki >= 3 || a.koszt >= 50) && a.sprzedaz > 0).sort((a, b) => b.sprzedaz - a.sprzedaz);
-          // Potencjalne gwiazdy: ROAS wysoki ale za mało danych (1-2 transakcje)
-          const potencjalne = allAukcjeFlat.filter(a => a.roas >= 7 && a.sztuki < 3 && a.koszt < 50 && a.sprzedaz > 0).sort((a, b) => b.roas - a.roas);
-          console.log('[Ads Parser] Summary:', { kampanie: kampanie.length, totKoszt: totKoszt.toFixed(2), totSprzedaz: totSprzedaz.toFixed(2), zgnile: zgnile.length, gwiazdy: gwiazdy.length });
-          console.log('[Ads Parser] Top 5 by koszt:', kampanie.flatMap(k=>k.aukcje).sort((a,b)=>b.koszt-a.koszt).slice(0,5).map(a=>({nr:a.nr,koszt:a.koszt,sprzedaz:a.sprzedaz,roas:a.roas,sztuki:a.sztuki})));
-          resolve({ type:'ads', kampanie, totKoszt, totSprzedaz, totRoas: totKoszt > 0 ? totSprzedaz / totKoszt : 0, zgnile, kosztZgnile: zgnile.reduce((s,a)=>s+a.koszt,0), gwiazdy });
+          const agg = {};
+          allAukcjeFlat.forEach(a => {
+            if (!a.nr) return;
+            if (!agg[a.nr]) agg[a.nr] = { nr: a.nr, oferta: a.oferta, koszt: 0, sprzedaz: 0, wysw: 0, klik: 0, sztuki: 0, kampanie: 0 };
+            agg[a.nr].koszt += a.koszt;
+            agg[a.nr].sprzedaz += a.sprzedaz;
+            agg[a.nr].wysw += a.wysw;
+            agg[a.nr].klik += a.klik;
+            agg[a.nr].sztuki += (a.sztuki || 0);
+            agg[a.nr].kampanie++;
+            if (!agg[a.nr].oferta && a.oferta) agg[a.nr].oferta = a.oferta;
+          });
+          const aggregated = Object.values(agg).map(a => ({
+            ...a,
+            roas: a.koszt > 0 ? a.sprzedaz / a.koszt : 0,
+            ctr: a.wysw > 0 ? a.klik / a.wysw * 100 : 0,
+          })).sort((a, b) => b.sprzedaz - a.sprzedaz);
+
+          // Gwiazdy/zgniłe na AGREGATACH (nie per-kampania!)
+          const zgnile = aggregated.filter(a => a.koszt >= 30 && a.sprzedaz === 0 && a.roas === 0).sort((a, b) => b.koszt - a.koszt);
+          const gwiazdy = aggregated.filter(a => a.roas >= 7 && (a.sztuki >= 3 || a.koszt >= 50) && a.sprzedaz > 0).sort((a, b) => b.sprzedaz - a.sprzedaz);
+          const potencjalne = aggregated.filter(a => a.roas >= 7 && a.sztuki < 3 && a.koszt < 50 && a.sprzedaz > 0).sort((a, b) => b.roas - a.roas);
+
+          console.log('[Ads Parser] Summary:', { kampanie: kampanie.length, aukcjeUniq: aggregated.length, totKoszt: totKoszt.toFixed(2), totSprzedaz: totSprzedaz.toFixed(2), zgnile: zgnile.length, gwiazdy: gwiazdy.length });
+          console.log('[Ads Parser] Top 5 by sprzedaż (aggregate):', aggregated.slice(0,5).map(a=>({nr:a.nr,koszt:a.koszt.toFixed(0),sprzedaz:a.sprzedaz.toFixed(0),roas:a.roas.toFixed(2),szt:a.sztuki,kampanie:a.kampanie})));
+          resolve({ type:'ads', kampanie, aggregated, totKoszt, totSprzedaz, totRoas: totKoszt > 0 ? totSprzedaz / totKoszt : 0, zgnile, kosztZgnile: zgnile.reduce((s,a)=>s+a.koszt,0), gwiazdy, potencjalne });
 
         } else if (type === 'sprzedaz') {
           // Sprzedaż/Odwiedziny — sheet "Odwiedziny wg ofert", fallback to index 1
@@ -9419,6 +9438,17 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   if (podBe.length) { p += `\nPONIŻEJ BE ROAS ${be.toFixed(2)} (ROAS>0 ale poniżej progu rentowności, koszt>=30zł):\n`; podBe.slice(0,10).forEach(a => { p += `  [${a.nr}] ${a.oferta} | Koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} (BE:${be.toFixed(2)}) → TNIJ\n`; }); }
   if (ads.gwiazdy.length) { p += `\nGWIAZDY POTWIERDZONE (ROAS>=${be.toFixed(0)}, min 3 szt. lub koszt>50zł — SKALUJ):\n`; ads.gwiazdy.slice(0,10).forEach(a => { p += `  [${a.nr}] ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł Szt:${a.sztuki||0}${a.miejsce?' ['+a.miejsce+']':''}\n`; }); }
   if (ads.potencjalne && ads.potencjalne.length) { p += `\nPOTENCJALNE GWIAZDY (ROAS wysoki ale 1-2 transakcje — za mało danych, OBSERWUJ 14 dni, NIE skaluj):\n`; ads.potencjalne.slice(0,8).forEach(a => { p += `  [${a.nr}] ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł Szt:${a.sztuki||0} — ZA MAŁO DANYCH\n`; }); }
+
+  // AGREGACJA PER AUKCJA — łączny wynik across all campaigns
+  if (ads.aggregated && ads.aggregated.length) {
+    p += `\n== PODSUMOWANIE PER AUKCJA (ŁĄCZNE wyniki ze WSZYSTKICH kampanii) ==\n`;
+    p += `WAŻNE: Ta sekcja pokazuje PRAWDZIWY wynik aukcji — sumę kosztów i sprzedaży ze wszystkich kampanii.\n`;
+    p += `Używaj TYCH danych do decyzji, nie per-kampania (ta sama aukcja może mieć ROAS 0 w jednej kampanii i 15 w drugiej).\n\n`;
+    ads.aggregated.slice(0, 20).forEach(a => {
+      const flag = a.roas === 0 && a.koszt >= 30 ? 'MARTWA' : a.roas < be && a.roas > 0 && a.koszt >= 30 ? 'PONIŻEJ BE' : a.roas >= be && a.sztuki >= 3 ? 'GWIAZDA' : a.roas >= be ? 'POTENCJALNA' : '';
+      p += `  [${flag}] [${a.nr}] ${a.oferta} | Łączny koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki} W kampaniach:${a.kampanie}\n`;
+    });
+  }
 
   // Cross-campaign: ta sama aukcja w wielu kampaniach
   const nrMap = {};
