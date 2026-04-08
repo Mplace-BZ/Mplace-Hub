@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.67</title>
+<title>MPlace Hub v5.68</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.67</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.68</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9188,8 +9188,17 @@ async function aaParseFile(file, type) {
           return parseFloat(s) || 0;
         };
 
+        // Find sheet by name — Allegro naming convention
+        const findSheet = (wb, ...names) => {
+          for (const n of names) {
+            const found = wb.SheetNames.find(s => s.toLowerCase().includes(n.toLowerCase()));
+            if (found) return wb.Sheets[found];
+          }
+          return null;
+        };
+
         if (type === 'ads') {
-          const ws = wb.Sheets[wb.SheetNames[0]];
+          const ws = findSheet(wb, 'Statystyki') || wb.Sheets[wb.SheetNames[0]];
           const rows = XLSX.utils.sheet_to_json(ws, { defval: 0 });
           const kampMap = {};
           rows.forEach(row => {
@@ -9243,10 +9252,16 @@ async function aaParseFile(file, type) {
           resolve({ type:'ads', kampanie, totKoszt, totSprzedaz, totRoas: totKoszt > 0 ? totSprzedaz / totKoszt : 0, zgnile, kosztZgnile: zgnile.reduce((s,a)=>s+a.koszt,0), gwiazdy });
 
         } else if (type === 'sprzedaz') {
-          // Sprzedaż/Odwiedziny = Sheet 2 (index 1), fallback to smart search
+          // Sprzedaż/Odwiedziny — sheet "Odwiedziny wg ofert", fallback to index 1
           let rows = [];
-          // Prefer sheet index 1 (second tab)
-          if (wb.SheetNames.length > 1) {
+          // Prefer by name
+          const spWs = findSheet(wb, 'Odwiedziny wg ofert', 'Odwiedziny');
+          if (spWs) {
+            const r = XLSX.utils.sheet_to_json(spWs, { defval: 0 });
+            if (r.length) rows = r;
+          }
+          // Fallback: sheet index 1
+          if (!rows.length && wb.SheetNames.length > 1) {
             const ws = wb.Sheets[wb.SheetNames[1]];
             const r = XLSX.utils.sheet_to_json(ws, { defval: 0 });
             if (r.length && r[0] && Object.keys(r[0]).some(k => k.includes('Nazwa oferty') || k.includes('Liczba wizyt') || k.includes('Transakcje'))) rows = r;
@@ -9280,11 +9295,12 @@ async function aaParseFile(file, type) {
           resolve({ type:'sprzedaz', oferty: oferty.slice(0,50), totWizyty, totTransakcje, srKonwersja: totWizyty > 0 ? totTransakcje / totWizyty : 0, martwePunkty: martwePunkty.slice(0,10), porzuconeKoszyki: porzuconeKoszyki.slice(0,10) });
 
         } else if (type === 'konwersja') {
-          // Konwersja = Sheet 3 (index 2), with header offset handling, fallback to smart search
+          // Konwersja — sheet "Wg ofert", with header offset, fallback to index 2
           let rows = [];
-          // Prefer sheet index 2 (third tab) with range offsets
           const targetSheetIdx = wb.SheetNames.length > 2 ? 2 : (wb.SheetNames.length > 1 ? 1 : 0);
-          const targetWs = wb.Sheets[wb.SheetNames[targetSheetIdx]];
+          // Prefer by name "Wg ofert" (not "Odwiedziny wg ofert")
+          const knWs = wb.SheetNames.find(s => s.includes('Wg ofert') && !s.includes('Odwiedziny'));
+          const targetWs = knWs ? wb.Sheets[knWs] : wb.Sheets[wb.SheetNames[targetSheetIdx]];
           for (const rangeOpt of [{ defval: 0 }, { defval: 0, range: 2 }, { defval: 0, range: 3 }]) {
             const r = XLSX.utils.sheet_to_json(targetWs, rangeOpt);
             if (r.length && r[0] && Object.keys(r[0]).some(k => k.includes('Wartość sprzedaży') || k.includes('cena oferty') || k.includes('Liczba trans'))) { rows = r; break; }
