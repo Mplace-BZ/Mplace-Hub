@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.65</title>
+<title>MPlace Hub v5.66</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.65</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.66</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9826,23 +9826,29 @@ function dzisRenderUploadSlots() {
   const container = document.getElementById('dzisUploadSlots');
   if (!window._dzisSelectedKonta.length) { container.style.display = 'none'; return; }
   container.style.display = 'block';
+  const skrotKonta = { MobelKap:'MK', PerfektCiecie:'PC', MeblenaCzasie:'MnC', Luxsen:'Lux', Semmi:'Sem', BOTAVIT:'BoV', Materazzi:'Mtz', MtzzEU:'mEU', Ankado24:'a24' };
   container.innerHTML = window._dzisSelectedKonta.map(k => {
     const name = AC_META[k]?.name || k;
-    return `<div style="margin-bottom:8px">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text2);margin-bottom:4px">${name}</div>
-      <div style="display:flex;gap:4px">
-        <div class="kb-slot" onclick="document.getElementById('dzF_${k}_ads').click()" style="flex:1;padding:5px 8px">
-          <input type="file" id="dzF_${k}_ads" accept=".xlsx" style="display:none" onchange="dzisFileUp('${k}','ads',this)">
-          <span id="dzN_${k}_ads" style="font-size:9px;color:var(--text3);font-family:var(--mono)">Ads</span>
-        </div>
-        <div class="kb-slot" onclick="document.getElementById('dzF_${k}_sp').click()" style="flex:1;padding:5px 8px">
-          <input type="file" id="dzF_${k}_sp" accept=".xlsx" style="display:none" onchange="dzisFileUp('${k}','sprzedaz',this)">
-          <span id="dzN_${k}_sp" style="font-size:9px;color:var(--text3);font-family:var(--mono)">Sprzedaż</span>
-        </div>
-        <div class="kb-slot" onclick="document.getElementById('dzF_${k}_kn').click()" style="flex:1;padding:5px 8px">
-          <input type="file" id="dzF_${k}_kn" accept=".xlsx" style="display:none" onchange="dzisFileUp('${k}','konwersja',this)">
-          <span id="dzN_${k}_kn" style="font-size:9px;color:var(--text3);font-family:var(--mono)">Konwersja</span>
-        </div>
+    const sk = skrotKonta[k] || k;
+    const ads = window._dzisFiles[k+'_ads'];
+    const sp = window._dzisFiles[k+'_sprzedaz'];
+    const kn = window._dzisFiles[k+'_konwersja'];
+    const slotStyle = (file, label) => {
+      if (file) return `<div class="kb-slot done" onclick="document.getElementById('dzF_${k}_${label}').click()" style="flex:1;padding:6px 8px;text-align:center">
+        <input type="file" id="dzF_${k}_${label}" accept=".xlsx" style="display:none" onchange="dzisFileUp('${k}','${label==='sp'?'sprzedaz':label==='kn'?'konwersja':'ads'}',this)">
+        <div style="font-size:9px;color:#34d399;font-family:var(--mono)">${file.name.length>18?file.name.substring(0,15)+'...':file.name}</div>
+      </div>`;
+      return `<div class="kb-slot" onclick="document.getElementById('dzF_${k}_${label}').click()" style="flex:1;padding:6px 8px;text-align:center">
+        <input type="file" id="dzF_${k}_${label}" accept=".xlsx" style="display:none" onchange="dzisFileUp('${k}','${label==='sp'?'sprzedaz':label==='kn'?'konwersja':'ads'}',this)">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${label==='ads'?'Ads XLSX':label==='sp'?'Sprzedaż':'Konwersja'}</div>
+      </div>`;
+    };
+    return `<div style="margin-bottom:10px">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text);margin-bottom:4px;font-weight:600">${name} <span style="color:var(--text3);font-weight:400">(${sk})</span></div>
+      <div style="display:flex;gap:6px">
+        ${slotStyle(ads, 'ads')}
+        ${slotStyle(sp, 'sp')}
+        ${slotStyle(kn, 'kn')}
       </div>
     </div>`;
   }).join('');
@@ -9855,11 +9861,11 @@ function dzisRenderUploadSlots() {
 function dzisFileUp(konto, type, input) {
   const file = input.files[0]; if (!file) return;
   window._dzisFiles[konto + '_' + type] = file;
-  const nameId = 'dzN_' + konto + '_' + (type === 'sprzedaz' ? 'sp' : type === 'konwersja' ? 'kn' : 'ads');
-  const el = document.getElementById(nameId);
-  if (el) { el.textContent = file.name.length > 12 ? file.name.substring(0,10) + '..' : file.name; el.style.color = '#34d399'; }
-  const slot = el?.closest('.kb-slot'); if (slot) slot.classList.add('done');
   dzisRenderUploadSlots();
+  // Update step3 info
+  const fileCount = Object.values(window._dzisFiles).filter(f => f).length;
+  const info = document.getElementById('dzisStep3Info');
+  if (info) info.textContent = `Dane kont + Wiedza + analizy + ${fileCount} XLSX`;
 }
 
 async function generateDzis() {
