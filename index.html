@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.73</title>
+<title>MPlace Hub v5.74</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.73</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.74</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1184,6 +1184,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
           <div style="font-size:10px;color:var(--text3)" id="dzisCatalogStatus">Agent wie co masz wystawione — ceny, SKU, stany</div>
         </div>
       </div>
+      <button onclick="catClearAll()" style="font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Wyczyść</button>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
       <div class="kb-slot" onclick="document.getElementById('catF_MobelKap').click()" style="flex:1;min-width:140px;padding:6px 8px;text-align:center;border-color:rgba(167,139,250,.25)" id="catSlot_MobelKap">
@@ -9919,12 +9920,21 @@ async function catUpload(konto, input) {
     try {
       const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
       const ws = wb.Sheets[wb.SheetNames[0]];
-      // Try with header offset — Allegro has metadata in row 1, real headers in row 2
-      let rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
-      // Check if headers are __EMPTY — if so, skip row 1
-      if (rows.length && rows[0] && Object.keys(rows[0])[0].includes('__EMPTY')) {
-        rows = XLSX.utils.sheet_to_json(ws, { defval: '', range: 1 });
+      // Try multiple header offsets — Allegro has metadata rows before real headers
+      let rows = [];
+      for (const rangeVal of [0, 1, 2, 3]) {
+        const r = XLSX.utils.sheet_to_json(ws, { defval: '', range: rangeVal });
+        if (r.length && r[0]) {
+          const firstKey = Object.keys(r[0])[0] || '';
+          console.log(`[Catalog] Trying range=${rangeVal}, first header: "${firstKey}"`);
+          if (!firstKey.includes('__EMPTY') && !firstKey.includes('Informacje')) {
+            rows = r;
+            console.log(`[Catalog] Using range=${rangeVal}, headers:`, Object.keys(r[0]).slice(0, 8).join(' | '));
+            break;
+          }
+        }
       }
+      if (!rows.length) { rows = XLSX.utils.sheet_to_json(ws, { defval: '', range: 1 }); }
 
       const pln = v => { let s = String(v||0).replace(/PLN/gi,'').replace(/\s/g,''); if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,''); s=s.replace(',','.'); return parseFloat(s)||0; };
 
@@ -10012,6 +10022,18 @@ function buildCatalogContext() {
     if (cat.activeCount > 30) ctx += `  ... i ${cat.activeCount - 30} więcej ofert\n`;
   });
   return ctx;
+}
+
+function catClearAll() {
+  ['MobelKap', 'PerfektCiecie', 'MeblenaCzasie'].forEach(k => {
+    localStorage.removeItem(CAT_KEY + k);
+    const slotEl = document.getElementById('catSlot_' + k);
+    if (slotEl) slotEl.classList.remove('done');
+    const nameEl = document.getElementById('catN_' + k);
+    if (nameEl) nameEl.innerHTML = AC_META[k]?.name || k;
+  });
+  const statusEl = document.getElementById('dzisCatalogStatus');
+  if (statusEl) statusEl.textContent = 'Agent wie co masz wystawione — ceny, SKU, stany';
 }
 
 const DZIS_CACHE_KEY = 'dzisCache';
