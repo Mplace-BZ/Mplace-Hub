@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.76</title>
+<title>MPlace Hub v5.77</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.76</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.77</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9921,38 +9921,19 @@ async function catUpload(konto, input) {
       const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
       const ws = wb.Sheets[wb.SheetNames[0]];
 
-      // Allegro exports have merged cells — sheet_to_json fails
-      // Use raw approach: convert to array of arrays, find header row manually
-      const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-      console.log('[Catalog] Raw rows:', raw.length);
-      // Debug: show first 5 rows with non-empty values
-      for (let i = 0; i < Math.min(raw.length, 6); i++) {
-        const nonEmpty = (raw[i]||[]).filter(c => c !== '' && c !== null && c !== undefined);
-        console.log(`[Catalog] Row ${i} (${nonEmpty.length} non-empty):`, nonEmpty.slice(0, 8).join(' | '));
-      }
+      // Allegro exports: row 1 = merged metadata headers, row 2 = real column names
+      // Decode merged cells and rebuild worksheet without merged row
+      // Strategy: delete row 1 by shifting range, then parse normally
+      const ref = ws['!ref'] || 'A1';
+      const range = XLSX.utils.decode_range(ref);
+      range.s.r = 1; // Start from row index 1 (skip row 0 = merged metadata)
+      ws['!ref'] = XLSX.utils.encode_range(range);
+      // Also remove merge info that confuses parser
+      delete ws['!merges'];
 
-      // Find header row — look for row containing "ID oferty", "Status", "Tytuł"
-      let headerIdx = -1;
-      for (let i = 0; i < Math.min(raw.length, 10); i++) {
-        const nonEmpty = (raw[i]||[]).filter(c => c !== '' && c !== null && c !== undefined);
-        const rowStr = nonEmpty.map(c => String(c)).join('|').toLowerCase();
-        if (rowStr.includes('id oferty') || rowStr.includes('status oferty') || rowStr.includes('tytuł oferty') || rowStr.includes('sygnatura')) {
-          headerIdx = i;
-          console.log(`[Catalog] Found headers at row ${i}:`, nonEmpty.slice(0, 12).join(' | '));
-          break;
-        }
-      }
-      if (headerIdx < 0) { console.error('[Catalog] No header row found in first 10 rows!'); throw new Error('Nie znaleziono nagłówków w pliku. Sprawdź czy to eksport z Allegro.'); }
-
-      // Build rows from header + data
-      const headers = raw[headerIdx].map(h => String(h || '').trim());
-      const rows = [];
-      for (let i = headerIdx + 1; i < raw.length; i++) {
-        const obj = {};
-        headers.forEach((h, ci) => { if (h) obj[h] = raw[i][ci] !== undefined ? raw[i][ci] : ''; });
-        rows.push(obj);
-      }
-      console.log(`[Catalog] Parsed ${rows.length} rows, headers:`, headers.filter(h=>h).slice(0,10).join(' | '));
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+      const keys = rows.length ? Object.keys(rows[0]).filter(k => !k.includes('__EMPTY')) : [];
+      console.log(`[Catalog] Parsed ${rows.length} rows, ${keys.length} real columns:`, keys.slice(0, 12).join(' | '));
 
       const pln = v => { let s = String(v||0).replace(/PLN/gi,'').replace(/\s/g,''); if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,''); s=s.replace(',','.'); return parseFloat(s)||0; };
 
