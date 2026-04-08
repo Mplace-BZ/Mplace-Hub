@@ -26,16 +26,18 @@
 - Nie skracaj promptów — wszystkie 100 musi być zachowane w pełnej treści
 
 ## Stack
-- Vanilla JS, jeden plik index.html (~637KB, ~9800 linii)
+- Vanilla JS, jeden plik index.html (~776KB, ~12200 linii)
 - Chart.js 4.4.1 + datalabels plugin
+- SheetJS (XLSX 0.18.5) — parsowanie plików Excel
 - Firebase Firestore + Google OAuth
 - GitHub Pages: mplace-bz.github.io/Mplace-Hub/
 - Agent proxy: Cloudflare Worker red-haze-5f37mplace-agent.contactmplace.workers.dev
 
 ## Model AI
 - claude-sonnet-4-6
-- max_tokens: 4096 (Agent/Raport), 8192 (Prezentacja slajdowa)
+- max_tokens: 4096 (Agent/Raport), 8192 (Prezentacja/Analiza/Kanibalizator)
 - Klucz API: mplace-agent (console.anthropic.com)
+- Worker obsługuje vision (base64 images w content[])
 
 ## Design System
 - DM Mono dla liczb, DM Sans dla tekstu UI
@@ -90,12 +92,46 @@
 - Ścieżka danych: /users/{userId}/{document=**} (NIE allegro_users)
 - publicPresentations: read publiczny, write wymaga auth
 
+## Analiza Ofert (zakładka Analiza)
+- Upload 3 XLSX per konto: Ads (Statystyki), Sprzedaż (Odwiedziny wg ofert), Konwersja (Wg ofert)
+- Opcjonalnie: Ads 30d jako kontekst historyczny (zapobiega false positives z krótkich okresów)
+- Parser: aaParseFile() z findSheet() — szuka zakładek po nazwie Allegro
+  - Ads → sheet "Statystyki*"
+  - Sprzedaż → sheet "Odwiedziny wg ofert"
+  - Konwersja → sheet "Wg ofert" (nie "Odwiedziny wg ofert")
+- Wartości PLN: pln() helper stripuje "PLN", zamienia , na ., obsługuje separatory tysięcy
+- BE ROAS obliczany per konto z calc() — nie hardcoded
+- Prompt 8 sekcji: Diagnoza, Zatrzymaj, Tnij, Skaluj, Kanibalizacja, Martwe punkty, Placement, Plan
+- Szablony uwag: localStorage, persistent
+- Historia analiz: localStorage (aaHistory), ostatnie 20
+
+## Kanibalizator (zakładka Kanibalizator)
+- 9 plików XLSX (3 typy × 3 konta MEBLE: MK, PC, MnC)
+- Matchowanie produktów po nazwie oferty (25 znaków)
+- Wyróżnienia: textarea per konto, auto-saved do localStorage
+- Tabela HTML: produkt × konta z kolorowaniem (lider/tnij)
+- AI prompt 6 sekcji: Diagnoza, Liderzy, Wyłącz, Wyróżnienia, Budżet, Plan
+- Historia + persistent wyróżnienia
+
+## Screener (zakładka Screener)
+- Chat z Agentem + paste screenshotów (multi-image, Ctrl+V)
+- Vision: obrazki resize do 1024px, base64 w content[]
+- Multi-turn: pełna historia konwersacji
+- Kopiuj/Drukuj/HTML pod każdą odpowiedzią
+
+## Cockpit (Play button ▶)
+- 3-krokowy workflow: Data → Upload XLSX → 23 zadań
+- Agent generuje JSON z 23 zadaniami (PILNE/WAŻNE/INFO)
+- Karty z checkboxami, progress bar, streak, timer, Did You Know
+- Cache dzienny, done state persistent
+- Upload per konto: Ads + Sprzedaż + Konwersja + Ads 30d (kontekst)
+
 ## Generowanie komend
 - Jedna komenda CC = jedna logiczna zmiana
 - Podawaj zawsze nazwę funkcji lub numer linii — nie każ CC czytać całego pliku
 - Po każdej zmianie SSE/stream — sprawdź czy Agent nadal działa przed kolejną zmianą
 
 ## Praca z plikiem
-- index.html ma ~9800 linii
+- index.html ma ~12200 linii
 - Zawsze podawaj numer linii lub nazwę 
   funkcji zamiast czytać cały plik

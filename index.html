@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.70</title>
+<title>MPlace Hub v5.71</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.70</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.71</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1171,6 +1171,33 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <div id="dzisTimer" style="font-family:var(--mono);font-size:13px;color:var(--text3)"></div>
+    </div>
+  </div>
+
+  <!-- KROK 0: KATALOG OFERT -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:24px;height:24px;border-radius:50%;background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">0</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">Katalog ofert (upload raz / miesiąc)</div>
+          <div style="font-size:10px;color:var(--text3)" id="dzisCatalogStatus">Agent wie co masz wystawione — ceny, SKU, stany</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+      <div class="kb-slot" onclick="document.getElementById('catF_MobelKap').click()" style="flex:1;min-width:140px;padding:6px 8px;text-align:center;border-color:rgba(167,139,250,.25)" id="catSlot_MobelKap">
+        <input type="file" id="catF_MobelKap" accept=".xlsx,.csv" style="display:none" onchange="catUpload('MobelKap',this)">
+        <div style="font-size:10px;font-family:var(--mono);color:var(--g-meble,#ff6b35)" id="catN_MobelKap">MobelKap</div>
+      </div>
+      <div class="kb-slot" onclick="document.getElementById('catF_PerfektCiecie').click()" style="flex:1;min-width:140px;padding:6px 8px;text-align:center;border-color:rgba(167,139,250,.25)" id="catSlot_PerfektCiecie">
+        <input type="file" id="catF_PerfektCiecie" accept=".xlsx,.csv" style="display:none" onchange="catUpload('PerfektCiecie',this)">
+        <div style="font-size:10px;font-family:var(--mono);color:var(--g-meble,#ff6b35)" id="catN_PerfektCiecie">Perfekt Cięcie</div>
+      </div>
+      <div class="kb-slot" onclick="document.getElementById('catF_MeblenaCzasie').click()" style="flex:1;min-width:140px;padding:6px 8px;text-align:center;border-color:rgba(167,139,250,.25)" id="catSlot_MeblenaCzasie">
+        <input type="file" id="catF_MeblenaCzasie" accept=".xlsx,.csv" style="display:none" onchange="catUpload('MeblenaCzasie',this)">
+        <div style="font-size:10px;font-family:var(--mono);color:var(--g-meble,#ff6b35)" id="catN_MeblenaCzasie">Meble na Czasie</div>
+      </div>
     </div>
   </div>
 
@@ -2631,6 +2658,7 @@ function showView(v){
     document.getElementById('navDzis').style.boxShadow='0 0 12px rgba(239,68,68,.6)';
     dzisCheckStep1();
     dzisStartTimer();
+    catRenderStatus();
     // Show DYK
     const wE = getWiedza();
     if (wE.length) { const r = wE[Math.floor(Math.random()*wE.length)]; document.getElementById('dzisDYKText').textContent = r.title+' — '+r.content.substring(0,120)+'...'; document.getElementById('dzisDYK').style.display='block'; }
@@ -9355,6 +9383,19 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   p += `BE ROAS tego konta: ${be.toFixed(2)} (próg rentowności — poniżej tej wartości reklama generuje stratę)\n\n`;
   if (uwagi) p += `UWAGI MENEDŻERA:\n${uwagi}\n\n`;
 
+  // Add catalog if available for this account
+  const kontoKey = Object.keys(AC_META).find(k => AC_META[k].name === konto) || '';
+  const cat = kontoKey ? getCatalog(kontoKey) : null;
+  if (cat && cat.oferty.length) {
+    p += `== KATALOG OFERT (${cat.activeCount} aktywnych, upload ${cat.uploadDate}) ==\n`;
+    p += `Porównaj aukcje z Ads z katalogiem — wskaż oferty BEZ Ads które mają potencjał.\n`;
+    cat.oferty.filter(o => o.status.toLowerCase().includes('aktywna')).slice(0, 40).forEach(o => {
+      p += `  [${o.id}] ${o.nazwa} | ${o.cena.toFixed(0)} zł | SKU: ${o.sku}\n`;
+    });
+    if (cat.activeCount > 40) p += `  ... i ${cat.activeCount - 40} więcej\n`;
+    p += '\n';
+  }
+
   p += `== RAPORT 1: ALLEGRO ADS ==\n`;
   p += `Łącznie: Koszt ${ads.totKoszt.toFixed(0)} zł | Sprzedaż ${ads.totSprzedaz.toFixed(0)} zł | ROAS ${ads.totRoas.toFixed(2)}\n`;
   p += `Przepalone (>=30 zł, 0 sprzedaży): ${ads.zgnile.length} aukcji = ${ads.kosztZgnile.toFixed(0)} zł\n\n`;
@@ -9856,6 +9897,112 @@ function aaShowHistoryEntry(id) {
 // ═══════════════════════════════════════════════════════════
 // DZIŚ — Centrum Dowodzenia
 // ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// KATALOG OFERT — persistent per konto
+// ═══════════════════════════════════════════════════════════
+const CAT_KEY = 'catalog_';
+
+function getCatalog(konto) {
+  try { return JSON.parse(localStorage.getItem(CAT_KEY + konto) || 'null'); } catch(e) { return null; }
+}
+
+function saveCatalog(konto, data) {
+  localStorage.setItem(CAT_KEY + konto, JSON.stringify(data));
+}
+
+async function catUpload(konto, input) {
+  const file = input.files[0]; if (!file) return;
+  await aaLoadSheetJS();
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+      const pln = v => { let s = String(v||0).replace(/PLN/gi,'').replace(/\s/g,''); if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,''); s=s.replace(',','.'); return parseFloat(s)||0; };
+
+      // Flexible column matching
+      const col = (row, ...names) => {
+        const keys = Object.keys(row);
+        for (const n of names) {
+          // Exact
+          if (row[n] !== undefined) return row[n];
+          // Partial
+          const found = keys.find(k => k.includes(n));
+          if (found !== undefined) return row[found];
+        }
+        return '';
+      };
+
+      const oferty = rows.map(row => ({
+        id: String(col(row, 'ID oferty', 'Id oferty') || '').replace(/\D/g, ''),
+        sku: String(col(row, 'Sygnatura/SKU', 'Sygnatura', 'SKU') || ''),
+        nazwa: String(col(row, 'Tytuł oferty', 'Tytuł') || '').substring(0, 60),
+        cena: pln(col(row, 'Cena PL', 'Cena Allegro', 'Regulowa Cena')),
+        status: String(col(row, 'Status oferty', 'Status') || ''),
+        sztuki: parseInt(col(row, 'Liczba sztuk', 'Liczba szt')) || 0,
+        marka: String(col(row, 'Marka') || ''),
+        kodProducenta: String(col(row, 'Kod producenta', 'Kod produc') || ''),
+      })).filter(o => o.id && o.id.length > 5);
+
+      const data = {
+        konto,
+        oferty,
+        count: oferty.length,
+        activeCount: oferty.filter(o => o.status.toLowerCase().includes('aktywna')).length,
+        uploadDate: new Date().toLocaleDateString('pl-PL'),
+        fileName: file.name
+      };
+
+      saveCatalog(konto, data);
+      catRenderStatus();
+      console.log(`[Catalog] ${konto}: ${data.count} ofert (${data.activeCount} aktywnych)`);
+    } catch(err) {
+      console.error('[Catalog] Parse error:', err);
+      alert('Błąd parsowania katalogu: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function catRenderStatus() {
+  const meble = ['MobelKap', 'PerfektCiecie', 'MeblenaCzasie'];
+  let totalOffers = 0;
+  meble.forEach(k => {
+    const cat = getCatalog(k);
+    const slotEl = document.getElementById('catSlot_' + k);
+    const nameEl = document.getElementById('catN_' + k);
+    if (cat && nameEl) {
+      nameEl.innerHTML = `${AC_META[k]?.name||k} <span style="color:#2dd4a0">${cat.activeCount} ofert</span><br><span style="font-size:8px;color:var(--text3)">${cat.uploadDate}</span>`;
+      if (slotEl) slotEl.classList.add('done');
+      totalOffers += cat.count;
+    }
+  });
+  const statusEl = document.getElementById('dzisCatalogStatus');
+  if (statusEl) {
+    if (totalOffers > 0) statusEl.innerHTML = `<span style="color:#2dd4a0">${totalOffers} ofert załadowanych</span>`;
+  }
+}
+
+function buildCatalogContext() {
+  let ctx = '';
+  const meble = ['MobelKap', 'PerfektCiecie', 'MeblenaCzasie'];
+  meble.forEach(k => {
+    const cat = getCatalog(k);
+    if (!cat || !cat.oferty.length) return;
+    ctx += `\nKATALOG ${AC_META[k]?.name||k} (${cat.activeCount} aktywnych ofert, upload ${cat.uploadDate}):\n`;
+    // Top 30 by price descending
+    const top = cat.oferty.filter(o => o.status.toLowerCase().includes('aktywna')).sort((a,b) => b.cena - a.cena).slice(0, 30);
+    top.forEach(o => {
+      ctx += `  [${o.id}] ${o.nazwa} | ${o.cena.toFixed(0)} zł | SKU: ${o.sku} | Szt: ${o.sztuki}\n`;
+    });
+    if (cat.activeCount > 30) ctx += `  ... i ${cat.activeCount - 30} więcej ofert\n`;
+  });
+  return ctx;
+}
+
 const DZIS_CACHE_KEY = 'dzisCache';
 const DZIS_DONE_KEY = 'dzisDone';
 const DZIS_STREAK_KEY = 'dzisStreak';
@@ -10031,6 +10178,10 @@ async function generateDzis() {
         } catch(e) { prompt += `\n${kontoName} — ${type}: błąd parsowania\n`; }
       }
     }
+
+    // Add catalog context if available
+    const catCtx = buildCatalogContext();
+    if (catCtx) prompt += `\n${catCtx}\n`;
 
     prompt += `\nOdpowiedz TYLKO w JSON (bez markdown, bez tekstu przed/po):\n`;
     prompt += `{"tasks":[{"priority":"PILNE","title":"...","konto":"...","efekt":"...","opis":"..."}],"summary":"1 zdanie"}\n\n`;
