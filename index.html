@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.68</title>
+<title>MPlace Hub v5.69</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.68</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.69</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2073,6 +2073,18 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#38bdf8;margin-bottom:.3rem;font-family:var(--mono)">Raport 3</div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:.25rem">Wynik konwersji</div>
       <div id="aaFile3Name" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Raport_*.xlsx</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:1rem">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#f5a623;margin-bottom:.4rem;font-family:var(--mono)">Kontekst historyczny (opcjonalne)</div>
+    <div style="display:grid;grid-template-columns:1fr;gap:.75rem">
+      <div id="aaSlot4" onclick="document.getElementById('aaFile4').click()" style="border:1px dashed rgba(245,166,35,.3);border-radius:8px;padding:10px 14px;cursor:pointer;text-align:center;background:rgba(245,166,35,.03);transition:border-color .2s">
+        <input type="file" id="aaFile4" accept=".xlsx" style="display:none" onchange="aaHandleFile(4,this)">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#f5a623;margin-bottom:.3rem;font-family:var(--mono)">Ads 30 dni</div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:.2rem">Statystyki Ads za ostatnie 30 dni — Agent porówna z bieżącym okresem</div>
+        <div id="aaFile4Name" style="font-size:10px;color:var(--text3);font-family:var(--mono)">statystyki_oferty_30dni.xlsx</div>
+      </div>
     </div>
   </div>
 
@@ -9118,7 +9130,7 @@ function renderKalendar(){
 // ═══════════════════════════════════════════════════════════
 // ANALIZA OFERT — 3-raport XLSX optimizer
 // ═══════════════════════════════════════════════════════════
-window._aaFiles = { 1: null, 2: null, 3: null };
+window._aaFiles = { 1: null, 2: null, 3: null, 4: null };
 window._aaHistory = JSON.parse(localStorage.getItem('aaHistory') || '[]');
 
 function aaHandleFile(slot, input) {
@@ -9337,7 +9349,7 @@ async function aaParseFile(file, type) {
   });
 }
 
-function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas) {
+function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ads30d) {
   const be = beRoas || 6;
   let p = `Analizujesz 3 raporty Allegro dla konta ${konto} za okres ${okres}.\n`;
   p += `BE ROAS tego konta: ${be.toFixed(2)} (próg rentowności — poniżej tej wartości reklama generuje stratę)\n\n`;
@@ -9411,6 +9423,23 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas) {
     konwersja.oferty.slice(0,15).forEach(o => { p += `  ${o.oferta} | Trans:${o.transakcje} Szt:${o.sztuki} Wartość:${o.wartosc.toFixed(0)}zł Cena:${o.cena.toFixed(0)}zł Promo:[${o.promowanie}] ${o.kategoria?'Kat:'+o.kategoria:''}\n`; });
   }
 
+  // Ads 30d context — historical comparison
+  if (ads30d && ads30d.kampanie) {
+    p += `\n== KONTEKST HISTORYCZNY — ADS 30 DNI ==\n`;
+    p += `Łącznie 30d: Koszt ${ads30d.totKoszt.toFixed(0)} zł | Sprzedaż ${ads30d.totSprzedaz.toFixed(0)} zł | ROAS ${ads30d.totRoas.toFixed(2)}\n`;
+    p += `WAŻNE: Porównaj ROAS per aukcja: bieżący okres vs 30 dni.\n`;
+    p += `Jeśli aukcja ma ROAS=0 w bieżącym okresie ale ROAS>=${be.toFixed(0)} za 30 dni → NIE wyłączaj, oznacz jako "efekt sezonowy".\n`;
+    p += `Jeśli aukcja ma ROAS=0 zarówno za bieżący jak i 30 dni → WYŁĄCZ.\n\n`;
+    // Build per-auction 30d lookup
+    const all30d = ads30d.kampanie.flatMap(k => k.aukcje);
+    // Show top auctions by cost with 30d ROAS
+    const topByCost = all30d.sort((a,b) => b.koszt - a.koszt).slice(0, 20);
+    p += `Top 20 aukcji 30d (wg kosztu):\n`;
+    topByCost.forEach(a => {
+      p += `  [${a.nr}] ${a.oferta} | Koszt30d:${a.koszt.toFixed(0)}zł Sprzedaż30d:${a.sprzedaz.toFixed(0)}zł ROAS30d:${a.roas.toFixed(2)}\n`;
+    });
+  }
+
   p += `\n== ZADANIE ==\n`;
   p += `BE ROAS tego konta: ${be.toFixed(2)} — używaj tej wartości jako progu rentowności.\n`;
   p += `Wygeneruj RAPORT REKOMENDACJI w 8 sekcjach. Konkretne liczby. Po polsku.\n\n`;
@@ -9460,15 +9489,21 @@ async function aaRunAnalysis() {
       konwersjaData = await aaParseFile(window._aaFiles[3], 'konwersja');
     }
 
+    // Parse Ads 30d context file if uploaded
+    let ads30dData = null;
+    if (window._aaFiles[4]) {
+      thinkingText.textContent = 'Czytam Ads 30 dni (kontekst)...';
+      ads30dData = await aaParseFile(window._aaFiles[4], 'ads');
+    }
+
     thinkingText.textContent = 'Agent AI analizuje raporty...';
     const kontoName = AC_META[konto]?.name || konto;
-    // Calculate actual BE ROAS for this account
     const prod = getProd(konto);
     const curMonth = MONTHS[new Date().getMonth()];
     const curData = getData(konto).find(d => d.m === curMonth);
     const C = curData ? calc(curData, prod) : null;
-    const beRoas = C && C.beRoasAds ? C.beRoasAds : 6; // fallback 6 if no data
-    const prompt = aaBuildPrompt(kontoName, okres || 'bieżący', uwagi, adsData || {totKoszt:0,totSprzedaz:0,totRoas:0,kampanie:[],zgnile:[],kosztZgnile:0,gwiazdy:[]}, sprzedazData, konwersjaData, beRoas);
+    const beRoas = C && C.beRoasAds ? C.beRoasAds : 6;
+    const prompt = aaBuildPrompt(kontoName, okres || 'bieżący', uwagi, adsData || {totKoszt:0,totSprzedaz:0,totRoas:0,kampanie:[],zgnile:[],kosztZgnile:0,gwiazdy:[]}, sprzedazData, konwersjaData, beRoas, ads30dData);
 
     const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
       method: 'POST',
@@ -9869,6 +9904,7 @@ function dzisRenderUploadSlots() {
     const ads = window._dzisFiles[k+'_ads'];
     const sp = window._dzisFiles[k+'_sprzedaz'];
     const kn = window._dzisFiles[k+'_konwersja'];
+    const ads30 = window._dzisFiles[k+'_ads30d'];
     const slotStyle = (file, label) => {
       if (file) return `<div class="kb-slot done" onclick="document.getElementById('dzF_${k}_${label}').click()" style="flex:1;padding:6px 8px;text-align:center">
         <input type="file" id="dzF_${k}_${label}" accept=".xlsx" style="display:none" onchange="dzisFileUp('${k}','${label==='sp'?'sprzedaz':label==='kn'?'konwersja':'ads'}',this)">
@@ -9885,6 +9921,18 @@ function dzisRenderUploadSlots() {
         ${slotStyle(ads, 'ads')}
         ${slotStyle(sp, 'sp')}
         ${slotStyle(kn, 'kn')}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:4px">
+        ${(() => {
+          if (ads30) return `<div class="kb-slot done" onclick="document.getElementById('dzF_${k}_ads30d').click()" style="flex:1;padding:5px 8px;text-align:center;border-color:rgba(245,166,35,.5);background:rgba(245,166,35,.04)">
+            <input type="file" id="dzF_${k}_ads30d" accept=".xlsx" style="display:none" onchange="dzisFileUp('${k}','ads30d',this)">
+            <div style="font-size:9px;color:#f5a623;font-family:var(--mono)">${ads30.name.length>25?ads30.name.substring(0,22)+'...':ads30.name}</div>
+          </div>`;
+          return `<div class="kb-slot" onclick="document.getElementById('dzF_${k}_ads30d').click()" style="flex:1;padding:5px 8px;text-align:center;border-color:rgba(245,166,35,.25)">
+            <input type="file" id="dzF_${k}_ads30d" accept=".xlsx" style="display:none" onchange="dzisFileUp('${k}','ads30d',this)">
+            <div style="font-size:10px;color:#f5a623;font-family:var(--mono)">Ads 30d (kontekst)</div>
+          </div>`;
+        })()}
       </div>
     </div>`;
   }).join('');
