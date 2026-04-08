@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.64</title>
+<title>MPlace Hub v5.65</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.64</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.65</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1157,23 +1157,87 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 </div>
 
-<!-- ═══ VIEW: DZIŚ ═══ -->
+<!-- ═══ VIEW: DZIŚ — COCKPIT ═══ -->
 <div class="view" id="viewDzis">
 <div class="container" style="max-width:900px">
+  <!-- HEADER -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
     <div style="display:flex;align-items:center;gap:12px">
       <div style="width:36px;height:36px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(239,68,68,.4)"><svg width="14" height="16" viewBox="0 0 12 14" fill="none"><path d="M2 1L11 7L2 13V1Z" fill="#fff"/></svg></div>
       <div>
-        <div class="ph-title" style="margin:0;line-height:1.2">Dziś</div>
+        <div class="ph-title" style="margin:0;line-height:1.2">Cockpit</div>
         <div style="font-family:var(--mono);font-size:11px;color:var(--text3)" id="dzisDate"></div>
       </div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
       <div id="dzisTimer" style="font-family:var(--mono);font-size:13px;color:var(--text3)"></div>
-      <button onclick="generateDzisRefresh()" style="font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:4px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.06);color:#ef4444;cursor:pointer">Odśwież</button>
     </div>
   </div>
 
+  <!-- KROK 1: DANE -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:24px;height:24px;border-radius:50%;background:rgba(255,107,53,.15);color:var(--accent);font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">1</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">Dane sprzedażowe</div>
+          <div style="font-size:10px;color:var(--text3)" id="dzisStep1Status">Sprawdzam...</div>
+        </div>
+      </div>
+      <button onclick="showView('entry')" style="font-family:var(--mono);font-size:10px;padding:4px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer">Otwórz Data</button>
+    </div>
+  </div>
+
+  <!-- KROK 2: RAPORTY XLSX -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:24px;height:24px;border-radius:50%;background:rgba(56,189,248,.15);color:#38bdf8;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">2</div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text)">Raporty Allegro (opcjonalne)</div>
+        <div style="font-size:10px;color:var(--text3)">Upload Ads + Sprzedaż + Konwersja → głębsza analiza z numerami aukcji</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+      <span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-right:4px">Konta:</span>
+      <button class="dzis-konto-btn" onclick="dzisToggleKonto('MobelKap',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:var(--g-meble,#ff6b35);cursor:pointer">MoK</button>
+      <button class="dzis-konto-btn" onclick="dzisToggleKonto('PerfektCiecie',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:var(--g-meble,#ff6b35);cursor:pointer">PeC</button>
+      <button class="dzis-konto-btn" onclick="dzisToggleKonto('MeblenaCzasie',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:var(--g-meble,#ff6b35);cursor:pointer">MnC</button>
+      <span style="width:1px;height:14px;background:var(--border);margin:0 4px"></span>
+      <button class="dzis-konto-btn" onclick="dzisToggleKonto('Luxsen',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#2dd4a0;cursor:pointer">Lux</button>
+      <button class="dzis-konto-btn" onclick="dzisToggleKonto('Semmi',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#2dd4a0;cursor:pointer">Sem</button>
+      <button class="dzis-konto-btn" onclick="dzisToggleKonto('BOTAVIT',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#2dd4a0;cursor:pointer">BoV</button>
+      <span style="width:1px;height:14px;background:var(--border);margin:0 4px"></span>
+      <button class="dzis-konto-btn" onclick="dzisToggleKonto('Materazzi',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#b47fff;cursor:pointer">Mtz</button>
+      <button class="dzis-konto-btn" onclick="dzisToggleKonto('MtzzEU',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#b47fff;cursor:pointer">mEU</button>
+      <button class="dzis-konto-btn" onclick="dzisToggleKonto('Ankado24',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#b47fff;cursor:pointer">a24</button>
+    </div>
+    <div id="dzisUploadSlots" style="display:none;margin-top:8px"></div>
+  </div>
+
+  <!-- KROK 3: GENERUJ -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:1.25rem">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:24px;height:24px;border-radius:50%;background:rgba(239,68,68,.15);color:#ef4444;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">3</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">Generuj 23 zadania na dziś</div>
+          <div style="font-size:10px;color:var(--text3)" id="dzisStep3Info">Dane kont + Wiedza + ostatnie analizy</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button onclick="generateDzis()" style="font-family:var(--mono);font-size:11px;padding:6px 16px;border-radius:6px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.12);color:#ef4444;cursor:pointer;font-weight:600">▸ Generuj plan</button>
+        <button onclick="generateDzisRefresh()" style="font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Odśwież</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DID YOU KNOW -->
+  <div id="dzisDYK" style="display:none;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-size:11px;color:#a78bfa">
+    <span style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px">Did you know?</span>
+    <span id="dzisDYKText"></span>
+  </div>
+
+  <!-- STATS + PROGRESS -->
   <div id="dzisStats" class="dzis-stats" style="display:none"></div>
   <div id="dzisProgressWrap" style="display:none">
     <div style="display:flex;justify-content:space-between;margin-bottom:4px">
@@ -1183,18 +1247,16 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <div class="dzis-progress"><div class="dzis-progress-bar" id="dzisProgressBar" style="width:0%"></div></div>
   </div>
 
-  <div id="dzisDYK" style="display:none;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-size:11px;color:#a78bfa">
-    <span style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px">Did you know?</span>
-    <span id="dzisDYKText"></span>
-  </div>
-
+  <!-- LOADING -->
   <div id="dzisLoading" style="display:none;align-items:center;gap:.75rem;padding:1.5rem;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:10px;margin-bottom:1.5rem">
     <div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div>
     <div id="dzisLoadingText" style="font-size:12px;color:#ef4444;font-family:var(--mono)">Agent przygotowuje Twój plan dnia...</div>
   </div>
 
+  <!-- TASKS -->
   <div id="dzisContent"></div>
 
+  <!-- FOOTER -->
   <div id="dzisFooter" style="display:none;margin-top:1.5rem;display:flex;gap:.5rem">
     <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Kopiuj</button>
     <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Drukuj</button>
@@ -2555,7 +2617,18 @@ function showView(v){
   if(v==='dzis'){
     document.getElementById('viewDzis').classList.add('active');
     document.getElementById('navDzis').style.boxShadow='0 0 12px rgba(239,68,68,.6)';
-    generateDzis();
+    dzisCheckStep1();
+    dzisStartTimer();
+    // Show DYK
+    const wE = getWiedza();
+    if (wE.length) { const r = wE[Math.floor(Math.random()*wE.length)]; document.getElementById('dzisDYKText').textContent = r.title+' — '+r.content.substring(0,120)+'...'; document.getElementById('dzisDYK').style.display='block'; }
+    // Auto-load cached tasks
+    const now2 = new Date();
+    const dayN2 = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
+    const moN2 = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
+    document.getElementById('dzisDate').textContent = `${dayN2[now2.getDay()]}, ${now2.getDate()} ${moN2[now2.getMonth()]} ${now2.getFullYear()} · Dzień ${now2.getDate()}/${DAYS_IN[MONTHS[now2.getMonth()]]||30}`;
+    const cached2 = JSON.parse(localStorage.getItem(DZIS_CACHE_KEY)||'{}');
+    if (cached2.date === now2.toLocaleDateString('pl-PL') && cached2.tasks) dzisRenderTasks(cached2.tasks, cached2.summary);
   } else if(v==='entry'){
     document.getElementById('viewEntry').classList.add('active');
     document.getElementById('navEntry').classList.add('active');
@@ -9716,6 +9789,78 @@ const DZIS_CACHE_KEY = 'dzisCache';
 const DZIS_DONE_KEY = 'dzisDone';
 const DZIS_STREAK_KEY = 'dzisStreak';
 let _dzisTimerInterval = null;
+window._dzisSelectedKonta = [];
+window._dzisFiles = {};
+
+function dzisCheckStep1() {
+  const curM = MONTHS[new Date().getMonth()];
+  const today = new Date().getDate();
+  let filled = 0, total = Object.keys(AC_META).length;
+  Object.keys(AC_META).forEach(k => {
+    const d = getData(k).find(r => r.m === curM);
+    if (d && d.sprzedaz > 0) filled++;
+  });
+  const el = document.getElementById('dzisStep1Status');
+  if (el) {
+    if (filled >= total) el.innerHTML = `<span style="color:#2dd4a0">${filled}/${total} kont uzupełnionych</span>`;
+    else if (filled > 0) el.innerHTML = `<span style="color:#f5a623">${filled}/${total} kont — uzupełnij resztę</span>`;
+    else el.innerHTML = `<span style="color:#ef4444">Brak danych za ${curM} — otwórz Data</span>`;
+  }
+}
+
+function dzisToggleKonto(key, btn) {
+  const idx = window._dzisSelectedKonta.indexOf(key);
+  if (idx >= 0) {
+    window._dzisSelectedKonta.splice(idx, 1);
+    btn.style.background = 'var(--bg3)';
+    btn.style.fontWeight = '400';
+  } else {
+    window._dzisSelectedKonta.push(key);
+    btn.style.background = 'rgba(56,189,248,.15)';
+    btn.style.fontWeight = '700';
+  }
+  dzisRenderUploadSlots();
+}
+
+function dzisRenderUploadSlots() {
+  const container = document.getElementById('dzisUploadSlots');
+  if (!window._dzisSelectedKonta.length) { container.style.display = 'none'; return; }
+  container.style.display = 'block';
+  container.innerHTML = window._dzisSelectedKonta.map(k => {
+    const name = AC_META[k]?.name || k;
+    return `<div style="margin-bottom:8px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text2);margin-bottom:4px">${name}</div>
+      <div style="display:flex;gap:4px">
+        <div class="kb-slot" onclick="document.getElementById('dzF_${k}_ads').click()" style="flex:1;padding:5px 8px">
+          <input type="file" id="dzF_${k}_ads" accept=".xlsx" style="display:none" onchange="dzisFileUp('${k}','ads',this)">
+          <span id="dzN_${k}_ads" style="font-size:9px;color:var(--text3);font-family:var(--mono)">Ads</span>
+        </div>
+        <div class="kb-slot" onclick="document.getElementById('dzF_${k}_sp').click()" style="flex:1;padding:5px 8px">
+          <input type="file" id="dzF_${k}_sp" accept=".xlsx" style="display:none" onchange="dzisFileUp('${k}','sprzedaz',this)">
+          <span id="dzN_${k}_sp" style="font-size:9px;color:var(--text3);font-family:var(--mono)">Sprzedaż</span>
+        </div>
+        <div class="kb-slot" onclick="document.getElementById('dzF_${k}_kn').click()" style="flex:1;padding:5px 8px">
+          <input type="file" id="dzF_${k}_kn" accept=".xlsx" style="display:none" onchange="dzisFileUp('${k}','konwersja',this)">
+          <span id="dzN_${k}_kn" style="font-size:9px;color:var(--text3);font-family:var(--mono)">Konwersja</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // Update step3 info
+  const fileCount = Object.values(window._dzisFiles).filter(f => f).length;
+  const info = document.getElementById('dzisStep3Info');
+  if (info) info.textContent = `Dane kont + Wiedza + analizy${fileCount > 0 ? ' + ' + fileCount + ' XLSX' : ''}`;
+}
+
+function dzisFileUp(konto, type, input) {
+  const file = input.files[0]; if (!file) return;
+  window._dzisFiles[konto + '_' + type] = file;
+  const nameId = 'dzN_' + konto + '_' + (type === 'sprzedaz' ? 'sp' : type === 'konwersja' ? 'kn' : 'ads');
+  const el = document.getElementById(nameId);
+  if (el) { el.textContent = file.name.length > 12 ? file.name.substring(0,10) + '..' : file.name; el.style.color = '#34d399'; }
+  const slot = el?.closest('.kb-slot'); if (slot) slot.classList.add('done');
+  dzisRenderUploadSlots();
+}
 
 async function generateDzis() {
   const content = document.getElementById('dzisContent');
@@ -9728,8 +9873,9 @@ async function generateDzis() {
   const todayStr = now.toLocaleDateString('pl-PL');
   dateEl.textContent = `${dayNames[now.getDay()]}, ${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} · Dzień ${now.getDate()}/${DAYS_IN[MONTHS[now.getMonth()]]||30}`;
 
-  // Start timer
+  // Start timer + check steps
   dzisStartTimer();
+  dzisCheckStep1();
 
   // Did you know — random from Wiedza
   const wEntries = getWiedza();
@@ -9769,6 +9915,32 @@ async function generateDzis() {
 
     if (lastAnalyses.length) { prompt += `\nOstatnie analizy: ${lastAnalyses.map(a=>a.konto+' ('+a.okres+')').join(', ')}\n`; }
     if (lastKanibalizacja.length) { prompt += `Ostatnia kanibalizacja: ${lastKanibalizacja[0].date}\n`; }
+
+    // Parse uploaded XLSX files if any
+    const uploadedFiles = Object.entries(window._dzisFiles).filter(([k,f]) => f);
+    if (uploadedFiles.length) {
+      await aaLoadSheetJS();
+      prompt += `\nDANE Z RAPORTÓW XLSX:\n`;
+      for (const [key, file] of uploadedFiles) {
+        const [konto, type] = key.split('_');
+        const kontoName = AC_META[konto]?.name || konto;
+        try {
+          const data = await aaParseFile(file, type);
+          if (type === 'ads' && data.kampanie) {
+            prompt += `\n${kontoName} — Ads: Koszt ${data.totKoszt.toFixed(0)}zł | Sprzedaż ${data.totSprzedaz.toFixed(0)}zł | ROAS ${data.totRoas.toFixed(2)}\n`;
+            prompt += `  Martwe aukcje (>=30zł, 0 sprzedaży): ${data.zgnile.length} = ${data.kosztZgnile.toFixed(0)}zł\n`;
+            prompt += `  Gwiazdy (ROAS>=7): ${data.gwiazdy.length}\n`;
+            data.zgnile.slice(0,5).forEach(a => { prompt += `  ZATRZYMAJ [${a.nr}] ${a.oferta} | ${a.koszt.toFixed(0)}zł przepalone\n`; });
+            data.gwiazdy.slice(0,5).forEach(a => { prompt += `  SKALUJ [${a.nr}] ${a.oferta} | ROAS:${a.roas.toFixed(2)}\n`; });
+          } else if (type === 'sprzedaz' && data.oferty) {
+            prompt += `\n${kontoName} — Sprzedaż: ${data.totWizyty} wizyt | ${data.totTransakcje} transakcji | Konwersja ${(data.srKonwersja*100).toFixed(2)}%\n`;
+            if (data.martwePunkty.length) { prompt += `  Martwe punkty (dużo wizyt, 0 trans): ${data.martwePunkty.length}\n`; }
+          } else if (type === 'konwersja' && data.oferty) {
+            prompt += `\n${kontoName} — Konwersja: Łączna sprzedaż ${data.totWartosc.toFixed(0)}zł\n`;
+          }
+        } catch(e) { prompt += `\n${kontoName} — ${type}: błąd parsowania\n`; }
+      }
+    }
 
     prompt += `\nOdpowiedz TYLKO w JSON (bez markdown, bez tekstu przed/po):\n`;
     prompt += `{"tasks":[{"priority":"PILNE","title":"...","konto":"...","efekt":"...","opis":"..."}],"summary":"1 zdanie"}\n\n`;
