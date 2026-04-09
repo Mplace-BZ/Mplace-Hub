@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.91</title>
+<title>MPlace Hub v5.92</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.91</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.92</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9702,15 +9702,16 @@ async function aaRunAnalysis() {
       </div>
       <div class="agent-md">${html}</div>
     </div>
-    <div style="display:flex;gap:.5rem;margin-top:.75rem">
+    <div style="display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap">
       <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Kopiuj tekst</button>
       <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Drukuj / PDF</button>
       <button onclick="aaDownloadHtml()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.06);color:#38bdf8;cursor:pointer">Pobierz .html</button>
+      <button onclick="aaSendToScreener('${entry.id}')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(232,121,249,.3);background:rgba(232,121,249,.08);color:#e879f9;cursor:pointer">→ Screener</button>
     </div>`;
 
-    // Save to history
+    // Save to history (with raw markdown text for Screener handoff)
     const entry = { id: Date.now(), konto: kontoName, okres: okres || 'bieżący',
-      date: now.toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}), aiHtml: html };
+      date: now.toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}), aiHtml: html, aiText: text };
     window._aaHistory.push(entry);
     if (window._aaHistory.length > 20) window._aaHistory = window._aaHistory.slice(-20);
     localStorage.setItem('aaHistory', JSON.stringify(window._aaHistory));
@@ -9995,10 +9996,19 @@ function aaRenderHistory() {
   if (!wrap || !container) return;
   if (!window._aaHistory.length) { wrap.style.display = 'none'; return; }
   wrap.style.display = 'block';
-  container.innerHTML = window._aaHistory.slice().reverse().slice(0,5).map(h => `
+
+  // Master "Strategia MEBLE" button — pojawia się gdy są raporty dla wszystkich 3 kont MEBLE
+  const mebleNames = ['MobelKap', 'Perfekt Cięcie', 'Meble na Czasie'];
+  const recentMeble = mebleNames.map(name => window._aaHistory.slice().reverse().find(h => h.konto === name)).filter(Boolean);
+  const mebleBtn = recentMeble.length === 3
+    ? `<div style="margin-bottom:10px"><button onclick="aaSendMebleStrategyToScreener()" style="font-family:var(--mono);font-size:11px;padding:8px 16px;border-radius:6px;border:1px solid rgba(255,107,53,.4);background:rgba(255,107,53,.1);color:#ff6b35;cursor:pointer;font-weight:500;width:100%">⚡ STRATEGIA MEBLE — wyślij wszystkie 3 raporty do Screenera</button></div>`
+    : '';
+
+  container.innerHTML = mebleBtn + window._aaHistory.slice().reverse().slice(0,5).map(h => `
     <div style="border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;transition:border-color .2s">
       <div onclick="aaShowHistoryEntry('${h.id}')" style="cursor:pointer;flex:1"><span style="font-size:12px;color:var(--text);font-weight:500">${h.konto} — ${h.okres}</span><br><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">${h.date}</span></div>
       <div style="display:flex;gap:8px;align-items:center">
+        <span onclick="aaSendToScreener('${h.id}')" style="font-size:10px;color:#e879f9;font-family:var(--mono);cursor:pointer" title="Wyślij do Screenera">→ Screener</span>
         <span onclick="aaShowHistoryEntry('${h.id}')" style="font-size:11px;color:#38bdf8;font-family:var(--mono);cursor:pointer">pokaż</span>
         <span onclick="aaDeleteHistoryEntry('${h.id}')" style="font-size:14px;color:var(--text3);cursor:pointer;line-height:1" title="Usuń">×</span>
       </div>
@@ -10022,6 +10032,104 @@ function aaShowHistoryEntry(id) {
     <div class="agent-md">${entry.aiHtml}</div>
   </div>`;
   document.getElementById('aaResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Wyciągnij plain text z entry (preferuj aiText, fallback strip HTML z aiHtml)
+function aaEntryText(entry) {
+  if (entry.aiText) return entry.aiText;
+  // Fallback dla starych wpisów bez aiText
+  const tmp = document.createElement('div');
+  tmp.innerHTML = entry.aiHtml || '';
+  return tmp.innerText || tmp.textContent || '';
+}
+
+// Wyślij pojedynczy raport do Screenera jako kontekst
+function aaSendToScreener(id) {
+  const entry = window._aaHistory.find(h => String(h.id) === String(id));
+  if (!entry) { alert('Nie znaleziono raportu w historii.'); return; }
+  const text = aaEntryText(entry);
+  if (!text) { alert('Raport nie zawiera tekstu (pustego raportu nie da się wysłać).'); return; }
+
+  // Inicjalizuj scrHistory jeśli puste
+  if (!window._scrHistory) window._scrHistory = [];
+
+  // Dodaj raport jako wiadomość użytkownika
+  const contextMsg = `📊 KONTEKST: Raport Analizy Ofert dla ${entry.konto} (okres: ${entry.okres})\n\n${text}`;
+  window._scrHistory.push({ role: 'user', content: contextMsg });
+  // Dodaj sztuczną odpowiedź assistanta żeby utrzymać poprawną sekwencję user/assistant
+  window._scrHistory.push({ role: 'assistant', content: `Zapoznałem się z raportem ${entry.konto} (${entry.okres}). Czekam na pytanie strategiczne.` });
+
+  // Przełącz widok na Screener
+  if (typeof showView === 'function') showView('screener');
+
+  // Wyrenderuj wiadomości w panelu
+  setTimeout(() => {
+    const messagesEl = document.getElementById('scrMessages');
+    if (messagesEl) {
+      messagesEl.innerHTML += `<div style="margin-bottom:10px;text-align:right"><div style="display:inline-block;background:rgba(232,121,249,.1);border:1px solid rgba(232,121,249,.2);border-radius:8px;padding:8px 12px;max-width:90%;text-align:left"><div style="font-size:11px;color:#e879f9;margin-bottom:4px">📊 Raport Analizy: ${entry.konto} — ${entry.okres}</div><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${(text.length / 1000).toFixed(1)}k znaków załadowane jako kontekst</div></div></div>`;
+      messagesEl.innerHTML += `<div style="margin-bottom:10px"><div style="display:inline-block;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;max-width:90%"><span style="font-size:12px;color:var(--text2)">Zapoznałem się z raportem ${entry.konto}. Czekam na pytanie strategiczne.</span></div></div>`;
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+  }, 100);
+}
+
+// Strategia MEBLE — wyślij wszystkie 3 raporty + pytania strategiczne
+function aaSendMebleStrategyToScreener() {
+  const mebleNames = ['MobelKap', 'Perfekt Cięcie', 'Meble na Czasie'];
+  const recent = mebleNames.map(name => window._aaHistory.slice().reverse().find(h => h.konto === name)).filter(Boolean);
+  if (recent.length < 3) {
+    alert('Brakuje raportów. Wygeneruj raporty dla wszystkich 3 kont MEBLE: MobelKap, Perfekt Cięcie, Meble na Czasie.');
+    return;
+  }
+
+  if (!window._scrHistory) window._scrHistory = [];
+
+  // Dodaj 3 raporty jako sekwencję user/assistant
+  recent.forEach(entry => {
+    const text = aaEntryText(entry);
+    const contextMsg = `📊 KONTEKST #${recent.indexOf(entry)+1}/3: Raport Analizy Ofert dla ${entry.konto} (okres: ${entry.okres})\n\n${text}`;
+    window._scrHistory.push({ role: 'user', content: contextMsg });
+    window._scrHistory.push({ role: 'assistant', content: `Załadowałem raport ${entry.konto}. ${recent.indexOf(entry) < 2 ? 'Czekam na kolejny raport lub pytanie.' : 'Mam komplet 3 raportów MEBLE. Gotowy do analizy strategicznej między kontami.'}` });
+  });
+
+  // Przełącz na Screener
+  if (typeof showView === 'function') showView('screener');
+
+  setTimeout(() => {
+    const messagesEl = document.getElementById('scrMessages');
+    if (messagesEl) {
+      let html = '';
+      recent.forEach(entry => {
+        const text = aaEntryText(entry);
+        html += `<div style="margin-bottom:10px;text-align:right"><div style="display:inline-block;background:rgba(232,121,249,.1);border:1px solid rgba(232,121,249,.2);border-radius:8px;padding:8px 12px;max-width:90%;text-align:left"><div style="font-size:11px;color:#e879f9;margin-bottom:4px">📊 Raport: ${entry.konto} — ${entry.okres}</div><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${(text.length / 1000).toFixed(1)}k znaków</div></div></div>`;
+      });
+      html += `<div style="margin-bottom:10px"><div style="display:inline-block;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;max-width:90%"><span style="font-size:12px;color:var(--text2)">Mam komplet 3 raportów MEBLE (MobelKap, Perfekt Cięcie, Meble na Czasie). Gotowy do analizy strategicznej między kontami. Zadaj pytanie poniżej.</span></div></div>`;
+      messagesEl.innerHTML += html;
+
+      // Wstaw startowy prompt strategiczny do inputu
+      const input = document.getElementById('scrInput');
+      if (input) {
+        input.value = `Mam 3 raporty Analizy Ofert dla całej grupy MEBLE (MobelKap, Perfekt Cięcie, Meble na Czasie).
+
+Wykonaj analizę strategiczną międzykontową w 5 sekcjach:
+
+1. KANIBALIZACJA SKU MIĘDZY KONTAMI — które konkretne aukcje (po ID) występują na 2-3 kontach jednocześnie? Które konto sprzedaje je najlepiej (najwyższa konwersja, najwyższy ROAS Ads)? Wskaż konkretne SKU do wyłączenia/przeniesienia.
+
+2. KONSOLIDACJA SMART — TOP 15 aukcji DPD 2pak across 3 kont posortowane po wolumenie wizyt. Każda z konkretnym ID, kontem, obecną konwersją, szacunkiem wzrostu po Smart. Łączny potencjał finansowy grupy.
+
+3. ALOKACJA BUDŻETU ADS — analiza efektywności budżetu Ads między 3 kontami. PC ma marżę 5.1% (alarm), MK 8.3%, MnC 9.1%. Czy budżet powinien być przesunięty? Jak?
+
+4. PC RATUNEK — Perfekt Cięcie ma marżę 5.1% i spada 3 tygodnie. Jaki jest plan ratunkowy? Czy konto da się odbudować, czy lepiej oddać wolumen do MK/MnC?
+
+5. PLAN DZIAŁANIA TYGODNIOWY — 10 najważniejszych działań sortowanych po wpływie finansowym, z przypisaniem do konkretnego konta i terminem do 16.04.2026.
+
+Patrz na grupę jako portfel — nie jako 3 niezależne konta.`;
+        input.focus();
+      }
+
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+  }, 100);
 }
 
 // ═══════════════════════════════════════════════════════════
