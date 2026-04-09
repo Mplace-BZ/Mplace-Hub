@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.88</title>
+<title>MPlace Hub v5.89</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.88</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.89</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9429,8 +9429,22 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   if (cat && cat.oferty.length) {
     p += `== KATALOG OFERT (${cat.activeCount} aktywnych, upload ${cat.uploadDate}) ==\n`;
     p += `Porównaj aukcje z Ads z katalogiem — wskaż oferty BEZ Ads które mają potencjał.\n`;
+    if (cat.dostawaStats) {
+      p += `\nCENNIKI DOSTAWY (aktywne aukcje):\n`;
+      p += `  Smart (1 paczka, 0 zł dla klienta, 13 zł w cenie): ${cat.dostawaStats.smart}\n`;
+      p += `  DPD 2 paczki (40 zł dla klienta, klient płaci osobno): ${cat.dostawaStats.dpd_2pak}\n`;
+      p += `  DPD 3 paczki (60 zł dla klienta): ${cat.dostawaStats.dpd_3pak}\n`;
+      if (cat.dostawaStats.inne) p += `  Inne/nieznany: ${cat.dostawaStats.inne}\n`;
+      p += `\nWAŻNE — REGUŁA DOSTAWY:\n`;
+      p += `Aukcje na Smart konwertują 4-7x wyższej niż aukcje DPD 2/3 paczki (dane historyczne MK: Smart 2.10% vs DPD 0.46%).\n`;
+      p += `Klient na DPD widzi szok cenowy w koszyku → masowe porzucenia.\n`;
+      p += `Jeśli aukcja DPD ma >50 wizyt + konwersja <0.7% + ≥10 porzuconych koszyków → KANDYDAT DO PRZENIESIENIA NA SMART.\n`;
+      p += `Math: cena +33 zł (13 Smart fee + 20 zł druga paczka), klient widzi "darmową dostawę", konwersja rośnie 3-5x.\n`;
+    }
+    p += `\n`;
     cat.oferty.filter(o => { const s=o.status.toLowerCase(); return s.includes('aktywna')||s.includes('wystawiona'); }).slice(0, 40).forEach(o => {
-      p += `  [${o.id}] ${o.nazwa} | ${o.cena.toFixed(0)} zł | SKU: ${o.sku}\n`;
+      const dost = o.dostawa === 'smart' ? 'SMART' : o.dostawa === 'dpd_2pak' ? 'DPD2' : o.dostawa === 'dpd_3pak' ? 'DPD3' : '?';
+      p += `  [${o.id}] ${o.nazwa} | ${o.cena.toFixed(0)} zł | ${dost} | SKU: ${o.sku}\n`;
     });
     if (cat.activeCount > 40) p += `  ... i ${cat.activeCount - 40} więcej\n`;
     p += '\n';
@@ -9557,7 +9571,8 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   p += `6. KANIBALIZACJA — aukcje w wielu kampaniach: pokaż ŁĄCZNY wynik (agregat) vs per-kampania, wskaż duplikaty do wyłączenia. WARUNEK: minimum 3 transakcje łącznie żeby rekomendować jakąkolwiek decyzję. Mniej = "obserwuj", brak akcji.\n`;
   p += `7. CTR vs KONWERSJA — wysokie CTR bez sprzedaży: diagnoza (cena? zdjęcia? migracja ruchu?), konkretna rekomendacja\n`;
   p += `8. PLACEMENT — Wyniki wyszukiwania vs Strona produktu: który działa, rekomendacja\n`;
-  p += `9. PLAN TYGODNIA — 5 działań sortowane po kwocie oszczędności: [PILNE/WAŻNE] Co → Gdzie → Oszczędność zł/mies.\n`;
+  p += `9. KANDYDACI DO SMART — wykorzystując CENNIKI DOSTAWY z katalogu: które aukcje DPD 2/3 paczki mają wysoką liczbę wizyt + porzuconych koszyków + niską konwersję? Te są w pierwszej kolejności do przeniesienia na Smart. Pokaż TOP 5 z szacunkiem wzrostu transakcji (konwersja Smart ~2% vs obecna).\n`;
+  p += `10. PLAN TYGODNIA — 5 działań sortowane po kwocie oszczędności: [PILNE/WAŻNE] Co → Gdzie → Oszczędność zł/mies.\n`;
   return p;
 }
 
@@ -10062,6 +10077,15 @@ async function catUpload(konto, input) {
       // Debug: log headers
       console.log('[Catalog] Headers:', Object.keys(rows[0] || {}).join(' | '));
 
+      // Normalizuj cennik dostawy: 'smart' / 'dpd_2pak' / 'dpd_3pak' / 'inne'
+      const normalizeDostawa = raw => {
+        const s = String(raw || '').toLowerCase();
+        if (s.includes('smart')) return 'smart';
+        if (s.includes('dpd 2 paczki') || s.includes('2 paczki')) return 'dpd_2pak';
+        if (s.includes('dpd 3 paczki') || s.includes('3 paczki')) return 'dpd_3pak';
+        return s ? 'inne' : '';
+      };
+
       const oferty = rows.map(row => ({
         id: String(col(row, 'ID oferty', 'Id oferty', 'ID') || '').replace(/\D/g, ''),
         sku: String(col(row, 'Sygnatura/SKU Sprzedającego', 'Sygnatura/SKU', 'Sygnatura', 'SKU') || ''),
@@ -10073,13 +10097,24 @@ async function catUpload(konto, input) {
         kodProducenta: String(col(row, 'Kod producenta', 'Kod produc') || ''),
         kategoria: String(col(row, 'Kategoria główna', 'Kategoria') || ''),
         podkategoria: String(col(row, 'Podkategoria', 'Podkateg') || ''),
+        dostawa: normalizeDostawa(col(row, 'Cennik dostawy', 'Cennik')),
       })).filter(o => o.id && o.id.length > 5);
+
+      // Statystyki cenników dla aktywnych aukcji
+      const aktywne = oferty.filter(o => { const s = o.status.toLowerCase(); return s.includes('aktywna') || s.includes('wystawiona'); });
+      const dostawaStats = {
+        smart: aktywne.filter(o => o.dostawa === 'smart').length,
+        dpd_2pak: aktywne.filter(o => o.dostawa === 'dpd_2pak').length,
+        dpd_3pak: aktywne.filter(o => o.dostawa === 'dpd_3pak').length,
+        inne: aktywne.filter(o => o.dostawa === 'inne' || !o.dostawa).length,
+      };
 
       const data = {
         konto,
         oferty,
         count: oferty.length,
-        activeCount: oferty.filter(o => { const s = o.status.toLowerCase(); return s.includes('aktywna') || s.includes('wystawiona') || s === 'aktywna'; }).length,
+        activeCount: aktywne.length,
+        dostawaStats,
         uploadDate: new Date().toLocaleDateString('pl-PL'),
         fileName: file.name
       };
