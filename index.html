@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.17</title>
+<title>MPlace Hub v6.18</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.17</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.18</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2457,7 +2457,9 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 
     <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem">
       <button id="caArchRunBtn" onclick="caRunArchitect()" disabled style="font-family:var(--mono);font-size:11px;padding:10px 20px;border-radius:6px;border:1px solid rgba(255,107,53,.4);background:rgba(255,107,53,.12);color:#ff6b35;cursor:pointer;font-weight:500;opacity:0.5">⚡ Generuj plan reorganizacji (AI)</button>
-      <button onclick="caExportPlanCSV()" id="caArchCsvBtn" style="display:none;font-family:var(--mono);font-size:10px;padding:8px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer">📥 Eksport CSV</button>
+      <button onclick="caExportPlanCSV()" id="caArchCsvBtn" style="display:none;font-family:var(--mono);font-size:10px;padding:8px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer">📥 Eksport CSV planu</button>
+      <button onclick="caExportGroupsCSV()" id="caArchGroupsCsvBtn" style="display:none;font-family:var(--mono);font-size:10px;padding:8px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer">📥 Eksport CSV grup z ID</button>
+      <button onclick="caPrintGroupsList()" id="caArchPrintBtn" style="display:none;font-family:var(--mono);font-size:10px;padding:8px 14px;border-radius:6px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.1);color:#38bdf8;cursor:pointer">🖨 Drukuj listę grup</button>
       <span id="caArchRunStatus" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
     </div>
 
@@ -11912,6 +11914,10 @@ async function caRunArchitect() {
     }
     if (status) { status.textContent = '✓ Plan gotowy'; status.style.color = '#34d399'; }
     document.getElementById('caArchCsvBtn').style.display = 'inline-block';
+    const groupsBtn = document.getElementById('caArchGroupsCsvBtn');
+    const printBtn = document.getElementById('caArchPrintBtn');
+    if (groupsBtn) groupsBtn.style.display = 'inline-block';
+    if (printBtn) printBtn.style.display = 'inline-block';
   } catch(err) {
     if (status) { status.textContent = '✗ Błąd: ' + err.message; status.style.color = '#ef4444'; }
   }
@@ -12106,26 +12112,35 @@ function caBuildArchitectPrompt(data) {
   p += `9. ZAWSZE respektuj BACKUP STATUS przed jakąkolwiek rekomendacją ZAMKNIJ — to jest reguła nadrzędna\n\n`;
 
   p += `=== FORMAT SEKCJI PODSUMOWANIE GRUP REKLAM (KRYTYCZNY — z ID aukcji) ===\n`;
-  p += `Każda grupa MUSI zawierać konkretne ID aukcji z metrykami żeby user mógł utworzyć grupę w panelu Allegro.\n`;
+  p += `Każda grupa MUSI zawierać konkretne ID aukcji żeby user mógł utworzyć grupę w panelu Allegro przez kopiuj-wklej.\n`;
   p += `BEZ ID grupa jest bezużyteczna — user nie wie co wkleić w "Wybierz oferty".\n\n`;
-  p += `Format docelowy:\n`;
+  p += `Format docelowy (KAŻDA grupa ma 2 części):\n`;
   p += `\`\`\`\n`;
-  p += `/010/MC/ CORE_LAZIENKA_PRALKA_62\n`;
+  p += `/010/MC/ CORE_LAZIENKA_PRALKA_62\n\n`;
   p += `  [MC][010][WW][RW] PRALKA_62_DAB_WOTAN\n`;
+  p += `  IDs do wklejenia w Allegro: 18039920084 18039920085\n`;
+  p += `  Szczegóły:\n`;
   p += `    → 18039920084 (koszt:627zł ROAS:8.69 trans:23) ⭐ gwiazda\n`;
+  p += `    → 18039920085 (koszt:120zł ROAS:7.20 trans:5) ⭐ gwiazda\n\n`;
   p += `  [MC][010][WW][RW] PRALKA_62_BIALA\n`;
-  p += `    → 18039923392 (koszt:45zł ROAS:6.78 trans:2)\n`;
+  p += `  IDs do wklejenia w Allegro: 18039923392\n`;
+  p += `  Szczegóły:\n`;
+  p += `    → 18039923392 (koszt:45zł ROAS:6.78 trans:2) ✅ OK\n\n`;
   p += `  [MC][010][WW][RW] PRALKA_62_SONOMA (OBSERWUJ)\n`;
+  p += `  IDs do wklejenia w Allegro: 18039914242\n`;
+  p += `  Szczegóły:\n`;
   p += `    → 18039914242 (koszt:21zł ROAS:0.00 trans:0) ⚠️ BACKUP:NIE\n`;
   p += `\`\`\`\n\n`;
+  p += `KRYTYCZNE: linia "IDs do wklejenia" musi mieć ID **oddzielone POJEDYNCZĄ SPACJĄ**, bez przecinków, bez nawiasów. To format który Allegro Ads akceptuje przy wklejaniu wielu aukcji do grupy reklam.\n\n`;
   p += `REGUŁY DLA SEKCJI PODSUMOWANIE:\n`;
-  p += `- Każda grupa ma listę ID z formatem: → ID (koszt:Xzł ROAS:Y trans:Z)\n`;
+  p += `- Linia "IDs do wklejenia" zawiera tylko liczby ID oddzielone spacjami\n`;
+  p += `- Linia "Szczegóły:" pokazuje per ID metryki (koszt, ROAS, trans) + status (gwiazda/OK/obserwuj/BACKUP:NIE)\n`;
   p += `- Aukcje z ROAS >= 6 i 3+ trans → dopisz "⭐ gwiazda"\n`;
   p += `- Aukcje z ROAS 4-6 → dopisz "✅ OK"\n`;
   p += `- Aukcje z ROAS 3-4 → dopisz "⚠️ obserwuj 14 dni"\n`;
-  p += `- Aukcje z BACKUP:NIE (z danych powyżej) → dopisz "⚠️ BACKUP:NIE" — KRYTYCZNE dla ochrony\n`;
+  p += `- Aukcje z BACKUP:NIE (z danych powyżej) → dopisz "⚠️ BACKUP:NIE"\n`;
   p += `- Aukcje cross-account [TAKZE_NA:...] → dopisz "🔄 też na: [konto]"\n`;
-  p += `- Maksymalnie 5 ID per grupa (jeśli więcej, wybierz top 5 po koszcie + dopisz "... i N więcej")\n`;
+  p += `- Maksymalnie 8 ID per grupa (jeśli więcej, wybierz top 8 po koszcie + dopisz "... i N więcej")\n`;
   p += `- Grupuj aukcje per kolor/wariant — jeśli grupa to "PRALKA_62_DAB_WOTAN", wszystkie ID w niej muszą być wariantem WOTAN, nie miks kolorów\n`;
   p += `- Jeśli nie wiesz która aukcja powinna być w której grupie — patrz na nazwę aukcji w danych źródłowych (zawiera kolor/wymiar)\n\n`;
 
@@ -12180,6 +12195,217 @@ function caExportPlanCSV() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+// Parser sekcji "PODSUMOWANIE GRUP REKLAM" z planu Architecta
+// Zwraca strukturę: [{ konto, kampania, grupa, ids: [id1, id2, ...], details: [{id, koszt, roas, trans, status}] }]
+function caParseGroupsFromPlan(text) {
+  if (!text) return [];
+  const lines = text.split('\n');
+  const groups = [];
+  let currentKonto = null;
+  let currentKampania = null;
+  let currentGroup = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Wykryj konto z nagłówka sekcji "PODSUMOWANIE GRUP REKLAM — MobelKap"
+    const kontoMatch = trimmed.match(/PODSUMOWANIE GRUP[Y]? REKLAM\s*[—\-–]\s*(MobelKap|Perfekt Cięcie|Meble na Czasie|MK|PC|MC|MnC)/i);
+    if (kontoMatch) {
+      const k = kontoMatch[1];
+      currentKonto = k.includes('Mobel') || k === 'MK' ? 'MobelKap'
+                   : k.includes('Perfekt') || k === 'PC' ? 'PerfektCiecie'
+                   : 'MeblenaCzasie';
+      currentKampania = null;
+      currentGroup = null;
+      continue;
+    }
+
+    if (!currentKonto) continue;
+
+    // Wykryj kampanię /NNN/KK/ NAZWA lub /NNN/ NAZWA
+    const kampMatch = trimmed.match(/^\/(\d{3})\/(?:[A-Z]{2})?\/?\s+([A-Z_]+)/);
+    if (kampMatch && !trimmed.includes('[')) {
+      currentKampania = trimmed;
+      continue;
+    }
+
+    // Wykryj grupę reklam: [KONTO][NNN][PLACEMENT][TARGETING] LINIA_KOLOR
+    const grupaMatch = trimmed.match(/^\[(MK|PC|MC)\]\[(\d{3})\]\[(WW|WL\+|LK\+|PZ\+)\]\[(RW|R)\]\s*(.+?)(?:\s*\(.*\))?$/);
+    if (grupaMatch) {
+      currentGroup = {
+        konto: currentKonto,
+        kampania: currentKampania || '?',
+        grupa: trimmed,
+        ids: [],
+        details: []
+      };
+      groups.push(currentGroup);
+      continue;
+    }
+
+    // Wykryj linię "IDs do wklejenia w Allegro: 12345 67890"
+    const idsLineMatch = trimmed.match(/^IDs?\s+do\s+wklejenia[^:]*:\s*(.+)$/i);
+    if (idsLineMatch && currentGroup) {
+      const ids = idsLineMatch[1].split(/\s+/).filter(s => /^\d{8,}$/.test(s));
+      currentGroup.ids = ids;
+      continue;
+    }
+
+    // Wykryj linię szczegółów aukcji "→ 12345 (koszt:Xzł ROAS:Y trans:Z) status"
+    const detailMatch = trimmed.match(/^→\s*(\d{8,})\s*\(([^)]+)\)(.*)$/);
+    if (detailMatch && currentGroup) {
+      const [, id, metrics, statusRaw] = detailMatch;
+      const kosztMatch = metrics.match(/koszt:?\s*(\d+)/i);
+      const roasMatch = metrics.match(/ROAS:?\s*([\d.]+)/i);
+      const transMatch = metrics.match(/trans:?\s*(\d+)/i);
+      currentGroup.details.push({
+        id,
+        koszt: kosztMatch ? parseInt(kosztMatch[1]) : 0,
+        roas: roasMatch ? parseFloat(roasMatch[1]) : 0,
+        trans: transMatch ? parseInt(transMatch[1]) : 0,
+        status: statusRaw.trim()
+      });
+      // Jeśli nie było linii "IDs do wklejenia" — buduj z details
+      if (!currentGroup.ids.includes(id)) currentGroup.ids.push(id);
+    }
+  }
+
+  return groups;
+}
+
+function caExportGroupsCSV() {
+  if (!window._caArchLastPlan) { alert('Najpierw wygeneruj plan'); return; }
+  const groups = caParseGroupsFromPlan(window._caArchLastPlan);
+  if (!groups.length) {
+    alert('Nie znaleziono sekcji PODSUMOWANIE GRUP REKLAM w planie. Sprawdź czy plan zawiera tabele grup z ID.');
+    return;
+  }
+
+  const rows = [];
+  rows.push('Konto;Kampania;Grupa reklam;IDs (do wklejenia);Liczba aukcji;Status grupy;ID;Koszt 30d;ROAS;Trans;Status aukcji');
+
+  groups.forEach(g => {
+    const idsString = g.ids.join(' '); // SPACJA, nie przecinek (format Allegro)
+    const liczba = g.ids.length;
+    // Status grupy z nazwy (OBSERWUJ, GWIAZDA itp.)
+    const statusGrupy = g.grupa.match(/\((.+?)\)/)?.[1] || '';
+
+    if (g.details.length === 0) {
+      // Tylko podsumowanie grupy
+      rows.push([
+        g.konto, g.kampania, g.grupa, idsString, liczba, statusGrupy,
+        '', '', '', '', ''
+      ].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(';'));
+    } else {
+      // Wiersz per aukcja w grupie
+      g.details.forEach(d => {
+        rows.push([
+          g.konto, g.kampania, g.grupa, idsString, liczba, statusGrupy,
+          d.id, d.koszt, d.roas, d.trans, d.status
+        ].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(';'));
+      });
+    }
+  });
+
+  const csv = rows.join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `grupy_reklam_meble_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function caPrintGroupsList() {
+  if (!window._caArchLastPlan) { alert('Najpierw wygeneruj plan'); return; }
+  const groups = caParseGroupsFromPlan(window._caArchLastPlan);
+  if (!groups.length) {
+    alert('Nie znaleziono sekcji PODSUMOWANIE GRUP REKLAM w planie.');
+    return;
+  }
+
+  // Grupuj per konto
+  const perKonto = { MobelKap: [], PerfektCiecie: [], MeblenaCzasie: [] };
+  groups.forEach(g => { if (perKonto[g.konto]) perKonto[g.konto].push(g); });
+
+  const kontoNames = { MobelKap: '🏆 MobelKap (SCALE)', PerfektCiecie: '🎯 Perfekt Cięcie (NICHE)', MeblenaCzasie: '💎 Meble na Czasie (PREMIUM)' };
+  const kontoColors = { MobelKap: '#ff6b35', PerfektCiecie: '#34d399', MeblenaCzasie: '#f5a623' };
+
+  let html = `<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><title>Lista grup reklam — restart MEBLE</title>
+    <style>
+    @page { size: A4; margin: 12mm; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: -apple-system, "Segoe UI", Arial, sans-serif; font-size: 9pt; color: #1a1a1a; line-height: 1.4; }
+    .header { border-bottom: 2px solid #ff6b35; padding-bottom: 6px; margin-bottom: 10px; display:flex; justify-content:space-between; align-items:baseline; }
+    .title { font-size: 14pt; font-weight: 800; }
+    .title span { color: #ff6b35; }
+    .sub { font-size: 8pt; color: #666; }
+    .konto-section { margin-bottom: 14px; page-break-inside: avoid; }
+    .konto-title { font-size: 11pt; font-weight: 700; padding: 4px 10px; border-radius: 3px; margin-bottom: 6px; }
+    .kampania { font-family: monospace; font-size: 9pt; font-weight: 700; margin-top: 6px; padding: 2px 6px; background: #f3f4f6; border-left: 3px solid #ff6b35; }
+    .grupa { font-family: monospace; font-size: 8.5pt; padding: 3px 0 3px 12px; margin-top: 3px; }
+    .grupa-name { font-weight: 600; color: #333; }
+    .ids { background: #fef6e0; border: 1px solid #f5c97e; padding: 3px 8px; margin-top: 2px; margin-left: 12px; font-family: monospace; font-size: 8pt; word-wrap: break-word; }
+    .ids-label { font-size: 7pt; color: #888; text-transform: uppercase; letter-spacing: .04em; margin-right: 4px; }
+    .details { font-size: 7.5pt; color: #555; margin-left: 12px; margin-top: 1px; }
+    .footer { border-top: 1px solid #ddd; padding-top: 4px; margin-top: 10px; font-size: 7pt; color: #888; text-align: center; }
+    .legend { font-size: 7pt; color: #666; padding: 4px 8px; background: #f9fafb; border-radius: 3px; margin-bottom: 8px; }
+    @media print { .konto-section { page-break-inside: avoid; } body { padding: 0; } }
+    </style></head><body>
+    <div class="header">
+      <div>
+        <div class="title">Mplace <span>Hub</span> — Lista grup reklam do restartu</div>
+        <div class="sub">Restart MEBLE · ${new Date().toLocaleDateString('pl-PL')}</div>
+      </div>
+      <div class="sub">${groups.length} grup łącznie</div>
+    </div>
+    <div class="legend">
+      <strong>Instrukcja:</strong> W panelu Allegro Ads → utwórz kampanię z nazwą po lewej → utwórz grupę reklam z nazwą poniżej → kliknij "Wybierz oferty" → "Ręczny wybór" → wklej IDs (oddzielone spacją) → Zapisz.
+    </div>`;
+
+  ['MobelKap', 'PerfektCiecie', 'MeblenaCzasie'].forEach(konto => {
+    const list = perKonto[konto];
+    if (!list.length) return;
+
+    html += `<div class="konto-section">
+      <div class="konto-title" style="background:${kontoColors[konto]}20;color:${kontoColors[konto]};border-left:3px solid ${kontoColors[konto]}">${kontoNames[konto]} — ${list.length} grup</div>`;
+
+    // Grupuj per kampania
+    const perKamp = {};
+    list.forEach(g => {
+      if (!perKamp[g.kampania]) perKamp[g.kampania] = [];
+      perKamp[g.kampania].push(g);
+    });
+
+    Object.entries(perKamp).forEach(([kampania, gs]) => {
+      html += `<div class="kampania">📁 ${kampania}</div>`;
+      gs.forEach(g => {
+        html += `<div class="grupa"><span class="grupa-name">${g.grupa}</span> <span style="color:#888">(${g.ids.length} aukcji)</span></div>`;
+        if (g.ids.length) {
+          html += `<div class="ids"><span class="ids-label">IDs:</span>${g.ids.join(' ')}</div>`;
+        }
+        if (g.details.length) {
+          const detailsLine = g.details.slice(0, 5).map(d => `${d.id} ROAS:${d.roas.toFixed(1)}`).join(' · ');
+          html += `<div class="details">${detailsLine}</div>`;
+        }
+      });
+    });
+
+    html += `</div>`;
+  });
+
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.18</div></body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => { w.print(); }, 400);
 }
 
 function kbFile(konto, type, input) {
