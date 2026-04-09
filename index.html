@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.86</title>
+<title>MPlace Hub v5.87</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.86</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.87</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2093,14 +2093,14 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <div id="aaSlot2" onclick="document.getElementById('aaFile2').click()" style="border:1px dashed rgba(56,189,248,.3);border-radius:8px;padding:1rem;cursor:pointer;text-align:center;background:rgba(56,189,248,.03);transition:border-color .2s">
       <input type="file" id="aaFile2" accept=".xlsx" style="display:none" onchange="aaHandleFile(2,this)">
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#38bdf8;margin-bottom:.3rem;font-family:var(--mono)">Raport 2</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:.25rem">Wynik sprzedaży</div>
-      <div id="aaFile2Name" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Raport_*.xlsx</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:.25rem">Odwiedziny i konwersja</div>
+      <div id="aaFile2Name" style="font-size:10px;color:var(--text3);font-family:var(--mono)">odwiedziny_wg_ofert_*.xlsx</div>
     </div>
     <div id="aaSlot3" onclick="document.getElementById('aaFile3').click()" style="border:1px dashed rgba(56,189,248,.3);border-radius:8px;padding:1rem;cursor:pointer;text-align:center;background:rgba(56,189,248,.03);transition:border-color .2s">
       <input type="file" id="aaFile3" accept=".xlsx" style="display:none" onchange="aaHandleFile(3,this)">
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#38bdf8;margin-bottom:.3rem;font-family:var(--mono)">Raport 3</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:.25rem">Wynik konwersji</div>
-      <div id="aaFile3Name" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Raport_*.xlsx</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:.25rem">Sprzedaż wg ofert</div>
+      <div id="aaFile3Name" style="font-size:10px;color:var(--text3);font-family:var(--mono)">sprzedaz_wg_ofert_*.xlsx</div>
     </div>
   </div>
 
@@ -9237,6 +9237,22 @@ async function aaParseFile(file, type) {
           }
           return null;
         };
+
+        // Auto-detect file type by sheet content — fallback gdy user pomyli sloty
+        // Sprzedaż file: "Wg ofert" sheet, multi-row header (row 1: "Seria 1"/nazwa konta)
+        // Odwiedziny file: "Odwiedziny wg ofert" sheet, header row 1
+        const hasOdwiedziny = wb.SheetNames.some(s => s.toLowerCase().includes('odwiedziny wg ofert'));
+        const hasSprzedazSheet = wb.SheetNames.some(s => s.toLowerCase().includes('wg ofert') && !s.toLowerCase().includes('odwiedziny'));
+        // If user uploaded SPRZEDAŻ file in slot 2 (sprzedaz/odwiedziny parser) — switch to konwersja parser
+        if (type === 'sprzedaz' && !hasOdwiedziny && hasSprzedazSheet) {
+          console.log('[Auto-detect] Slot 2 zawiera plik Sprzedaż — przełączam na parser konwersji');
+          type = 'konwersja';
+        }
+        // If user uploaded ODWIEDZINY file in slot 3 (konwersja/sprzedaż parser) — switch to sprzedaz parser
+        if (type === 'konwersja' && !hasSprzedazSheet && hasOdwiedziny) {
+          console.log('[Auto-detect] Slot 3 zawiera plik Odwiedziny — przełączam na parser odwiedzin');
+          type = 'sprzedaz';
+        }
 
         if (type === 'ads') {
           const ws = findSheet(wb, 'Statystyki') || wb.Sheets[wb.SheetNames[0]];
