@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.16</title>
+<title>MPlace Hub v6.17</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.16</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.17</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -12102,8 +12102,32 @@ function caBuildArchitectPrompt(data) {
   p += `5. NNN: zaczynaj per konto od 010, kolejne 020, 030...\n`;
   p += `6. Aukcje wymień jako TOP 5 ID po koszcie (nie wszystkie, oszczędzaj tokeny)\n`;
   p += `7. Każdy wiersz musi mieć krótkie uzasadnienie (1-2 zdania)\n`;
-  p += `8. Po tabeli per konto dodaj sekcję "PODSUMOWANIE GROUP REKLAM" z listą wszystkich nowych grup wg konwencji [KONTO][NNN][WW][RW] LINIA_WYMIAR_KOLOR — KONTO odpowiednie dla danego konta (MK dla MobelKap, PC dla Perfekt Cięcie, MC dla Meble na Czasie)\n`;
+  p += `8. Po tabeli per konto dodaj sekcję "PODSUMOWANIE GROUP REKLAM" — patrz format poniżej\n`;
   p += `9. ZAWSZE respektuj BACKUP STATUS przed jakąkolwiek rekomendacją ZAMKNIJ — to jest reguła nadrzędna\n\n`;
+
+  p += `=== FORMAT SEKCJI PODSUMOWANIE GRUP REKLAM (KRYTYCZNY — z ID aukcji) ===\n`;
+  p += `Każda grupa MUSI zawierać konkretne ID aukcji z metrykami żeby user mógł utworzyć grupę w panelu Allegro.\n`;
+  p += `BEZ ID grupa jest bezużyteczna — user nie wie co wkleić w "Wybierz oferty".\n\n`;
+  p += `Format docelowy:\n`;
+  p += `\`\`\`\n`;
+  p += `/010/MC/ CORE_LAZIENKA_PRALKA_62\n`;
+  p += `  [MC][010][WW][RW] PRALKA_62_DAB_WOTAN\n`;
+  p += `    → 18039920084 (koszt:627zł ROAS:8.69 trans:23) ⭐ gwiazda\n`;
+  p += `  [MC][010][WW][RW] PRALKA_62_BIALA\n`;
+  p += `    → 18039923392 (koszt:45zł ROAS:6.78 trans:2)\n`;
+  p += `  [MC][010][WW][RW] PRALKA_62_SONOMA (OBSERWUJ)\n`;
+  p += `    → 18039914242 (koszt:21zł ROAS:0.00 trans:0) ⚠️ BACKUP:NIE\n`;
+  p += `\`\`\`\n\n`;
+  p += `REGUŁY DLA SEKCJI PODSUMOWANIE:\n`;
+  p += `- Każda grupa ma listę ID z formatem: → ID (koszt:Xzł ROAS:Y trans:Z)\n`;
+  p += `- Aukcje z ROAS >= 6 i 3+ trans → dopisz "⭐ gwiazda"\n`;
+  p += `- Aukcje z ROAS 4-6 → dopisz "✅ OK"\n`;
+  p += `- Aukcje z ROAS 3-4 → dopisz "⚠️ obserwuj 14 dni"\n`;
+  p += `- Aukcje z BACKUP:NIE (z danych powyżej) → dopisz "⚠️ BACKUP:NIE" — KRYTYCZNE dla ochrony\n`;
+  p += `- Aukcje cross-account [TAKZE_NA:...] → dopisz "🔄 też na: [konto]"\n`;
+  p += `- Maksymalnie 5 ID per grupa (jeśli więcej, wybierz top 5 po koszcie + dopisz "... i N więcej")\n`;
+  p += `- Grupuj aukcje per kolor/wariant — jeśli grupa to "PRALKA_62_DAB_WOTAN", wszystkie ID w niej muszą być wariantem WOTAN, nie miks kolorów\n`;
+  p += `- Jeśli nie wiesz która aukcja powinna być w której grupie — patrz na nazwę aukcji w danych źródłowych (zawiera kolor/wymiar)\n\n`;
 
   p += `Na końcu dodaj sekcję **EFEKTY OCZEKIWANE** z liczbami:\n`;
   p += `- Liczba zamkniętych duplikatów (BEZPIECZNYCH)\n`;
