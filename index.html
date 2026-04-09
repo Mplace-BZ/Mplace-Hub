@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.94</title>
+<title>MPlace Hub v5.95</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.94</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.95</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1039,7 +1039,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <div class="nav-sep"></div>
     <button class="nav-btn" onclick="showView('agent')" id="navAgent" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Agent ✦</button>
     <button class="nav-btn" onclick="showView('analiza')" id="navAnaliza" style="color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2)">Analiza</button>
-    <button class="nav-btn" onclick="showView('kanibalizator')" id="navKanibalizator" style="color:#ef4444;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)">Kanibalizator</button>
+    <button class="nav-btn" onclick="showView('kanibalizator')" id="navKanibalizator" style="color:#ef4444;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)">Wyróżnienia</button>
     <button class="nav-btn" onclick="showView('screener')" id="navScreener" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Screener</button>
     <button class="nav-btn" onclick="showView('importads')" id="navImportAds" style="color:#f472b6;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2)">Import Ads</button>
     <div class="nav-sep"></div>
@@ -2070,7 +2070,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
     <div>
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Konto</div>
-      <select id="aaKonto" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;font-family:var(--mono)">
+      <select id="aaKonto" onchange="aaUpdateWyrInfo()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;font-family:var(--mono)">
         <option value="">— wybierz konto —</option>
         <optgroup label="MEBLE"><option value="MobelKap">MobelKap</option><option value="PerfektCiecie">Perfekt Cięcie</option><option value="MeblenaCzasie">Meble na Czasie</option></optgroup>
         <optgroup label="LUXSEN"><option value="Luxsen">Luxsen</option><option value="Semmi">Semmi</option><option value="BOTAVIT">BOTAVIT</option></optgroup>
@@ -2132,6 +2132,12 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <div id="aaTemplates" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
   </div>
 
+  <div id="aaWyrInfo" style="margin-bottom:1rem;display:none;padding:8px 12px;border:1px solid rgba(239,68,68,.2);border-radius:6px;background:rgba(239,68,68,.04)">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#ef4444;margin-bottom:.3rem;font-family:var(--mono)">Wyróżnienia tego konta (auto z Wyróżnienia Managera)</div>
+    <div id="aaWyrList" style="font-size:11px;color:var(--text2);font-family:var(--mono);line-height:1.6"></div>
+    <div style="font-size:9px;color:var(--text3);margin-top:4px">Edytuj listę w zakładce <strong>Wyróżnienia ◆</strong>. Agent uwzględni wyróżnione aukcje w analizie.</div>
+  </div>
+
   <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.5rem">
     <button id="aaRunBtn" onclick="aaRunAnalysis()" style="font-family:var(--mono);font-size:12px;padding:10px 24px;border-radius:8px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.12);color:#38bdf8;cursor:pointer;font-weight:500;letter-spacing:.04em">▸ Analizuj z AI</button>
     <button onclick="aaReset()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">↺ Resetuj</button>
@@ -2172,72 +2178,49 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 <div class="view" id="viewKanibalizator">
 <div class="container" style="max-width:1100px">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow" style="color:#ef4444">► KANIBALIZACJA MIĘDZY KONTAMI</div>
-    <div class="ph-title">Kanibalizator <span style="color:#ef4444">◆</span></div>
-    <div class="ph-sub">Wgraj raporty z 3 kont MEBLE → wykryj nakładanie produktów → zoptymalizuj podział</div>
+    <div class="ph-eyebrow" style="color:#ef4444">► PLANOWANIE WYRÓŻNIEŃ</div>
+    <div class="ph-title">Wyróżnienia <span style="color:#ef4444">◆</span> Manager</div>
+    <div class="ph-sub">Lista wyróżnionych aukcji per konto + budżet kontroli (cel ≤ 5% sprzedaży) + historia zmian</div>
   </div>
+
+  <!-- Budget tracker per konto -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem" id="wyrBudgetCards"></div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
     <div>
       <div style="font-size:11px;font-family:var(--mono);color:var(--g-meble,#ff6b35);margin-bottom:6px;font-weight:600">MobelKap (MK)</div>
-      <div style="display:flex;flex-direction:column;gap:4px">
-        <div class="kb-slot" onclick="document.getElementById('kbF_mk_ads').click()"><input type="file" id="kbF_mk_ads" accept=".xlsx" style="display:none" onchange="kbFile('mk','ads',this)"><span id="kbN_mk_ads" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Ads XLSX</span></div>
-        <div class="kb-slot" onclick="document.getElementById('kbF_mk_sp').click()"><input type="file" id="kbF_mk_sp" accept=".xlsx" style="display:none" onchange="kbFile('mk','sprzedaz',this)"><span id="kbN_mk_sp" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Sprzedaż XLSX</span></div>
-        <div class="kb-slot" onclick="document.getElementById('kbF_mk_kn').click()"><input type="file" id="kbF_mk_kn" accept=".xlsx" style="display:none" onchange="kbFile('mk','konwersja',this)"><span id="kbN_mk_kn" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Konwersja XLSX</span></div>
-      </div>
-      <div style="margin-top:6px"><div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">WYRÓŻNIENIA (numery aukcji)</div>
-      <textarea id="kbWyr_mk" rows="2" placeholder="17565030433&#10;17617165511" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:10px;font-family:var(--mono);resize:vertical;box-sizing:border-box"></textarea></div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">WYRÓŻNIENIA (1 numer aukcji w linii)</div>
+      <textarea id="kbWyr_mk" rows="8" oninput="wyrUpdateBudget()" placeholder="17565030433&#10;17617165511" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:11px;font-family:var(--mono);resize:vertical;box-sizing:border-box;min-height:160px"></textarea>
+      <div id="wyrCount_mk" style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px">0 wyróżnień</div>
     </div>
     <div>
       <div style="font-size:11px;font-family:var(--mono);color:var(--g-meble,#ff6b35);margin-bottom:6px;font-weight:600">Perfekt Cięcie (PC)</div>
-      <div style="display:flex;flex-direction:column;gap:4px">
-        <div class="kb-slot" onclick="document.getElementById('kbF_pc_ads').click()"><input type="file" id="kbF_pc_ads" accept=".xlsx" style="display:none" onchange="kbFile('pc','ads',this)"><span id="kbN_pc_ads" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Ads XLSX</span></div>
-        <div class="kb-slot" onclick="document.getElementById('kbF_pc_sp').click()"><input type="file" id="kbF_pc_sp" accept=".xlsx" style="display:none" onchange="kbFile('pc','sprzedaz',this)"><span id="kbN_pc_sp" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Sprzedaż XLSX</span></div>
-        <div class="kb-slot" onclick="document.getElementById('kbF_pc_kn').click()"><input type="file" id="kbF_pc_kn" accept=".xlsx" style="display:none" onchange="kbFile('pc','konwersja',this)"><span id="kbN_pc_kn" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Konwersja XLSX</span></div>
-      </div>
-      <div style="margin-top:6px"><div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">WYRÓŻNIENIA (numery aukcji)</div>
-      <textarea id="kbWyr_pc" rows="2" placeholder="12840113580&#10;11516146737" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:10px;font-family:var(--mono);resize:vertical;box-sizing:border-box"></textarea></div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">WYRÓŻNIENIA (1 numer aukcji w linii)</div>
+      <textarea id="kbWyr_pc" rows="8" oninput="wyrUpdateBudget()" placeholder="12840113580&#10;11516146737" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:11px;font-family:var(--mono);resize:vertical;box-sizing:border-box;min-height:160px"></textarea>
+      <div id="wyrCount_pc" style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px">0 wyróżnień</div>
     </div>
     <div>
       <div style="font-size:11px;font-family:var(--mono);color:var(--g-meble,#ff6b35);margin-bottom:6px;font-weight:600">Meble na Czasie (MnC)</div>
-      <div style="display:flex;flex-direction:column;gap:4px">
-        <div class="kb-slot" onclick="document.getElementById('kbF_mnc_ads').click()"><input type="file" id="kbF_mnc_ads" accept=".xlsx" style="display:none" onchange="kbFile('mnc','ads',this)"><span id="kbN_mnc_ads" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Ads XLSX</span></div>
-        <div class="kb-slot" onclick="document.getElementById('kbF_mnc_sp').click()"><input type="file" id="kbF_mnc_sp" accept=".xlsx" style="display:none" onchange="kbFile('mnc','sprzedaz',this)"><span id="kbN_mnc_sp" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Sprzedaż XLSX</span></div>
-        <div class="kb-slot" onclick="document.getElementById('kbF_mnc_kn').click()"><input type="file" id="kbF_mnc_kn" accept=".xlsx" style="display:none" onchange="kbFile('mnc','konwersja',this)"><span id="kbN_mnc_kn" style="font-size:10px;color:var(--text3);font-family:var(--mono)">Konwersja XLSX</span></div>
-      </div>
-      <div style="margin-top:6px"><div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">WYRÓŻNIENIA (numery aukcji)</div>
-      <textarea id="kbWyr_mnc" rows="2" placeholder="18040805229&#10;18019543227" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:10px;font-family:var(--mono);resize:vertical;box-sizing:border-box"></textarea></div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">WYRÓŻNIENIA (1 numer aukcji w linii)</div>
+      <textarea id="kbWyr_mnc" rows="8" oninput="wyrUpdateBudget()" placeholder="18040805229&#10;18019543227" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:11px;font-family:var(--mono);resize:vertical;box-sizing:border-box;min-height:160px"></textarea>
+      <div id="wyrCount_mnc" style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px">0 wyróżnień</div>
     </div>
   </div>
 
   <div style="margin-bottom:1rem">
-    <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">USUNIĘTE WYRÓŻNIENIA (historia zmian)</div>
-    <textarea id="kbWyrRemoved" rows="2" placeholder="Tutaj przenieś numery aukcji po usunięciu wyróżnień..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:10px;font-family:var(--mono);resize:vertical;box-sizing:border-box"></textarea>
-  </div>
-
-  <div style="margin-bottom:1rem">
-    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Uwagi / kontekst</div>
-    <textarea id="kbUwagi" placeholder="Okres raportu, co się zmieniło, na co zwrócić uwagę..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:50px;box-sizing:border-box"></textarea>
+    <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">USUNIĘTE WYRÓŻNIENIA (historia zmian — przenieś tu numery po wyłączeniu)</div>
+    <textarea id="kbWyrRemoved" rows="3" placeholder="Tutaj przenieś numery aukcji po usunięciu wyróżnień..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text);font-size:10px;font-family:var(--mono);resize:vertical;box-sizing:border-box"></textarea>
   </div>
 
   <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.5rem">
-    <button id="kbRunBtn" onclick="kbRun()" style="font-family:var(--mono);font-size:12px;padding:10px 24px;border-radius:8px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.12);color:#ef4444;cursor:pointer;font-weight:500">▸ Analizuj kanibalizację</button>
-    <button onclick="kbClearFiles()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">↺ Wyczyść pliki</button>
-    <button onclick="kbReset()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid rgba(239,68,68,.3);background:transparent;color:#ef4444;cursor:pointer">Resetuj wszystko</button>
-    <div id="kbFileCount" style="font-size:10px;color:var(--text3);font-family:var(--mono)">0 / 9 plików</div>
+    <button onclick="wyrSaveAll()" style="font-family:var(--mono);font-size:11px;padding:8px 16px;border-radius:6px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.12);color:#ef4444;cursor:pointer">💾 Zapisz wszystkie</button>
+    <span id="wyrSaveStatus" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
   </div>
 
-  <div id="kbThinking" style="display:none;align-items:center;gap:.75rem;padding:1rem;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:8px;margin-bottom:1.5rem">
-    <div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div>
-    <div id="kbThinkingText" style="font-size:12px;color:#ef4444;font-family:var(--mono)">Analizuję...</div>
-  </div>
-
-  <div id="kbTable" style="margin-bottom:1.5rem"></div>
-  <div id="kbResult"></div>
-
-  <div id="kbHistoryWrap" style="margin-top:1.5rem;display:none">
-    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.75rem;font-family:var(--mono)">Historia kanibalizacji</div>
-    <div id="kbHistory"></div>
+  <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:1rem;font-size:11px;color:var(--text3);line-height:1.5">
+    <strong style="color:var(--text2)">ℹ️ Jak to działa:</strong> Lista wyróżnień jest automatycznie zapisywana do localStorage. Każde konto ma swój budżet (cel ≤ 5% sprzedaży miesięcznej z Dashboard). <br>
+    <strong style="color:var(--text2)">→ Analiza Ofert</strong> automatycznie czyta tę listę dla danego konta i Agent uwzględnia wyróżnienia w rekomendacjach (wyróżnione aukcje z niskim ROAS = priorytet do optymalizacji).<br>
+    <strong style="color:var(--text2)">Cross-account analiza:</strong> Strategia MEBLE w Screenerze.
   </div>
 </div>
 </div>
@@ -2749,7 +2732,7 @@ function showView(v){
     document.getElementById('viewKanibalizator').classList.add('active');
     document.getElementById('navKanibalizator').classList.add('active');
     kbLoadWyroznienia();
-    kbRenderHistory();
+    if (typeof wyrUpdateBudget === 'function') wyrUpdateBudget();
   } else if(v==='screener'){
     document.getElementById('viewScreener').classList.add('active');
     document.getElementById('navScreener').classList.add('active');
@@ -9472,13 +9455,32 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   if (cat && cat.oferty) {
     cat.oferty.forEach(o => { if (o.id) dostMap[o.id] = o.dostawa; });
   }
+  // Lookup wyróżnień dla tego konta (z Wyróżnienia Manager)
+  const wyrList = (typeof wyrGetForKontoName === 'function') ? wyrGetForKontoName(konto) : [];
+  const wyrSet = new Set(wyrList);
   const dostTag = nr => {
     const d = dostMap[String(nr)];
-    if (d === 'smart') return ' [SMART]';
-    if (d === 'dpd_2pak') return ' [DPD2]';
-    if (d === 'dpd_3pak') return ' [DPD3]';
-    return '';
+    let tag = '';
+    if (d === 'smart') tag = ' [SMART]';
+    else if (d === 'dpd_2pak') tag = ' [DPD2]';
+    else if (d === 'dpd_3pak') tag = ' [DPD3]';
+    if (wyrSet.has(String(nr))) tag += ' [WYRÓŻNIONA]';
+    return tag;
   };
+
+  // Sekcja wyróżnień w prompcie — informacja dla Agenta
+  if (wyrList.length) {
+    p += `== WYRÓŻNIONE AUKCJE TEGO KONTA (${wyrList.length}) ==\n`;
+    p += `Lista wyróżnień (płatna premium ekspozycja, koszt ~3-5% sprzedaży konta):\n`;
+    wyrList.forEach(id => { p += `  [${id}]\n`; });
+    p += `\nWAŻNE — REGUŁA WYRÓŻNIEŃ:\n`;
+    p += `Wyróżnienia to dodatkowy koszt premium placement. Cel: ≤ 5% sprzedaży miesięcznej.\n`;
+    p += `- Wyróżniona aukcja z ROAS Ads < BE = priorytet do optymalizacji (płacisz dwukrotnie: Ads + wyróżnienie)\n`;
+    p += `- Wyróżniona aukcja z konwersją < 1% = możliwa pomyłka (premium ekspozycja na słaby listing)\n`;
+    p += `- Wyróżniona aukcja na DPD z porzuconymi koszykami = priorytet #1 do migracji Smart\n`;
+    p += `- Wyróżniona aukcja z ROAS > BE i 3+ transakcji = trzymaj wyróżnienie\n`;
+    p += `Aukcje oznaczone [WYRÓŻNIONA] w sekcji Ads poniżej.\n\n`;
+  }
 
   p += `Kampanie (sortowane po koszcie malejąco):\n`;
   ads.kampanie.sort((a,b) => b.koszt - a.koszt).forEach(k => {
@@ -9622,6 +9624,20 @@ function aaSetOkresCustom() {
   if (!fromStr || !toStr) return;
   const fmt = s => { const [y,m,d] = s.split('-'); return `${d}.${m}.${y}`; };
   document.getElementById('aaOkres').value = `${fmt(fromStr)} – ${fmt(toStr)}`;
+}
+
+// Pokaż listę wyróżnień dla wybranego konta
+function aaUpdateWyrInfo() {
+  const konto = document.getElementById('aaKonto').value;
+  const kontoName = (typeof AC_META !== 'undefined' && AC_META[konto]) ? AC_META[konto].name : konto;
+  const wrap = document.getElementById('aaWyrInfo');
+  const list = document.getElementById('aaWyrList');
+  if (!wrap || !list) return;
+  if (!konto || typeof wyrGetForKontoName !== 'function') { wrap.style.display = 'none'; return; }
+  const wyr = wyrGetForKontoName(kontoName);
+  if (!wyr.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  list.innerHTML = wyr.map(id => `<span style="display:inline-block;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:3px;padding:2px 6px;margin:2px">[${id}]</span>`).join('');
 }
 
 async function aaRunAnalysis() {
@@ -10702,8 +10718,91 @@ function kbSaveWyroznienia() {
 
 // Auto-save wyróżnienia on input
 document.addEventListener('input', e => {
-  if (e.target.id?.startsWith('kbWyr')) kbSaveWyroznienia();
+  if (e.target.id?.startsWith('kbWyr')) { kbSaveWyroznienia(); wyrUpdateBudget(); }
 });
+
+// Wyróżnienia Manager — budget tracker per konto
+function wyrUpdateBudget() {
+  const kontoMap = { mk: 'MobelKap', pc: 'PerfektCiecie', mnc: 'MeblenaCzasie' };
+  const kontoNames = { mk: 'MobelKap', pc: 'Perfekt Cięcie', mnc: 'Meble na Czasie' };
+  KB_KONTA.forEach(k => {
+    const list = kbParseWyroznienia(k);
+    const cnt = document.getElementById('wyrCount_'+k);
+    if (cnt) cnt.textContent = `${list.length} wyróżnień`;
+  });
+
+  // Render budget cards
+  const cardsEl = document.getElementById('wyrBudgetCards');
+  if (!cardsEl) return;
+  let cardsHtml = '';
+  KB_KONTA.forEach(k => {
+    const fullKonto = kontoMap[k];
+    const name = kontoNames[k];
+    const list = kbParseWyroznienia(k);
+
+    // Get current month sales from data
+    let monthlySprzedaz = 0;
+    let wyrCost = 0;
+    let pctCel = 5; // 5% target
+    try {
+      const prod = (typeof getProd === 'function') ? getProd(fullKonto) : null;
+      const curMonth = (typeof MONTHS !== 'undefined') ? MONTHS[new Date().getMonth()] : '';
+      const curData = (typeof getData === 'function') ? getData(fullKonto).find(d => d.m === curMonth) : null;
+      if (curData) {
+        monthlySprzedaz = curData.s || 0;
+        wyrCost = curData.w || 0; // wyróżnienia field
+        const C = (typeof calc === 'function' && prod) ? calc(curData, prod) : null;
+        if (C && typeof C.wPct === 'number') pctCel = 5;
+      }
+    } catch(e) {}
+
+    const wyrPct = monthlySprzedaz > 0 ? (wyrCost / monthlySprzedaz * 100) : 0;
+    const status = wyrPct === 0 ? 'brak danych' : wyrPct <= pctCel ? '✅ w celu' : '🔴 powyżej celu';
+    const statusColor = wyrPct === 0 ? 'var(--text3)' : wyrPct <= pctCel ? '#34d399' : '#ef4444';
+    const budgetMax = (monthlySprzedaz * pctCel / 100).toFixed(0);
+    const wolnyBudget = (monthlySprzedaz * pctCel / 100 - wyrCost).toFixed(0);
+
+    cardsHtml += `<div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--bg2)">
+      <div style="font-size:11px;color:var(--g-meble,#ff6b35);font-family:var(--mono);font-weight:600;margin-bottom:8px">${name}</div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Aktywnych wyróżnień: <span style="color:var(--text);font-weight:600">${list.length}</span></div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Sprzedaż mies.: <span style="color:var(--text);font-family:var(--mono)">${monthlySprzedaz.toFixed(0)} zł</span></div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Wyróżnienia: <span style="color:var(--text);font-family:var(--mono)">${wyrCost.toFixed(0)} zł</span> (${wyrPct.toFixed(1)}%)</div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Budżet ${pctCel}%: <span style="color:var(--text);font-family:var(--mono)">${budgetMax} zł</span></div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:6px">Wolne: <span style="color:${parseInt(wolnyBudget) >= 0 ? '#34d399' : '#ef4444'};font-family:var(--mono)">${wolnyBudget} zł</span></div>
+      <div style="font-size:10px;color:${statusColor};font-family:var(--mono);text-align:center;padding:4px;background:rgba(0,0,0,.2);border-radius:4px">${status}</div>
+    </div>`;
+  });
+  cardsEl.innerHTML = cardsHtml;
+}
+
+// Manual save z feedbackiem
+function wyrSaveAll() {
+  kbSaveWyroznienia();
+  // Save removed too
+  const rem = document.getElementById('kbWyrRemoved');
+  const data = JSON.parse(localStorage.getItem(KB_WYR_KEY) || '{}');
+  if (rem) data._removed = rem.value;
+  localStorage.setItem(KB_WYR_KEY, JSON.stringify(data));
+  const status = document.getElementById('wyrSaveStatus');
+  if (status) {
+    status.textContent = '✓ Zapisano ' + new Date().toLocaleTimeString('pl-PL');
+    status.style.color = '#34d399';
+    setTimeout(() => { if (status.textContent.startsWith('✓')) { status.textContent = ''; status.style.color = ''; } }, 3000);
+  }
+  wyrUpdateBudget();
+}
+
+// Pobierz wyróżnienia dla konta po pełnej nazwie (do użycia w Analizie)
+function wyrGetForKontoName(kontoName) {
+  const map = { 'MobelKap': 'mk', 'Perfekt Cięcie': 'pc', 'Meble na Czasie': 'mnc' };
+  const shortKey = map[kontoName];
+  if (!shortKey) return [];
+  try {
+    const saved = JSON.parse(localStorage.getItem(KB_WYR_KEY) || '{}');
+    const text = saved[shortKey] || '';
+    return text.split(/[\n,;\s]+/).map(s => s.trim()).filter(s => s.length > 5);
+  } catch(e) { return []; }
+}
 
 function kbFile(konto, type, input) {
   const file = input.files[0];
