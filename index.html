@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.04</title>
+<title>MPlace Hub v6.10</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.04</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.10</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1041,6 +1041,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <button class="nav-btn" onclick="showView('analiza')" id="navAnaliza" style="color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2)">Analiza</button>
     <button class="nav-btn" onclick="showView('kanibalizator')" id="navKanibalizator" style="color:#ef4444;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)">Wyróżnienia</button>
     <button class="nav-btn" onclick="showView('strategia')" id="navStrategia" style="color:#ff6b35;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Strategia</button>
+    <button class="nav-btn" onclick="showView('centrumads')" id="navCentrumAds" style="color:#06b6d4;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2)">Centrum Ads</button>
     <button class="nav-btn" onclick="showView('screener')" id="navScreener" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Screener</button>
     <button class="nav-btn" onclick="showView('importads')" id="navImportAds" style="color:#f472b6;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2)">Import Ads</button>
     <div class="nav-sep"></div>
@@ -2317,6 +2318,108 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 </div>
 
+<!-- ═══ VIEW: CENTRUM ADS ═══ -->
+<div class="view" id="viewCentrumAds">
+<div class="container" style="max-width:1200px">
+  <div style="margin-bottom:1.5rem">
+    <div class="ph-eyebrow" style="color:#06b6d4">► CENTRUM KAMPANII ALLEGRO ADS</div>
+    <div class="ph-title">Centrum <span style="color:#06b6d4">◆</span> Ads</div>
+    <div class="ph-sub">Generator nazw · Walidator konwencji · Hierarchia kampanii read-only</div>
+  </div>
+
+  <!-- Info bar konwencji -->
+  <div style="margin-bottom:1.5rem;padding:12px 16px;background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.2);border-radius:8px">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#06b6d4;font-family:var(--mono);margin-bottom:6px;font-weight:600">► KONWENCJA NAZEWNICTWA ADS — FORMAT A (MEBLE)</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.6;font-family:var(--mono)">
+      <strong style="color:#06b6d4">Kampania:</strong>  /NNN/ KATEGORIA_LINIA_WYMIAR<br>
+      <strong style="color:#06b6d4">Grupa:</strong>     [NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR<br>
+      <strong style="color:#06b6d4">Przykład:</strong>  /010/ LAZIENKA_PRALKA_62 → [010][WW][RW] PRALKA_62_WOTAN
+    </div>
+  </div>
+
+  <!-- ═══ SEKCJA 1: GENERATOR NAZW ═══ -->
+  <div style="margin-bottom:2rem;padding:16px 20px;border:1px solid var(--border);border-radius:10px;background:var(--bg2)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-family:var(--mono);font-size:12px;color:#06b6d4;font-weight:600;letter-spacing:.04em">▸ GENERATOR NAZW KAMPANII</div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">wypełnij formularz → kopiuj gotowe nazwy do panelu Allegro</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+      <div>
+        <div style="font-size:9px;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:4px">Konto</div>
+        <select id="caKonto" onchange="caUpdateNNN()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:11px;font-family:var(--mono)">
+          <option value="MobelKap">MobelKap (SCALE)</option>
+          <option value="PerfektCiecie">Perfekt Cięcie (NICHE)</option>
+          <option value="MeblenaCzasie">Meble na Czasie (PREMIUM)</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:9px;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:4px">NNN (numer)</div>
+        <input id="caNNN" type="text" placeholder="010" maxlength="3" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:11px;font-family:var(--mono)">
+      </div>
+      <div>
+        <div style="font-size:9px;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:4px">Kategoria</div>
+        <input id="caKategoria" type="text" placeholder="LAZIENKA" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:11px;font-family:var(--mono);text-transform:uppercase">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:.75rem;margin-bottom:.75rem">
+      <div>
+        <div style="font-size:9px;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:4px">Linia</div>
+        <input id="caLinia" type="text" placeholder="PRALKA" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:11px;font-family:var(--mono);text-transform:uppercase">
+      </div>
+      <div>
+        <div style="font-size:9px;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:4px">Wymiar (opc.)</div>
+        <input id="caWymiar" type="text" placeholder="62" maxlength="3" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:11px;font-family:var(--mono)">
+      </div>
+      <div>
+        <div style="font-size:9px;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:4px">Kolory (oddzielone przecinkiem)</div>
+        <input id="caKolory" type="text" placeholder="WOTAN, BIALA, LANCELOT, ARTISAN" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:11px;font-family:var(--mono);text-transform:uppercase">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem">
+      <button onclick="caGenerate()" style="font-family:var(--mono);font-size:11px;padding:8px 18px;border-radius:6px;border:1px solid rgba(6,182,212,.4);background:rgba(6,182,212,.12);color:#06b6d4;cursor:pointer;font-weight:500">▸ Generuj nazwy</button>
+      <button onclick="caCopyOutput()" style="font-family:var(--mono);font-size:10px;padding:7px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">📋 Kopiuj wszystko</button>
+      <span id="caCopyStatus" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
+    </div>
+
+    <pre id="caOutput" style="margin:0;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;font-family:var(--mono);min-height:120px;line-height:1.6;white-space:pre-wrap">Wypełnij formularz powyżej i kliknij "Generuj nazwy"...</pre>
+  </div>
+
+  <!-- ═══ SEKCJA 2: WALIDATOR KAMPANII ═══ -->
+  <div style="margin-bottom:2rem;padding:16px 20px;border:1px solid var(--border);border-radius:10px;background:var(--bg2)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-family:var(--mono);font-size:12px;color:#06b6d4;font-weight:600;letter-spacing:.04em">▸ WALIDATOR KONWENCJI</div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">wgraj raport Ads XLSX → sprawdź zgodność z konwencją</div>
+    </div>
+
+    <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:.75rem">
+      <input type="file" id="caValidatorFile" accept=".xlsx" onchange="caHandleValidatorFile(this)" style="display:none">
+      <button onclick="document.getElementById('caValidatorFile').click()" style="font-family:var(--mono);font-size:11px;padding:8px 18px;border-radius:6px;border:1px solid rgba(6,182,212,.4);background:rgba(6,182,212,.12);color:#06b6d4;cursor:pointer">📂 Wgraj raport Ads XLSX</button>
+      <span id="caValidatorStatus" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
+    </div>
+
+    <div id="caValidatorResult" style="margin-top:.75rem"></div>
+  </div>
+
+  <!-- ═══ SEKCJA 3: HIERARCHIA KAMPANII ═══ -->
+  <div style="margin-bottom:2rem;padding:16px 20px;border:1px solid var(--border);border-radius:10px;background:var(--bg2)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-family:var(--mono);font-size:12px;color:#06b6d4;font-weight:600;letter-spacing:.04em">▸ HIERARCHIA KAMPANII (READ-ONLY)</div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">kampania → grupa reklam → aukcja + alerty</div>
+    </div>
+
+    <div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:8px 12px;background:var(--bg);border-radius:6px">
+      Wgraj raport Ads w sekcji walidatora powyżej — hierarchia pojawi się tutaj automatycznie.<br>
+      <span style="color:var(--text3);font-size:10px">Allegro Ads nie ma publicznego API edycji — Centrum Ads jest tylko widokiem + generatorem nazw. Edycja zawsze ręczna w panelu Allegro.</span>
+    </div>
+
+    <div id="caHierarchy" style="margin-top:.75rem"></div>
+  </div>
+</div>
+</div>
+
 <!-- ═══ VIEW: KALKULATOR ═══ -->
 <div class="view" id="viewKalkulator">
 <div class="container">
@@ -2714,7 +2817,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewKanibalizator','viewStrategia','viewScreener','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
+  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -2808,6 +2911,10 @@ function showView(v){
     document.getElementById('viewStrategia').classList.add('active');
     document.getElementById('navStrategia').classList.add('active');
     if (typeof stratRenderMeble === 'function') stratRenderMeble();
+  } else if(v==='centrumads'){
+    document.getElementById('viewCentrumAds').classList.add('active');
+    document.getElementById('navCentrumAds').classList.add('active');
+    if (typeof caInit === 'function') caInit();
   } else if(v==='screener'){
     document.getElementById('viewScreener').classList.add('active');
     document.getElementById('navScreener').classList.add('active');
@@ -11157,6 +11264,281 @@ function stratOpenInAnaliza(konto) {
       if (typeof aaUpdateWyrInfo === 'function') aaUpdateWyrInfo();
     }
   }, 100);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CENTRUM ADS — Generator nazw + Walidator + Hierarchia
+// ═══════════════════════════════════════════════════════════
+
+const CA_KEY = 'ads_campaigns_meble';
+const CA_REGEX_CAMP = /^\/(\d{3})\/\s*([A-Z]+)_([A-Z]+)(?:_(\d+))?$/;
+const CA_REGEX_GROUP = /^\[(\d{3})\]\[(WW|WL\+)\]\[(RW|R)\]\s*([A-Z]+)(?:_(\d+))?_?(.+)?$/;
+
+function caParseCampaignName(name) {
+  const m = String(name || '').trim().match(CA_REGEX_CAMP);
+  if (!m) return { matched: false, raw: name };
+  return { matched: true, nnn: m[1], kategoria: m[2], linia: m[3], wymiar: m[4] || null };
+}
+
+function caParseGroupName(name) {
+  const m = String(name || '').trim().match(CA_REGEX_GROUP);
+  if (!m) return { matched: false, raw: name };
+  return { matched: true, nnn: m[1], placement: m[2], targeting: m[3], linia: m[4], wymiar: m[5] || null, kolor: (m[6] || '').trim() };
+}
+
+function caInit() {
+  // Suggest next NNN dla MK przy pierwszym wejściu
+  const sel = document.getElementById('caKonto');
+  if (sel && !document.getElementById('caNNN').value) {
+    caUpdateNNN();
+  }
+}
+
+function caGetSavedCampaignsForKonto(konto) {
+  try {
+    const all = JSON.parse(localStorage.getItem(CA_KEY) || '{}');
+    return all[konto] || [];
+  } catch(e) { return []; }
+}
+
+function caSaveCampaignsForKonto(konto, list) {
+  try {
+    const all = JSON.parse(localStorage.getItem(CA_KEY) || '{}');
+    all[konto] = list;
+    localStorage.setItem(CA_KEY, JSON.stringify(all));
+  } catch(e) {}
+}
+
+function caNextSequenceNumber(konto) {
+  const list = caGetSavedCampaignsForKonto(konto);
+  if (!list.length) return '010';
+  // Znajdź najwyższy NNN i dodaj 10
+  const usedNumbers = list.map(c => parseInt(c.nnn, 10)).filter(n => !isNaN(n));
+  if (!usedNumbers.length) return '010';
+  const next = Math.max(...usedNumbers) + 10;
+  return String(next).padStart(3, '0');
+}
+
+function caUpdateNNN() {
+  const konto = document.getElementById('caKonto').value;
+  const nnn = caNextSequenceNumber(konto);
+  const nnnEl = document.getElementById('caNNN');
+  if (nnnEl && !nnnEl.value) nnnEl.value = nnn;
+}
+
+function caGenerate() {
+  const konto = document.getElementById('caKonto').value;
+  const nnn = (document.getElementById('caNNN').value || '').trim().padStart(3, '0');
+  const kategoria = (document.getElementById('caKategoria').value || '').trim().toUpperCase();
+  const linia = (document.getElementById('caLinia').value || '').trim().toUpperCase();
+  const wymiar = (document.getElementById('caWymiar').value || '').trim();
+  const koloryRaw = (document.getElementById('caKolory').value || '').trim();
+
+  if (!nnn || !kategoria || !linia) {
+    document.getElementById('caOutput').textContent = '⚠️ Wypełnij minimum: NNN, Kategoria, Linia';
+    return;
+  }
+
+  // Walidacja regex kampanii — generujemy zgodnie z konwencją
+  const campName = wymiar
+    ? `/${nnn}/ ${kategoria}_${linia}_${wymiar}`
+    : `/${nnn}/ ${kategoria}_${linia}`;
+
+  // Sprawdź czy zgodne z konwencją
+  const parsed = caParseCampaignName(campName);
+  if (!parsed.matched) {
+    document.getElementById('caOutput').textContent = `⚠️ Wygenerowana nazwa "${campName}" nie pasuje do regex konwencji. Sprawdź czy używasz tylko WIELKICH LITER ASCII (bez polskich znaków).`;
+    return;
+  }
+
+  // Parsuj kolory
+  const kolory = koloryRaw ? koloryRaw.split(/[,;]/).map(k => k.trim().toUpperCase().replace(/\s+/g, '_')).filter(Boolean) : [];
+
+  // Buduj output
+  let out = `╔═══════════════════════════════════════════════════════════════╗\n`;
+  out += `║  KONTO: ${konto.padEnd(54)}║\n`;
+  out += `╚═══════════════════════════════════════════════════════════════╝\n\n`;
+
+  out += `KAMPANIA (skopiuj do panelu Allegro Ads):\n`;
+  out += `${campName}\n\n`;
+
+  if (kolory.length) {
+    out += `GRUPY REKLAM (skopiuj każdą jako osobną grupę):\n`;
+    kolory.forEach(kolor => {
+      const groupName = wymiar
+        ? `[${nnn}][WW][RW] ${linia}_${wymiar}_${kolor}`
+        : `[${nnn}][WW][RW] ${linia}_${kolor}`;
+      out += `  ${groupName}\n`;
+    });
+    out += `\n`;
+  } else {
+    out += `(brak kolorów — dodaj listę oddzieloną przecinkami żeby wygenerować grupy)\n\n`;
+  }
+
+  out += `USTAWIENIA REKOMENDOWANE (każda grupa):\n`;
+  out += `  • Strategia licytacji: Maksymalne CPC z Dynamic CPC ON\n`;
+  out += `  • Targetowanie: Ręczny wybór ofert (RW)\n`;
+  out += `  • Placement: Wynik wyszukiwania (WW)\n`;
+  out += `  • Budżet dzienny: 20-40 zł (start), zwiększaj po 7 dniach jeśli ROAS > BE\n`;
+  out += `  • Stawka startowa: 1.20-1.50 zł CPC\n\n`;
+
+  out += `WYKLUCZENIA (KRYTYCZNE):\n`;
+  out += `  • Wyklucz wszystkie aukcje tej kampanii z [ALL] Bestseller Automat\n`;
+  out += `  • Bez wykluczeń = wzajemne podbijanie CPC o 20-40%\n`;
+
+  document.getElementById('caOutput').textContent = out;
+
+  // Zapisz wygenerowaną kampanię do localStorage
+  const saved = caGetSavedCampaignsForKonto(konto);
+  if (!saved.find(c => c.nnn === nnn)) {
+    saved.push({ nnn, kategoria, linia, wymiar, kolory, generatedAt: Date.now() });
+    caSaveCampaignsForKonto(konto, saved);
+  }
+
+  // Suggest następny NNN
+  document.getElementById('caNNN').value = '';
+  caUpdateNNN();
+}
+
+function caCopyOutput() {
+  const text = document.getElementById('caOutput').textContent;
+  if (!text || text.startsWith('Wypełnij') || text.startsWith('⚠️')) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const status = document.getElementById('caCopyStatus');
+    status.textContent = '✓ Skopiowano';
+    status.style.color = '#34d399';
+    setTimeout(() => { status.textContent = ''; status.style.color = ''; }, 2000);
+  });
+}
+
+async function caHandleValidatorFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById('caValidatorStatus');
+  status.textContent = 'Ładuję parser XLSX...';
+
+  try {
+    if (typeof aaLoadSheetJS === 'function') await aaLoadSheetJS();
+    status.textContent = `Czytam ${file.name}...`;
+    const adsData = await aaParseFile(file, 'ads');
+    status.textContent = `✓ Wczytano ${adsData.kampanie.length} kampanii`;
+    status.style.color = '#34d399';
+
+    caRenderValidator(adsData);
+    caRenderHierarchy(adsData);
+  } catch(err) {
+    status.textContent = '✗ Błąd: ' + err.message;
+    status.style.color = '#ef4444';
+  }
+}
+
+function caRenderValidator(adsData) {
+  const wrap = document.getElementById('caValidatorResult');
+  if (!wrap || !adsData || !adsData.kampanie) return;
+
+  const kampanie = adsData.kampanie;
+  const total = kampanie.length;
+  const matched = kampanie.filter(k => caParseCampaignName(k.kampania).matched).length;
+  const pct = total > 0 ? Math.round(matched / total * 100) : 0;
+
+  let html = `
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:6px">
+      <div style="font-size:11px;color:var(--text2);font-family:var(--mono)">Zgodność konwencji:</div>
+      <div style="font-size:14px;color:${pct === 100 ? '#34d399' : pct >= 70 ? '#f5a623' : '#ef4444'};font-weight:600;font-family:var(--mono)">${matched}/${total} (${pct}%)</div>
+    </div>
+    <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:30px 1fr 80px 80px 60px;gap:8px;padding:8px 12px;background:var(--bg);font-family:var(--mono);font-size:9px;text-transform:uppercase;color:var(--text3);letter-spacing:.04em;border-bottom:1px solid var(--border)">
+        <div></div><div>Kampania</div><div style="text-align:right">Koszt</div><div style="text-align:right">Sprzedaż</div><div style="text-align:right">ROAS</div>
+      </div>
+  `;
+
+  kampanie.sort((a,b) => b.koszt - a.koszt).forEach(k => {
+    const parsed = caParseCampaignName(k.kampania);
+    const status = parsed.matched ? '🟢' : '🔴';
+    const hierarchy = parsed.matched
+      ? `<div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px">[NNN:${parsed.nnn}] KAT:${parsed.kategoria} · LINIA:${parsed.linia}${parsed.wymiar ? ' · WYM:' + parsed.wymiar : ''}</div>`
+      : `<div style="font-size:9px;color:#ef4444;font-family:var(--mono);margin-top:2px">⚠️ Nie pasuje do regex: /NNN/ KAT_LINIA_WYMIAR</div>`;
+    html += `
+      <div style="display:grid;grid-template-columns:30px 1fr 80px 80px 60px;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);align-items:start">
+        <div style="font-size:14px">${status}</div>
+        <div>
+          <div style="font-size:11px;color:var(--text);font-family:var(--mono)">${k.kampania}</div>
+          ${hierarchy}
+        </div>
+        <div style="font-size:10px;color:var(--text2);font-family:var(--mono);text-align:right">${k.koszt.toFixed(0)} zł</div>
+        <div style="font-size:10px;color:var(--text2);font-family:var(--mono);text-align:right">${k.sprzedaz.toFixed(0)} zł</div>
+        <div style="font-size:10px;color:${k.roas >= 6 ? '#34d399' : k.roas >= 3 ? '#f5a623' : '#ef4444'};font-family:var(--mono);text-align:right;font-weight:600">${k.roas.toFixed(2)}</div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  wrap.innerHTML = html;
+}
+
+function caRenderHierarchy(adsData) {
+  const wrap = document.getElementById('caHierarchy');
+  if (!wrap || !adsData || !adsData.kampanie) return;
+
+  // Sprawdź potencjalne kanibalizacje (aukcje w wielu kampaniach)
+  const auctionToCampaigns = {};
+  adsData.kampanie.forEach(k => {
+    k.aukcje.forEach(a => {
+      if (!a.nr) return;
+      if (!auctionToCampaigns[a.nr]) auctionToCampaigns[a.nr] = [];
+      auctionToCampaigns[a.nr].push(k.kampania);
+    });
+  });
+  const duplicates = new Set(Object.keys(auctionToCampaigns).filter(nr => auctionToCampaigns[nr].length > 1));
+
+  let html = `
+    <div style="margin-top:14px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-family:var(--mono);margin-bottom:8px">Hierarchia kampanii (sortowane po koszcie)</div>
+  `;
+
+  adsData.kampanie.sort((a,b) => b.koszt - a.koszt).forEach((k, idx) => {
+    const parsed = caParseCampaignName(k.kampania);
+    const matchBadge = parsed.matched ? '🟢' : '🔴';
+    const roasColor = k.roas >= 6 ? '#34d399' : k.roas >= 3 ? '#f5a623' : '#ef4444';
+
+    // Alerty dla kampanii
+    const alerts = [];
+    const hasOverlap = k.aukcje.some(a => duplicates.has(String(a.nr)));
+    if (hasOverlap) alerts.push('⚠️ Aukcje w innych kampaniach (kanibalizacja)');
+    if (k.roas < 3 && k.koszt > 30) alerts.push('🔴 ROAS < 3 — natychmiast wyłącz');
+
+    html += `
+      <details style="margin-bottom:6px;border:1px solid var(--border);border-radius:6px;background:var(--bg)">
+        <summary style="padding:10px 12px;cursor:pointer;display:grid;grid-template-columns:25px 1fr 80px 70px;gap:8px;align-items:center">
+          <div>${matchBadge}</div>
+          <div>
+            <div style="font-size:11px;color:var(--text);font-family:var(--mono)">${k.kampania}</div>
+            ${alerts.length ? `<div style="font-size:9px;color:#ef4444;font-family:var(--mono);margin-top:2px">${alerts.join(' · ')}</div>` : ''}
+          </div>
+          <div style="font-size:10px;color:var(--text2);font-family:var(--mono);text-align:right">${k.koszt.toFixed(0)} zł</div>
+          <div style="font-size:10px;color:${roasColor};font-family:var(--mono);text-align:right;font-weight:600">${k.roas.toFixed(2)}</div>
+        </summary>
+        <div style="padding:8px 12px 12px 30px;border-top:1px solid var(--border)">
+          <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:6px">AUKCJE W KAMPANII (${k.aukcje.length})</div>
+          ${k.aukcje.sort((a,b) => b.koszt - a.koszt).slice(0, 10).map(a => {
+            const isDup = duplicates.has(String(a.nr));
+            return `
+              <div style="display:grid;grid-template-columns:1fr 70px 70px 60px;gap:8px;padding:4px 0;font-size:10px;font-family:var(--mono);color:var(--text2)">
+                <div>${isDup ? '⚠️ ' : ''}[${a.nr}] ${(a.oferta || '').substring(0, 50)}</div>
+                <div style="text-align:right">${a.koszt.toFixed(1)} zł</div>
+                <div style="text-align:right">${a.sprzedaz.toFixed(0)} zł</div>
+                <div style="text-align:right;color:${a.roas >= 6 ? '#34d399' : a.roas >= 3 ? '#f5a623' : '#ef4444'};font-weight:600">${a.roas.toFixed(2)}</div>
+              </div>
+            `;
+          }).join('')}
+          ${k.aukcje.length > 10 ? `<div style="font-size:9px;color:var(--text3);margin-top:4px">... i ${k.aukcje.length - 10} więcej</div>` : ''}
+        </div>
+      </details>
+    `;
+  });
+
+  html += `</div>`;
+  wrap.innerHTML = html;
 }
 
 function kbFile(konto, type, input) {
