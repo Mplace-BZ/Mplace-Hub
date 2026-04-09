@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.14</title>
+<title>MPlace Hub v6.15</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.14</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.15</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -11896,16 +11896,43 @@ function caBuildArchitectPrompt(data) {
   p += `|---|---|---|---|---|---|---|---|\n\n`;
   p += `AKCJE możliwe:\n`;
   p += `- **ZACHOWAJ** — kampania działa dobrze, tylko zmień nazwę na konwencję\n`;
-  p += `- **OCZYŚĆ** — KAMPANIA MA MIX DOBRYCH I ZŁYCH GRUP REKLAM. Zachowaj kampanię, ZAMKNIJ konkretne grupy z ROAS<3 wewnątrz, ZACHOWAJ grupy z ROAS>BE. Wymień w uzasadnieniu które grupy zamknąć i które zachować.\n`;
+  p += `- **OCZYŚĆ** — KAMPANIA MA MIX DOBRYCH I ZŁYCH GRUP REKLAM. Zachowaj kampanię, ZAMKNIJ konkretne grupy z ROAS<4 wewnątrz, ZACHOWAJ grupy z ROAS>=4. Wymień w uzasadnieniu które grupy zamknąć i które zachować.\n`;
   p += `- **PODZIEL** — kampania ma grupy z różnych linii produktowych (np. KARO + TBOX + LARA), podziel na osobne kampanie per linia\n`;
   p += `- **POŁĄCZ** — kilka kampanii to ten sam temat, scal w jedną\n`;
   p += `- **ZAMKNIJ** — kampania w całości do wyłączenia (wszystkie grupy słabe lub pełna kanibalizacja z inną kampanią)\n`;
   p += `- **PRZENIES → KONTO** — aukcje są w specjalizacji innego konta (kanibalizacja cross-account)\n`;
   p += `- **NOWA** — kampania której brak a powinna być (np. dla top performera bez dedykowanej kampanii)\n\n`;
+
+  p += `=== KRYTYCZNA REGUŁA PROGÓW ROAS (USTALONE Z USEREM) ===\n`;
+  p += `- ROAS < 3 = ZAMKNIJ natychmiast (groźne, niszczy marżę)\n`;
+  p += `- ROAS 3-3.99 = ostrzeżenie ALE ZOSTAWIAMY (cytat usera: "do 4 zawsze zostawiamy")\n`;
+  p += `- ROAS 4 - BE = optymalizuj (tnij stawkę), NIE ZAMYKAJ\n`;
+  p += `- ROAS >= BE = OK\n`;
+  p += `**NIGDY NIE ZAMYKAJ GRUPY Z ROAS >= 4** chyba że ma 0 transakcji ALBO jest jawnym duplikatem innej grupy z wyższym ROAS.\n`;
+  p += `Grupy z ROAS 3-4: w planie OBSERWUJ 14 dni po restarcie, NIE wpisuj jako "zamknij".\n\n`;
+
   p += `KIEDY OCZYŚĆ vs ZAMKNIJ:\n`;
-  p += `- Jeśli kampania ma CHOĆ JEDNĄ grupę z ROAS >= 6 → OCZYŚĆ (zachowaj dobrą grupę, zamknij słabe)\n`;
+  p += `- Jeśli kampania ma CHOĆ JEDNĄ grupę z ROAS >= 6 → OCZYŚĆ (zachowaj dobrą grupę, zamknij grupy z ROAS<4)\n`;
   p += `- Jeśli WSZYSTKIE grupy mają ROAS < 4 → ZAMKNIJ całą kampanię\n`;
+  p += `- Grupy z ROAS 3-4 zostają jako "OBSERWUJ 14 dni" (NIE są na liście do zamknięcia)\n`;
   p += `- ZAMKNIJ całą kampanię TYLKO jeśli żadna grupa wewnątrz nie warta zachowania\n\n`;
+
+  p += `=== KRYTYCZNA REGUŁA CROSS-ACCOUNT (OBOWIĄZKOWA) ===\n`;
+  p += `Strategia portfelowa MEBLE definiuje SPECJALIZACJE per konto:\n`;
+  p += `- MK = SCALE → szafki pralkowe, nowości, półki wysuwane, szafki łazienkowe, t-box, KARO 92, COMBO\n`;
+  p += `- PC = NICHE → donice (Craft, Lancelot), kwietniki, szafki lustro niszowe (Lancelot), SLIM Lancelot, sezonowe\n`;
+  p += `- MC = PREMIUM → TOP92 Wotan, KARO 65 Wotan, stoliki podnoszone, gwiazdy z konwersją 4%+\n\n`;
+
+  p += `ZADANIE CROSS-ACCOUNT (do wykonania PRZED tabelą reorganizacji):\n`;
+  p += `1. Dla każdej aukcji NA NIEWŁAŚCIWYM koncie zgodnie ze specjalizacją:\n`;
+  p += `   - Aukcja typu DONICA / KWIETNIK na MK lub MC → należy do PC. Rekomenduj PRZENIES → PC\n`;
+  p += `   - Aukcja typu TOP92 WOTAN / KARO65 WOTAN na MK → należy do MC. Rekomenduj PRZENIES → MC\n`;
+  p += `   - Aukcja typu SZAFKA PRALKA / SZAFKA ŁAZIENKOWA / NOWOŚCI na PC → należy do MK. Rekomenduj PRZENIES → MK\n`;
+  p += `2. Sprawdź każdą aukcję cross-account flagged [TAKZE_NA:...] — jeśli na 2+ kontach:\n`;
+  p += `   - Wyznacz właściciela frazy = konto z ROLĄ zgodną z typem produktu (NIE tylko najwyższy ROAS!)\n`;
+  p += `   - Pozostałe konta → akcja PRZENIES → [konto-właściciel] LUB w uzasadnieniu "wyłącz Ads, zostaw listing organicznie"\n`;
+  p += `3. Każda decyzja PRZENIES MUSI być w tabeli jako osobny wiersz z wymienionymi ID aukcji do przeniesienia.\n`;
+  p += `4. Jeśli na koncie znajdziesz aukcję poza specjalizacją z dobrym ROAS (>BE), ale brak takiej kampanii na właściwym koncie → zaproponuj NOWA kampania na właściwym koncie.\n\n`;
 
   p += `=== KRYTYCZNA REGUŁA BEZPIECZEŃSTWA: BACKUP STATUS PRZED ZAMKNIJ ===\n`;
   p += `Każda aukcja w każdej kampanii ma w danych powyżej tag [BACKUP:...]:\n`;
