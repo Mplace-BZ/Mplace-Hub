@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.97</title>
+<title>MPlace Hub v5.98</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.97</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.98</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2181,6 +2181,15 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <div class="ph-eyebrow" style="color:#ef4444">► PLANOWANIE WYRÓŻNIEŃ</div>
     <div class="ph-title">Wyróżnienia <span style="color:#ef4444">◆</span> Manager</div>
     <div class="ph-sub">Lista wyróżnionych aukcji per konto + budżet kontroli (cel ≤ 5% sprzedaży) + historia zmian</div>
+  </div>
+
+  <!-- Toggle: poprzedni miesiąc (rzeczywisty) vs bieżący (projekcja MTD) -->
+  <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:.75rem">
+    <span style="font-size:10px;color:var(--text3);font-family:var(--mono)">WIDOK BUDŻETU:</span>
+    <div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden">
+      <button id="wyrToggleLast" onclick="wyrSetMode('last')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border:none;background:rgba(239,68,68,.15);color:#ef4444;cursor:pointer">Poprzedni mies. (real)</button>
+      <button id="wyrToggleCur" onclick="wyrSetMode('cur')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border:none;background:transparent;color:var(--text3);cursor:pointer;border-left:1px solid var(--border)">Bieżący (proj.)</button>
+    </div>
   </div>
 
   <!-- Budget tracker per konto -->
@@ -10721,10 +10730,31 @@ document.addEventListener('input', e => {
   if (e.target.id?.startsWith('kbWyr')) { kbSaveWyroznienia(); wyrUpdateBudget(); }
 });
 
+// Wyróżnienia Manager — tryb widoku: 'last' (poprzedni rzeczywisty) lub 'cur' (bieżący proj.)
+window._wyrMode = window._wyrMode || 'last';
+
+function wyrSetMode(mode) {
+  window._wyrMode = mode;
+  // Update toggle buttons
+  const lastBtn = document.getElementById('wyrToggleLast');
+  const curBtn = document.getElementById('wyrToggleCur');
+  if (lastBtn && curBtn) {
+    if (mode === 'last') {
+      lastBtn.style.background = 'rgba(239,68,68,.15)'; lastBtn.style.color = '#ef4444';
+      curBtn.style.background = 'transparent'; curBtn.style.color = 'var(--text3)';
+    } else {
+      curBtn.style.background = 'rgba(239,68,68,.15)'; curBtn.style.color = '#ef4444';
+      lastBtn.style.background = 'transparent'; lastBtn.style.color = 'var(--text3)';
+    }
+  }
+  wyrUpdateBudget();
+}
+
 // Wyróżnienia Manager — budget tracker per konto
 function wyrUpdateBudget() {
   const kontoMap = { mk: 'MobelKap', pc: 'PerfektCiecie', mnc: 'MeblenaCzasie' };
   const kontoNames = { mk: 'MobelKap', pc: 'Perfekt Cięcie', mnc: 'Meble na Czasie' };
+  const mode = window._wyrMode || 'last';
   KB_KONTA.forEach(k => {
     const list = kbParseWyroznienia(k);
     const cnt = document.getElementById('wyrCount_'+k);
@@ -10740,29 +10770,44 @@ function wyrUpdateBudget() {
     const name = kontoNames[k];
     const list = kbParseWyroznienia(k);
 
-    // Get current month sales from data — używamy estym() do projekcji EOM
+    // Get sales/wyróżnienia data based on mode
     let monthlySprzedaz = 0;
     let wyrCost = 0;
     let pctCel = 5; // 5% target
     let isProjection = false;
+    let monthLabel = '';
     try {
       const curMonth = (typeof MONTHS !== 'undefined') ? MONTHS[new Date().getMonth()] : '';
       const allData = (typeof getData === 'function') ? getData(fullKonto) : [];
-      let curData = allData.find(d => d.m === curMonth);
-      // Fallback: jeśli brak bieżącego miesiąca, weź ostatni dostępny
-      if (!curData && allData.length) curData = allData[allData.length - 1];
-      if (curData) {
-        // Projekcja EOM: estOver > estym() (z dnia) > sprzedaz raw
-        if (typeof estym === 'function') {
-          monthlySprzedaz = estym(curData);
-          isProjection = curData.dzien && (curData.dzien < 28);
+
+      let dataForCalc = null;
+      if (mode === 'last') {
+        // Tryb "poprzedni miesiąc rzeczywisty" — bierzemy ostatni miesiąc PRZED bieżącym
+        // Jeśli bieżący miesiąc istnieje w danych, weź ten przed nim. Inaczej ostatni dostępny.
+        const curIdx = allData.findIndex(d => d.m === curMonth);
+        if (curIdx > 0) dataForCalc = allData[curIdx - 1];
+        else if (curIdx === -1 && allData.length) dataForCalc = allData[allData.length - 1];
+        else if (curIdx === 0 && allData.length > 1) dataForCalc = allData[0]; // tylko bieżący w danych
+      } else {
+        // Tryb "bieżący projekcja"
+        dataForCalc = allData.find(d => d.m === curMonth);
+        if (!dataForCalc && allData.length) dataForCalc = allData[allData.length - 1];
+      }
+
+      if (dataForCalc) {
+        monthLabel = dataForCalc.m || '';
+        if (mode === 'cur' && typeof estym === 'function') {
+          monthlySprzedaz = estym(dataForCalc);
+          isProjection = dataForCalc.dzien && (dataForCalc.dzien < 28);
         } else {
-          monthlySprzedaz = curData.estOver || curData.sprzedaz || 0;
+          // Tryb 'last' lub fallback: surowe rzeczywiste dane miesiąca
+          monthlySprzedaz = dataForCalc.sprzedaz || 0;
+          isProjection = false;
         }
-        wyrCost = curData.promoC || 0;
-        // Wyróżnienia też skalujemy proporcjonalnie do projekcji jeśli to MTD
-        if (isProjection && curData.dzien && curData.sprzedaz > 0) {
-          const ratio = monthlySprzedaz / curData.sprzedaz;
+        wyrCost = dataForCalc.promoC || 0;
+        // Skaluj wyróżnienia tylko w trybie projekcji
+        if (mode === 'cur' && isProjection && dataForCalc.dzien && dataForCalc.sprzedaz > 0) {
+          const ratio = monthlySprzedaz / dataForCalc.sprzedaz;
           wyrCost = wyrCost * ratio;
         }
       }
@@ -10774,12 +10819,16 @@ function wyrUpdateBudget() {
     const budgetMax = (monthlySprzedaz * pctCel / 100).toFixed(0);
     const wolnyBudget = (monthlySprzedaz * pctCel / 100 - wyrCost).toFixed(0);
 
-    const projTag = isProjection ? ' <span style="color:var(--text3);font-size:9px">(EOM proj.)</span>' : '';
+    const projTag = isProjection ? ' <span style="color:var(--text3);font-size:9px">(proj.)</span>' : '';
+    const labelMies = monthLabel ? ` <span style="color:var(--text3);font-size:9px">(${monthLabel})</span>` : '';
     cardsHtml += `<div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--bg2)">
-      <div style="font-size:11px;color:var(--g-meble,#ff6b35);font-family:var(--mono);font-weight:600;margin-bottom:8px">${name}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:11px;color:var(--g-meble,#ff6b35);font-family:var(--mono);font-weight:600">${name}</div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--mono)">${monthLabel}</div>
+      </div>
       <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Aktywnych wyróżnień: <span style="color:var(--text);font-weight:600">${list.length}</span></div>
-      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Sprzedaż mies.${projTag}: <span style="color:var(--text);font-family:var(--mono)">${monthlySprzedaz.toFixed(0)} zł</span></div>
-      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Wyróżnienia${isProjection ? ' (proj.)' : ''}: <span style="color:var(--text);font-family:var(--mono)">${wyrCost.toFixed(0)} zł</span> (${wyrPct.toFixed(1)}%)</div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Sprzedaż${projTag}: <span style="color:var(--text);font-family:var(--mono)">${monthlySprzedaz.toFixed(0)} zł</span></div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Wyróżnienia${projTag}: <span style="color:var(--text);font-family:var(--mono)">${wyrCost.toFixed(0)} zł</span> (${wyrPct.toFixed(1)}%)</div>
       <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Budżet ${pctCel}%: <span style="color:var(--text);font-family:var(--mono)">${budgetMax} zł</span></div>
       <div style="font-size:10px;color:var(--text3);margin-bottom:6px">Wolne: <span style="color:${parseInt(wolnyBudget) >= 0 ? '#34d399' : '#ef4444'};font-family:var(--mono)">${wolnyBudget} zł</span></div>
       <div style="font-size:10px;color:${statusColor};font-family:var(--mono);text-align:center;padding:4px;background:rgba(0,0,0,.2);border-radius:4px">${status}</div>
