@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.99</title>
+<title>MPlace Hub v6.00</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.99</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.00</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1040,6 +1040,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <button class="nav-btn" onclick="showView('agent')" id="navAgent" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Agent ✦</button>
     <button class="nav-btn" onclick="showView('analiza')" id="navAnaliza" style="color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2)">Analiza</button>
     <button class="nav-btn" onclick="showView('kanibalizator')" id="navKanibalizator" style="color:#ef4444;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)">Wyróżnienia</button>
+    <button class="nav-btn" onclick="showView('strategia')" id="navStrategia" style="color:#ff6b35;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Strategia</button>
     <button class="nav-btn" onclick="showView('screener')" id="navScreener" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Screener</button>
     <button class="nav-btn" onclick="showView('importads')" id="navImportAds" style="color:#f472b6;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2)">Import Ads</button>
     <div class="nav-sep"></div>
@@ -2277,6 +2278,45 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 </div>
 
+<!-- ═══ VIEW: STRATEGIA ═══ -->
+<div class="view" id="viewStrategia">
+<div class="container" style="max-width:1200px">
+  <div style="margin-bottom:1.5rem">
+    <div class="ph-eyebrow" style="color:#ff6b35">► STRATEGIA PORTFELOWA</div>
+    <div class="ph-title">Strategia <span style="color:#ff6b35">◆</span> Grupy</div>
+    <div class="ph-sub">Role kont · pricing tier · specjalizacje · aktualne KPI vs cele</div>
+  </div>
+
+  <!-- Toggle widoku: tryb karty per konto vs macierz porównawcza -->
+  <div style="margin-bottom:1rem;padding:10px 14px;background:rgba(255,107,53,.04);border:1px solid rgba(255,107,53,.15);border-radius:8px">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#ff6b35;font-family:var(--mono);margin-bottom:6px;font-weight:600">► GRUPA MEBLE — STRATEGIA PORTFELOWA</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.5">
+      3 konta, 3 role komplementarne. <strong style="color:#ff6b35">MK = wolumen</strong> (szafki pralkowe, nowości) · <strong style="color:#ff6b35">PC = nisze</strong> (donice, kwietniki, sezonowe) · <strong style="color:#ff6b35">MnC = premium</strong> (+2.5% cena, gwiazdy TOP92/KARO65).
+      Kanibalizacja wewnątrz grupy eliminowana przez segmentację — konto z najwyższym ROAS na danej frazie jest jej <em>właścicielem</em>.
+    </div>
+  </div>
+
+  <!-- 3-kolumnowy dashboard per konto MEBLE -->
+  <div id="stratMebleCards" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem"></div>
+
+  <!-- Reguły strategiczne grupy -->
+  <div style="border:1px solid var(--border);border-radius:10px;padding:14px 18px;background:var(--bg2);margin-bottom:1rem">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;font-family:var(--mono)">Reguły strategiczne — jak Agent interpretuje role</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.7">
+      <strong style="color:#ff6b35">SCALE (MobelKap):</strong> pełny budżet Ads na kategoriach specjalizacji. Unikaj eksperymentów. Maksymalizuj zasięg na stałych CORE.<br>
+      <strong style="color:#ff6b35">NICHE (Perfekt Cięcie):</strong> NIE rekomenduj szerokich kampanii. Kategoria poza specjalizacją → "wyłącz Ads, zostaw organikę". Priorytet: donice, kwietniki, sezonowe.<br>
+      <strong style="color:#ff6b35">PREMIUM (Meble na Czasie):</strong> tylko aukcje z potwierdzoną konwersją ≥3% i min 5 transakcjami. Niższa konwersja → "nie skaluj, obserwuj". Pricing +2.5%.<br>
+      <strong style="color:#ef4444">KANIBALIZACJA CROSS-ACCOUNT:</strong> jeśli aukcja występuje w specjalizacji innego konta MEBLE → wyłącz Ads na tym koncie. Przykład: KARO 65 Wotan należy do MnC (ROAS 8.96), MK wyłącza (ROAS 1.30).
+    </div>
+  </div>
+
+  <!-- Info dla grup bez ról (LUXSEN / ONE) -->
+  <div style="border:1px dashed var(--border);border-radius:10px;padding:14px 18px;background:var(--bg2);color:var(--text3);font-size:11px;line-height:1.6">
+    <strong style="color:var(--text2)">LUXSEN i ONE</strong> — role nie zdefiniowane. Strategia portfelowa wdrożona jako pierwsza dla MEBLE (09.04.2026). Po testowaniu i walidacji planu MEBLE (Faza 1-3) replikujemy na pozostałe grupy.
+  </div>
+</div>
+</div>
+
 <!-- ═══ VIEW: KALKULATOR ═══ -->
 <div class="view" id="viewKalkulator">
 <div class="container">
@@ -2477,7 +2517,27 @@ const GROUPS={
   ONE:{label:'ONE',c:'var(--g-one)',cls:'g-one-badge',egh:'egh-o',accs:['Materazzi','MtzzEU','Ankado24']},
 };
 const AC_META={
-  MobelKap:{name:'MobelKap',group:'MEBLE'},PerfektCiecie:{name:'Perfekt Cięcie',group:'MEBLE'},MeblenaCzasie:{name:'Meble na Czasie',group:'MEBLE'},
+  MobelKap:{name:'MobelKap',group:'MEBLE',
+    role:'scale', pricingTier:'base', pricingDelta:0,
+    specjalizacje:['szafki_pralkowe','nowosci','polki_wysuwane','szafki_lazienkowe','t-box','stoliki_KARO_92'],
+    adsTarget:6.5, wyrTarget:5.0,
+    strategiaOpis:'Maszyna wolumenowa grupy MEBLE. Największy ruch organiczny (1443 wizyt na top SKU). Pełny budżet Ads na szafkach pralkowych (po migracji Smart) + nowości + półki wysuwane. Priorytet: skalowanie wolumenu.',
+    badge:'🏆 SCALE'
+  },
+  PerfektCiecie:{name:'Perfekt Cięcie',group:'MEBLE',
+    role:'niche', pricingTier:'base', pricingDelta:0,
+    specjalizacje:['donice_Craft','donice_Lancelot','kwietniki','szafki_lustro_niszowe','slim','sezonowe'],
+    adsTarget:5.5, wyrTarget:3.0,
+    strategiaOpis:'Chirurgiczna specjalizacja w niszach gdzie MK/MnC nie konkurują. Super Sprzedawca + Qlt 336. Donica Craft 45x22 = ROAS 99×. Ads% redukcja z 10.1% → 5.5%, wyróżnienia 6.4% → 3.0%. NIE wchodzi w stoliki/szafki wolumenowe — zostawia MK i MnC.',
+    badge:'🎯 NICHE'
+  },
+  MeblenaCzasie:{name:'Meble na Czasie',group:'MEBLE',
+    role:'premium', pricingTier:'premium', pricingDelta:2.5,
+    specjalizacje:['TOP92_Wotan','KARO65_Wotan','stoliki_podnoszone','gwiazdy_4pct_konw'],
+    adsTarget:6.5, wyrTarget:4.5,
+    strategiaOpis:'Premium tier grupy MEBLE. Najwyższa marża (9.1%) i ROAS (8.23). TOP92 Wotan = 53% sprzedaży. Pricing +2.5% vs MK/PC (efektywna marża +0.75%). Selektywne Ads tylko na gwiazdach z ROAS > BE i konwersją 3%+. Nie skaluje eksperymentów — tylko potwierdzone top performery.',
+    badge:'💎 PREMIUM +2.5%'
+  },
   Luxsen:{name:'Luxsen',group:'LUXSEN'},Semmi:{name:'Semmi',group:'LUXSEN'},BOTAVIT:{name:'BOTAVIT',group:'LUXSEN'},
   Materazzi:{name:'Materazzi',group:'ONE'},MtzzEU:{name:'MtzzEU',group:'ONE'},Ankado24:{name:'Ankado24',group:'ONE'},
 };
@@ -2654,7 +2714,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewKanibalizator','viewScreener','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
+  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewKanibalizator','viewStrategia','viewScreener','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -2744,6 +2804,10 @@ function showView(v){
     // Inicjalizuj toggle widoku — domyślnie poprzedni miesiąc rzeczywisty
     if (typeof wyrSetMode === 'function') wyrSetMode(window._wyrMode || 'last');
     else if (typeof wyrUpdateBudget === 'function') wyrUpdateBudget();
+  } else if(v==='strategia'){
+    document.getElementById('viewStrategia').classList.add('active');
+    document.getElementById('navStrategia').classList.add('active');
+    if (typeof stratRenderMeble === 'function') stratRenderMeble();
   } else if(v==='screener'){
     document.getElementById('viewScreener').classList.add('active');
     document.getElementById('navScreener').classList.add('active');
@@ -9428,10 +9492,40 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   const be = beRoas || 6;
   let p = `Analizujesz 3 raporty Allegro dla konta ${konto} za okres ${okres}.\n`;
   p += `BE ROAS tego konta: ${be.toFixed(2)} (próg rentowności — poniżej tej wartości reklama generuje stratę)\n\n`;
+
+  // Rola konta w grupie (strategia portfelowa)
+  const kontoKey = Object.keys(AC_META).find(k => AC_META[k].name === konto) || '';
+  const meta = kontoKey ? AC_META[kontoKey] : null;
+  if (meta && meta.role) {
+    p += `== ROLA KONTA W GRUPIE ${meta.group} ==\n`;
+    p += `Rola: ${meta.role.toUpperCase()} (${meta.badge})\n`;
+    p += `Pricing tier: ${meta.pricingTier}${meta.pricingDelta !== 0 ? ' (' + (meta.pricingDelta > 0 ? '+' : '') + meta.pricingDelta + '% vs base)' : ''}\n`;
+    p += `Specjalizacje: ${meta.specjalizacje.join(', ')}\n`;
+    p += `Cel Ads%: ${meta.adsTarget}% | Cel Wyróżnienia%: ${meta.wyrTarget}%\n`;
+    p += `Strategia: ${meta.strategiaOpis}\n\n`;
+    p += `REGUŁA STRATEGII ROLI "${meta.role.toUpperCase()}":\n`;
+    if (meta.role === 'scale') {
+      p += `- Rekomenduj PEŁNY budżet Ads na kategoriach specjalizacji (${meta.specjalizacje.slice(0,3).join(', ')}...)\n`;
+      p += `- Unikaj eksperymentów poza specjalizacją — to konto ma wolumenowy cel\n`;
+      p += `- Priorytet: maksymalizacja zasięgu na CORE kampaniach, utrzymanie Ads% ≤ ${meta.adsTarget}%\n`;
+      p += `- NIE rekomenduj podnoszenia cen — to konto jest BASE pricing\n`;
+    } else if (meta.role === 'niche') {
+      p += `- NIE rekomenduj szerokich kampanii — to konto nie ma wolumenowego celu\n`;
+      p += `- Aukcja POZA specjalizacją (${meta.specjalizacje.slice(0,3).join(', ')}...) → "rozważ wyłączenie Ads, zostaw organikę"\n`;
+      p += `- Priorytet: chirurgiczne Ads tylko na kategoriach specjalizacji, Ads% ≤ ${meta.adsTarget}%\n`;
+      p += `- Redukcja wyróżnień do ${meta.wyrTarget}% (historycznie bezpieczne przy niszowym wolumenie)\n`;
+    } else if (meta.role === 'premium') {
+      p += `- Rekomenduj SKALOWANIE tylko aukcji z potwierdzoną konwersją ≥3% i min 5 transakcji\n`;
+      p += `- Niska konwersja lub <5 transakcji → "nie skaluj, obserwuj" zamiast wyłącz\n`;
+      p += `- Priorytet: utrzymanie marży premium (pricing +${meta.pricingDelta}%)\n`;
+      p += `- Skup się na gwiazdach z specjalizacji: ${meta.specjalizacje.join(', ')}\n`;
+    }
+    p += `- KANIBALIZACJA CROSS-ACCOUNT: jeśli aukcja występuje w specjalizacji innego konta ${meta.group} z wyższym ROAS → rekomenduj "wyłącz Ads, zostaw właścicielowi frazy"\n\n`;
+  }
+
   if (uwagi) p += `UWAGI MENEDŻERA:\n${uwagi}\n\n`;
 
   // Add catalog if available for this account
-  const kontoKey = Object.keys(AC_META).find(k => AC_META[k].name === konto) || '';
   const cat = kontoKey ? getCatalog(kontoKey) : null;
   if (cat && cat.oferty.length) {
     p += `== KATALOG OFERT (${cat.activeCount} aktywnych, upload ${cat.uploadDate}) ==\n`;
@@ -10144,19 +10238,26 @@ function aaSendMebleStrategyToScreener() {
       if (input) {
         input.value = `Mam 3 raporty Analizy Ofert dla całej grupy MEBLE (MobelKap, Perfekt Cięcie, Meble na Czasie).
 
+ROLE KONT (ustalone 09.04.2026 — respektuj je w rekomendacjach):
+- MobelKap = SCALE (wolumen, szafki pralkowe + nowości + stoliki KARO 92). Pricing: base. Ads target: 6.5%. Wyróżnienia target: 5.0%.
+- Perfekt Cięcie = NICHE (donice Craft/Lancelot, kwietniki, szafki lustro niszowe, SLIM, sezonowe). Pricing: base. Ads target: 5.5%. Wyróżnienia target: 3.0%.
+- Meble na Czasie = PREMIUM +2.5% (TOP92 Wotan, KARO 65 Wotan, stoliki podnoszone). Pricing: premium +2.5%. Ads target: 6.5%. Wyróżnienia target: 4.5%.
+
+REGUŁA CROSS-ACCOUNT: jeśli aukcja występuje w specjalizacji innego konta z wyższym ROAS → wyłącz Ads na słabszym koncie ("zostaw właścicielowi frazy"). Przykład wzorcowy: KARO 65 Wotan = MnC (ROAS 8.96), MK wyłącza (ROAS 1.30).
+
 Wykonaj analizę strategiczną międzykontową w 5 sekcjach:
 
-1. KANIBALIZACJA SKU MIĘDZY KONTAMI — które konkretne aukcje (po ID) występują na 2-3 kontach jednocześnie? Które konto sprzedaje je najlepiej (najwyższa konwersja, najwyższy ROAS Ads)? Wskaż konkretne SKU do wyłączenia/przeniesienia.
+1. KANIBALIZACJA SKU MIĘDZY KONTAMI — które konkretne aukcje (po ID) występują na 2-3 kontach jednocześnie? Które konto jest WŁAŚCICIELEM frazy zgodnie z rolą (premium=MnC dla top gwiazd, scale=MK dla wolumenu, niche=PC dla niszy)? Wskaż konkretne SKU do wyłączenia Ads na słabszych kontach.
 
-2. KONSOLIDACJA SMART — TOP 15 aukcji DPD 2pak across 3 kont posortowane po wolumenie wizyt. Każda z konkretnym ID, kontem, obecną konwersją, szacunkiem wzrostu po Smart. Łączny potencjał finansowy grupy.
+2. KONSOLIDACJA SMART — TOP 15 aukcji DPD 2pak across 3 kont posortowane po wolumenie wizyt. Każda z konkretnym ID, kontem, obecną konwersją, szacunkiem wzrostu po Smart. Łączny potencjał finansowy grupy. Priorytet: aukcje w specjalizacji konta.
 
-3. ALOKACJA BUDŻETU ADS — analiza efektywności budżetu Ads między 3 kontami. PC ma marżę 5.1% (alarm), MK 8.3%, MnC 9.1%. Czy budżet powinien być przesunięty? Jak?
+3. ALOKACJA BUDŻETU ADS — analiza efektywności budżetu Ads między 3 kontami względem targets (MK 6.5%, PC 5.5%, MnC 6.5%). Czy budżet powinien być przesunięty do właścicieli fraz? Jak?
 
-4. PC RATUNEK — Perfekt Cięcie ma marżę 5.1% i spada 3 tygodnie. Jaki jest plan ratunkowy? Czy konto da się odbudować, czy lepiej oddać wolumen do MK/MnC?
+4. PC RATUNEK — Perfekt Cięcie ma marżę krytyczną i spada. Jaki plan żeby wrócić do celu 5.5% Ads% i 3.0% wyróżnień bez utraty wolumenu w niszach specjalizacji?
 
-5. PLAN DZIAŁANIA TYGODNIOWY — 10 najważniejszych działań sortowanych po wpływie finansowym, z przypisaniem do konkretnego konta i terminem do 16.04.2026.
+5. PLAN DZIAŁANIA TYGODNIOWY — 10 działań sortowanych po wpływie finansowym, z przypisaniem do konkretnego konta, terminem do 16.04.2026, i oznaczeniem zgodności z rolą konta (SCALE/NICHE/PREMIUM).
 
-Patrz na grupę jako portfel — nie jako 3 niezależne konta.`;
+Patrz na grupę jako portfel ról komplementarnych — nie jako 3 niezależne konta konkurujące ze sobą.`;
         input.focus();
       }
 
@@ -10866,6 +10967,149 @@ function wyrGetForKontoName(kontoName) {
     const text = saved[shortKey] || '';
     return text.split(/[\n,;\s]+/).map(s => s.trim()).filter(s => s.length > 5);
   } catch(e) { return []; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// STRATEGIA PORTFELOWA — renderer kart per konto MEBLE
+// ═══════════════════════════════════════════════════════════
+function stratRenderMeble() {
+  const cardsEl = document.getElementById('stratMebleCards');
+  if (!cardsEl) return;
+
+  const mebleKonta = ['MobelKap', 'PerfektCiecie', 'MeblenaCzasie'];
+  const roleColors = {
+    scale: '#38bdf8',
+    niche: '#34d399',
+    premium: '#f5a623',
+  };
+  const roleBg = {
+    scale: 'rgba(56,189,248,.08)',
+    niche: 'rgba(52,211,153,.08)',
+    premium: 'rgba(245,166,35,.08)',
+  };
+
+  let html = '';
+  mebleKonta.forEach(k => {
+    const meta = AC_META[k];
+    if (!meta || !meta.role) return;
+
+    // Aktualne KPI — bierzemy ostatni dostępny miesiąc (preferuj bieżący jeśli ma dane)
+    let curKpi = { adsPct: 0, wyrPct: 0, marza: 0, roasAds: 0, beRoas: 0, monthLabel: '—', sprzedaz: 0 };
+    try {
+      const curMonth = MONTHS[new Date().getMonth()];
+      const allData = getData(k);
+      // Preferuj poprzedni miesiąc (rzeczywiste dane) jeśli bieżący ma tylko MTD
+      const curIdx = allData.findIndex(d => d.m === curMonth);
+      let dataForKpi = null;
+      if (curIdx > 0) dataForKpi = allData[curIdx - 1];
+      else if (allData.length) dataForKpi = allData[allData.length - 1];
+
+      if (dataForKpi) {
+        const prod = getProd(k);
+        const C = calc(dataForKpi, prod);
+        curKpi.monthLabel = dataForKpi.m || '—';
+        curKpi.sprzedaz = dataForKpi.sprzedaz || 0;
+        curKpi.adsPct = curKpi.sprzedaz > 0 ? ((dataForKpi.adsCost || 0) / curKpi.sprzedaz * 100) : 0;
+        curKpi.wyrPct = curKpi.sprzedaz > 0 ? ((dataForKpi.promoC || 0) / curKpi.sprzedaz * 100) : 0;
+        curKpi.marza = C && typeof C.mAfter === 'number' ? C.mAfter : 0;
+        curKpi.roasAds = C && typeof C.roasAds === 'number' ? C.roasAds : 0;
+        curKpi.beRoas = C && typeof C.beRoasAds === 'number' ? C.beRoasAds : 0;
+      }
+    } catch(e) {}
+
+    // Status vs targets
+    const adsStatus = curKpi.adsPct === 0 ? 'brak' : curKpi.adsPct <= meta.adsTarget ? 'ok' : 'over';
+    const wyrStatus = curKpi.wyrPct === 0 ? 'brak' : curKpi.wyrPct <= meta.wyrTarget ? 'ok' : 'over';
+    const roasStatus = curKpi.roasAds === 0 ? 'brak' : curKpi.roasAds >= curKpi.beRoas ? 'ok' : 'over';
+    const stColor = s => s === 'ok' ? '#34d399' : s === 'over' ? '#ef4444' : 'var(--text3)';
+    const stIcon = s => s === 'ok' ? '✅' : s === 'over' ? '🔴' : '—';
+
+    // Wyróżnienia z Manager'a
+    const wyrList = wyrGetForKontoName(meta.name);
+
+    const roleColor = roleColors[meta.role] || 'var(--text)';
+    const roleBgColor = roleBg[meta.role] || 'var(--bg2)';
+
+    html += `
+      <div style="border:1px solid var(--border);border-radius:10px;padding:16px;background:var(--bg2)">
+        <!-- Header z rolą i badge -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-family:var(--mono);font-size:11px;color:#ff6b35;font-weight:700;letter-spacing:.04em;margin-bottom:4px">${meta.name.toUpperCase()}</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${meta.group}</div>
+          </div>
+          <div style="padding:4px 10px;border-radius:20px;background:${roleBgColor};border:1px solid ${roleColor};font-family:var(--mono);font-size:10px;color:${roleColor};font-weight:600;white-space:nowrap">${meta.badge}</div>
+        </div>
+
+        <!-- Strategia opis -->
+        <div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:12px;min-height:70px">
+          ${meta.strategiaOpis}
+        </div>
+
+        <!-- Specjalizacje jako chipy -->
+        <div style="margin-bottom:12px">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-family:var(--mono);margin-bottom:5px">Specjalizacje</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">
+            ${meta.specjalizacje.map(s => `<span style="padding:2px 8px;border-radius:4px;background:${roleBgColor};border:1px solid ${roleColor};color:${roleColor};font-family:var(--mono);font-size:9px">${s}</span>`).join('')}
+          </div>
+        </div>
+
+        <!-- Pricing tier (jeśli premium/discount) -->
+        ${meta.pricingDelta !== 0 ? `
+          <div style="margin-bottom:12px;padding:8px 10px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:6px">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#f5a623;font-family:var(--mono);margin-bottom:3px">Pricing tier</div>
+            <div style="font-size:11px;color:var(--text);font-family:var(--mono)">${meta.pricingTier.toUpperCase()} <span style="color:#f5a623;font-weight:600">${meta.pricingDelta > 0 ? '+' : ''}${meta.pricingDelta}%</span> vs base</div>
+          </div>
+        ` : ''}
+
+        <!-- KPI actual vs target -->
+        <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-family:var(--mono)">KPI</div>
+            <div style="font-size:9px;color:var(--text3);font-family:var(--mono)">${curKpi.monthLabel}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px;font-family:var(--mono)">
+            <div style="padding:6px 8px;background:var(--bg);border-radius:4px">
+              <div style="color:var(--text3);font-size:9px;margin-bottom:2px">Ads%</div>
+              <div style="color:${stColor(adsStatus)};font-weight:600">${curKpi.adsPct.toFixed(1)}% / ${meta.adsTarget}% ${stIcon(adsStatus)}</div>
+            </div>
+            <div style="padding:6px 8px;background:var(--bg);border-radius:4px">
+              <div style="color:var(--text3);font-size:9px;margin-bottom:2px">Wyróż.%</div>
+              <div style="color:${stColor(wyrStatus)};font-weight:600">${curKpi.wyrPct.toFixed(1)}% / ${meta.wyrTarget}% ${stIcon(wyrStatus)}</div>
+            </div>
+            <div style="padding:6px 8px;background:var(--bg);border-radius:4px">
+              <div style="color:var(--text3);font-size:9px;margin-bottom:2px">ROAS Ads</div>
+              <div style="color:${stColor(roasStatus)};font-weight:600">${curKpi.roasAds.toFixed(2)} / BE ${curKpi.beRoas.toFixed(2)} ${stIcon(roasStatus)}</div>
+            </div>
+            <div style="padding:6px 8px;background:var(--bg);border-radius:4px">
+              <div style="color:var(--text3);font-size:9px;margin-bottom:2px">Marża</div>
+              <div style="color:var(--text);font-weight:600">${curKpi.marza.toFixed(1)}%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aktywne wyróżnienia counter -->
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">Aktywne wyróżnienia: <span style="color:var(--text);font-weight:600">${wyrList.length}</span></div>
+          <button onclick="stratOpenInAnaliza('${k}')" style="font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:4px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.06);color:#38bdf8;cursor:pointer">→ Analiza</button>
+        </div>
+      </div>
+    `;
+  });
+
+  cardsEl.innerHTML = html;
+}
+
+// Przeskocz do zakładki Analiza z pre-selected kontem
+function stratOpenInAnaliza(konto) {
+  showView('analiza');
+  setTimeout(() => {
+    const sel = document.getElementById('aaKonto');
+    if (sel) {
+      sel.value = konto;
+      if (typeof aaUpdateWyrInfo === 'function') aaUpdateWyrInfo();
+    }
+  }, 100);
 }
 
 function kbFile(konto, type, input) {
