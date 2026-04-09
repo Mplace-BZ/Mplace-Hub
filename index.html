@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.93</title>
+<title>MPlace Hub v5.94</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.93</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.94</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2273,8 +2273,14 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
       <button onclick="scrSend()" style="font-family:var(--mono);font-size:11px;padding:8px 16px;border-radius:6px;border:1px solid rgba(232,121,249,.4);background:rgba(232,121,249,.12);color:#e879f9;cursor:pointer;white-space:nowrap;flex-shrink:0">Wyślij</button>
     </div>
   </div>
-  <div style="display:flex;justify-content:flex-end;margin-top:6px">
+  <div style="display:flex;justify-content:space-between;margin-top:6px;align-items:center">
+    <button onclick="scrSaveSession()" id="scrSaveBtn" style="font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;border:1px solid rgba(232,121,249,.3);background:rgba(232,121,249,.06);color:#e879f9;cursor:pointer">💾 Zapisz rozmowę</button>
     <button onclick="scrClear()" style="font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Wyczyść rozmowę</button>
+  </div>
+
+  <div id="scrHistoryWrap" style="margin-top:1.5rem;display:none">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.5rem;font-family:var(--mono)">HISTORIA ROZMÓW</div>
+    <div id="scrHistoryList"></div>
   </div>
 </div>
 </div>
@@ -11216,6 +11222,101 @@ function scrClear() {
   window._scrImages = [];
   document.getElementById('scrMessages').innerHTML = '';
   scrRenderImagePreviews();
+}
+
+// Historia rozmów Screenera — localStorage
+function scrLoadHistoryList() {
+  try { return JSON.parse(localStorage.getItem('scrSessions') || '[]'); } catch(e) { return []; }
+}
+
+function scrSaveSession() {
+  if (!window._scrHistory || !window._scrHistory.length) {
+    alert('Brak rozmowy do zapisania.');
+    return;
+  }
+  const firstUserMsg = window._scrHistory.find(m => m.role === 'user');
+  let title = '';
+  if (firstUserMsg) {
+    const content = typeof firstUserMsg.content === 'string' ? firstUserMsg.content : (firstUserMsg.content.find(c => c.type === 'text')?.text || '');
+    // Wyciągnij tytuł — pierwsza linia lub pierwsze 60 znaków
+    title = content.split('\n').find(l => l.trim()) || 'Rozmowa';
+    title = title.substring(0, 60).trim();
+  }
+  const customTitle = prompt('Nazwa rozmowy:', title || 'Rozmowa Screener');
+  if (customTitle === null) return; // user clicked cancel
+
+  // Render messages HTML do zapisu
+  const messagesHtml = document.getElementById('scrMessages').innerHTML;
+
+  const session = {
+    id: Date.now(),
+    title: customTitle || title || 'Rozmowa',
+    date: new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    messageCount: window._scrHistory.length,
+    history: window._scrHistory,
+    messagesHtml: messagesHtml
+  };
+
+  const sessions = scrLoadHistoryList();
+  sessions.push(session);
+  // Trzymaj max 20 ostatnich
+  if (sessions.length > 20) sessions.splice(0, sessions.length - 20);
+  try {
+    localStorage.setItem('scrSessions', JSON.stringify(sessions));
+    scrRenderHistoryList();
+    // Wizualne potwierdzenie
+    const btn = document.getElementById('scrSaveBtn');
+    if (btn) {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✓ Zapisano';
+      setTimeout(() => { btn.innerHTML = orig; }, 1500);
+    }
+  } catch(err) {
+    alert('Nie udało się zapisać (możliwe że localStorage pełny): ' + err.message);
+  }
+}
+
+function scrRenderHistoryList() {
+  const wrap = document.getElementById('scrHistoryWrap');
+  const list = document.getElementById('scrHistoryList');
+  if (!wrap || !list) return;
+  const sessions = scrLoadHistoryList();
+  if (!sessions.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  list.innerHTML = sessions.slice().reverse().slice(0, 10).map(s => `
+    <div style="border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+      <div onclick="scrLoadSession('${s.id}')" style="cursor:pointer;flex:1">
+        <div style="font-size:12px;color:var(--text);font-weight:500">${s.title}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${s.date} · ${s.messageCount} wiad.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span onclick="scrLoadSession('${s.id}')" style="font-size:10px;color:#e879f9;font-family:var(--mono);cursor:pointer">wczytaj</span>
+        <span onclick="scrDeleteSession('${s.id}')" style="font-size:14px;color:var(--text3);cursor:pointer;line-height:1" title="Usuń">×</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function scrLoadSession(id) {
+  const sessions = scrLoadHistoryList();
+  const session = sessions.find(s => String(s.id) === String(id));
+  if (!session) { alert('Nie znaleziono rozmowy.'); return; }
+  if (window._scrHistory && window._scrHistory.length && !confirm('Bieżąca rozmowa zostanie zastąpiona. Kontynuować?')) return;
+  window._scrHistory = session.history || [];
+  document.getElementById('scrMessages').innerHTML = session.messagesHtml || '';
+  document.getElementById('scrMessages').scrollTop = document.getElementById('scrMessages').scrollHeight;
+}
+
+function scrDeleteSession(id) {
+  if (!confirm('Usunąć rozmowę z historii?')) return;
+  const sessions = scrLoadHistoryList().filter(s => String(s.id) !== String(id));
+  localStorage.setItem('scrSessions', JSON.stringify(sessions));
+  scrRenderHistoryList();
+}
+
+// Render historii przy starcie
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', () => { try { scrRenderHistoryList(); } catch(e) {} });
 }
 
 async function scrSend() {
