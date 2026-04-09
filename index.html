@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.12</title>
+<title>MPlace Hub v6.13</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.12</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.13</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2329,11 +2329,12 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 
   <!-- Info bar konwencji -->
   <div style="margin-bottom:1.5rem;padding:12px 16px;background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.2);border-radius:8px">
-    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#06b6d4;font-family:var(--mono);margin-bottom:6px;font-weight:600">► KONWENCJA NAZEWNICTWA ADS — FORMAT A (MEBLE)</div>
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#06b6d4;font-family:var(--mono);margin-bottom:6px;font-weight:600">► KONWENCJA NAZEWNICTWA ADS — FORMAT A v2 (MEBLE)</div>
     <div style="font-size:11px;color:var(--text2);line-height:1.6;font-family:var(--mono)">
       <strong style="color:#06b6d4">Kampania:</strong>  /NNN/ KATEGORIA_LINIA_WYMIAR<br>
-      <strong style="color:#06b6d4">Grupa:</strong>     [NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR<br>
-      <strong style="color:#06b6d4">Przykład:</strong>  /010/ LAZIENKA_PRALKA_62 → [010][WW][RW] PRALKA_62_WOTAN
+      <strong style="color:#06b6d4">Grupa:</strong>     [KONTO][NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR<br>
+      <strong style="color:#06b6d4">KONTO:</strong>     MK (MobelKap) · PC (Perfekt Cięcie) · MC (Meble na Czasie)<br>
+      <strong style="color:#06b6d4">Przykład:</strong>  /010/ LAZIENKA_PRALKA_62 → [MK][010][WW][RW] PRALKA_62_WOTAN
     </div>
   </div>
 
@@ -9750,11 +9751,11 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += `Aukcje oznaczone [WYRÓŻNIONA] w sekcji Ads poniżej.\n\n`;
   }
 
-  // Parser nazw kampanii i grup reklam wg konwencji MEBLE (Format A)
+  // Parser nazw kampanii i grup reklam wg konwencji MEBLE (Format A v2 — z prefiksem konta w grupach)
   // Kampania: /NNN/ KATEGORIA_LINIA_WYMIAR?
-  // Grupa: [NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR
+  // Grupa: [KONTO][NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR
   const campaignRegex = /^\/(\d{3})\/\s*([A-Z]+)_([A-Z]+)(?:_(\d+))?$/;
-  const groupRegex = /^\[(\d{3})\]\[(WW|WL\+)\]\[(RW|R)\]\s*([A-Z]+)(?:_(\d+))?_?(.+)?$/;
+  const groupRegex = /^\[(MK|PC|MC)\]\[(\d{3})\]\[(WW|WL\+)\]\[(RW|R)\]\s*([A-Z]+)(?:_(\d+))?_?(.+)?$/;
 
   function parseCampaignName(name) {
     const m = String(name || '').trim().match(campaignRegex);
@@ -9764,7 +9765,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   function parseGroupName(name) {
     const m = String(name || '').trim().match(groupRegex);
     if (!m) return { matched: false, raw: name };
-    return { matched: true, nnn: m[1], placement: m[2], targeting: m[3], linia: m[4], wymiar: m[5] || null, kolor: (m[6] || '').trim() };
+    return { matched: true, konto: m[1], nnn: m[2], placement: m[3], targeting: m[4], linia: m[5], wymiar: m[6] || null, kolor: (m[7] || '').trim() };
   }
 
   // Statystyki zgodności konwencji
@@ -11316,8 +11317,12 @@ function stratOpenInAnaliza(konto) {
 // ═══════════════════════════════════════════════════════════
 
 const CA_KEY = 'ads_campaigns_meble';
+// Format A v2 — grupy reklam mają prefix konta [MK]/[PC]/[MC]
 const CA_REGEX_CAMP = /^\/(\d{3})\/\s*([A-Z]+)_([A-Z]+)(?:_(\d+))?$/;
-const CA_REGEX_GROUP = /^\[(\d{3})\]\[(WW|WL\+)\]\[(RW|R)\]\s*([A-Z]+)(?:_(\d+))?_?(.+)?$/;
+const CA_REGEX_GROUP = /^\[(MK|PC|MC)\]\[(\d{3})\]\[(WW|WL\+)\]\[(RW|R)\]\s*([A-Z]+)(?:_(\d+))?_?(.+)?$/;
+
+// Mapowanie pełna nazwa konta → skrót w grupach reklam
+const CA_KONTO_SKROT = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC' };
 
 function caParseCampaignName(name) {
   const m = String(name || '').trim().match(CA_REGEX_CAMP);
@@ -11328,7 +11333,7 @@ function caParseCampaignName(name) {
 function caParseGroupName(name) {
   const m = String(name || '').trim().match(CA_REGEX_GROUP);
   if (!m) return { matched: false, raw: name };
-  return { matched: true, nnn: m[1], placement: m[2], targeting: m[3], linia: m[4], wymiar: m[5] || null, kolor: (m[6] || '').trim() };
+  return { matched: true, konto: m[1], nnn: m[2], placement: m[3], targeting: m[4], linia: m[5], wymiar: m[6] || null, kolor: (m[7] || '').trim() };
 }
 
 function caInit() {
@@ -11407,12 +11412,15 @@ function caGenerate() {
   out += `KAMPANIA (skopiuj do panelu Allegro Ads):\n`;
   out += `${campName}\n\n`;
 
+  // Prefix konta dla grup (Format A v2)
+  const kontoSkrot = CA_KONTO_SKROT[konto] || 'MK';
+
   if (kolory.length) {
     out += `GRUPY REKLAM (skopiuj każdą jako osobną grupę):\n`;
     kolory.forEach(kolor => {
       const groupName = wymiar
-        ? `[${nnn}][WW][RW] ${linia}_${wymiar}_${kolor}`
-        : `[${nnn}][WW][RW] ${linia}_${kolor}`;
+        ? `[${kontoSkrot}][${nnn}][WW][RW] ${linia}_${wymiar}_${kolor}`
+        : `[${kontoSkrot}][${nnn}][WW][RW] ${linia}_${kolor}`;
       out += `  ${groupName}\n`;
     });
     out += `\n`;
@@ -11800,9 +11808,13 @@ function caBuildArchitectPrompt(data) {
   p += `💎 Meble na Czasie = PREMIUM +2.5%: TOP92 Wotan, KARO 65 Wotan, stoliki podnoszone, gwiazdy z konwersją 4%+. Ads target: 6.5%.\n`;
   p += `REGUŁA WŁASNOŚCI FRAZY: jeśli aukcja jest na 2+ kontach, właścicielem jest konto z najwyższym ROAS Ads + zgodne z rolą strategiczną. Pozostałe konta WYŁĄCZAJĄ Ads (zostawiają listing aktywny — organika).\n\n`;
 
-  p += `== KONWENCJA NAZEWNICTWA ADS (FORMAT A) ==\n`;
+  p += `== KONWENCJA NAZEWNICTWA ADS (FORMAT A v2 — z prefiksem konta w grupach) ==\n`;
   p += `Kampania: /NNN/ KATEGORIA_LINIA_WYMIAR (np. /010/ LAZIENKA_PRALKA_62)\n`;
-  p += `Grupa reklam: [NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR (np. [010][WW][RW] PRALKA_62_WOTAN)\n`;
+  p += `Grupa reklam: [KONTO][NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR\n`;
+  p += `Przykład grupy MK: [MK][010][WW][RW] PRALKA_62_WOTAN\n`;
+  p += `Przykład grupy PC: [PC][010][WW][RW] DONICA_45_LANCELOT\n`;
+  p += `Przykład grupy MC: [MC][010][WL+][RW] STOLIK_TOP_92_WOTAN_GWIAZDA\n\n`;
+  p += `KONTO (skrót w grupach): MK = MobelKap, PC = Perfekt Cięcie, MC = Meble na Czasie\n`;
   p += `KATEGORIA: LAZIENKA, SALON, KUCHNIA, OGROD, NOWOSCI, SEZON, AUTO\n`;
   p += `LINIA: PRALKA, KARO, TOP, SLUPEK, KWIETNIK, DONICA, TBOX, SLIM, LUSTRO\n`;
   p += `WYMIAR: 62, 48, 92, 65 (opcjonalny)\n`;
@@ -11878,12 +11890,12 @@ function caBuildArchitectPrompt(data) {
   p += `WYMAGANIA OGÓLNE:\n`;
   p += `1. Każda kampania z każdego konta MUSI być w tabeli (nie pomijaj)\n`;
   p += `2. Sortuj sekcje per konto: MK → PC → MnC, w każdym sekcji sortuj po koszcie malejąco\n`;
-  p += `3. Stosuj konwencję Format A dla wszystkich nowych nazw\n`;
+  p += `3. Stosuj konwencję Format A v2 dla wszystkich nowych nazw — KAMPANIE bez prefiksu konta, GRUPY z prefiksem [MK]/[PC]/[MC]\n`;
   p += `4. Pisz nowe nazwy ZAWSZE WIELKIMI LITERAMI bez polskich znaków\n`;
   p += `5. NNN: zaczynaj per konto od 010, kolejne 020, 030...\n`;
   p += `6. Aukcje wymień jako TOP 5 ID po koszcie (nie wszystkie, oszczędzaj tokeny)\n`;
   p += `7. Każdy wiersz musi mieć krótkie uzasadnienie (1-2 zdania)\n`;
-  p += `8. Po tabeli per konto dodaj sekcję "PODSUMOWANIE GROUP REKLAM" z listą wszystkich nowych grup wg konwencji [NNN][WW][RW] LINIA_WYMIAR_KOLOR (top 3-5 grup per kampania)\n`;
+  p += `8. Po tabeli per konto dodaj sekcję "PODSUMOWANIE GROUP REKLAM" z listą wszystkich nowych grup wg konwencji [KONTO][NNN][WW][RW] LINIA_WYMIAR_KOLOR — KONTO odpowiednie dla danego konta (MK dla MobelKap, PC dla Perfekt Cięcie, MC dla Meble na Czasie)\n`;
   p += `9. ZAWSZE respektuj BACKUP STATUS przed jakąkolwiek rekomendacją ZAMKNIJ — to jest reguła nadrzędna\n\n`;
 
   p += `Na końcu dodaj sekcję **EFEKTY OCZEKIWANE** z liczbami:\n`;
