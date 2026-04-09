@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.19</title>
+<title>MPlace Hub v6.20</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.19</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.20</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2260,10 +2260,56 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 
   <div id="scrMessages" style="min-height:100px;max-height:600px;overflow-y:auto;margin-bottom:1rem"></div>
 
+  <!-- ═══ Sekcja UPLOAD plików XLSX (collapsible) ═══ -->
+  <details id="scrFilesSection" style="margin-bottom:1rem;border:1px solid rgba(232,121,249,.25);border-radius:8px;background:rgba(232,121,249,.03)">
+    <summary style="padding:10px 14px;cursor:pointer;font-family:var(--mono);font-size:11px;color:#e879f9;display:flex;justify-content:space-between;align-items:center">
+      <span>📂 Wgraj pliki XLSX (Ads / Odwiedziny / Sprzedaż / Katalog) — 0 plików załadowanych <span id="scrFilesCount" style="color:var(--text3);font-size:9px;margin-left:4px"></span></span>
+      <span style="font-size:9px;color:var(--text3)">rozwiń ▼</span>
+    </summary>
+    <div style="padding:10px 14px;border-top:1px solid rgba(232,121,249,.15)">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:8px;line-height:1.5">
+        Wybierz konto + typ pliku, wgraj XLSX. Po dodaniu plików zadaj pytanie w polu poniżej — Agent dostanie sparsowane dane jako kontekst pierwszej wiadomości. Multi-turn działa normalnie po wgraniu.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:8px;align-items:end;margin-bottom:8px">
+        <div>
+          <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">KONTO</div>
+          <select id="scrFileKonto" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:5px 8px;color:var(--text);font-size:10px;font-family:var(--mono)">
+            <option value="MobelKap">MobelKap (MK)</option>
+            <option value="PerfektCiecie">Perfekt Cięcie (PC)</option>
+            <option value="MeblenaCzasie">Meble na Czasie (MC)</option>
+            <option value="Luxsen">Luxsen</option>
+            <option value="Semmi">Semmi</option>
+            <option value="BOTAVIT">BOTAVIT</option>
+            <option value="Materazzi">Materazzi</option>
+            <option value="MtzzEU">MtzzEU</option>
+            <option value="Ankado24">Ankado24</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">TYP PLIKU</div>
+          <select id="scrFileType" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:5px 8px;color:var(--text);font-size:10px;font-family:var(--mono)">
+            <option value="ads">Ads (statystyki kampanii)</option>
+            <option value="sprzedaz">Odwiedziny wg ofert</option>
+            <option value="konwersja">Sprzedaż wg ofert</option>
+            <option value="ads30d">Ads 30 dni (kontekst)</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">PLIK XLSX</div>
+          <input type="file" id="scrFileInput" accept=".xlsx" onchange="scrAddFile(this)" style="width:100%;font-family:var(--mono);font-size:9px;color:var(--text2)">
+        </div>
+      </div>
+      <div id="scrFilesList" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px">
+        <button onclick="scrClearFiles()" style="font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">🗑 Wyczyść pliki</button>
+      </div>
+    </div>
+  </details>
+
   <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
     <div id="scrImagePreview" style="display:none;padding:8px 12px;border-bottom:1px solid var(--border)"></div>
     <div style="padding:10px 12px;display:flex;gap:8px;align-items:flex-end">
-      <textarea id="scrInput" rows="6" placeholder="Wklej screenshot (Ctrl+V) lub napisz pytanie... (Cmd+Enter = wyślij)" style="flex:1;background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;line-height:1.4;min-height:80px"></textarea>
+      <textarea id="scrInput" rows="6" placeholder="Wklej screenshot (Ctrl+V), wgraj XLSX (📂 powyżej) lub napisz pytanie... (Cmd+Enter = wyślij)" style="flex:1;background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;line-height:1.4;min-height:80px"></textarea>
       <button onclick="scrSend()" style="font-family:var(--mono);font-size:11px;padding:8px 16px;border-radius:6px;border:1px solid rgba(232,121,249,.4);background:rgba(232,121,249,.12);color:#e879f9;cursor:pointer;white-space:nowrap;flex-shrink:0">Wyślij</button>
     </div>
   </div>
@@ -12400,7 +12446,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.19</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.20</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -12927,6 +12973,167 @@ function scrClear() {
   scrRenderImagePreviews();
 }
 
+// ═══════════════════════════════════════════════════════════
+// SCREENER — UPLOAD XLSX (multi-turn chat z plikami)
+// ═══════════════════════════════════════════════════════════
+
+window._scrFiles = window._scrFiles || []; // [{ konto, type, fileName, parsed }]
+window._scrFilesContextSent = false; // czy kontekst plików już wysłany do Agenta
+
+async function scrAddFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const konto = document.getElementById('scrFileKonto').value;
+  const type = document.getElementById('scrFileType').value;
+  const realType = type === 'ads30d' ? 'ads' : type; // Ads 30d używa parsera ads
+
+  try {
+    if (typeof aaLoadSheetJS === 'function') await aaLoadSheetJS();
+    const parsed = await aaParseFile(file, realType);
+
+    window._scrFiles.push({
+      konto,
+      type, // przechowujemy oryginalny typ (ads/sprzedaz/konwersja/ads30d) dla kontekstu
+      fileName: file.name,
+      parsed,
+      addedAt: Date.now()
+    });
+
+    // Reset cache kontekstu — następne wysłanie wyśle pliki do Agenta
+    window._scrFilesContextSent = false;
+
+    scrRenderFilesList();
+    input.value = ''; // reset input dla kolejnego uploadu
+  } catch(err) {
+    alert('Błąd parsowania pliku: ' + err.message);
+  }
+}
+
+function scrRemoveFile(idx) {
+  window._scrFiles.splice(idx, 1);
+  window._scrFilesContextSent = false;
+  scrRenderFilesList();
+}
+
+function scrClearFiles() {
+  if (window._scrFiles.length && !confirm('Usunąć wszystkie wgrane pliki?')) return;
+  window._scrFiles = [];
+  window._scrFilesContextSent = false;
+  scrRenderFilesList();
+}
+
+function scrRenderFilesList() {
+  const list = document.getElementById('scrFilesList');
+  const summary = document.getElementById('scrFilesSection')?.querySelector('summary span:first-child');
+  if (!list) return;
+
+  const count = window._scrFiles.length;
+  if (summary) {
+    summary.innerHTML = `📂 Wgraj pliki XLSX (Ads / Odwiedziny / Sprzedaż / Katalog) — ${count} plików załadowanych`;
+  }
+
+  if (!count) {
+    list.innerHTML = '<div style="font-size:9px;color:var(--text3);font-style:italic">Brak wgranych plików</div>';
+    return;
+  }
+
+  const kontoSkrot = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC' };
+  const typeLabels = { ads: 'Ads', sprzedaz: 'Odwiedziny', konwersja: 'Sprzedaż', ads30d: 'Ads 30d' };
+  const typeColors = { ads: '#38bdf8', sprzedaz: '#34d399', konwersja: '#f5a623', ads30d: '#a78bfa' };
+
+  list.innerHTML = window._scrFiles.map((f, idx) => {
+    const skrot = kontoSkrot[f.konto] || f.konto.substring(0,2);
+    const label = typeLabels[f.type] || f.type;
+    const color = typeColors[f.type] || '#e879f9';
+    let stats = '';
+    if (f.parsed) {
+      if (f.type === 'ads' || f.type === 'ads30d') {
+        stats = `${f.parsed.kampanie?.length || 0} kamp · ${(f.parsed.totKoszt||0).toFixed(0)} zł`;
+      } else if (f.type === 'sprzedaz') {
+        stats = `${f.parsed.oferty?.length || 0} ofert · ${f.parsed.totWizyty || 0} wizyt`;
+      } else if (f.type === 'konwersja') {
+        stats = `${f.parsed.oferty?.length || 0} ofert · ${(f.parsed.totWartosc||0).toFixed(0)} zł`;
+      }
+    }
+    return `<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px;background:${color}15;border:1px solid ${color}40;border-radius:4px;font-size:10px;font-family:var(--mono)">
+      <strong style="color:${color}">[${skrot}]</strong>
+      <span style="color:var(--text2)">${label}</span>
+      <span style="color:var(--text3);font-size:9px">${stats}</span>
+      <span onclick="scrRemoveFile(${idx})" style="cursor:pointer;color:var(--text3);font-size:11px;padding:0 2px" title="Usuń">×</span>
+    </div>`;
+  }).join('');
+}
+
+// Buduj kontekst plików do wstrzyknięcia w pierwsze user message po dodaniu plików
+function scrBuildFilesContext() {
+  if (!window._scrFiles.length) return '';
+
+  let ctx = `\n\n=== WGRANE PLIKI XLSX (kontekst do analizy) ===\n`;
+  ctx += `Liczba plików: ${window._scrFiles.length}\n\n`;
+
+  // Group per konto
+  const perKonto = {};
+  window._scrFiles.forEach(f => {
+    if (!perKonto[f.konto]) perKonto[f.konto] = [];
+    perKonto[f.konto].push(f);
+  });
+
+  Object.entries(perKonto).forEach(([konto, files]) => {
+    ctx += `\n--- KONTO: ${konto} ---\n`;
+    files.forEach(f => {
+      const p = f.parsed || {};
+      if (f.type === 'ads' || f.type === 'ads30d') {
+        const label = f.type === 'ads30d' ? 'ADS 30 DNI' : 'ADS';
+        ctx += `\n[${label}] ${f.fileName}\n`;
+        ctx += `Łącznie: ${(p.totKoszt||0).toFixed(0)} zł koszt | ${(p.totSprzedaz||0).toFixed(0)} zł sprzedaż | ROAS ${(p.totRoas||0).toFixed(2)} | ${p.kampanie?.length || 0} kampanii\n`;
+        if (p.kampanie?.length) {
+          ctx += `Top 10 kampanii po koszcie:\n`;
+          p.kampanie.slice().sort((a,b) => b.koszt - a.koszt).slice(0,10).forEach(k => {
+            ctx += `  "${k.kampania}" | Koszt:${k.koszt.toFixed(0)}zł Sprzedaż:${k.sprzedaz.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} (${k.aukcje?.length||0} aukcji)\n`;
+          });
+        }
+        if (p.aggregated?.length) {
+          ctx += `Top 10 aukcji po sprzedaży (agregat across kampanii):\n`;
+          p.aggregated.slice(0,10).forEach(a => {
+            ctx += `  [${a.nr}] ${(a.oferta||'').substring(0,50)} | Koszt:${a.koszt.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Trans:${a.sztuki||0}\n`;
+          });
+        }
+      } else if (f.type === 'sprzedaz') {
+        ctx += `\n[ODWIEDZINY] ${f.fileName}\n`;
+        ctx += `Łącznie: ${p.totWizyty||0} wizyt | ${p.totTransakcje||0} transakcji | konwersja: ${((p.srKonwersja||0)*100).toFixed(2)}%\n`;
+        if (p.oferty?.length) {
+          ctx += `Top 15 ofert po wizytach:\n`;
+          p.oferty.slice(0,15).forEach(o => {
+            ctx += `  ${o.id?'['+o.id+'] ':''}${(o.oferta||'').substring(0,50)} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% Koszyk:${o.koszyk||0}\n`;
+          });
+        }
+        if (p.martwePunkty?.length) {
+          ctx += `Martwe punkty (>=10 wizyt, 0 trans):\n`;
+          p.martwePunkty.slice(0,5).forEach(o => { ctx += `  ${(o.oferta||'').substring(0,50)} | ${o.wizyty||0} wizyt\n`; });
+        }
+      } else if (f.type === 'konwersja') {
+        ctx += `\n[SPRZEDAŻ] ${f.fileName}\n`;
+        ctx += `Łączna sprzedaż: ${(p.totWartosc||0).toFixed(0)} zł | ${p.oferty?.length || 0} ofert\n`;
+        if (p.oferty?.length) {
+          // Liczba transakcji łącznie (do AOV!)
+          const totTrans = p.oferty.reduce((s,o)=>s+(o.transakcje||0),0);
+          const aov = totTrans > 0 ? (p.totWartosc / totTrans) : 0;
+          ctx += `Łącznie transakcji: ${totTrans} | AOV (Average Order Value): ${aov.toFixed(0)} zł\n`;
+          ctx += `Top 15 ofert po wartości:\n`;
+          p.oferty.slice(0,15).forEach(o => {
+            ctx += `  ${(o.oferta||'').substring(0,50)} | Trans:${o.transakcje||0} Szt:${o.sztuki||0} Wartość:${(o.wartosc||0).toFixed(0)}zł Cena:${(o.cena||0).toFixed(0)}zł ${o.kategoria?'Kat:'+o.kategoria:''}\n`;
+          });
+        }
+      }
+    });
+  });
+
+  ctx += `\n=== KONIEC DANYCH PLIKÓW ===\n`;
+  ctx += `Powyższe dane są dostępne dla całej rozmowy. Odpowiadaj na pytania użytkownika opierając się na nich. Możesz cytować konkretne kampanie, aukcje, ID, wartości. Dla pytań o AOV: AOV = łączna sprzedaż / łączna liczba transakcji.\n\n`;
+  return ctx;
+}
+
 // Historia rozmów Screenera — localStorage
 function scrLoadHistoryList() {
   try { return JSON.parse(localStorage.getItem('scrSessions') || '[]'); } catch(e) { return []; }
@@ -13039,14 +13246,22 @@ async function scrSend() {
   messagesEl.innerHTML += userHtml;
 
   // Build content for this message
+  // Wstrzyknij kontekst plików XLSX (jeśli są wgrane i nie były jeszcze wysłane)
+  let questionText = q || 'Co widzisz na tych screenshotach? Przeanalizuj.';
+  if (window._scrFiles && window._scrFiles.length && !window._scrFilesContextSent) {
+    const filesCtx = scrBuildFilesContext();
+    questionText = filesCtx + '\n\nPYTANIE UŻYTKOWNIKA:\n' + questionText;
+    window._scrFilesContextSent = true; // wyślij raz, multi-turn działa dalej naturalnie
+  }
+
   const contentBlocks = [];
   imgs.forEach(img => {
     contentBlocks.push({ type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.base64 } });
   });
-  contentBlocks.push({ type: 'text', text: q || 'Co widzisz na tych screenshotach? Przeanalizuj.' });
+  contentBlocks.push({ type: 'text', text: questionText });
 
   // Add to conversation history
-  window._scrHistory.push({ role: 'user', content: hasImages ? contentBlocks : q || 'Przeanalizuj.' });
+  window._scrHistory.push({ role: 'user', content: hasImages ? contentBlocks : questionText });
 
   // Clear input
   input.value = '';
