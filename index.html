@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v5.85</title>
+<title>MPlace Hub v5.86</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.85</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v5.86</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9455,14 +9455,17 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   ads.kampanie.forEach(k => k.aukcje.forEach(a => {
     if (!a.nr) return;
     if (!nrMap[a.nr]) nrMap[a.nr] = [];
-    nrMap[a.nr].push({ kampania: k.kampania, koszt: a.koszt, sprzedaz: a.sprzedaz, roas: a.roas, miejsce: a.miejsce });
+    nrMap[a.nr].push({ kampania: k.kampania, koszt: a.koszt, sprzedaz: a.sprzedaz, roas: a.roas, sztuki: a.sztuki || 0, miejsce: a.miejsce });
   }));
   const duplikaty = Object.entries(nrMap).filter(([nr, entries]) => entries.length > 1);
   if (duplikaty.length) {
     p += `\nAUKCJE W WIELU KAMPANIACH (potencjalna kanibalizacja — ta sama oferta licytuje w różnych kampaniach):\n`;
+    p += `WAŻNE: jeśli ŁĄCZNE transakcje aukcji < 3 — NIE rekomenduj wykluczenia, oznacz "ZA MAŁO DANYCH, obserwuj 14 dni". 1 transakcja = przypadek, nawet przy ROAS 30+.\n`;
     duplikaty.slice(0, 8).forEach(([nr, entries]) => {
-      p += `  [${nr}] — pojawia się w ${entries.length} kampaniach:\n`;
-      entries.forEach(e => { p += `    ${e.kampania} | Koszt:${e.koszt.toFixed(0)}zł Sprzedaż:${e.sprzedaz.toFixed(0)}zł ROAS:${e.roas.toFixed(2)}${e.miejsce?' ['+e.miejsce+']':''}\n`; });
+      const totSzt = entries.reduce((s, e) => s + e.sztuki, 0);
+      const dataFlag = totSzt < 3 ? ' [ZA MAŁO DANYCH — NIE wyłączaj]' : '';
+      p += `  [${nr}] — w ${entries.length} kampaniach (łącznie ${totSzt} szt.)${dataFlag}:\n`;
+      entries.forEach(e => { p += `    ${e.kampania} | Koszt:${e.koszt.toFixed(0)}zł Sprzedaż:${e.sprzedaz.toFixed(0)}zł ROAS:${e.roas.toFixed(2)} Szt:${e.sztuki}${e.miejsce?' ['+e.miejsce+']':''}\n`; });
     });
   }
 
@@ -9527,14 +9530,15 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   p += `E) Wysoki CTR + niska sprzedaż = problem z ofertą (cena/zdjęcia), NIE z kampanią. Sprawdź czy ruch migruje do konkurencji.\n`;
   p += `F) Dane główne = 14 dni (lub bieżący okres). Dane 30d = kontekst historyczny. Opieraj decyzje na GŁÓWNYCH danych, 30d jako weryfikacja.\n`;
   p += `G) Jeśli ROAS główny < BE ale ROAS 30d > BE = efekt sezonowy, NIE wyłączaj.\n`;
-  p += `H) Jeśli ROAS główny < 3 I ROAS 30d < 3 = strukturalnie martwa, WYŁĄCZ.\n\n`;
+  p += `H) Jeśli ROAS główny < 3 I ROAS 30d < 3 = strukturalnie martwa, WYŁĄCZ.\n`;
+  p += `I) KANIBALIZACJA: jeśli aukcja w wielu kampaniach ma ŁĄCZNIE < 3 transakcji — NIE rekomenduj wykluczenia z żadnej kampanii. Porównanie ROAS 36 vs 6 przy 1 transakcji w każdej = przypadek, nie dane. Oznacz "obserwuj 14 dni".\n\n`;
   p += `RAPORT w 8 sekcjach. Konkretne liczby. Po polsku.\n\n`;
   p += `1. DIAGNOZA — ile dokładnie tracisz na Ads miesięcznie (kwota w zł), ROAS vs BE, marża\n`;
   p += `2. WYŁĄCZ (ROAS < 3 lub ROAS=0 przy koszt>=30zł) — groźne, natychmiast: [numer] | koszt X zł | ROAS X | strata X zł/mies.\n`;
   p += `3. OSTRZEŻENIE (ROAS 3-4) — poważne, decyzja w 7 dni: optymalizuj lub wyłącz\n`;
   p += `4. OPTYMALIZUJ (ROAS 4 do ${be.toFixed(1)}) — tnij stawkę: [numer] | koszt X zł | ROAS X vs BE ${be.toFixed(2)} | o ile % obniżyć\n`;
   p += `5. SKALUJ (ROAS > BE, min 3 transakcje) — TYLKO potwierdzone gwiazdy. 1-2 transakcje = "obserwuj", NIE skaluj\n`;
-  p += `6. KANIBALIZACJA — aukcje w wielu kampaniach: pokaż ŁĄCZNY wynik (agregat) vs per-kampania, wskaż duplikaty do wyłączenia\n`;
+  p += `6. KANIBALIZACJA — aukcje w wielu kampaniach: pokaż ŁĄCZNY wynik (agregat) vs per-kampania, wskaż duplikaty do wyłączenia. WARUNEK: minimum 3 transakcje łącznie żeby rekomendować jakąkolwiek decyzję. Mniej = "obserwuj", brak akcji.\n`;
   p += `7. CTR vs KONWERSJA — wysokie CTR bez sprzedaży: diagnoza (cena? zdjęcia? migracja ruchu?), konkretna rekomendacja\n`;
   p += `8. PLACEMENT — Wyniki wyszukiwania vs Strona produktu: który działa, rekomendacja\n`;
   p += `9. PLAN TYGODNIA — 5 działań sortowane po kwocie oszczędności: [PILNE/WAŻNE] Co → Gdzie → Oszczędność zł/mies.\n`;
