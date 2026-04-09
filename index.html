@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.11</title>
+<title>MPlace Hub v6.12</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.11</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.12</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -11745,22 +11745,52 @@ async function caRunArchitect() {
 function caBuildArchitectPrompt(data) {
   // Buduj globalną mapę aukcji × konta
   const auctionMap = {};
+  // BACKUP MAP per konto: { konto: { auctionId: [{kampania, koszt, roas, sztuki}, ...] } }
+  const backupMap = { MobelKap: {}, PerfektCiecie: {}, MeblenaCzasie: {} };
+
   ['MobelKap', 'PerfektCiecie', 'MeblenaCzasie'].forEach(konto => {
     const ads = data[konto];
     ads.kampanie.forEach(k => {
       k.aukcje.forEach(a => {
         if (!a.nr) return;
+        // Cross-account map
         if (!auctionMap[a.nr]) auctionMap[a.nr] = {};
         if (!auctionMap[a.nr][konto]) auctionMap[a.nr][konto] = { kampanie: [], oferta: a.oferta, koszt: 0, sprzedaz: 0, sztuki: 0 };
         auctionMap[a.nr][konto].kampanie.push(k.kampania);
         auctionMap[a.nr][konto].koszt += a.koszt;
         auctionMap[a.nr][konto].sprzedaz += a.sprzedaz;
         auctionMap[a.nr][konto].sztuki += (a.sztuki || 0);
+        // Backup map (same account)
+        if (!backupMap[konto][a.nr]) backupMap[konto][a.nr] = [];
+        backupMap[konto][a.nr].push({
+          kampania: k.kampania,
+          koszt: a.koszt,
+          sprzedaz: a.sprzedaz,
+          roas: a.roas,
+          sztuki: a.sztuki || 0
+        });
       });
     });
   });
 
   const crossAccount = Object.entries(auctionMap).filter(([nr, accs]) => Object.keys(accs).length > 1);
+
+  // Helper: czy aukcja ma backup w innej kampanii TEGO SAMEGO konta?
+  function getBackupStatus(konto, auctionNr, currentKampania) {
+    const allInstances = backupMap[konto][auctionNr] || [];
+    const otherInstances = allInstances.filter(i => i.kampania !== currentKampania);
+    if (otherInstances.length === 0) return { hasBackup: false, count: 0, bestRoas: 0 };
+    const bestRoas = Math.max(...otherInstances.map(i => i.roas));
+    const totalKoszt = otherInstances.reduce((s, i) => s + i.koszt, 0);
+    const totalSprzedaz = otherInstances.reduce((s, i) => s + i.sprzedaz, 0);
+    return {
+      hasBackup: true,
+      count: otherInstances.length,
+      bestRoas,
+      aggregateRoas: totalKoszt > 0 ? totalSprzedaz / totalKoszt : 0,
+      kampanie: otherInstances.map(i => i.kampania)
+    };
+  }
 
   let p = `Jesteś AI Architectem Allegro Ads dla grupy MEBLE. Masz dane Ads dla 3 kont i musisz zaproponować pełny plan reorganizacji kampanii zgodnie ze strategią portfelową.\n\n`;
 
@@ -11789,8 +11819,17 @@ function caBuildArchitectPrompt(data) {
       p += `KAMPANIA: "${k.kampania}" | Koszt:${k.koszt.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}%\n`;
       k.aukcje.sort((a, b) => b.koszt - a.koszt).slice(0, 8).forEach(a => {
         const inOtherAccounts = auctionMap[a.nr] ? Object.keys(auctionMap[a.nr]).filter(kk => kk !== konto) : [];
-        const crossFlag = inOtherAccounts.length ? ` [TAKŻE NA: ${inOtherAccounts.join(',')}]` : '';
-        p += `  [${a.nr}] ${(a.oferta || '').substring(0, 50)} | Koszt:${a.koszt.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki || 0}${crossFlag}\n`;
+        const crossFlag = inOtherAccounts.length ? ` [TAKZE_NA:${inOtherAccounts.join(',')}]` : '';
+        // BACKUP STATUS: czy aukcja ma backup w innej kampanii TEGO SAMEGO konta?
+        const backup = getBackupStatus(konto, a.nr, k.kampania);
+        let backupFlag = '';
+        if (backup.hasBackup) {
+          const safe = backup.bestRoas >= 4;
+          backupFlag = ` [BACKUP:TAK_${backup.count}kamp_bestROAS${backup.bestRoas.toFixed(1)}${safe ? '_BEZPIECZNE_DO_ZAMKNIECIA' : '_OSTRZEZENIE'}]`;
+        } else {
+          backupFlag = ` [BACKUP:NIE_OSTRZEZENIE_JEDYNA_KAMPANIA]`;
+        }
+        p += `  [${a.nr}] ${(a.oferta || '').substring(0, 50)} | Koszt:${a.koszt.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki || 0}${crossFlag}${backupFlag}\n`;
       });
       if (k.aukcje.length > 8) p += `  ... i ${k.aukcje.length - 8} więcej aukcji\n`;
     });
@@ -11819,7 +11858,24 @@ function caBuildArchitectPrompt(data) {
   p += `- **ZAMKNIJ** — duplikat, ROAS<3 lub poza specjalizacją konta — wyłącz\n`;
   p += `- **PRZENIES → KONTO** — aukcje są w specjalizacji innego konta (kanibalizacja cross-account)\n`;
   p += `- **NOWA** — kampania której brak a powinna być (np. dla top performera bez dedykowanej kampanii)\n\n`;
-  p += `WYMAGANIA:\n`;
+
+  p += `=== KRYTYCZNA REGUŁA BEZPIECZEŃSTWA: BACKUP STATUS PRZED ZAMKNIJ ===\n`;
+  p += `Każda aukcja w każdej kampanii ma w danych powyżej tag [BACKUP:...]:\n`;
+  p += `- [BACKUP:TAK_Xkamp_bestROASY_BEZPIECZNE_DO_ZAMKNIECIA] — aukcja jest też w X innych kampaniach tego konta, z best ROAS Y >= 4 → bezpieczne zamknięcie tej instancji\n`;
+  p += `- [BACKUP:TAK_Xkamp_bestROASY_OSTRZEZENIE] — aukcja ma backup ALE best ROAS w innych kampaniach < 4 → backup też słaby, ostrożnie\n`;
+  p += `- [BACKUP:NIE_OSTRZEZENIE_JEDYNA_KAMPANIA] — aukcja jest TYLKO w tej kampanii, zamknięcie usunie ją z Ads całkowicie\n\n`;
+  p += `REGUŁA: PRZED rekomendacją ZAMKNIJ kampanii sprawdź WSZYSTKIE aukcje w środku:\n`;
+  p += `1. Jeśli WSZYSTKIE aukcje mają [BACKUP:TAK_...BEZPIECZNE_DO_ZAMKNIECIA] → ZAMKNIJ bez ostrzeżeń\n`;
+  p += `2. Jeśli CZĘŚĆ aukcji ma [BACKUP:NIE...] LUB [BACKUP:TAK_...OSTRZEZENIE]:\n`;
+  p += `   → W kolumnie Akcja użyj: **ZAMKNIJ Z OSTRZEŻENIEM**\n`;
+  p += `   → W uzasadnieniu wymień ID aukcji bez backup z ich ROAS i sugestię "Przed zamknięciem przenieś [ID] do kampanii [X] LUB pozostaw aukcję na organice"\n`;
+  p += `3. Jeśli aukcja ma ROAS > BE (>= 5) i [BACKUP:NIE...] i tylko 1-2 transakcje → NIE rekomenduj jej zamknięcia, sugeruj "OBSERWUJ 14 dni, za mało danych"\n\n`;
+  p += `Format aukcji w kolumnie "Aukcje (top 5 ID)" przy ZAMKNIJ:\n`;
+  p += `- Aukcje BEZPIECZNE: tylko ID, np. "17560035805, 17565016974"\n`;
+  p += `- Aukcje OSTRZEŻENIE: ID + flaga [!], np. "17355976987[!], 13577281200[!]"\n`;
+  p += `- Pod tabelą per konto dodaj sekcję "⚠️ AUKCJE WYMAGAJĄCE OCHRONY PRZED ZAMKNIĘCIEM" z pełną listą [ID] + ROAS + propozycją gdzie przenieść\n\n`;
+
+  p += `WYMAGANIA OGÓLNE:\n`;
   p += `1. Każda kampania z każdego konta MUSI być w tabeli (nie pomijaj)\n`;
   p += `2. Sortuj sekcje per konto: MK → PC → MnC, w każdym sekcji sortuj po koszcie malejąco\n`;
   p += `3. Stosuj konwencję Format A dla wszystkich nowych nazw\n`;
@@ -11827,12 +11883,15 @@ function caBuildArchitectPrompt(data) {
   p += `5. NNN: zaczynaj per konto od 010, kolejne 020, 030...\n`;
   p += `6. Aukcje wymień jako TOP 5 ID po koszcie (nie wszystkie, oszczędzaj tokeny)\n`;
   p += `7. Każdy wiersz musi mieć krótkie uzasadnienie (1-2 zdania)\n`;
-  p += `8. Po tabeli per konto dodaj sekcję "PODSUMOWANIE GROUP REKLAM" z listą wszystkich nowych grup wg konwencji [NNN][WW][RW] LINIA_WYMIAR_KOLOR (top 3-5 grup per kampania)\n\n`;
+  p += `8. Po tabeli per konto dodaj sekcję "PODSUMOWANIE GROUP REKLAM" z listą wszystkich nowych grup wg konwencji [NNN][WW][RW] LINIA_WYMIAR_KOLOR (top 3-5 grup per kampania)\n`;
+  p += `9. ZAWSZE respektuj BACKUP STATUS przed jakąkolwiek rekomendacją ZAMKNIJ — to jest reguła nadrzędna\n\n`;
+
   p += `Na końcu dodaj sekcję **EFEKTY OCZEKIWANE** z liczbami:\n`;
-  p += `- Liczba zamkniętych duplikatów\n`;
+  p += `- Liczba zamkniętych duplikatów (BEZPIECZNYCH)\n`;
+  p += `- Liczba kampanii ZAMKNIJ Z OSTRZEŻENIEM (wymagają ręcznej decyzji menedżera)\n`;
   p += `- Liczba kampanii do przeniesienia cross-account\n`;
   p += `- Szacunkowa oszczędność miesięczna (zł/mies.)\n`;
-  p += `- Ile kanibalizacji cross-account zostanie wyeliminowane\n`;
+  p += `- Liczba aukcji wymagających ochrony (BACKUP:NIE z dobrym ROAS)\n`;
   return p;
 }
 
