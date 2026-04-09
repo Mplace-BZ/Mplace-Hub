@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.20</title>
+<title>MPlace Hub v6.21</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.20</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.21</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2263,17 +2263,18 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   <!-- ═══ Sekcja UPLOAD plików XLSX (collapsible) ═══ -->
   <details id="scrFilesSection" style="margin-bottom:1rem;border:1px solid rgba(232,121,249,.25);border-radius:8px;background:rgba(232,121,249,.03)">
     <summary style="padding:10px 14px;cursor:pointer;font-family:var(--mono);font-size:11px;color:#e879f9;display:flex;justify-content:space-between;align-items:center">
-      <span>📂 Wgraj pliki XLSX (Ads / Odwiedziny / Sprzedaż / Katalog) — 0 plików załadowanych <span id="scrFilesCount" style="color:var(--text3);font-size:9px;margin-left:4px"></span></span>
+      <span>📂 Wgraj pliki XLSX (Ads / Odwiedziny / Sprzedaż / Katalog) — <span id="scrFilesCount">0 plików</span></span>
       <span style="font-size:9px;color:var(--text3)">rozwiń ▼</span>
     </summary>
     <div style="padding:10px 14px;border-top:1px solid rgba(232,121,249,.15)">
       <div style="font-size:10px;color:var(--text3);margin-bottom:8px;line-height:1.5">
-        Wybierz konto + typ pliku, wgraj XLSX. Po dodaniu plików zadaj pytanie w polu poniżej — Agent dostanie sparsowane dane jako kontekst pierwszej wiadomości. Multi-turn działa normalnie po wgraniu.
+        <strong style="color:#e879f9">🤖 Auto-detekcja:</strong> wgraj wiele plików naraz — system wykryje konto i typ z nazwy pliku lub zawartości XLSX. Możesz też wybrać ręcznie z dropdownu (override).
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:8px;align-items:end;margin-bottom:8px">
         <div>
           <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">KONTO</div>
           <select id="scrFileKonto" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:5px 8px;color:var(--text);font-size:10px;font-family:var(--mono)">
+            <option value="_auto">🤖 Auto-detekcja (zalecane)</option>
             <option value="MobelKap">MobelKap (MK)</option>
             <option value="PerfektCiecie">Perfekt Cięcie (PC)</option>
             <option value="MeblenaCzasie">Meble na Czasie (MC)</option>
@@ -2288,6 +2289,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
         <div>
           <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">TYP PLIKU</div>
           <select id="scrFileType" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:5px 8px;color:var(--text);font-size:10px;font-family:var(--mono)">
+            <option value="_auto">🤖 Auto-detekcja</option>
             <option value="ads">Ads (statystyki kampanii)</option>
             <option value="sprzedaz">Odwiedziny wg ofert</option>
             <option value="konwersja">Sprzedaż wg ofert</option>
@@ -2295,8 +2297,8 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
           </select>
         </div>
         <div>
-          <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">PLIK XLSX</div>
-          <input type="file" id="scrFileInput" accept=".xlsx" onchange="scrAddFile(this)" style="width:100%;font-family:var(--mono);font-size:9px;color:var(--text2)">
+          <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">PLIKI XLSX (możesz wybrać wiele)</div>
+          <input type="file" id="scrFileInput" accept=".xlsx" multiple onchange="scrAddFile(this)" style="width:100%;font-family:var(--mono);font-size:9px;color:var(--text2)">
         </div>
       </div>
       <div id="scrFilesList" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px"></div>
@@ -12446,7 +12448,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.20</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.21</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -12977,36 +12979,164 @@ function scrClear() {
 // SCREENER — UPLOAD XLSX (multi-turn chat z plikami)
 // ═══════════════════════════════════════════════════════════
 
-window._scrFiles = window._scrFiles || []; // [{ konto, type, fileName, parsed }]
+window._scrFiles = window._scrFiles || []; // [{ konto, type, fileName, parsed, source }]
 window._scrFilesContextSent = false; // czy kontekst plików już wysłany do Agenta
 
+// Detekcja konta z nazwy pliku (regex 3-warstwowy)
+function scrDetectKontoFromName(fileName) {
+  const lower = String(fileName || '').toLowerCase();
+  // MEBLE
+  if (/mobelkap|mobel.?kap|\bmk[\b_-]/.test(lower)) return 'MobelKap';
+  if (/perfektciecie|perfekt.?ciecie|perfekt.?cięcie|\bpc[\b_-]/.test(lower)) return 'PerfektCiecie';
+  if (/meble.?na.?czasie|meblenaczasie|\bmnc[\b_-]|\bmc[\b_-]/.test(lower)) return 'MeblenaCzasie';
+  // LUXSEN
+  if (/luxsen|\blux[\b_-]/.test(lower)) return 'Luxsen';
+  if (/semmi|\bsem[\b_-]/.test(lower)) return 'Semmi';
+  if (/botavit|\bbov[\b_-]/.test(lower)) return 'BOTAVIT';
+  // ONE
+  if (/materazzi|\bmtz[\b_-]/.test(lower)) return 'Materazzi';
+  if (/mtzzeu|\bmeu[\b_-]/.test(lower)) return 'MtzzEU';
+  if (/ankado24|\ba24[\b_-]/.test(lower)) return 'Ankado24';
+  return null;
+}
+
+// Detekcja konta z zawartości XLSX (Allegro wpisuje nazwę sprzedawcy w komórki)
+function scrDetectKontoFromWorkbook(wb) {
+  // Mapowanie nazw sprzedawców (lowercase) → klucze AC_META
+  // Potwierdzone z plików Allegro 09.04.2026:
+  const sellerMap = {
+    'mobelkap': 'MobelKap',
+    'perfektciecie': 'PerfektCiecie',
+    'meble-na-czasie': 'MeblenaCzasie',
+    'meblenaczasie': 'MeblenaCzasie',
+    'luxsen': 'Luxsen',
+    'semmi': 'Semmi',
+    'botavit': 'BOTAVIT',
+    'materazzi': 'Materazzi',
+    'mtzzeu': 'MtzzEU',
+    'ankado24': 'Ankado24'
+  };
+
+  // Skanuj pierwsze 5 komórek pierwszych 3 zakładek — Allegro zwykle wpisuje nazwę w A1, A2 lub B1
+  for (const sheetName of wb.SheetNames.slice(0, 3)) {
+    const ws = wb.Sheets[sheetName];
+    if (!ws || !ws['!ref']) continue;
+    // Sprawdź A1, B1, C1, A2, B2 (i pierwsze hyperlinki)
+    const cellsToCheck = ['A1', 'B1', 'C1', 'A2', 'B2', 'A3', 'B3'];
+    for (const addr of cellsToCheck) {
+      const cell = ws[addr];
+      if (!cell) continue;
+      const val = String(cell.v || cell.h || '').toLowerCase().trim();
+      if (sellerMap[val]) return { konto: sellerMap[val], source: 'file' };
+      // Częściowy match (np. "Mobelkap" w "Mobelkap Sp. z o.o.")
+      for (const [seller, key] of Object.entries(sellerMap)) {
+        if (val.includes(seller)) return { konto: key, source: 'file' };
+      }
+    }
+  }
+  return null;
+}
+
+// Detekcja typu pliku z workbook (po nazwach zakładek)
+function scrDetectFileType(wb) {
+  const sheets = wb.SheetNames.map(s => s.toLowerCase());
+  // Sprzedaż wg ofert (parsuje aaParseFile jako 'konwersja' — historyczna nazwa)
+  if (sheets.some(s => /^wg ofert/.test(s) || (s.includes('wg ofert') && !s.includes('odwiedziny')))) {
+    return 'konwersja';
+  }
+  // Odwiedziny wg ofert
+  if (sheets.some(s => s.includes('odwiedziny'))) {
+    return 'sprzedaz';
+  }
+  // Statystyki (Ads)
+  if (sheets.some(s => s.includes('statystyki'))) {
+    return 'ads';
+  }
+  return null;
+}
+
 async function scrAddFile(input) {
-  const file = input.files[0];
-  if (!file) return;
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
 
-  const konto = document.getElementById('scrFileKonto').value;
-  const type = document.getElementById('scrFileType').value;
-  const realType = type === 'ads30d' ? 'ads' : type; // Ads 30d używa parsera ads
+  // Multi-upload — przetwórz wszystkie pliki
+  if (typeof aaLoadSheetJS === 'function') await aaLoadSheetJS();
 
-  try {
-    if (typeof aaLoadSheetJS === 'function') await aaLoadSheetJS();
-    const parsed = await aaParseFile(file, realType);
+  const dropdownKonto = document.getElementById('scrFileKonto').value;
+  const dropdownType = document.getElementById('scrFileType').value;
+  const useAutoKonto = dropdownKonto === '_auto';
+  const useAutoType = dropdownType === '_auto';
 
-    window._scrFiles.push({
-      konto,
-      type, // przechowujemy oryginalny typ (ads/sprzedaz/konwersja/ads30d) dla kontekstu
-      fileName: file.name,
-      parsed,
-      addedAt: Date.now()
-    });
+  const errors = [];
 
-    // Reset cache kontekstu — następne wysłanie wyśle pliki do Agenta
-    window._scrFilesContextSent = false;
+  for (const file of files) {
+    try {
+      // Wczytaj workbook RAW żeby móc detekcji przed parserem
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
 
-    scrRenderFilesList();
-    input.value = ''; // reset input dla kolejnego uploadu
-  } catch(err) {
-    alert('Błąd parsowania pliku: ' + err.message);
+      // 1. Detekcja KONTA: dropdown manual > nazwa pliku > zawartość > fallback alert
+      let konto, kontoSource;
+      if (!useAutoKonto) {
+        konto = dropdownKonto;
+        kontoSource = 'manual';
+      } else {
+        // A: nazwa pliku
+        const fromName = scrDetectKontoFromName(file.name);
+        if (fromName) {
+          konto = fromName;
+          kontoSource = 'name';
+        } else {
+          // B: zawartość pliku
+          const fromFile = scrDetectKontoFromWorkbook(wb);
+          if (fromFile) {
+            konto = fromFile.konto;
+            kontoSource = 'file';
+          }
+        }
+      }
+
+      if (!konto) {
+        errors.push(`${file.name}: nie wykryto konta (wybierz ręcznie w dropdownie)`);
+        continue;
+      }
+
+      // 2. Detekcja TYPU: dropdown manual > zawartość workbook
+      let type;
+      if (!useAutoType) {
+        type = dropdownType;
+      } else {
+        type = scrDetectFileType(wb);
+      }
+
+      if (!type) {
+        errors.push(`${file.name}: nie wykryto typu pliku (wybierz ręcznie)`);
+        continue;
+      }
+
+      const realType = type === 'ads30d' ? 'ads' : type;
+      const parsed = await aaParseFile(file, realType);
+
+      window._scrFiles.push({
+        konto,
+        type,
+        fileName: file.name,
+        parsed,
+        source: kontoSource || 'manual',
+        addedAt: Date.now()
+      });
+
+      window._scrFilesContextSent = false; // reset cache kontekstu
+    } catch(err) {
+      errors.push(`${file.name}: ${err.message}`);
+    }
+  }
+
+  scrRenderFilesList();
+  input.value = ''; // reset input dla kolejnego uploadu
+
+  if (errors.length) {
+    alert('Część plików nie została wgrana:\n\n' + errors.join('\n'));
   }
 }
 
@@ -13025,12 +13155,17 @@ function scrClearFiles() {
 
 function scrRenderFilesList() {
   const list = document.getElementById('scrFilesList');
-  const summary = document.getElementById('scrFilesSection')?.querySelector('summary span:first-child');
+  const countEl = document.getElementById('scrFilesCount');
   if (!list) return;
 
   const count = window._scrFiles.length;
-  if (summary) {
-    summary.innerHTML = `📂 Wgraj pliki XLSX (Ads / Odwiedziny / Sprzedaż / Katalog) — ${count} plików załadowanych`;
+  if (countEl) {
+    if (count === 0) {
+      countEl.textContent = '0 plików';
+    } else {
+      const uniqKonta = new Set(window._scrFiles.map(f => f.konto)).size;
+      countEl.textContent = `${count} plików · ${uniqKonta} kont`;
+    }
   }
 
   if (!count) {
@@ -13038,25 +13173,40 @@ function scrRenderFilesList() {
     return;
   }
 
-  const kontoSkrot = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC' };
+  const kontoSkrot = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC', Luxsen: 'Lux', Semmi: 'Sem', BOTAVIT: 'BoV', Materazzi: 'Mtz', MtzzEU: 'mEU', Ankado24: 'a24' };
   const typeLabels = { ads: 'Ads', sprzedaz: 'Odwiedziny', konwersja: 'Sprzedaż', ads30d: 'Ads 30d' };
   const typeColors = { ads: '#38bdf8', sprzedaz: '#34d399', konwersja: '#f5a623', ads30d: '#a78bfa' };
+  const sourceIcon = { name: '📁', file: '📄', manual: '✋' };
+  const sourceTitle = { name: 'wykryto z nazwy pliku', file: 'wykryto z zawartości XLSX', manual: 'ręcznie z dropdownu' };
 
   list.innerHTML = window._scrFiles.map((f, idx) => {
     const skrot = kontoSkrot[f.konto] || f.konto.substring(0,2);
     const label = typeLabels[f.type] || f.type;
     const color = typeColors[f.type] || '#e879f9';
+    const icon = sourceIcon[f.source] || '✋';
+    const iconTitle = sourceTitle[f.source] || 'manualne';
+
+    // BUG FIX: per-file stats — używamy konkretnego f.parsed nie referencji
     let stats = '';
-    if (f.parsed) {
+    const p = f.parsed;
+    if (p) {
       if (f.type === 'ads' || f.type === 'ads30d') {
-        stats = `${f.parsed.kampanie?.length || 0} kamp · ${(f.parsed.totKoszt||0).toFixed(0)} zł`;
+        const kampN = (p.kampanie && Array.isArray(p.kampanie)) ? p.kampanie.length : 0;
+        const koszt = typeof p.totKoszt === 'number' ? p.totKoszt : 0;
+        stats = `${kampN} kamp · ${koszt.toFixed(0)} zł`;
       } else if (f.type === 'sprzedaz') {
-        stats = `${f.parsed.oferty?.length || 0} ofert · ${f.parsed.totWizyty || 0} wizyt`;
+        const ofertN = (p.oferty && Array.isArray(p.oferty)) ? p.oferty.length : 0;
+        const wizyty = typeof p.totWizyty === 'number' ? p.totWizyty : 0;
+        stats = `${ofertN} ofert · ${wizyty} wizyt`;
       } else if (f.type === 'konwersja') {
-        stats = `${f.parsed.oferty?.length || 0} ofert · ${(f.parsed.totWartosc||0).toFixed(0)} zł`;
+        const ofertN = (p.oferty && Array.isArray(p.oferty)) ? p.oferty.length : 0;
+        const wartosc = typeof p.totWartosc === 'number' ? p.totWartosc : 0;
+        stats = `${ofertN} ofert · ${wartosc.toFixed(0)} zł`;
       }
     }
+
     return `<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px;background:${color}15;border:1px solid ${color}40;border-radius:4px;font-size:10px;font-family:var(--mono)">
+      <span title="${iconTitle}" style="font-size:10px">${icon}</span>
       <strong style="color:${color}">[${skrot}]</strong>
       <span style="color:var(--text2)">${label}</span>
       <span style="color:var(--text3);font-size:9px">${stats}</span>
