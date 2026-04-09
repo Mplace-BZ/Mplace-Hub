@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.03</title>
+<title>MPlace Hub v6.04</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.03</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.04</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9598,10 +9598,45 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += `Aukcje oznaczone [WYRÓŻNIONA] w sekcji Ads poniżej.\n\n`;
   }
 
+  // Parser nazw kampanii i grup reklam wg konwencji MEBLE (Format A)
+  // Kampania: /NNN/ KATEGORIA_LINIA_WYMIAR?
+  // Grupa: [NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR
+  const campaignRegex = /^\/(\d{3})\/\s*([A-Z]+)_([A-Z]+)(?:_(\d+))?$/;
+  const groupRegex = /^\[(\d{3})\]\[(WW|WL\+)\]\[(RW|R)\]\s*([A-Z]+)(?:_(\d+))?_?(.+)?$/;
+
+  function parseCampaignName(name) {
+    const m = String(name || '').trim().match(campaignRegex);
+    if (!m) return { matched: false, raw: name };
+    return { matched: true, nnn: m[1], kategoria: m[2], linia: m[3], wymiar: m[4] || null };
+  }
+  function parseGroupName(name) {
+    const m = String(name || '').trim().match(groupRegex);
+    if (!m) return { matched: false, raw: name };
+    return { matched: true, nnn: m[1], placement: m[2], targeting: m[3], linia: m[4], wymiar: m[5] || null, kolor: (m[6] || '').trim() };
+  }
+
+  // Statystyki zgodności konwencji
+  const totalKamp = ads.kampanie.length;
+  const matchedKamp = ads.kampanie.filter(k => parseCampaignName(k.kampania).matched).length;
+  const conventionRate = totalKamp > 0 ? Math.round(matchedKamp / totalKamp * 100) : 0;
+
+  p += `\n== KONWENCJA NAZEWNICTWA ADS (MEBLE Format A) ==\n`;
+  p += `Format kampanii: /NNN/ KATEGORIA_LINIA_WYMIAR (np. /010/ LAZIENKA_PRALKA_62)\n`;
+  p += `Format grupy: [NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR (np. [010][WW][RW] PRALKA_62_WOTAN)\n`;
+  p += `Zgodność konwencji tego konta: ${matchedKamp}/${totalKamp} kampanii (${conventionRate}%)\n`;
+  if (conventionRate < 100) {
+    p += `WAŻNE: Kampanie oznaczone [POZA KONWENCJĄ] nie pasują do regex konwencji. Restart MEBLE planowany 12.04.2026.\n`;
+  }
+  p += `\n`;
+
   p += `Kampanie (sortowane po koszcie malejąco):\n`;
   ads.kampanie.sort((a,b) => b.koszt - a.koszt).forEach(k => {
     const flag = k.roas === 0 && k.koszt > 0 ? 'WYŁĄCZ' : k.roas < 3 ? 'WYŁĄCZ' : k.roas < 4 ? 'OSTRZEŻENIE' : k.roas < be ? 'OPTYMALIZUJ' : 'OK';
-    p += `  [${flag}] ${k.kampania} | Koszt:${k.koszt.toFixed(0)}zł Sprzedaż:${k.sprzedaz.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}%\n`;
+    const parsedKamp = parseCampaignName(k.kampania);
+    const kampHierarchy = parsedKamp.matched
+      ? ` → [NNN:${parsedKamp.nnn}, KAT:${parsedKamp.kategoria}, LINIA:${parsedKamp.linia}${parsedKamp.wymiar?', WYM:'+parsedKamp.wymiar:''}]`
+      : ' [POZA KONWENCJĄ]';
+    p += `  [${flag}] ${k.kampania}${kampHierarchy} | Koszt:${k.koszt.toFixed(0)}zł Sprzedaż:${k.sprzedaz.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}%\n`;
     k.aukcje.sort((a,b) => b.koszt - a.koszt).slice(0, 8).forEach(a => {
       p += `    [${a.nr}]${dostTag(a.nr)} ${a.oferta} | Koszt:${a.koszt.toFixed(1)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki||0} CTR:${a.ctr.toFixed(2)}%${a.miejsce?' ['+a.miejsce+']':''}\n`;
     });
