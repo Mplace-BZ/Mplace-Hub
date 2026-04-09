@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.13</title>
+<title>MPlace Hub v6.14</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.13</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.14</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9496,6 +9496,7 @@ async function aaParseFile(file, type) {
               return 0;
             };
             const kamp = String(col('Nazwa kampanii', 'Nazwa kamp') || Object.values(row)[0] || '?');
+            const grupa = String(col('Nazwa grupy reklam', 'Nazwa grupy', 'grupy reklam') || '_default');
             const oferta = String(col('Tytuł klikniętej oferty', 'Tytuł kliknięt') || '').substring(0, 60);
             const nr = String(col('Numer klikniętej oferty', 'Numer kliknięt') || '');
             const koszt = pln(col('Koszt(PLN)', 'Koszt('));
@@ -9509,21 +9510,46 @@ async function aaParseFile(file, type) {
             // Debug: log first 3 rows to verify parsing
             if (Object.keys(kampMap).length === 0 && kampMap.constructor === Object) {
               console.log('[Ads Parser] Headers:', keys.join(' | '));
-              console.log('[Ads Parser] Row 1:', { nr, koszt, sprzedaz: sprzedazVal, roasFile, sztuki, cpc, miejsce });
+              console.log('[Ads Parser] Row 1:', { kamp, grupa, nr, koszt, sprzedaz: sprzedazVal, roasFile, sztuki, cpc, miejsce });
             }
-            if (!kampMap[kamp]) kampMap[kamp] = { kampania: kamp, koszt:0, sprzedaz:0, wysw:0, klik:0, aukcje:[] };
+            if (!kampMap[kamp]) kampMap[kamp] = { kampania: kamp, koszt:0, sprzedaz:0, wysw:0, klik:0, aukcje:[], grupyMap:{} };
             kampMap[kamp].koszt += koszt;
             kampMap[kamp].sprzedaz += sprzedazVal;
             kampMap[kamp].wysw += wysw;
             kampMap[kamp].klik += klik;
-            kampMap[kamp].aukcje.push({ nr, oferta, koszt, sprzedaz: sprzedazVal, wysw, klik, cpc, miejsce, sztuki,
+            // Grupy reklam — nowa hierarchia 3-poziomowa: kampania → grupa → aukcja
+            if (!kampMap[kamp].grupyMap[grupa]) {
+              kampMap[kamp].grupyMap[grupa] = { grupa, koszt:0, sprzedaz:0, wysw:0, klik:0, aukcje:[] };
+            }
+            const g = kampMap[kamp].grupyMap[grupa];
+            g.koszt += koszt;
+            g.sprzedaz += sprzedazVal;
+            g.wysw += wysw;
+            g.klik += klik;
+            const aukcjaObj = { nr, oferta, koszt, sprzedaz: sprzedazVal, wysw, klik, cpc, miejsce, sztuki,
+              grupa, // ← nowy field: do której grupy należy ta aukcja
               roas: koszt > 0 ? sprzedazVal / koszt : roasFile,
-              ctr: wysw > 0 ? klik / wysw * 100 : 0 });
+              ctr: wysw > 0 ? klik / wysw * 100 : 0 };
+            g.aukcje.push(aukcjaObj);
+            kampMap[kamp].aukcje.push(aukcjaObj);
           });
-          const kampanie = Object.values(kampMap).map(k => ({
-            ...k, roas: k.koszt > 0 ? k.sprzedaz / k.koszt : 0, ctr: k.wysw > 0 ? k.klik / k.wysw * 100 : 0,
-            aukcje: k.aukcje.sort((a, b) => b.koszt - a.koszt)
-          })).sort((a, b) => b.sprzedaz - a.sprzedaz);
+          const kampanie = Object.values(kampMap).map(k => {
+            // Buduj listę grup z policzonymi metrykami
+            const grupy = Object.values(k.grupyMap || {}).map(g => ({
+              ...g,
+              roas: g.koszt > 0 ? g.sprzedaz / g.koszt : 0,
+              ctr: g.wysw > 0 ? g.klik / g.wysw * 100 : 0,
+              aukcje: g.aukcje.sort((a, b) => b.koszt - a.koszt)
+            })).sort((a, b) => b.koszt - a.koszt);
+            const { grupyMap, ...rest } = k;
+            return {
+              ...rest,
+              roas: k.koszt > 0 ? k.sprzedaz / k.koszt : 0,
+              ctr: k.wysw > 0 ? k.klik / k.wysw * 100 : 0,
+              aukcje: k.aukcje.sort((a, b) => b.koszt - a.koszt),
+              grupy // ← NEW: kampania ma teraz `grupy[]` jak również `aukcje[]` (dla wstecznej kompatybilności)
+            };
+          }).sort((a, b) => b.sprzedaz - a.sprzedaz);
           const totKoszt = kampanie.reduce((s, k) => s + k.koszt, 0);
           const totSprzedaz = kampanie.reduce((s, k) => s + k.sprzedaz, 0);
           // ── AGREGACJA PER AUKCJA (suma across ALL campaigns) ──
@@ -11821,29 +11847,34 @@ function caBuildArchitectPrompt(data) {
   p += `PLACEMENT: WW (Wynik Wyszukiwania, default), WL+ (Wynik+Lewa, agresywny tylko gwiazdy)\n`;
   p += `TARGETING: RW (Ręczny Wybór + Dynamic CPC, default), R (Reguły, start)\n\n`;
 
-  // Per konto: kampanie + ich aukcje
+  // Per konto: kampanie → grupy reklam → aukcje (hierarchia 3-poziomowa)
   ['MobelKap', 'PerfektCiecie', 'MeblenaCzasie'].forEach(konto => {
     const ads = data[konto];
     const meta = (typeof AC_META !== 'undefined') ? AC_META[konto] : {};
     p += `\n== ${konto.toUpperCase()} (${meta.role || '?'}) — KAMPANIE OBECNE ==\n`;
     p += `Łącznie: ${ads.kampanie.length} kampanii | Koszt: ${ads.totKoszt.toFixed(0)} zł | Sprzedaż: ${ads.totSprzedaz.toFixed(0)} zł | ROAS: ${ads.totRoas.toFixed(2)}\n\n`;
     ads.kampanie.sort((a, b) => b.koszt - a.koszt).forEach(k => {
-      p += `KAMPANIA: "${k.kampania}" | Koszt:${k.koszt.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}%\n`;
-      k.aukcje.sort((a, b) => b.koszt - a.koszt).slice(0, 8).forEach(a => {
-        const inOtherAccounts = auctionMap[a.nr] ? Object.keys(auctionMap[a.nr]).filter(kk => kk !== konto) : [];
-        const crossFlag = inOtherAccounts.length ? ` [TAKZE_NA:${inOtherAccounts.join(',')}]` : '';
-        // BACKUP STATUS: czy aukcja ma backup w innej kampanii TEGO SAMEGO konta?
-        const backup = getBackupStatus(konto, a.nr, k.kampania);
-        let backupFlag = '';
-        if (backup.hasBackup) {
-          const safe = backup.bestRoas >= 4;
-          backupFlag = ` [BACKUP:TAK_${backup.count}kamp_bestROAS${backup.bestRoas.toFixed(1)}${safe ? '_BEZPIECZNE_DO_ZAMKNIECIA' : '_OSTRZEZENIE'}]`;
-        } else {
-          backupFlag = ` [BACKUP:NIE_OSTRZEZENIE_JEDYNA_KAMPANIA]`;
-        }
-        p += `  [${a.nr}] ${(a.oferta || '').substring(0, 50)} | Koszt:${a.koszt.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki || 0}${crossFlag}${backupFlag}\n`;
+      const grupy = k.grupy || [{ grupa: '_default', koszt: k.koszt, sprzedaz: k.sprzedaz, roas: k.roas, ctr: k.ctr, aukcje: k.aukcje }];
+      p += `KAMPANIA: "${k.kampania}" | Koszt:${k.koszt.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}% | Grup:${grupy.length}\n`;
+      grupy.forEach(g => {
+        const grupaFlag = g.roas >= 6 ? '✅ DOBRA' : g.roas >= 3 ? '⚠️ SLABA' : g.roas > 0 ? '🔴 PRZEPALA' : '❌ ZERO';
+        p += `  GRUPA: "${g.grupa}" | Koszt:${g.koszt.toFixed(0)}zł Sprzedaż:${g.sprzedaz.toFixed(0)}zł ROAS:${g.roas.toFixed(2)} ${grupaFlag}\n`;
+        g.aukcje.sort((a, b) => b.koszt - a.koszt).slice(0, 5).forEach(a => {
+          const inOtherAccounts = auctionMap[a.nr] ? Object.keys(auctionMap[a.nr]).filter(kk => kk !== konto) : [];
+          const crossFlag = inOtherAccounts.length ? ` [TAKZE_NA:${inOtherAccounts.join(',')}]` : '';
+          // BACKUP STATUS: czy aukcja ma backup w innej kampanii TEGO SAMEGO konta?
+          const backup = getBackupStatus(konto, a.nr, k.kampania);
+          let backupFlag = '';
+          if (backup.hasBackup) {
+            const safe = backup.bestRoas >= 4;
+            backupFlag = ` [BACKUP:TAK_${backup.count}kamp_bestROAS${backup.bestRoas.toFixed(1)}${safe ? '_BEZPIECZNE' : '_OSTRZEZENIE'}]`;
+          } else {
+            backupFlag = ` [BACKUP:NIE_JEDYNA_KAMPANIA]`;
+          }
+          p += `    [${a.nr}] ${(a.oferta || '').substring(0, 45)} | K:${a.koszt.toFixed(0)}zł R:${a.roas.toFixed(2)} S:${a.sztuki || 0}${crossFlag}${backupFlag}\n`;
+        });
+        if (g.aukcje.length > 5) p += `    ... i ${g.aukcje.length - 5} więcej aukcji w tej grupie\n`;
       });
-      if (k.aukcje.length > 8) p += `  ... i ${k.aukcje.length - 8} więcej aukcji\n`;
     });
   });
 
@@ -11865,11 +11896,16 @@ function caBuildArchitectPrompt(data) {
   p += `|---|---|---|---|---|---|---|---|\n\n`;
   p += `AKCJE możliwe:\n`;
   p += `- **ZACHOWAJ** — kampania działa dobrze, tylko zmień nazwę na konwencję\n`;
-  p += `- **PODZIEL** — kampania ma mix produktów, podziel na X mniejszych (wymień w uzasadnieniu)\n`;
+  p += `- **OCZYŚĆ** — KAMPANIA MA MIX DOBRYCH I ZŁYCH GRUP REKLAM. Zachowaj kampanię, ZAMKNIJ konkretne grupy z ROAS<3 wewnątrz, ZACHOWAJ grupy z ROAS>BE. Wymień w uzasadnieniu które grupy zamknąć i które zachować.\n`;
+  p += `- **PODZIEL** — kampania ma grupy z różnych linii produktowych (np. KARO + TBOX + LARA), podziel na osobne kampanie per linia\n`;
   p += `- **POŁĄCZ** — kilka kampanii to ten sam temat, scal w jedną\n`;
-  p += `- **ZAMKNIJ** — duplikat, ROAS<3 lub poza specjalizacją konta — wyłącz\n`;
+  p += `- **ZAMKNIJ** — kampania w całości do wyłączenia (wszystkie grupy słabe lub pełna kanibalizacja z inną kampanią)\n`;
   p += `- **PRZENIES → KONTO** — aukcje są w specjalizacji innego konta (kanibalizacja cross-account)\n`;
   p += `- **NOWA** — kampania której brak a powinna być (np. dla top performera bez dedykowanej kampanii)\n\n`;
+  p += `KIEDY OCZYŚĆ vs ZAMKNIJ:\n`;
+  p += `- Jeśli kampania ma CHOĆ JEDNĄ grupę z ROAS >= 6 → OCZYŚĆ (zachowaj dobrą grupę, zamknij słabe)\n`;
+  p += `- Jeśli WSZYSTKIE grupy mają ROAS < 4 → ZAMKNIJ całą kampanię\n`;
+  p += `- ZAMKNIJ całą kampanię TYLKO jeśli żadna grupa wewnątrz nie warta zachowania\n\n`;
 
   p += `=== KRYTYCZNA REGUŁA BEZPIECZEŃSTWA: BACKUP STATUS PRZED ZAMKNIJ ===\n`;
   p += `Każda aukcja w każdej kampanii ma w danych powyżej tag [BACKUP:...]:\n`;
