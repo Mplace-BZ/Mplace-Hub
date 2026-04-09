@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.10</title>
+<title>MPlace Hub v6.11</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.10</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.11</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2416,6 +2416,51 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     </div>
 
     <div id="caHierarchy" style="margin-top:.75rem"></div>
+  </div>
+
+  <!-- ═══ SEKCJA 4: AI ARCHITECT — PLAN REORGANIZACJI 3 KONT ═══ -->
+  <div style="margin-bottom:2rem;padding:16px 20px;border:1px solid rgba(255,107,53,.3);border-radius:10px;background:rgba(255,107,53,.04)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-family:var(--mono);font-size:12px;color:#ff6b35;font-weight:600;letter-spacing:.04em">▸ AI ARCHITECT — PLAN REORGANIZACJI 3 KONT MEBLE</div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">cross-account analiza · kanibalizacja · role · CSV eksport</div>
+    </div>
+
+    <div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:14px;padding:10px 12px;background:var(--bg);border-radius:6px">
+      Wgraj raporty Ads dla wszystkich 3 kont MEBLE. AI Architect zbuduje globalną mapę kampanii, wykryje kanibalizację cross-account i wewnątrz kont, zaproponuje reorganizację zgodnie z rolami (MK=SCALE, PC=NICHE, MnC=PREMIUM) i wygeneruje plan w formie tabeli + CSV do skopiowania w panelu Allegro.
+    </div>
+
+    <!-- 3 sloty upload -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+      <div>
+        <div style="font-size:9px;text-transform:uppercase;color:var(--g-meble,#ff6b35);font-family:var(--mono);margin-bottom:4px;font-weight:600">MobelKap (SCALE)</div>
+        <input type="file" id="caArchFileMK" accept=".xlsx" onchange="caHandleArchitectFile('MobelKap',this)" style="display:none">
+        <button onclick="document.getElementById('caArchFileMK').click()" style="width:100%;font-family:var(--mono);font-size:10px;padding:10px;border-radius:6px;border:1px dashed rgba(255,107,53,.3);background:rgba(255,107,53,.05);color:#ff6b35;cursor:pointer">📂 Wgraj raport Ads MK</button>
+        <div id="caArchStatusMK" style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px;text-align:center">brak pliku</div>
+      </div>
+      <div>
+        <div style="font-size:9px;text-transform:uppercase;color:var(--g-meble,#ff6b35);font-family:var(--mono);margin-bottom:4px;font-weight:600">Perfekt Cięcie (NICHE)</div>
+        <input type="file" id="caArchFilePC" accept=".xlsx" onchange="caHandleArchitectFile('PerfektCiecie',this)" style="display:none">
+        <button onclick="document.getElementById('caArchFilePC').click()" style="width:100%;font-family:var(--mono);font-size:10px;padding:10px;border-radius:6px;border:1px dashed rgba(255,107,53,.3);background:rgba(255,107,53,.05);color:#ff6b35;cursor:pointer">📂 Wgraj raport Ads PC</button>
+        <div id="caArchStatusPC" style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px;text-align:center">brak pliku</div>
+      </div>
+      <div>
+        <div style="font-size:9px;text-transform:uppercase;color:var(--g-meble,#ff6b35);font-family:var(--mono);margin-bottom:4px;font-weight:600">Meble na Czasie (PREMIUM)</div>
+        <input type="file" id="caArchFileMnC" accept=".xlsx" onchange="caHandleArchitectFile('MeblenaCzasie',this)" style="display:none">
+        <button onclick="document.getElementById('caArchFileMnC').click()" style="width:100%;font-family:var(--mono);font-size:10px;padding:10px;border-radius:6px;border:1px dashed rgba(255,107,53,.3);background:rgba(255,107,53,.05);color:#ff6b35;cursor:pointer">📂 Wgraj raport Ads MnC</button>
+        <div id="caArchStatusMnC" style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px;text-align:center">brak pliku</div>
+      </div>
+    </div>
+
+    <!-- Pre-analysis stats (kanibalizacja, duplikaty) -->
+    <div id="caArchStats" style="margin:.75rem 0;display:none"></div>
+
+    <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem">
+      <button id="caArchRunBtn" onclick="caRunArchitect()" disabled style="font-family:var(--mono);font-size:11px;padding:10px 20px;border-radius:6px;border:1px solid rgba(255,107,53,.4);background:rgba(255,107,53,.12);color:#ff6b35;cursor:pointer;font-weight:500;opacity:0.5">⚡ Generuj plan reorganizacji (AI)</button>
+      <button onclick="caExportPlanCSV()" id="caArchCsvBtn" style="display:none;font-family:var(--mono);font-size:10px;padding:8px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer">📥 Eksport CSV</button>
+      <span id="caArchRunStatus" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
+    </div>
+
+    <div id="caArchPlan" style="margin-top:.75rem"></div>
   </div>
 </div>
 </div>
@@ -11539,6 +11584,300 @@ function caRenderHierarchy(adsData) {
 
   html += `</div>`;
   wrap.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════
+// CENTRUM ADS — AI ARCHITECT (cross-account plan reorganizacji)
+// ═══════════════════════════════════════════════════════════
+
+window._caArchData = { MobelKap: null, PerfektCiecie: null, MeblenaCzasie: null };
+window._caArchLastPlan = null;
+
+async function caHandleArchitectFile(konto, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const statusId = konto === 'MobelKap' ? 'caArchStatusMK' : konto === 'PerfektCiecie' ? 'caArchStatusPC' : 'caArchStatusMnC';
+  const statusEl = document.getElementById(statusId);
+  if (statusEl) { statusEl.textContent = 'Czytam...'; statusEl.style.color = 'var(--text3)'; }
+
+  try {
+    if (typeof aaLoadSheetJS === 'function') await aaLoadSheetJS();
+    const adsData = await aaParseFile(file, 'ads');
+    window._caArchData[konto] = adsData;
+    if (statusEl) {
+      statusEl.textContent = `✓ ${adsData.kampanie.length} kamp · ${adsData.totKoszt.toFixed(0)} zł`;
+      statusEl.style.color = '#34d399';
+    }
+    caUpdateArchStats();
+    caUpdateArchRunButton();
+  } catch(err) {
+    if (statusEl) {
+      statusEl.textContent = '✗ Błąd: ' + err.message.substring(0, 30);
+      statusEl.style.color = '#ef4444';
+    }
+  }
+}
+
+function caUpdateArchRunButton() {
+  const allLoaded = window._caArchData.MobelKap && window._caArchData.PerfektCiecie && window._caArchData.MeblenaCzasie;
+  const btn = document.getElementById('caArchRunBtn');
+  if (btn) {
+    btn.disabled = !allLoaded;
+    btn.style.opacity = allLoaded ? '1' : '0.5';
+  }
+}
+
+// Pre-analiza: kanibalizacja cross-account + duplikaty wewnątrz konta
+function caUpdateArchStats() {
+  const wrap = document.getElementById('caArchStats');
+  if (!wrap) return;
+
+  const data = window._caArchData;
+  const loadedAccounts = Object.keys(data).filter(k => data[k]);
+  if (!loadedAccounts.length) { wrap.style.display = 'none'; return; }
+
+  // Mapa aukcji → konta
+  const auctionToAccounts = {}; // { '17565030433': { MobelKap: {kampanie: [...], totKoszt, totSprzedaz, totRoas}, ... } }
+  loadedAccounts.forEach(konto => {
+    const ads = data[konto];
+    ads.kampanie.forEach(k => {
+      k.aukcje.forEach(a => {
+        if (!a.nr) return;
+        if (!auctionToAccounts[a.nr]) auctionToAccounts[a.nr] = {};
+        if (!auctionToAccounts[a.nr][konto]) auctionToAccounts[a.nr][konto] = { kampanie: new Set(), koszt: 0, sprzedaz: 0, sztuki: 0 };
+        auctionToAccounts[a.nr][konto].kampanie.add(k.kampania);
+        auctionToAccounts[a.nr][konto].koszt += a.koszt;
+        auctionToAccounts[a.nr][konto].sprzedaz += a.sprzedaz;
+        auctionToAccounts[a.nr][konto].sztuki += (a.sztuki || 0);
+      });
+    });
+  });
+
+  // Cross-account kanibalizacja: aukcje na 2+ kontach
+  const crossAccount = Object.entries(auctionToAccounts).filter(([nr, accs]) => Object.keys(accs).length > 1);
+  // Wewnętrzne duplikaty: aukcje w 2+ kampaniach jednego konta
+  const internalDups = [];
+  Object.entries(auctionToAccounts).forEach(([nr, accs]) => {
+    Object.entries(accs).forEach(([konto, info]) => {
+      if (info.kampanie.size > 1) internalDups.push({ nr, konto, kampanie: info.kampanie.size, koszt: info.koszt });
+    });
+  });
+
+  // Stats per konto
+  let html = `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.75rem">`;
+  const kontoNames = { MobelKap: 'MK 🏆', PerfektCiecie: 'PC 🎯', MeblenaCzasie: 'MnC 💎' };
+  loadedAccounts.forEach(konto => {
+    const ads = data[konto];
+    const dupsThis = internalDups.filter(d => d.konto === konto).length;
+    html += `<div style="padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:10px;font-family:var(--mono)">
+      <div style="color:#ff6b35;font-weight:600;margin-bottom:4px">${kontoNames[konto]}</div>
+      <div style="color:var(--text3)">Kampanii: <span style="color:var(--text)">${ads.kampanie.length}</span></div>
+      <div style="color:var(--text3)">Koszt: <span style="color:var(--text)">${ads.totKoszt.toFixed(0)} zł</span></div>
+      <div style="color:var(--text3)">ROAS: <span style="color:${ads.totRoas >= 6 ? '#34d399' : '#ef4444'}">${ads.totRoas.toFixed(2)}</span></div>
+      <div style="color:var(--text3)">Aukcje w 2+ kamp: <span style="color:${dupsThis > 0 ? '#ef4444' : '#34d399'}">${dupsThis}</span></div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  if (loadedAccounts.length === 3) {
+    html += `<div style="padding:10px 12px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:6px;font-size:11px;font-family:var(--mono);color:var(--text2)">
+      <strong style="color:#ef4444">⚠️ KANIBALIZACJA CROSS-ACCOUNT:</strong> ${crossAccount.length} aukcji występuje na 2+ kontach jednocześnie<br>
+      <strong style="color:#f5a623">⚠️ DUPLIKATY WEWNĄTRZ KONT:</strong> ${internalDups.length} przypadków aukcji w wielu kampaniach
+    </div>`;
+  }
+
+  wrap.innerHTML = html;
+  wrap.style.display = 'block';
+}
+
+async function caRunArchitect() {
+  const data = window._caArchData;
+  if (!data.MobelKap || !data.PerfektCiecie || !data.MeblenaCzasie) {
+    alert('Wgraj raporty Ads dla wszystkich 3 kont');
+    return;
+  }
+
+  const btn = document.getElementById('caArchRunBtn');
+  const status = document.getElementById('caArchRunStatus');
+  const planWrap = document.getElementById('caArchPlan');
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  if (status) { status.textContent = 'Buduję mapę cross-account...'; status.style.color = '#ff6b35'; }
+  if (planWrap) planWrap.innerHTML = '';
+
+  try {
+    const prompt = caBuildArchitectPrompt(data);
+    if (status) status.textContent = 'AI Architect analizuje 3 konta (max 60 sek)...';
+
+    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 16384,
+        system: typeof buildAgentContext === 'function' ? buildAgentContext() : 'Jesteś architektem Allegro Ads dla grupy MEBLE.',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const text = await readSSE(resp);
+
+    window._caArchLastPlan = text;
+    const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+    if (planWrap) {
+      planWrap.innerHTML = `<div class="agent-msg" style="border-left-color:#ff6b35;padding:14px 18px;background:var(--bg2);border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+          <strong style="color:#ff6b35">⚡ AI Architect — Plan reorganizacji 3 kont MEBLE</strong>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${new Date().toLocaleString('pl-PL')}</span>
+        </div>
+        <div class="agent-md">${html}</div>
+      </div>`;
+    }
+    if (status) { status.textContent = '✓ Plan gotowy'; status.style.color = '#34d399'; }
+    document.getElementById('caArchCsvBtn').style.display = 'inline-block';
+  } catch(err) {
+    if (status) { status.textContent = '✗ Błąd: ' + err.message; status.style.color = '#ef4444'; }
+  }
+
+  btn.disabled = false;
+  btn.style.opacity = '1';
+}
+
+function caBuildArchitectPrompt(data) {
+  // Buduj globalną mapę aukcji × konta
+  const auctionMap = {};
+  ['MobelKap', 'PerfektCiecie', 'MeblenaCzasie'].forEach(konto => {
+    const ads = data[konto];
+    ads.kampanie.forEach(k => {
+      k.aukcje.forEach(a => {
+        if (!a.nr) return;
+        if (!auctionMap[a.nr]) auctionMap[a.nr] = {};
+        if (!auctionMap[a.nr][konto]) auctionMap[a.nr][konto] = { kampanie: [], oferta: a.oferta, koszt: 0, sprzedaz: 0, sztuki: 0 };
+        auctionMap[a.nr][konto].kampanie.push(k.kampania);
+        auctionMap[a.nr][konto].koszt += a.koszt;
+        auctionMap[a.nr][konto].sprzedaz += a.sprzedaz;
+        auctionMap[a.nr][konto].sztuki += (a.sztuki || 0);
+      });
+    });
+  });
+
+  const crossAccount = Object.entries(auctionMap).filter(([nr, accs]) => Object.keys(accs).length > 1);
+
+  let p = `Jesteś AI Architectem Allegro Ads dla grupy MEBLE. Masz dane Ads dla 3 kont i musisz zaproponować pełny plan reorganizacji kampanii zgodnie ze strategią portfelową.\n\n`;
+
+  p += `== STRATEGIA PORTFELOWA MEBLE ==\n`;
+  p += `🏆 MobelKap = SCALE: wolumen, szafki pralkowe, nowości, półki wysuwane, szafki łazienkowe, t-box, stoliki KARO 92. Pricing: base. Ads target: 6.5%.\n`;
+  p += `🎯 Perfekt Cięcie = NICHE: donice Craft/Lancelot, kwietniki, szafki lustro niszowe, SLIM, sezonowe. Ads target: 5.5%.\n`;
+  p += `💎 Meble na Czasie = PREMIUM +2.5%: TOP92 Wotan, KARO 65 Wotan, stoliki podnoszone, gwiazdy z konwersją 4%+. Ads target: 6.5%.\n`;
+  p += `REGUŁA WŁASNOŚCI FRAZY: jeśli aukcja jest na 2+ kontach, właścicielem jest konto z najwyższym ROAS Ads + zgodne z rolą strategiczną. Pozostałe konta WYŁĄCZAJĄ Ads (zostawiają listing aktywny — organika).\n\n`;
+
+  p += `== KONWENCJA NAZEWNICTWA ADS (FORMAT A) ==\n`;
+  p += `Kampania: /NNN/ KATEGORIA_LINIA_WYMIAR (np. /010/ LAZIENKA_PRALKA_62)\n`;
+  p += `Grupa reklam: [NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR (np. [010][WW][RW] PRALKA_62_WOTAN)\n`;
+  p += `KATEGORIA: LAZIENKA, SALON, KUCHNIA, OGROD, NOWOSCI, SEZON, AUTO\n`;
+  p += `LINIA: PRALKA, KARO, TOP, SLUPEK, KWIETNIK, DONICA, TBOX, SLIM, LUSTRO\n`;
+  p += `WYMIAR: 62, 48, 92, 65 (opcjonalny)\n`;
+  p += `PLACEMENT: WW (Wynik Wyszukiwania, default), WL+ (Wynik+Lewa, agresywny tylko gwiazdy)\n`;
+  p += `TARGETING: RW (Ręczny Wybór + Dynamic CPC, default), R (Reguły, start)\n\n`;
+
+  // Per konto: kampanie + ich aukcje
+  ['MobelKap', 'PerfektCiecie', 'MeblenaCzasie'].forEach(konto => {
+    const ads = data[konto];
+    const meta = (typeof AC_META !== 'undefined') ? AC_META[konto] : {};
+    p += `\n== ${konto.toUpperCase()} (${meta.role || '?'}) — KAMPANIE OBECNE ==\n`;
+    p += `Łącznie: ${ads.kampanie.length} kampanii | Koszt: ${ads.totKoszt.toFixed(0)} zł | Sprzedaż: ${ads.totSprzedaz.toFixed(0)} zł | ROAS: ${ads.totRoas.toFixed(2)}\n\n`;
+    ads.kampanie.sort((a, b) => b.koszt - a.koszt).forEach(k => {
+      p += `KAMPANIA: "${k.kampania}" | Koszt:${k.koszt.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}%\n`;
+      k.aukcje.sort((a, b) => b.koszt - a.koszt).slice(0, 8).forEach(a => {
+        const inOtherAccounts = auctionMap[a.nr] ? Object.keys(auctionMap[a.nr]).filter(kk => kk !== konto) : [];
+        const crossFlag = inOtherAccounts.length ? ` [TAKŻE NA: ${inOtherAccounts.join(',')}]` : '';
+        p += `  [${a.nr}] ${(a.oferta || '').substring(0, 50)} | Koszt:${a.koszt.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki || 0}${crossFlag}\n`;
+      });
+      if (k.aukcje.length > 8) p += `  ... i ${k.aukcje.length - 8} więcej aukcji\n`;
+    });
+  });
+
+  // Cross-account summary
+  if (crossAccount.length) {
+    p += `\n== KANIBALIZACJA CROSS-ACCOUNT (${crossAccount.length} aukcji na 2+ kontach) ==\n`;
+    crossAccount.slice(0, 30).forEach(([nr, accs]) => {
+      const accList = Object.entries(accs).map(([k, info]) =>
+        `${k}(ROAS ${info.koszt > 0 ? (info.sprzedaz / info.koszt).toFixed(2) : '0'}, ${info.sztuki}szt, ${info.koszt.toFixed(0)}zł)`
+      ).join(' vs ');
+      p += `[${nr}] ${accList}\n`;
+    });
+    if (crossAccount.length > 30) p += `... i ${crossAccount.length - 30} więcej\n`;
+  }
+
+  p += `\n== ZADANIE ==\n`;
+  p += `Wygeneruj **PLAN REORGANIZACJI** dla wszystkich 3 kont w formie tabeli markdown z kolumnami:\n\n`;
+  p += `| Konto | Akcja | Stara nazwa | Nowa nazwa | Aukcje (top 5 ID) | Koszt 30d | ROAS | Uzasadnienie |\n`;
+  p += `|---|---|---|---|---|---|---|---|\n\n`;
+  p += `AKCJE możliwe:\n`;
+  p += `- **ZACHOWAJ** — kampania działa dobrze, tylko zmień nazwę na konwencję\n`;
+  p += `- **PODZIEL** — kampania ma mix produktów, podziel na X mniejszych (wymień w uzasadnieniu)\n`;
+  p += `- **POŁĄCZ** — kilka kampanii to ten sam temat, scal w jedną\n`;
+  p += `- **ZAMKNIJ** — duplikat, ROAS<3 lub poza specjalizacją konta — wyłącz\n`;
+  p += `- **PRZENIES → KONTO** — aukcje są w specjalizacji innego konta (kanibalizacja cross-account)\n`;
+  p += `- **NOWA** — kampania której brak a powinna być (np. dla top performera bez dedykowanej kampanii)\n\n`;
+  p += `WYMAGANIA:\n`;
+  p += `1. Każda kampania z każdego konta MUSI być w tabeli (nie pomijaj)\n`;
+  p += `2. Sortuj sekcje per konto: MK → PC → MnC, w każdym sekcji sortuj po koszcie malejąco\n`;
+  p += `3. Stosuj konwencję Format A dla wszystkich nowych nazw\n`;
+  p += `4. Pisz nowe nazwy ZAWSZE WIELKIMI LITERAMI bez polskich znaków\n`;
+  p += `5. NNN: zaczynaj per konto od 010, kolejne 020, 030...\n`;
+  p += `6. Aukcje wymień jako TOP 5 ID po koszcie (nie wszystkie, oszczędzaj tokeny)\n`;
+  p += `7. Każdy wiersz musi mieć krótkie uzasadnienie (1-2 zdania)\n`;
+  p += `8. Po tabeli per konto dodaj sekcję "PODSUMOWANIE GROUP REKLAM" z listą wszystkich nowych grup wg konwencji [NNN][WW][RW] LINIA_WYMIAR_KOLOR (top 3-5 grup per kampania)\n\n`;
+  p += `Na końcu dodaj sekcję **EFEKTY OCZEKIWANE** z liczbami:\n`;
+  p += `- Liczba zamkniętych duplikatów\n`;
+  p += `- Liczba kampanii do przeniesienia cross-account\n`;
+  p += `- Szacunkowa oszczędność miesięczna (zł/mies.)\n`;
+  p += `- Ile kanibalizacji cross-account zostanie wyeliminowane\n`;
+  return p;
+}
+
+function caExportPlanCSV() {
+  if (!window._caArchLastPlan) { alert('Najpierw wygeneruj plan'); return; }
+  // Próba wyciągnięcia tabel markdown z planu i konwersji do CSV
+  const text = window._caArchLastPlan;
+  const lines = text.split('\n');
+  const csvRows = [];
+  csvRows.push('Konto;Akcja;Stara nazwa;Nowa nazwa;Aukcje;Koszt 30d;ROAS;Uzasadnienie');
+
+  let inTable = false;
+  for (const line of lines) {
+    // Wykryj wiersz markdown table z 8 kolumnami
+    if (line.match(/^\|.*\|.*\|.*\|.*\|.*\|.*\|.*\|.*\|/)) {
+      const cells = line.split('|').slice(1, -1).map(c => c.trim());
+      // Pomijaj separatory typu |---|---|
+      if (cells.every(c => /^-+$/.test(c))) continue;
+      // Pomijaj header tabeli (zawiera "Konto" i "Akcja")
+      if (cells[0] === 'Konto' || cells[0].toLowerCase() === 'konto') { inTable = true; continue; }
+      if (inTable && cells.length >= 8) {
+        // Escapuj średniki w treści
+        const escaped = cells.map(c => '"' + c.replace(/"/g, '""') + '"').join(';');
+        csvRows.push(escaped);
+      }
+    } else if (inTable && line.trim() === '') {
+      // Pusty wiersz po tabeli — koniec
+    }
+  }
+
+  if (csvRows.length === 1) {
+    alert('Nie udało się wyciągnąć tabeli z planu. Skopiuj plan ręcznie.');
+    return;
+  }
+
+  const csv = csvRows.join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `plan_reorganizacji_meble_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 function kbFile(konto, type, input) {
