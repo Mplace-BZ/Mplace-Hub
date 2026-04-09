@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.15</title>
+<title>MPlace Hub v6.16</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.15</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.16</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -10046,6 +10046,8 @@ async function aaRunAnalysis() {
     window._aaLastText = text;
     window._aaLastHtml = html;
     window._aaLastMeta = { konto: kontoName, okres: okres || 'bieżący', date: now.toLocaleString('pl-PL') };
+    // Standard MH report buttons
+    if (typeof mhSetReport === 'function') mhSetReport('analiza', text, html, { title: 'Analiza Ofert: ' + kontoName, konto: kontoName, okres: okres || 'bieżący', date: now.toLocaleString('pl-PL') });
 
     // Save to history FIRST (need entry.id for Screener button)
     const entry = { id: Date.now(), konto: kontoName, okres: okres || 'bieżący',
@@ -10057,12 +10059,7 @@ async function aaRunAnalysis() {
         <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${now.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}</span>
       </div>
       <div class="agent-md">${html}</div>
-    </div>
-    <div style="display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap">
-      <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Kopiuj tekst</button>
-      <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Drukuj / PDF</button>
-      <button onclick="aaDownloadHtml()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.06);color:#38bdf8;cursor:pointer">Pobierz .html</button>
-      <button onclick="aaSendToScreener('${entry.id}')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(232,121,249,.3);background:rgba(232,121,249,.08);color:#e879f9;cursor:pointer">→ Screener</button>
+      ${typeof mhReportButtonsHTML === 'function' ? mhReportButtonsHTML('analiza') : ''}
     </div>`;
 
     window._aaHistory.push(entry);
@@ -10085,6 +10082,150 @@ function aaCopyResult(btn) {
     btn.textContent = 'Skopiowano';
     setTimeout(() => { btn.textContent = orig; }, 2000);
   });
+}
+
+// ═══════════════════════════════════════════════════════════
+// MH REPORT BUTTONS — uniwersalny pasek 6 akcji pod każdym raportem
+// ═══════════════════════════════════════════════════════════
+// Standard MUST-HAVE dla każdego raportu w Hubie:
+// 1. Kopiuj  2. Pobierz HTML  3. Drukuj/PDF  4. Email  5. Zapisz (history)  6. → Screener
+
+window._mhReports = window._mhReports || {}; // pamięć ostatnich raportów per source
+
+function mhSetReport(source, text, html, meta) {
+  // source: 'analiza' | 'architect' | 'screener' | 'cockpit' itp.
+  window._mhReports[source] = { text, html, meta: meta || {}, savedAt: Date.now() };
+}
+
+function mhGetReport(source) {
+  return window._mhReports[source] || null;
+}
+
+function mhReportButtonsHTML(source) {
+  return `<div class="mh-report-buttons" style="display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap">
+    <button onclick="mhCopy('${source}',this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">📋 Kopiuj</button>
+    <button onclick="mhDownloadHtml('${source}')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.06);color:#38bdf8;cursor:pointer">⬇ Pobierz .html</button>
+    <button onclick="mhPrint('${source}')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">🖨 Drukuj/PDF</button>
+    <button onclick="mhEmail('${source}')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.06);color:#f5a623;cursor:pointer">✉ Email</button>
+    <button onclick="mhSave('${source}',this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.06);color:#34d399;cursor:pointer">💾 Zapisz</button>
+    <button onclick="mhSendToScreener('${source}')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(232,121,249,.3);background:rgba(232,121,249,.08);color:#e879f9;cursor:pointer">→ Screener</button>
+  </div>`;
+}
+
+function mhCopy(source, btn) {
+  const r = mhGetReport(source); if (!r) return;
+  navigator.clipboard.writeText(r.text || '').then(() => {
+    const orig = btn.textContent; btn.textContent = '✓ Skopiowano';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+}
+
+function mhBuildPrintHTML(r) {
+  const m = r.meta || {};
+  const html = r.html || (typeof marked !== 'undefined' ? marked.parse(r.text || '') : (r.text || '').replace(/\n/g,'<br>'));
+  return `<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><title>${m.title||m.konto||'Raport'} — ${m.okres||''}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'DM Sans',sans-serif;font-size:12px;color:#1f2937;max-width:820px;margin:0 auto;padding:1.5rem 2rem;line-height:1.6;background:#fff}
+    .header{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;padding-bottom:8px;border-bottom:2px solid #111;margin-bottom:1.25rem;display:flex;justify-content:space-between}
+    h1{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:#111;margin:1.5rem 0 .5rem;padding:6px 10px;background:#f3f4f6;border-left:4px solid #ef4444;border-radius:0 4px 4px 0}
+    h2{font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:#111;margin:1.2rem 0 .4rem;padding:4px 8px;background:#faf5ff;border-left:3px solid #b47fff;border-radius:0 3px 3px 0}
+    h3{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:#374151;margin:1rem 0 .3rem}
+    p{margin:.4rem 0}strong{color:#111;font-weight:700}em{color:#6b7280}
+    ul,ol{padding-left:1.4rem;margin:.4rem 0}li{margin:.25rem 0;padding-left:4px}li::marker{color:#ef4444}
+    table{width:100%;border-collapse:collapse;margin:10px 0;font-size:11px}
+    th{background:#f9fafb;font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;text-align:left;border:1px solid #e5e7eb;font-weight:700}
+    td{padding:5px 8px;border:1px solid #e5e7eb;vertical-align:top}tr:nth-child(even) td{background:#fafafa}
+    blockquote{border-left:3px solid #b47fff;padding:6px 12px;margin:8px 0;background:#faf5ff;font-style:italic;color:#6b7280;border-radius:0 4px 4px 0}
+    hr{border:none;border-top:1px solid #e5e7eb;margin:1rem 0}
+    code{font-family:'DM Mono',monospace;font-size:11px;background:#f3f4f6;padding:1px 4px;border-radius:3px}
+    .footer{margin-top:1.5rem;padding-top:8px;border-top:2px solid #111;font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;text-align:center}
+    @media print{body{padding:1rem}h1{break-before:auto;page-break-after:avoid}table{page-break-inside:avoid}}
+    </style></head>
+    <body><div class="header"><span>${m.title||m.konto||'Raport'} — ${m.okres||''}</span><span>${m.date||new Date().toLocaleString('pl-PL')}</span></div>${html}<div class="footer">MPlace Hub · ${m.date||''}</div></body></html>`;
+}
+
+function mhDownloadHtml(source) {
+  const r = mhGetReport(source); if (!r) return;
+  const m = r.meta || {};
+  const blob = new Blob([mhBuildPrintHTML(r)], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const slug = ((m.title || m.konto || 'raport') + '_' + (m.okres || '')).replace(/[^a-zA-Z0-9_-]/g, '_');
+  a.download = `${slug}_${new Date().toISOString().slice(0,10)}.html`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function mhPrint(source) {
+  const r = mhGetReport(source); if (!r) return;
+  const w = window.open('', '_blank');
+  w.document.write(mhBuildPrintHTML(r));
+  w.document.close();
+  setTimeout(() => { w.print(); }, 300);
+}
+
+function mhEmail(source) {
+  const r = mhGetReport(source); if (!r) return;
+  const m = r.meta || {};
+  const subject = encodeURIComponent(`MPlace Hub — ${m.title || m.konto || 'Raport'} — ${m.okres || new Date().toLocaleDateString('pl-PL')}`);
+  // Email body limit ~2000 chars dla mailto: — bierzemy max pierwsze 1900 znaków tekstu
+  const fullText = (r.text || '').substring(0, 1900);
+  const body = encodeURIComponent(`${fullText}\n\n---\nPełny raport w załączniku HTML (Pobierz .html w Hubie).\nWygenerowano: ${m.date || new Date().toLocaleString('pl-PL')}`);
+  const mailto = `mailto:?subject=${subject}&body=${body}`;
+  if (mailto.length > 8000) {
+    // Za duży mailto — fallback: kopiuj tekst, otwórz pusty mail
+    navigator.clipboard.writeText(r.text || '').then(() => {
+      alert('Tekst raportu skopiowany do schowka. Otwieram pusty mail — wklej Ctrl+V.');
+      window.location.href = `mailto:?subject=${subject}`;
+    });
+  } else {
+    window.location.href = mailto;
+  }
+}
+
+function mhSave(source, btn) {
+  const r = mhGetReport(source); if (!r) return;
+  const sessions = JSON.parse(localStorage.getItem('mhSavedReports') || '[]');
+  const m = r.meta || {};
+  sessions.unshift({
+    id: Date.now(),
+    source,
+    title: m.title || m.konto || 'Raport',
+    okres: m.okres || '',
+    date: new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    text: r.text,
+    html: r.html,
+    meta: m
+  });
+  if (sessions.length > 30) sessions.pop();
+  try {
+    localStorage.setItem('mhSavedReports', JSON.stringify(sessions));
+    const orig = btn.textContent; btn.textContent = '✓ Zapisano';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  } catch(e) {
+    alert('Nie udało się zapisać (localStorage pełny): ' + e.message);
+  }
+}
+
+function mhSendToScreener(source) {
+  const r = mhGetReport(source); if (!r) return;
+  if (!window._scrHistory) window._scrHistory = [];
+  const m = r.meta || {};
+  const contextMsg = `📊 KONTEKST: ${m.title || m.konto || 'Raport'} (${m.okres || 'bieżący'})\n\n${r.text}`;
+  window._scrHistory.push({ role: 'user', content: contextMsg });
+  window._scrHistory.push({ role: 'assistant', content: `Zapoznałem się z raportem ${m.title || m.konto || ''}. Czekam na pytanie strategiczne.` });
+  if (typeof showView === 'function') showView('screener');
+  setTimeout(() => {
+    const messagesEl = document.getElementById('scrMessages');
+    if (messagesEl) {
+      messagesEl.innerHTML += `<div style="margin-bottom:10px;text-align:right"><div style="display:inline-block;background:rgba(232,121,249,.1);border:1px solid rgba(232,121,249,.2);border-radius:8px;padding:8px 12px;max-width:90%;text-align:left"><div style="font-size:11px;color:#e879f9;margin-bottom:4px">📊 ${m.title || m.konto || 'Raport'} — ${m.okres || ''}</div><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${(r.text.length / 1000).toFixed(1)}k znaków załadowane jako kontekst</div></div></div>`;
+      messagesEl.innerHTML += `<div style="margin-bottom:10px"><div style="display:inline-block;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;max-width:90%"><span style="font-size:12px;color:var(--text2)">Zapoznałem się z raportem. Czekam na pytanie strategiczne.</span></div></div>`;
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+  }, 100);
 }
 
 function aaPrintResult() {
@@ -11757,13 +11898,16 @@ async function caRunArchitect() {
 
     window._caArchLastPlan = text;
     const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+    const meta = { title: 'AI Architect — Plan reorganizacji MEBLE', okres: '3 konta', date: new Date().toLocaleString('pl-PL') };
+    if (typeof mhSetReport === 'function') mhSetReport('architect', text, html, meta);
     if (planWrap) {
       planWrap.innerHTML = `<div class="agent-msg" style="border-left-color:#ff6b35;padding:14px 18px;background:var(--bg2);border-radius:8px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
           <strong style="color:#ff6b35">⚡ AI Architect — Plan reorganizacji 3 kont MEBLE</strong>
-          <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${new Date().toLocaleString('pl-PL')}</span>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${meta.date}</span>
         </div>
         <div class="agent-md">${html}</div>
+        ${typeof mhReportButtonsHTML === 'function' ? mhReportButtonsHTML('architect') : ''}
       </div>`;
     }
     if (status) { status.textContent = '✓ Plan gotowy'; status.style.color = '#34d399'; }
