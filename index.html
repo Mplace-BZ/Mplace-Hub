@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.26</title>
+<title>MPlace Hub v6.27</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.26</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.27</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2532,16 +2532,32 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
         <option value="PerfektCiecie">Perfekt Cięcie (PC)</option>
         <option value="MeblenaCzasie">Meble na Czasie (MC)</option>
       </select>
-      <button onclick="adsTrackerSavePlan()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer">💾 Zapisz plan restart</button>
+      <button onclick="adsTrackerSavePlan()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer">💾 Zapisz plan (AI Architect)</button>
+      <button onclick="document.getElementById('adsTrackerPasteArea').style.display=document.getElementById('adsTrackerPasteArea').style.display==='none'?'block':'none'" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.1);color:#fbbf24;cursor:pointer">📋 Wklej plan ręcznie</button>
+      <input type="file" id="adsTrackerBenchmarkFile" accept=".xlsx" onchange="adsTrackerUploadBenchmark(this)" style="display:none">
+      <button onclick="document.getElementById('adsTrackerBenchmarkFile').click()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(168,139,250,.4);background:rgba(168,139,250,.1);color:#a78bfa;cursor:pointer">📊 Benchmark (dzień 0)</button>
       <input type="file" id="adsTrackerCheckpointFile" accept=".xlsx" onchange="adsTrackerUploadCheckpoint(this)" style="display:none">
-      <button onclick="document.getElementById('adsTrackerCheckpointFile').click()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.1);color:#38bdf8;cursor:pointer">📥 Wgraj checkpoint Ads</button>
+      <button onclick="document.getElementById('adsTrackerCheckpointFile').click()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.1);color:#38bdf8;cursor:pointer">📥 Checkpoint (7/14/30d)</button>
       <span id="adsTrackerStatus" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
+    </div>
+
+    <!-- Textarea do wklejenia planu ręcznie -->
+    <div id="adsTrackerPasteArea" style="display:none;margin-bottom:12px">
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:4px">Wklej plan ze Screenera / czatu (Format A v2):</div>
+      <textarea id="adsTrackerPasteText" rows="8" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-size:10px;font-family:var(--mono);resize:vertical" placeholder="Wklej tekst planu — parser szuka linii:
+/NNN/ NAZWA_KAMPANII
+[MK][NNN][WW][RW] NAZWA_GRUPY
+IDs: 123456 789012 ..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button onclick="adsTrackerSavePastedPlan()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.15);color:#34d399;cursor:pointer;font-weight:600">💾 Zapisz wklejony plan</button>
+        <button onclick="document.getElementById('adsTrackerPasteArea').style.display='none'" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Anuluj</button>
+      </div>
     </div>
 
     <!-- Dashboard per konto -->
     <div id="adsTrackerDashboard" style="margin-top:8px">
       <div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:10px;background:var(--bg);border-radius:6px">
-        Wybierz konto powyżej. Jeśli nie ma zapisanego planu — najpierw wygeneruj Total Restart w AI Architect, potem klik "💾 Zapisz plan restart".
+        Wybierz konto powyżej.
       </div>
     </div>
   </div>
@@ -11868,6 +11884,189 @@ function adsTrackerSavePlanData(konto, plan) {
   localStorage.setItem(ADS_TRACKER_KEY, JSON.stringify(all));
 }
 
+// ── Parser planu z tekstu (Format A v2) ──────────────────
+function adsTrackerParsePlanText(text) {
+  const campaigns = [];
+  let currentCampaign = null;
+  let currentGroup = null;
+
+  const lines = text.split('\n');
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+
+    // Wykryj kampanię: /NNN/ NAZWA lub /NNN/D/ NAZWA
+    const campMatch = line.match(/\/(\d{3})\/(?:D\/)?\s*(.+)/);
+    if (campMatch && !line.startsWith('[') && !line.startsWith('IDs')) {
+      // Sprawdź czy to nie jest część innego tekstu
+      const campName = campMatch[0].trim();
+      if (campName.length < 80) {
+        currentCampaign = { name: campName, groups: [], budget: 100 };
+        campaigns.push(currentCampaign);
+        currentGroup = null;
+      }
+    }
+
+    // Wykryj grupę: [MK][NNN][WW][RW] NAZWA
+    const groupMatch = line.match(/\[([A-Z]{2,3})\]\[(\d{3})\]\[([A-Z]{2})\]\[([A-Z]{2})\]\s*(.+)/);
+    if (groupMatch && currentCampaign) {
+      currentGroup = {
+        konto: groupMatch[1],
+        name: line.match(/\[.+\]\s*(.+)/)?.[1] || groupMatch[5],
+        fullName: groupMatch[0],
+        ids: [],
+        cpc: null,
+        budget: null
+      };
+      currentCampaign.groups.push(currentGroup);
+    }
+
+    // Wykryj IDs: "IDs:123 456 789" lub "IDs: 123 456"
+    const idsMatch = line.match(/^IDs?\s*[:=]\s*(.+)/i);
+    if (idsMatch && currentGroup) {
+      const idsStr = idsMatch[1].replace(/[,;|·]/g, ' ');
+      const ids = idsStr.match(/\d{8,}/g) || [];
+      currentGroup.ids = ids;
+    }
+
+    // Wykryj CPC: "CPC: 1.40 zł" lub "Dynamic CPC start 1.40"
+    const cpcMatch = line.match(/(?:Dynamic\s+)?CPC\s*(?:start|startowy)?\s*[:=]?\s*(\d+[.,]\d+)/i);
+    if (cpcMatch && currentGroup) {
+      currentGroup.cpc = parseFloat(cpcMatch[1].replace(',', '.'));
+    }
+
+    // Wykryj budżet: "Budżet: 100 zł/dzień" lub "Budżet dzienny 50 zł"
+    const budMatch = line.match(/Bud[żz]et\s*(?:dzienny|\/dzie[ńn])?\s*[:=]?\s*(\d+)/i);
+    if (budMatch) {
+      if (currentGroup) currentGroup.budget = parseInt(budMatch[1]);
+      else if (currentCampaign) currentCampaign.budget = parseInt(budMatch[1]);
+    }
+  }
+
+  return campaigns;
+}
+
+// Zapisz plan z wklejonego tekstu (Screener / czat)
+function adsTrackerSavePastedPlan() {
+  const konto = document.getElementById('adsTrackerKonto').value;
+  if (!konto) { alert('Wybierz konto'); return; }
+
+  const text = document.getElementById('adsTrackerPasteText').value.trim();
+  if (!text || text.length < 50) { alert('Wklej plan — minimum 50 znaków'); return; }
+
+  const campaigns = adsTrackerParsePlanText(text);
+
+  // Filtruj kampanie per konto (MobelKap→MK, PerfektCiecie→PC, MeblenaCzasie→MC)
+  const kontoCode = konto === 'MobelKap' ? 'MK' : konto === 'PerfektCiecie' ? 'PC' : konto === 'MeblenaCzasie' ? 'MC' : '';
+  const filtered = campaigns.map(c => ({
+    ...c,
+    groups: c.groups.filter(g => !g.konto || g.konto === kontoCode)
+  })).filter(c => c.groups.length > 0);
+
+  // Jeśli brak filtrowanych — weź wszystkie (może nie ma tagów konta)
+  const finalCampaigns = filtered.length > 0 ? filtered : campaigns;
+
+  if (finalCampaigns.length === 0) {
+    alert('Nie znaleziono kampanii w tekście.\n\nSzukam linii:\n  /NNN/ NAZWA_KAMPANII\n  [MK][NNN][WW][RW] NAZWA_GRUPY\n  IDs: 123456 789012');
+    return;
+  }
+
+  const totalGroups = finalCampaigns.reduce((s, c) => s + c.groups.length, 0);
+  const totalIds = finalCampaigns.reduce((s, c) => s + c.groups.reduce((s2, g) => s2 + g.ids.length, 0), 0);
+
+  const plan = {
+    konto,
+    kontoName: (AC_META[konto] || {}).name || konto,
+    role: (AC_META[konto] || {}).role || '?',
+    startDate: new Date().toISOString().slice(0, 10),
+    startDateLocal: new Date().toLocaleDateString('pl-PL'),
+    campaigns: finalCampaigns,
+    campaignCount: finalCampaigns.length,
+    groupCount: totalGroups,
+    totalIds: totalIds,
+    planText: text.substring(0, 8000),
+    checkpoints: [],
+    source: 'paste',
+    version: 'v2'
+  };
+
+  adsTrackerSavePlanData(konto, plan);
+  adsTrackerRender();
+
+  // Ukryj textarea
+  document.getElementById('adsTrackerPasteArea').style.display = 'none';
+
+  const status = document.getElementById('adsTrackerStatus');
+  if (status) {
+    status.textContent = `✓ Plan ${plan.kontoName} zapisany: ${plan.campaignCount} kampanii, ${totalGroups} grup, ${totalIds} aukcji`;
+    status.style.color = '#34d399';
+  }
+}
+
+// ── Benchmark (dzień 0 — stary raport Ads przed restartem) ──
+async function adsTrackerUploadBenchmark(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const konto = document.getElementById('adsTrackerKonto').value;
+  if (!konto) { alert('Wybierz konto'); input.value = ''; return; }
+
+  const plan = adsTrackerGetPlan(konto);
+  if (!plan) { alert(`Brak planu dla ${konto}. Najpierw zapisz plan (wklej lub AI Architect).`); input.value = ''; return; }
+
+  const status = document.getElementById('adsTrackerStatus');
+  if (status) { status.textContent = 'Czytam benchmark...'; status.style.color = '#a78bfa'; }
+
+  try {
+    if (typeof aaLoadSheetJS === 'function') await aaLoadSheetJS();
+    const adsData = await aaParseFile(file, 'ads');
+
+    const benchmark = {
+      date: plan.startDate,
+      dateLocal: plan.startDateLocal,
+      daysSinceStart: 0,
+      label: '0d',
+      isBenchmark: true,
+      totKoszt: adsData.totKoszt,
+      totSprzedaz: adsData.totSprzedaz,
+      totRoas: adsData.totRoas,
+      campaignCount: adsData.kampanie.length,
+      campaigns: adsData.kampanie.map(k => ({
+        name: k.kampania,
+        koszt: k.koszt,
+        sprzedaz: k.sprzedaz,
+        roas: k.roas,
+        ctr: k.ctr,
+        aukcjeCount: k.aukcje ? k.aukcje.length : 0,
+        grupy: (k.grupy || []).map(g => ({
+          name: g.grupa,
+          koszt: g.koszt,
+          sprzedaz: g.sprzedaz,
+          roas: g.roas,
+        }))
+      }))
+    };
+
+    // Wstaw benchmark na pozycję 0 (przed innymi checkpointami)
+    const existing0d = plan.checkpoints.findIndex(c => c.label === '0d');
+    if (existing0d >= 0) {
+      plan.checkpoints[existing0d] = benchmark;
+    } else {
+      plan.checkpoints.unshift(benchmark);
+    }
+
+    adsTrackerSavePlanData(konto, plan);
+    adsTrackerRender();
+
+    if (status) {
+      status.textContent = `✓ Benchmark zapisany: ${benchmark.campaignCount} kampanii, ROAS ${benchmark.totRoas.toFixed(2)}, koszt ${benchmark.totKoszt.toFixed(0)} zł`;
+      status.style.color = '#a78bfa';
+    }
+    input.value = '';
+  } catch(err) {
+    if (status) { status.textContent = '✗ Błąd: ' + err.message; status.style.color = '#ef4444'; }
+    input.value = '';
+  }
+}
+
 // Zapisz plan restart z ostatniego raportu AI Architect
 function adsTrackerSavePlan() {
   const konto = document.getElementById('adsTrackerKonto').value;
@@ -12039,20 +12238,26 @@ function adsTrackerRender() {
       </div>
 
       <!-- Checkpointy timeline -->
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <div style="flex:1;padding:6px 10px;background:var(--bg);border-radius:4px;text-align:center;border:1px solid #34d399">
-          <div style="font-size:8px;color:var(--text3);text-transform:uppercase">START</div>
-          <div style="font-size:11px;font-family:var(--mono);color:var(--text)">${plan.startDateLocal}</div>
-        </div>
-        ${['7d','14d','30d'].map(label => {
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        ${['0d','START','7d','14d','30d'].map(label => {
+          if (label === 'START') {
+            return `<div style="flex:1;padding:6px 10px;background:var(--bg);border-radius:4px;text-align:center;border:1px solid #34d399">
+              <div style="font-size:8px;color:var(--text3);text-transform:uppercase">RESTART</div>
+              <div style="font-size:11px;font-family:var(--mono);color:var(--text)">${plan.startDateLocal}</div>
+            </div>`;
+          }
           const cp = plan.checkpoints.find(c => c.label === label);
-          const border = cp ? '1px solid #34d399' : '1px dashed var(--border)';
+          const isBench = label === '0d';
+          const accentColor = isBench ? '#a78bfa' : '#34d399';
+          const border = cp ? '1px solid ' + accentColor : '1px dashed var(--border)';
           const bg = cp ? 'var(--bg)' : 'transparent';
+          const headerLabel = isBench ? 'BENCHMARK' : label;
           return `<div style="flex:1;padding:6px 10px;background:${bg};border-radius:4px;text-align:center;border:${border}">
-            <div style="font-size:8px;color:var(--text3);text-transform:uppercase">${label}</div>
+            <div style="font-size:8px;color:${cp ? accentColor : 'var(--text3)'};text-transform:uppercase;font-weight:${cp ? '600' : '400'}">${headerLabel}</div>
             ${cp
               ? `<div style="font-size:11px;font-family:var(--mono);color:${cp.totRoas >= 6 ? '#34d399' : cp.totRoas >= 3 ? '#f5a623' : '#ef4444'}">ROAS ${cp.totRoas.toFixed(2)}</div>
-                 <div style="font-size:9px;color:var(--text3)">${cp.totKoszt.toFixed(0)} zł → ${cp.totSprzedaz.toFixed(0)} zł</div>`
+                 <div style="font-size:9px;color:var(--text3)">${cp.totKoszt.toFixed(0)} zł → ${cp.totSprzedaz.toFixed(0)} zł</div>
+                 ${isBench ? '<div style="font-size:8px;color:#a78bfa;margin-top:2px">' + cp.campaignCount + ' kampanii (stare)</div>' : ''}`
               : `<div style="font-size:10px;color:var(--text3)">—</div>`
             }
           </div>`;
@@ -12061,9 +12266,37 @@ function adsTrackerRender() {
     </div>
   `;
 
+  // Tabela kampanii z planu (kiedy jeszcze nie ma checkpointów)
+  if (plan.campaigns && plan.campaigns.length && !plan.checkpoints.filter(c => !c.isBenchmark).length) {
+    html += `
+      <div style="font-size:10px;text-transform:uppercase;color:#fbbf24;font-family:var(--mono);margin-bottom:6px">
+        PLAN KAMPANII — ${plan.campaignCount} kampanii · ${plan.groupCount} grup · ${plan.totalIds || '?'} aukcji
+      </div>
+      <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:2fr 1.5fr 1fr 60px;gap:4px;padding:6px 10px;background:var(--bg);font-size:8px;font-family:var(--mono);text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)">
+          <div>Kampania</div><div>Grupy</div><div>IDs</div><div style="text-align:right">CPC</div>
+        </div>
+    `;
+    plan.campaigns.forEach(c => {
+      const groupNames = c.groups.map(g => g.name || g.fullName).join(', ');
+      const idCount = c.groups.reduce((s, g) => s + (g.ids ? g.ids.length : 0), 0);
+      const cpc = c.groups.filter(g => g.cpc).map(g => g.cpc + ' zł').join(', ') || '—';
+      html += `
+        <div style="display:grid;grid-template-columns:2fr 1.5fr 1fr 60px;gap:4px;padding:5px 10px;border-bottom:1px solid var(--border);font-size:10px;font-family:var(--mono);align-items:start">
+          <div style="color:var(--text);font-weight:600">${c.name}</div>
+          <div style="color:var(--text2);font-size:9px;line-height:1.4">${c.groups.map(g => (g.name || '?')).join('<br>')}</div>
+          <div style="color:var(--text3);font-size:9px">${idCount} aukcji</div>
+          <div style="text-align:right;color:var(--text3)">${cpc}</div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
   // Tabela kampanii z checkpointami
-  if (plan.checkpoints.length) {
-    const latest = plan.checkpoints[plan.checkpoints.length - 1];
+  const nonBenchCheckpoints = plan.checkpoints.filter(c => !c.isBenchmark);
+  if (nonBenchCheckpoints.length) {
+    const latest = nonBenchCheckpoints[nonBenchCheckpoints.length - 1];
     html += `
       <div style="font-size:10px;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:6px">
         KAMPANIE — CHECKPOINT ${latest.label} (${latest.dateLocal}, dzień ${latest.daysSinceStart})
@@ -12103,10 +12336,29 @@ function adsTrackerRender() {
   if (plan.checkpoints.length > 1) {
     html += `<div style="margin-top:10px;font-size:10px;font-family:var(--mono);color:var(--text3)">TREND ROAS: `;
     plan.checkpoints.forEach((cp, i) => {
-      const arrow = i > 0 ? (cp.totRoas > plan.checkpoints[i-1].totRoas ? ' ↑ ' : ' ↓ ') : '';
-      html += `${arrow}<b style="color:${cp.totRoas >= 6 ? '#34d399' : '#f5a623'}">${cp.label}: ${cp.totRoas.toFixed(2)}</b> `;
+      const arrow = i > 0 ? (cp.totRoas > plan.checkpoints[i-1].totRoas ? ' <span style="color:#34d399">↑</span> ' : ' <span style="color:#ef4444">↓</span> ') : '';
+      const labelText = cp.isBenchmark ? 'BENCH' : cp.label;
+      const color = cp.isBenchmark ? '#a78bfa' : (cp.totRoas >= 6 ? '#34d399' : '#f5a623');
+      html += `${arrow}<b style="color:${color}">${labelText}: ${cp.totRoas.toFixed(2)}</b> `;
     });
     html += `</div>`;
+
+    // Porównanie benchmark vs latest
+    const bench = plan.checkpoints.find(c => c.isBenchmark);
+    const latestNonBench = nonBenchCheckpoints.length ? nonBenchCheckpoints[nonBenchCheckpoints.length - 1] : null;
+    if (bench && latestNonBench) {
+      const roasDiff = latestNonBench.totRoas - bench.totRoas;
+      const kosztDiff = latestNonBench.totKoszt - bench.totKoszt;
+      const arrow = roasDiff > 0 ? '↑' : '↓';
+      const color = roasDiff > 0 ? '#34d399' : '#ef4444';
+      html += `
+        <div style="margin-top:6px;padding:8px 12px;background:rgba(${roasDiff > 0 ? '52,211,153' : '239,68,68'},.08);border:1px solid rgba(${roasDiff > 0 ? '52,211,153' : '239,68,68'},.2);border-radius:6px;font-size:11px;font-family:var(--mono)">
+          <b style="color:${color}">${arrow} ROAS: ${bench.totRoas.toFixed(2)} → ${latestNonBench.totRoas.toFixed(2)} (${roasDiff > 0 ? '+' : ''}${roasDiff.toFixed(2)})</b>
+          <span style="color:var(--text3);margin-left:12px">Koszt: ${bench.totKoszt.toFixed(0)} → ${latestNonBench.totKoszt.toFixed(0)} zł (${kosztDiff > 0 ? '+' : ''}${kosztDiff.toFixed(0)} zł)</span>
+          <span style="color:var(--text3);margin-left:12px">Kampanie: ${bench.campaignCount} (stare) → ${latestNonBench.campaignCount} (nowe)</span>
+        </div>
+      `;
+    }
   }
 
   // Button usunięcia planu
@@ -13012,7 +13264,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.26</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.27</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
