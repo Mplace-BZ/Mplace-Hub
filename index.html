@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.23</title>
+<title>MPlace Hub v6.24</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.23</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.24</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9719,7 +9719,15 @@ async function aaParseFile(file, type) {
 
 function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ads30d) {
   const be = beRoas || 6;
-  let p = `Analizujesz 3 raporty Allegro dla konta ${konto} za okres ${okres}.\n`;
+  let p = `Jesteś dyrygent Ads dla konta ${konto} za okres ${okres}. Twój odbiorca to Chris — właściciel agencji e-commerce z 15+ lat doświadczenia. Chris nie potrzebuje wyjaśnień "czym jest ROAS" — potrzebuje gotowych akcji do copy-paste.\n\n`;
+  p += `STYL RAPORTU:\n`;
+  p += `- Każda rekomendacja = GOTOWA AKCJA z konkretnym ID, nazwą kampanii/grupy wg konwencji Format A v2, i stawką CPC\n`;
+  p += `- Sekcja 10 = "CHRIS DO ZROBIENIA" — 5 kroków sortowanych po zł, z copy-paste danymi\n`;
+  p += `- Sekcje 11-13 (Discoverer) = proaktywne szanse, nie reaktywne diagnozy\n`;
+  p += `- Przy KAŻDEJ rekomendacji "utwórz kampanię/grupę" podaj PEŁNĄ NAZWĘ wg Format A v2: /NNN/ KAT_LINIA_WYMIAR + [KONTO][NNN][WW][RW] LINIA_WYMIAR_KOLOR\n`;
+  p += `- Przy KAŻDEJ rekomendacji "dodaj aukcje" podaj IDs oddzielone SPACJAMI (format Allegro paste-ready)\n`;
+  p += `- Patrz na konto w kontekście GRUPY MEBLE (3 konta) — jeśli rekomendacja koliduje z innym kontem, flaguj cross-account\n`;
+  p += `- NIE pisz "rozważ", "może warto" — pisz "ZRÓB TO: [konkret]"\n\n`;
   p += `BE ROAS tego konta: ${be.toFixed(2)} (próg rentowności — poniżej tej wartości reklama generuje stratę)\n\n`;
 
   // Rola konta w grupie (strategia portfelowa)
@@ -9984,7 +9992,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   p += `7. CTR vs KONWERSJA — wysokie CTR bez sprzedaży: diagnoza (cena? zdjęcia? migracja ruchu?), konkretna rekomendacja\n`;
   p += `8. PLACEMENT — Wyniki wyszukiwania vs Strona produktu: który działa, rekomendacja\n`;
   p += `9. KANDYDACI DO SMART — wykorzystując CENNIKI DOSTAWY z katalogu: które aukcje DPD 2/3 paczki mają wysoką liczbę wizyt + porzuconych koszyków + niską konwersję? Te są w pierwszej kolejności do przeniesienia na Smart. Pokaż TOP 5 z szacunkiem wzrostu transakcji (konwersja Smart ~2% vs obecna).\n`;
-  p += `10. PLAN TYGODNIA — 5 działań sortowane po kwocie oszczędności: [PILNE/WAŻNE] Co → Gdzie → Oszczędność zł/mies.\n`;
+  p += `10. CHRIS DO ZROBIENIA — 5 najważniejszych działań sortowane po kwocie oszczędności/zysku: [PILNE/WAŻNE] Co dokładnie zrobić → W którym panelu Allegro → Konkretne ID/nazwy do skopiowania → Oszczędność/zysk zł/mies. Przy każdej nowej kampanii/grupie podaj PEŁNĄ NAZWĘ wg konwencji Format A v2 (/NNN/ KAT_LINIA_WYMIAR + [KONTO][NNN][WW][RW] LINIA_WYMIAR_KOLOR) i IDs do wklejenia oddzielone spacjami.\n`;
 
   // ═══ ADS DISCOVERER — cross-reference katalog × Ads × Odwiedziny ═══
   // Szuka aukcji BEZ kampanii Ads ale Z ruchem organicznym → kandydaci do NOWYCH kampanii
@@ -10082,13 +10090,26 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     if (kandydaciAds.length) {
       p += `TOP ${Math.min(15, kandydaciAds.length)} KANDYDATÓW DO NOWYCH KAMPANII ADS:\n`;
       p += `(sortowane po wizytach malejąco — im więcej wizyt organicznych, tym większy potencjał Ads)\n\n`;
+      // Mapowanie konta → skrót dla nazw grup
+      const kontoSkrotMap = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC' };
+      const kontoSkrotForGroups = kontoSkrotMap[kontoKey] || 'MK';
+
       kandydaciAds.slice(0, 15).forEach((o, i) => {
         const konw = o.wizyty > 0 ? (o.transakcje / o.wizyty * 100).toFixed(1) : '0';
         const dost = o.dostawa === 'smart' ? '[SMART]' : o.dostawa === 'dpd_2pak' ? '[DPD2]' : o.dostawa === 'dpd_3pak' ? '[DPD3]' : '';
         const wyr = o.maWyroznienie ? ' [WYRÓŻNIONA]' : '';
+        // Wygeneruj sugestię nazwy grupy reklam w Format A v2 na podstawie SKU/nazwy
+        const skuParts = (o.sku || o.nazwa || '').toUpperCase().replace(/[^A-Z0-9_ ]/g, '').split(/[\s_]+/).filter(s => s.length > 1);
+        const suggestedGroupName = skuParts.slice(0, 3).join('_') || 'NOWY_PRODUKT';
+
         p += `  #${i+1} [${o.id}] ${(o.nazwa || o.sku || '').substring(0, 50)} | ${o.cena.toFixed(0)} zł ${dost}${wyr}\n`;
         p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | Koszyk: ${o.koszyk} | Polubienia: ${o.polubienia}\n`;
-        p += `     → REKOMENDACJA: Utwórz kampanię Ads (Dynamic CPC 1.20 zł, WW, RW). Szacunek: +${Math.round(o.wizyty * 0.3)} wizyt z Ads → +${Math.round(o.wizyty * 0.3 * (o.transakcje / Math.max(o.wizyty, 1)))} transakcji/okres.\n\n`;
+        p += `     → GOTOWA AKCJA DLA CHRISA:\n`;
+        p += `       Kampania: dodaj do istniejącej lub utwórz nową wg kategorii produktu\n`;
+        p += `       Grupa reklam: [${kontoSkrotForGroups}][NNN][WW][RW] ${suggestedGroupName}\n`;
+        p += `       IDs do wklejenia: ${o.id}\n`;
+        p += `       Ustawienia: Dynamic CPC 1.20 zł | Budżet: ${o.cena > 400 ? '20' : '15'} zł/dzień\n`;
+        p += `       Szacunek: +${Math.round(o.wizyty * 0.3)} wizyt z Ads → +${Math.round(o.wizyty * 0.3 * (o.transakcje / Math.max(o.wizyty, 1)))} trans.\n\n`;
       });
     } else {
       p += `Brak kandydatów spełniających kryteria (≥30 wizyt + ≥1% konwersja + brak Ads).\n\n`;
@@ -12647,7 +12668,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.23</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.24</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
