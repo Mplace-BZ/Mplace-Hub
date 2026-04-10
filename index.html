@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.22</title>
+<title>MPlace Hub v6.23</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.22</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.23</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9985,6 +9985,160 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   p += `8. PLACEMENT — Wyniki wyszukiwania vs Strona produktu: który działa, rekomendacja\n`;
   p += `9. KANDYDACI DO SMART — wykorzystując CENNIKI DOSTAWY z katalogu: które aukcje DPD 2/3 paczki mają wysoką liczbę wizyt + porzuconych koszyków + niską konwersję? Te są w pierwszej kolejności do przeniesienia na Smart. Pokaż TOP 5 z szacunkiem wzrostu transakcji (konwersja Smart ~2% vs obecna).\n`;
   p += `10. PLAN TYGODNIA — 5 działań sortowane po kwocie oszczędności: [PILNE/WAŻNE] Co → Gdzie → Oszczędność zł/mies.\n`;
+
+  // ═══ ADS DISCOVERER — cross-reference katalog × Ads × Odwiedziny ═══
+  // Szuka aukcji BEZ kampanii Ads ale Z ruchem organicznym → kandydaci do NOWYCH kampanii
+  if (cat && cat.oferty && cat.oferty.length && (sprzedaz || konwersja)) {
+    // Zbiór ID aukcji aktywnych w Ads
+    const adsAukcjeIds = new Set();
+    if (ads && ads.kampanie) {
+      ads.kampanie.forEach(k => k.aukcje.forEach(a => { if (a.nr) adsAukcjeIds.add(String(a.nr)); }));
+    }
+
+    // Zbiór ID aukcji z wyróżnieniami
+    const wyrIds = wyrSet || new Set();
+
+    // Mapa wizyt + konwersji per ID z raportu Odwiedzin (sprzedaz type)
+    const odwiedzinyMap = {};
+    if (sprzedaz && sprzedaz.oferty) {
+      sprzedaz.oferty.forEach(o => {
+        if (o.id) odwiedzinyMap[String(o.id)] = {
+          wizyty: o.wizyty || 0,
+          transakcje: o.transakcje || 0,
+          konwersja: o.konwersja || 0,
+          koszyk: o.koszyk || 0,
+          polubienia: o.polubienia || 0,
+          ulubione: o.ulubione || 0,
+        };
+      });
+    }
+
+    // Mapa sprzedaży per ID z raportu Sprzedaży (konwersja type)
+    const sprzedazMap = {};
+    if (konwersja && konwersja.oferty) {
+      konwersja.oferty.forEach(o => {
+        // konwersja parser nie ma ID — próbujemy matchować po nazwie z katalogiem
+        // ale lepsze jest ID jeśli jest
+        if (o.id) sprzedazMap[String(o.id)] = { transakcje: o.transakcje || 0, wartosc: o.wartosc || 0, cena: o.cena || 0 };
+      });
+    }
+
+    // Aktywne oferty z katalogu bez Ads
+    const aktywne = cat.oferty.filter(o => {
+      const s = (o.status || '').toLowerCase();
+      return (s.includes('aktywna') || s.includes('wystawiona')) && o.id;
+    });
+    const bezAds = aktywne.filter(o => !adsAukcjeIds.has(String(o.id)));
+    const zAds = aktywne.filter(o => adsAukcjeIds.has(String(o.id)));
+
+    // Wzbogać o dane z odwiedzin
+    const bezAdsWzbogacone = bezAds.map(o => {
+      const odw = odwiedzinyMap[String(o.id)] || {};
+      const spr = sprzedazMap[String(o.id)] || {};
+      return {
+        ...o,
+        wizyty: odw.wizyty || 0,
+        transakcje: odw.transakcje || spr.transakcje || 0,
+        konwersja: odw.konwersja || 0,
+        koszyk: odw.koszyk || 0,
+        polubienia: odw.polubienia || 0,
+        wartosc: spr.wartosc || 0,
+        cenaSprzedaz: spr.cena || o.cena || 0,
+        maWyroznienie: wyrIds.has(String(o.id)),
+        dostawa: o.dostawa || '',
+      };
+    });
+
+    // ═══ SEKCJA 11: ADS DISCOVERER ═══
+    // Kandydaci do NOWYCH kampanii: ≥30 wizyt organicznych + konwersja ≥1% + brak Ads
+    const kandydaciAds = bezAdsWzbogacone
+      .filter(o => o.wizyty >= 30 && (o.wizyty > 0 ? (o.transakcje / o.wizyty * 100) : 0) >= 1.0)
+      .sort((a, b) => b.wizyty - a.wizyty);
+
+    // Kandydaci do Wyróżnień: ≥20 wizyt + konwersja ≥1% + bez wyróżnienia + bez Ads (lub z Ads)
+    const kandydaciWyr = aktywne
+      .filter(o => !wyrIds.has(String(o.id)))
+      .map(o => {
+        const odw = odwiedzinyMap[String(o.id)] || {};
+        return { ...o, wizyty: odw.wizyty || 0, transakcje: odw.transakcje || 0, konwersja: odw.konwersja || 0, koszyk: odw.koszyk || 0, maAds: adsAukcjeIds.has(String(o.id)) };
+      })
+      .filter(o => o.wizyty >= 20 && o.transakcje >= 1)
+      .sort((a, b) => b.transakcje - a.transakcje);
+
+    // Napraw ofertę: ≥50 wizyt + konwersja <0.5% + ≥5 porzuconych koszyków
+    const naprawOferte = bezAdsWzbogacone
+      .concat(zAds.map(o => {
+        const odw = odwiedzinyMap[String(o.id)] || {};
+        return { ...o, wizyty: odw.wizyty || 0, transakcje: odw.transakcje || 0, konwersja: odw.konwersja || 0, koszyk: odw.koszyk || 0, maAds: true, dostawa: o.dostawa || '' };
+      }))
+      .filter(o => o.wizyty >= 50 && (o.wizyty > 0 ? (o.transakcje / o.wizyty * 100) : 0) < 0.5 && o.koszyk >= 5)
+      .sort((a, b) => b.koszyk - a.koszyk);
+
+    // Statystyki ogólne
+    p += `\n== SEKCJA 11: ADS DISCOVERER — aukcje BEZ kampanii Ads z potencjałem ==\n`;
+    p += `Katalog: ${aktywne.length} aktywnych ofert | W kampaniach Ads: ${zAds.length} | BEZ Ads: ${bezAds.length}\n`;
+    p += `Kandydaci do Ads (≥30 wizyt organicznych, konwersja ≥1%, brak Ads): ${kandydaciAds.length}\n\n`;
+
+    if (kandydaciAds.length) {
+      p += `TOP ${Math.min(15, kandydaciAds.length)} KANDYDATÓW DO NOWYCH KAMPANII ADS:\n`;
+      p += `(sortowane po wizytach malejąco — im więcej wizyt organicznych, tym większy potencjał Ads)\n\n`;
+      kandydaciAds.slice(0, 15).forEach((o, i) => {
+        const konw = o.wizyty > 0 ? (o.transakcje / o.wizyty * 100).toFixed(1) : '0';
+        const dost = o.dostawa === 'smart' ? '[SMART]' : o.dostawa === 'dpd_2pak' ? '[DPD2]' : o.dostawa === 'dpd_3pak' ? '[DPD3]' : '';
+        const wyr = o.maWyroznienie ? ' [WYRÓŻNIONA]' : '';
+        p += `  #${i+1} [${o.id}] ${(o.nazwa || o.sku || '').substring(0, 50)} | ${o.cena.toFixed(0)} zł ${dost}${wyr}\n`;
+        p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | Koszyk: ${o.koszyk} | Polubienia: ${o.polubienia}\n`;
+        p += `     → REKOMENDACJA: Utwórz kampanię Ads (Dynamic CPC 1.20 zł, WW, RW). Szacunek: +${Math.round(o.wizyty * 0.3)} wizyt z Ads → +${Math.round(o.wizyty * 0.3 * (o.transakcje / Math.max(o.wizyty, 1)))} transakcji/okres.\n\n`;
+      });
+    } else {
+      p += `Brak kandydatów spełniających kryteria (≥30 wizyt + ≥1% konwersja + brak Ads).\n\n`;
+    }
+
+    // ═══ SEKCJA 12: WYRÓŻNIENIA DISCOVERER ═══
+    p += `\n== SEKCJA 12: WYRÓŻNIENIA DISCOVERER — kandydaci do promowania (+0.75% prowizji) ==\n`;
+    p += `Aukcje z ruchem organicznym BEZ wyróżnienia — wyróżnienie podnosi pozycję w organice i dodaje "Raty 0%".\n`;
+    p += `Koszt: flat 19.90 zł/10 dni (1.99 zł/dzień) lub elastic 2.90 zł/dzień.\n\n`;
+
+    if (kandydaciWyr.length) {
+      p += `TOP ${Math.min(10, kandydaciWyr.length)} KANDYDATÓW DO WYRÓŻNIEŃ:\n`;
+      kandydaciWyr.slice(0, 10).forEach((o, i) => {
+        const konw = o.wizyty > 0 ? (o.transakcje / o.wizyty * 100).toFixed(1) : '0';
+        const adsFlag = o.maAds ? ' [MA ADS]' : ' [BEZ ADS]';
+        p += `  #${i+1} [${o.id}] ${(o.nazwa || o.sku || '').substring(0, 50)} | ${(o.cena||0).toFixed(0)} zł${adsFlag}\n`;
+        p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}%\n`;
+        p += `     → Tryb: ${o.transakcje >= 3 ? 'FLAT 19.90/10d (potwierdzona sprzedaż)' : 'ELASTIC 2.90/d (test 14 dni)'}\n\n`;
+      });
+    } else {
+      p += `Brak kandydatów — wszystkie aukcje z ruchem mają już wyróżnienie.\n\n`;
+    }
+
+    // ═══ SEKCJA 13: NAPRAW OFERTĘ ═══
+    p += `\n== SEKCJA 13: NAPRAW OFERTĘ — aukcje z ruchem BEZ konwersji (NIE dawaj Ads!) ==\n`;
+    p += `Aukcje z ≥50 wizyt + konwersja <0.5% + ≥5 porzuconych koszyków = problem z OFERTĄ, nie z kampanią.\n`;
+    p += `Dawanie Ads na taką aukcję = przepalanie budżetu. Najpierw napraw: cenę, zdjęcia, opis, dostawę.\n\n`;
+
+    if (naprawOferte.length) {
+      p += `AUKCJE DO NAPRAWY (${naprawOferte.length}):\n`;
+      naprawOferte.slice(0, 10).forEach((o, i) => {
+        const konw = o.wizyty > 0 ? (o.transakcje / o.wizyty * 100).toFixed(1) : '0';
+        const dost = o.dostawa === 'smart' ? '[SMART]' : o.dostawa === 'dpd_2pak' ? '[DPD2 ⚠️ szok dostawy?]' : o.dostawa === 'dpd_3pak' ? '[DPD3 ⚠️]' : '';
+        const adsFlag = o.maAds ? ' [MA ADS → WYŁĄCZ do naprawy]' : ' [BEZ ADS → NIE uruchamiaj]';
+        p += `  #${i+1} [${o.id}] ${(o.nazwa || o.sku || '').substring(0, 50)} | ${(o.cena||0).toFixed(0)} zł ${dost}${adsFlag}\n`;
+        p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | Koszyk: ${o.koszyk} porzuconych\n`;
+        p += `     → DIAGNOZA: ${o.koszyk >= 10 ? 'Masowe porzucenia koszyków → sprawdź cenę dostawy i cenę vs konkurencja' : 'Niski koszyk+niska konwersja → sprawdź zdjęcia, tytuł, opis, kategoryzację'}\n`;
+        p += `     → AKCJA: Napraw ofertę PRZED uruchomieniem/zwiększeniem Ads. Po naprawie czekaj 14 dni na wyniki organiczne.\n\n`;
+      });
+    } else {
+      p += `Brak aukcji do naprawy spełniających kryteria.\n\n`;
+    }
+  }
+
+  p += `\n== PODSUMOWANIE SEKCJI 11-13 ==\n`;
+  p += `Sekcja 11 (Ads Discoverer): NOWE kampanie na aukcjach z udowodnioną organiką\n`;
+  p += `Sekcja 12 (Wyróżnienia Discoverer): promowanie aukcji bez wyróżnień\n`;
+  p += `Sekcja 13 (Napraw Ofertę): NIE dawaj Ads dopóki nie naprawisz listingu\n`;
+  p += `Priorytet: NAJPIERW sekcja 13 (napraw) → potem 12 (wyróżnienia) → potem 11 (nowe Ads)\n`;
+
   return p;
 }
 
@@ -11562,6 +11716,40 @@ function caInit() {
   if (sel && !document.getElementById('caNNN').value) {
     caUpdateNNN();
   }
+  // Załaduj ostatni plan AI Architect z localStorage (jeśli jest)
+  caLoadLastPlan();
+}
+
+function caLoadLastPlan() {
+  try {
+    const plans = JSON.parse(localStorage.getItem('caArchPlans') || '[]');
+    if (!plans.length) return;
+    const latest = plans[0];
+    if (!latest.text) return;
+    window._caArchLastPlan = latest.text;
+    const html = (typeof marked !== 'undefined') ? marked.parse(latest.text) : latest.text.replace(/\n/g, '<br>');
+    const meta = { title: 'AI Architect — Plan reorganizacji MEBLE', okres: '3 konta', date: latest.date || '' };
+    if (typeof mhSetReport === 'function') mhSetReport('architect', latest.text, html, meta);
+    const planWrap = document.getElementById('caArchPlan');
+    if (planWrap) {
+      planWrap.innerHTML = `<div class="agent-msg" style="border-left-color:#ff6b35;padding:14px 18px;background:var(--bg2);border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+          <strong style="color:#ff6b35">⚡ AI Architect — Plan reorganizacji (załadowany z historii)</strong>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${latest.date || ''}</span>
+        </div>
+        <div class="agent-md">${html}</div>
+        ${typeof mhReportButtonsHTML === 'function' ? mhReportButtonsHTML('architect') : ''}
+      </div>`;
+    }
+    const csvBtn = document.getElementById('caArchCsvBtn');
+    const groupsBtn = document.getElementById('caArchGroupsCsvBtn');
+    const printBtn = document.getElementById('caArchPrintBtn');
+    if (csvBtn) csvBtn.style.display = 'inline-block';
+    if (groupsBtn) groupsBtn.style.display = 'inline-block';
+    if (printBtn) printBtn.style.display = 'inline-block';
+    const status = document.getElementById('caArchRunStatus');
+    if (status) { status.textContent = '✓ Plan załadowany z historii'; status.style.color = '#34d399'; }
+  } catch(e) {}
 }
 
 function caGetSavedCampaignsForKonto(konto) {
@@ -11950,6 +12138,14 @@ async function caRunArchitect() {
     const text = await readSSE(resp);
 
     window._caArchLastPlan = text;
+    // Persistuj plan do localStorage żeby nie zniknął po refresh
+    try {
+      const planEntry = { text, date: new Date().toLocaleString('pl-PL'), id: Date.now() };
+      const plans = JSON.parse(localStorage.getItem('caArchPlans') || '[]');
+      plans.unshift(planEntry);
+      if (plans.length > 5) plans.pop();
+      localStorage.setItem('caArchPlans', JSON.stringify(plans));
+    } catch(e) {}
     const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
     const meta = { title: 'AI Architect — Plan reorganizacji MEBLE', okres: '3 konta', date: new Date().toLocaleString('pl-PL') };
     if (typeof mhSetReport === 'function') mhSetReport('architect', text, html, meta);
@@ -12451,7 +12647,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.22</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.23</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -13224,6 +13420,23 @@ function scrBuildFilesContext() {
 
   let ctx = `\n\n=== WGRANE PLIKI XLSX (kontekst do analizy) ===\n`;
   ctx += `Liczba plików: ${window._scrFiles.length}\n\n`;
+
+  // Wstrzyknij strategię portfelową z AC_META (żeby Agent nie mylił ról)
+  if (typeof AC_META !== 'undefined') {
+    const mebleKonta = ['MobelKap', 'PerfektCiecie', 'MeblenaCzasie'];
+    const hasAnyMeble = window._scrFiles.some(f => mebleKonta.includes(f.konto));
+    if (hasAnyMeble) {
+      ctx += `=== STRATEGIA PORTFELOWA MEBLE (role kont — respektuj w odpowiedziach) ===\n`;
+      mebleKonta.forEach(k => {
+        const m = AC_META[k];
+        if (m && m.role) {
+          ctx += `${m.name} = ${m.role.toUpperCase()} ${m.badge || ''} | Pricing: ${m.pricingTier}${m.pricingDelta ? ' +' + m.pricingDelta + '%' : ''} | Specjalizacje: ${(m.specjalizacje||[]).join(', ')} | Ads target: ${m.adsTarget}% | Wyróż. target: ${m.wyrTarget}%\n`;
+        }
+      });
+      ctx += `REGUŁA: respektuj role w rekomendacjach. MK=SCALE (wolumen), PC=NICHE (donice/kwietniki), MC=PREMIUM (gwiazdy).\n`;
+      ctx += `ROAS < 3 = wyłącz. ROAS 3-4 = zostawiamy (obserwuj). Min 3 transakcje do decyzji.\n\n`;
+    }
+  }
 
   // Group per konto
   const perKonto = {};
