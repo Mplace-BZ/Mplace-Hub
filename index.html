@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.21</title>
+<title>MPlace Hub v6.22</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.21</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.22</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9672,7 +9672,7 @@ async function aaParseFile(file, type) {
           const totTransakcje = oferty.reduce((s, o) => s + o.transakcje, 0);
           const martwePunkty = oferty.filter(o => o.wizyty >= 10 && o.transakcje === 0);
           const porzuconeKoszyki = oferty.filter(o => o.koszyk > 0 && o.transakcje === 0);
-          resolve({ type:'sprzedaz', oferty: oferty.slice(0,50), totWizyty, totTransakcje, srKonwersja: totWizyty > 0 ? totTransakcje / totWizyty : 0, martwePunkty: martwePunkty.slice(0,10), porzuconeKoszyki: porzuconeKoszyki.slice(0,10) });
+          resolve({ type:'sprzedaz', oferty: oferty.slice(0,100), totWizyty, totTransakcje, srKonwersja: totWizyty > 0 ? totTransakcje / totWizyty : 0, martwePunkty: martwePunkty.slice(0,10), porzuconeKoszyki: porzuconeKoszyki.slice(0,10), totalCount: oferty.length });
 
         } else if (type === 'konwersja') {
           // Konwersja — sheet "Wg ofert", with header offset, fallback to index 2
@@ -9709,7 +9709,7 @@ async function aaParseFile(file, type) {
             kategoria: String(fk(row, 'Kategoria', 'kategor') || ''),
             podkategoria: String(fk(row, 'Podkategoria 1', 'Podkategor') || '')
           })).filter(o => o.transakcje > 0 || o.wartosc > 0).sort((a, b) => b.wartosc - a.wartosc);
-          resolve({ type:'konwersja', oferty: oferty.slice(0,40), totWartosc: oferty.reduce((s,o)=>s+o.wartosc,0) });
+          resolve({ type:'konwersja', oferty: oferty.slice(0,100), totWartosc: oferty.reduce((s,o)=>s+o.wartosc,0), totalCount: oferty.length, totTransakcje: oferty.reduce((s,o)=>s+(o.transakcje||0),0) });
         }
       } catch (err) { reject(err); }
     };
@@ -9931,7 +9931,8 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += `\n== RAPORT 2: ODWIEDZINY I KONWERSJA ==\n`;
     p += `${sprzedaz.totWizyty || 0} wizyt | ${sprzedaz.totTransakcje || 0} transakcji | Konwersja: ${((sprzedaz.srKonwersja || 0) * 100).toFixed(2)}%\n\n`;
     p += `Top oferty:\n`;
-    sprzedaz.oferty.slice(0,20).forEach(o => { p += `  ${o.id?'['+o.id+'] ':''}${o.oferta} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% Koszyk:${o.koszyk||0} Ulubione:${o.ulubione||0} Polubienia:${o.polubienia||0}\n`; });
+    if (sprzedaz.totalCount) p += `(${sprzedaz.totalCount} ofert w pliku, poniżej top ${Math.min(30, sprzedaz.oferty.length)})\n`;
+    sprzedaz.oferty.slice(0,30).forEach(o => { p += `  ${o.id?'['+o.id+'] ':''}${o.oferta} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% Koszyk:${o.koszyk||0} Ulubione:${o.ulubione||0} Polubienia:${o.polubienia||0}\n`; });
     if (sprzedaz.martwePunkty && sprzedaz.martwePunkty.length) { p += `\nMARTWE PUNKTY (>=10 wizyt, 0 transakcji):\n`; sprzedaz.martwePunkty.forEach(o => { p += `  ${o.oferta} | ${o.wizyty||0} wizyt\n`; }); }
     if (sprzedaz.porzuconeKoszyki && sprzedaz.porzuconeKoszyki.length) { p += `\nPORZUCONE KOSZYKI:\n`; sprzedaz.porzuconeKoszyki.forEach(o => { p += `  ${o.oferta} | Koszyk:${o.koszyk||0} Wizyty:${o.wizyty||0}\n`; }); }
   }
@@ -9939,7 +9940,9 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   if (konwersja && konwersja.oferty) {
     p += `\n== RAPORT 3: WYNIKI SPRZEDAŻY ==\n`;
     p += `Łączna sprzedaż: ${(konwersja.totWartosc || 0).toFixed(0)} zł\n\nTop oferty:\n`;
-    konwersja.oferty.slice(0,15).forEach(o => { p += `  ${o.oferta} | Trans:${o.transakcje||0} Szt:${o.sztuki||0} Wartość:${(o.wartosc||0).toFixed(0)}zł Cena:${(o.cena||0).toFixed(0)}zł Promo:[${o.promowanie||'----'}] ${o.kategoria?'Kat:'+o.kategoria:''}\n`; });
+    if (konwersja.totalCount) p += `(${konwersja.totalCount} ofert w pliku, poniżej top ${Math.min(30, konwersja.oferty.length)})\n`;
+    if (konwersja.totTransakcje) { const aov = konwersja.totTransakcje > 0 ? ((konwersja.totWartosc||0) / konwersja.totTransakcje).toFixed(0) : '?'; p += `AOV (Average Order Value): ${aov} zł (${konwersja.totWartosc?.toFixed(0)||0} zł / ${konwersja.totTransakcje} trans.)\n`; }
+    konwersja.oferty.slice(0,30).forEach(o => { p += `  ${o.oferta} | Trans:${o.transakcje||0} Szt:${o.sztuki||0} Wartość:${(o.wartosc||0).toFixed(0)}zł Cena:${(o.cena||0).toFixed(0)}zł Promo:[${o.promowanie||'----'}] ${o.kategoria?'Kat:'+o.kategoria:''}\n`; });
   }
 
   // Ads 30d context — historical comparison
@@ -12448,7 +12451,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.21</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.22</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -13253,8 +13256,9 @@ function scrBuildFilesContext() {
         ctx += `\n[ODWIEDZINY] ${f.fileName}\n`;
         ctx += `Łącznie: ${p.totWizyty||0} wizyt | ${p.totTransakcje||0} transakcji | konwersja: ${((p.srKonwersja||0)*100).toFixed(2)}%\n`;
         if (p.oferty?.length) {
-          ctx += `Top 15 ofert po wizytach:\n`;
-          p.oferty.slice(0,15).forEach(o => {
+          if (p.totalCount) ctx += `(${p.totalCount} ofert w pliku, poniżej top ${Math.min(30, p.oferty.length)})\n`;
+          ctx += `Top ofert po wizytach:\n`;
+          p.oferty.slice(0,30).forEach(o => {
             ctx += `  ${o.id?'['+o.id+'] ':''}${(o.oferta||'').substring(0,50)} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% Koszyk:${o.koszyk||0}\n`;
           });
         }
@@ -13264,14 +13268,14 @@ function scrBuildFilesContext() {
         }
       } else if (f.type === 'konwersja') {
         ctx += `\n[SPRZEDAŻ] ${f.fileName}\n`;
-        ctx += `Łączna sprzedaż: ${(p.totWartosc||0).toFixed(0)} zł | ${p.oferty?.length || 0} ofert\n`;
+        const totalOfert = p.totalCount || p.oferty?.length || 0;
+        ctx += `Łączna sprzedaż: ${(p.totWartosc||0).toFixed(0)} zł | ${totalOfert} ofert w pliku\n`;
         if (p.oferty?.length) {
-          // Liczba transakcji łącznie (do AOV!)
-          const totTrans = p.oferty.reduce((s,o)=>s+(o.transakcje||0),0);
-          const aov = totTrans > 0 ? (p.totWartosc / totTrans) : 0;
-          ctx += `Łącznie transakcji: ${totTrans} | AOV (Average Order Value): ${aov.toFixed(0)} zł\n`;
-          ctx += `Top 15 ofert po wartości:\n`;
-          p.oferty.slice(0,15).forEach(o => {
+          const totTrans = p.totTransakcje || p.oferty.reduce((s,o)=>s+(o.transakcje||0),0);
+          const aov = totTrans > 0 ? ((p.totWartosc||0) / totTrans) : 0;
+          ctx += `Łącznie transakcji: ${totTrans} | AOV: ${aov.toFixed(0)} zł\n`;
+          ctx += `Top ofert po wartości (${Math.min(30, p.oferty.length)} z ${totalOfert}):\n`;
+          p.oferty.slice(0,30).forEach(o => {
             ctx += `  ${(o.oferta||'').substring(0,50)} | Trans:${o.transakcje||0} Szt:${o.sztuki||0} Wartość:${(o.wartosc||0).toFixed(0)}zł Cena:${(o.cena||0).toFixed(0)}zł ${o.kategoria?'Kat:'+o.kategoria:''}\n`;
           });
         }
