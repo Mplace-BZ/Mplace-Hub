@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.24</title>
+<title>MPlace Hub v6.25</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.24</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.25</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9991,7 +9991,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   p += `6. KANIBALIZACJA — aukcje w wielu kampaniach: pokaż ŁĄCZNY wynik (agregat) vs per-kampania, wskaż duplikaty do wyłączenia. WARUNEK: minimum 3 transakcje łącznie żeby rekomendować jakąkolwiek decyzję. Mniej = "obserwuj", brak akcji.\n`;
   p += `7. CTR vs KONWERSJA — wysokie CTR bez sprzedaży: diagnoza (cena? zdjęcia? migracja ruchu?), konkretna rekomendacja\n`;
   p += `8. PLACEMENT — Wyniki wyszukiwania vs Strona produktu: który działa, rekomendacja\n`;
-  p += `9. KANDYDACI DO SMART — wykorzystując CENNIKI DOSTAWY z katalogu: które aukcje DPD 2/3 paczki mają wysoką liczbę wizyt + porzuconych koszyków + niską konwersję? Te są w pierwszej kolejności do przeniesienia na Smart. Pokaż TOP 5 z szacunkiem wzrostu transakcji (konwersja Smart ~2% vs obecna).\n`;
+  p += `9. KANDYDACI DO SMART — wykorzystując CENNIKI DOSTAWY z katalogu: które aukcje DPD 2/3 paczki mają wysoką liczbę wizyt + porzuconych koszyków + niską konwersję? Pokaż TOP 5 z szacunkiem wzrostu transakcji (konwersja Smart ~2% vs obecna). WAŻNE: jeśli aukcja ma tag [DPD2] w danych Ads ALE tag [SMART] w katalogu → to znaczy że CENNIK ZOSTAŁ JUŻ ZMIENIONY na Smart. Nie rekomenduj migracji (już jest!) — rekomenduj "OBSERWUJ 14 dni konwersję po migracji" i podaj szacunek oczekiwanej konwersji.\n`;
   p += `10. CHRIS DO ZROBIENIA — 5 najważniejszych działań sortowane po kwocie oszczędności/zysku: [PILNE/WAŻNE] Co dokładnie zrobić → W którym panelu Allegro → Konkretne ID/nazwy do skopiowania → Oszczędność/zysk zł/mies. Przy każdej nowej kampanii/grupie podaj PEŁNĄ NAZWĘ wg konwencji Format A v2 (/NNN/ KAT_LINIA_WYMIAR + [KONTO][NNN][WW][RW] LINIA_WYMIAR_KOLOR) i IDs do wklejenia oddzielone spacjami.\n`;
 
   // ═══ ADS DISCOVERER — cross-reference katalog × Ads × Odwiedziny ═══
@@ -10134,20 +10134,54 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     }
 
     // ═══ SEKCJA 13: NAPRAW OFERTĘ ═══
-    p += `\n== SEKCJA 13: NAPRAW OFERTĘ — aukcje z ruchem BEZ konwersji (NIE dawaj Ads!) ==\n`;
-    p += `Aukcje z ≥50 wizyt + konwersja <0.5% + ≥5 porzuconych koszyków = problem z OFERTĄ, nie z kampanią.\n`;
-    p += `Dawanie Ads na taką aukcję = przepalanie budżetu. Najpierw napraw: cenę, zdjęcia, opis, dostawę.\n\n`;
+    p += `\n== SEKCJA 13: NAPRAW OFERTĘ — aukcje z ruchem BEZ konwersji ==\n`;
+    p += `Aukcje z ≥50 wizyt + konwersja <0.5% + ≥5 porzuconych koszyków = problem z OFERTĄ, nie z kampanią.\n\n`;
+    p += `⚠️ KRYTYCZNA REGUŁA — SPRAWDŹ CENNIK DOSTAWY PRZED REKOMENDACJĄ "WYŁĄCZ ADS":\n`;
+    p += `Jeśli aukcja ma tag [DPD2] lub [DPD3] w danych Ads powyżej → porzucenia koszyków mogą być SKUTKIEM szoku dostawy (klient widzi +40 zł w koszyku i ucieka).\n`;
+    p += `Jeśli KATALOG pokazuje tę aukcję jako [SMART] → CENNIK ZOSTAŁ NIEDAWNO ZMIENIONY na Smart.\n`;
+    p += `W takim przypadku NIE rekomenduj "wyłącz Ads" — rekomenduj "CZEKAJ 14 DNI po migracji Smart, mierz nową konwersję".\n`;
+    p += `Historyczne dane konwersji (0.4%) dotyczą STAREGO cennika DPD — po Smart konwersja powinna wzrosnąć 3-5× (benchmark MK: Smart 2.10% vs DPD 0.46%).\n`;
+    p += `Logika: jeśli tag w Ads = [DPD2] ale tag w katalogu = [SMART] → "aukcja właśnie przeniesiona na Smart, OBSERWUJ 14 dni zamiast wyłączać".\n\n`;
 
     if (naprawOferte.length) {
       p += `AUKCJE DO NAPRAWY (${naprawOferte.length}):\n`;
       naprawOferte.slice(0, 10).forEach((o, i) => {
         const konw = o.wizyty > 0 ? (o.transakcje / o.wizyty * 100).toFixed(1) : '0';
-        const dost = o.dostawa === 'smart' ? '[SMART]' : o.dostawa === 'dpd_2pak' ? '[DPD2 ⚠️ szok dostawy?]' : o.dostawa === 'dpd_3pak' ? '[DPD3 ⚠️]' : '';
-        const adsFlag = o.maAds ? ' [MA ADS → WYŁĄCZ do naprawy]' : ' [BEZ ADS → NIE uruchamiaj]';
+        // Sprawdź rozbieżność: tag Ads (z raportu) może mówić DPD, ale katalog (świeży) może mówić Smart
+        const katDostawa = dostMap[String(o.id)] || '';
+        const adsTagDpd = o.dostawa && (o.dostawa.includes('dpd'));
+        const katTagSmart = katDostawa === 'smart';
+        const migratedToSmart = adsTagDpd && katTagSmart;
+
+        let dost = '';
+        if (migratedToSmart) {
+          dost = '[SMART ✅ PRZENIESIONE] ← było DPD, cennik zmieniony na Smart';
+        } else if (o.dostawa === 'smart') {
+          dost = '[SMART]';
+        } else if (o.dostawa === 'dpd_2pak') {
+          dost = '[DPD2 ⚠️ szok dostawy?]';
+        } else if (o.dostawa === 'dpd_3pak') {
+          dost = '[DPD3 ⚠️]';
+        }
+
+        let adsFlag = '';
+        if (migratedToSmart) {
+          adsFlag = ' [MA ADS → NIE WYŁĄCZAJ! Cennik zmieniony na Smart — OBSERWUJ 14 dni konwersję]';
+        } else if (o.maAds) {
+          adsFlag = ' [MA ADS → WYŁĄCZ do naprawy]';
+        } else {
+          adsFlag = ' [BEZ ADS → NIE uruchamiaj]';
+        }
+
         p += `  #${i+1} [${o.id}] ${(o.nazwa || o.sku || '').substring(0, 50)} | ${(o.cena||0).toFixed(0)} zł ${dost}${adsFlag}\n`;
         p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | Koszyk: ${o.koszyk} porzuconych\n`;
-        p += `     → DIAGNOZA: ${o.koszyk >= 10 ? 'Masowe porzucenia koszyków → sprawdź cenę dostawy i cenę vs konkurencja' : 'Niski koszyk+niska konwersja → sprawdź zdjęcia, tytuł, opis, kategoryzację'}\n`;
-        p += `     → AKCJA: Napraw ofertę PRZED uruchomieniem/zwiększeniem Ads. Po naprawie czekaj 14 dni na wyniki organiczne.\n\n`;
+        if (migratedToSmart) {
+          p += `     → DIAGNOZA: Aukcja WŁAŚNIE przeniesiona na Smart! Historyczne dane (konwersja ${konw}%, ${o.koszyk} koszyków) dotyczą STAREGO cennika DPD.\n`;
+          p += `     → AKCJA: CZEKAJ 14 DNI. Oczekiwana nowa konwersja: ~2% (benchmark Smart). NIE wyłączaj Ads — właśnie naprawiłeś przyczynę porzuceń. Mierz od ${new Date(Date.now() + 14*86400000).toLocaleDateString('pl-PL')}.\n\n`;
+        } else {
+          p += `     → DIAGNOZA: ${o.koszyk >= 10 ? 'Masowe porzucenia koszyków → sprawdź cenę dostawy i cenę vs konkurencja' : 'Niski koszyk+niska konwersja → sprawdź zdjęcia, tytuł, opis, kategoryzację'}\n`;
+          p += `     → AKCJA: Napraw ofertę PRZED uruchomieniem/zwiększeniem Ads. Po naprawie czekaj 14 dni na wyniki organiczne.\n\n`;
+        }
       });
     } else {
       p += `Brak aukcji do naprawy spełniających kryteria.\n\n`;
@@ -12668,7 +12702,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.24</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.25</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
