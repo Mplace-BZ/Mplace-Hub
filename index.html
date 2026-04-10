@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.25</title>
+<title>MPlace Hub v6.26</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.25</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.26</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2513,6 +2513,38 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 
     <div id="caArchPlan" style="margin-top:.75rem"></div>
   </div>
+
+  <!-- ═══ SEKCJA 5: ADS TRACKER — plan + checkpointy + porównanie ═══ -->
+  <div style="margin-bottom:2rem;padding:16px 20px;border:1px solid rgba(52,211,153,.3);border-radius:10px;background:rgba(52,211,153,.04)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-family:var(--mono);font-size:12px;color:#34d399;font-weight:600;letter-spacing:.04em">▸ ADS TRACKER — plan restart + checkpointy 7/14/30d</div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">benchmark · porównanie · trend · auto-alert</div>
+    </div>
+
+    <!-- Alert jeśli czas na checkpoint -->
+    <div id="adsTrackerAlert" style="display:none;margin-bottom:10px;padding:8px 12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:6px;font-size:11px;color:#ef4444;font-family:var(--mono)"></div>
+
+    <!-- Dropdown konto -->
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+      <select id="adsTrackerKonto" onchange="adsTrackerRender()" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:11px;font-family:var(--mono)">
+        <option value="">— wybierz konto —</option>
+        <option value="MobelKap">MobelKap (MK)</option>
+        <option value="PerfektCiecie">Perfekt Cięcie (PC)</option>
+        <option value="MeblenaCzasie">Meble na Czasie (MC)</option>
+      </select>
+      <button onclick="adsTrackerSavePlan()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer">💾 Zapisz plan restart</button>
+      <input type="file" id="adsTrackerCheckpointFile" accept=".xlsx" onchange="adsTrackerUploadCheckpoint(this)" style="display:none">
+      <button onclick="document.getElementById('adsTrackerCheckpointFile').click()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.1);color:#38bdf8;cursor:pointer">📥 Wgraj checkpoint Ads</button>
+      <span id="adsTrackerStatus" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
+    </div>
+
+    <!-- Dashboard per konto -->
+    <div id="adsTrackerDashboard" style="margin-top:8px">
+      <div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:10px;background:var(--bg);border-radius:6px">
+        Wybierz konto powyżej. Jeśli nie ma zapisanego planu — najpierw wygeneruj Total Restart w AI Architect, potem klik "💾 Zapisz plan restart".
+      </div>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -3011,6 +3043,16 @@ function showView(v){
     document.getElementById('viewCentrumAds').classList.add('active');
     document.getElementById('navCentrumAds').classList.add('active');
     if (typeof caInit === 'function') caInit();
+    // Auto-check Ads Tracker alerts
+    if (typeof adsTrackerRender === 'function') {
+      const sel = document.getElementById('adsTrackerKonto');
+      // Auto-select konto z zapisanym planem
+      if (sel && !sel.value) {
+        const plans = adsTrackerGetPlans();
+        const firstKonto = Object.keys(plans)[0];
+        if (firstKonto) { sel.value = firstKonto; adsTrackerRender(); }
+      }
+    }
   } else if(v==='screener'){
     document.getElementById('viewScreener').classList.add('active');
     document.getElementById('navScreener').classList.add('active');
@@ -11807,6 +11849,274 @@ function caLoadLastPlan() {
   } catch(e) {}
 }
 
+// ═══════════════════════════════════════════════════════════
+// ADS TRACKER — plan restart + checkpointy + porównanie
+// ═══════════════════════════════════════════════════════════
+const ADS_TRACKER_KEY = 'adsTrackerPlans';
+
+function adsTrackerGetPlans() {
+  try { return JSON.parse(localStorage.getItem(ADS_TRACKER_KEY) || '{}'); } catch(e) { return {}; }
+}
+
+function adsTrackerGetPlan(konto) {
+  return adsTrackerGetPlans()[konto] || null;
+}
+
+function adsTrackerSavePlanData(konto, plan) {
+  const all = adsTrackerGetPlans();
+  all[konto] = plan;
+  localStorage.setItem(ADS_TRACKER_KEY, JSON.stringify(all));
+}
+
+// Zapisz plan restart z ostatniego raportu AI Architect
+function adsTrackerSavePlan() {
+  const konto = document.getElementById('adsTrackerKonto').value;
+  if (!konto) { alert('Wybierz konto'); return; }
+
+  // Parsuj plan z AI Architect (ostatni wygenerowany)
+  const planText = window._caArchLastPlan;
+  if (!planText) {
+    alert('Brak planu AI Architect. Najpierw wygeneruj Total Restart w sekcji AI Architect powyżej.');
+    return;
+  }
+
+  // Wyciągnij kampanie z planu (parsujemy sekcję PODSUMOWANIE GRUP per konto)
+  const groups = (typeof caParseGroupsFromPlan === 'function') ? caParseGroupsFromPlan(planText) : [];
+  const kontoGroups = groups.filter(g => g.konto === konto);
+
+  // Zbuduj strukturę planu
+  const campaigns = {};
+  kontoGroups.forEach(g => {
+    if (!campaigns[g.kampania]) {
+      campaigns[g.kampania] = { name: g.kampania, groups: [], budget: 100 };
+    }
+    campaigns[g.kampania].groups.push({
+      name: g.grupa,
+      ids: g.ids,
+      details: g.details
+    });
+  });
+
+  const plan = {
+    konto,
+    kontoName: (AC_META[konto] || {}).name || konto,
+    role: (AC_META[konto] || {}).role || '?',
+    startDate: new Date().toISOString().slice(0,10),
+    startDateLocal: new Date().toLocaleDateString('pl-PL'),
+    campaigns: Object.values(campaigns),
+    campaignCount: Object.keys(campaigns).length,
+    groupCount: kontoGroups.length,
+    planText: planText.substring(0, 5000), // zachowaj skrót planu
+    checkpoints: [],
+    version: 'v1'
+  };
+
+  adsTrackerSavePlanData(konto, plan);
+  adsTrackerRender();
+
+  const status = document.getElementById('adsTrackerStatus');
+  if (status) { status.textContent = `✓ Plan ${plan.kontoName} zapisany (${plan.campaignCount} kampanii, ${plan.groupCount} grup)`; status.style.color = '#34d399'; }
+}
+
+// Upload checkpoint Ads (raport po 7/14/30 dniach)
+async function adsTrackerUploadCheckpoint(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const konto = document.getElementById('adsTrackerKonto').value;
+  if (!konto) { alert('Wybierz konto'); return; }
+
+  const plan = adsTrackerGetPlan(konto);
+  if (!plan) { alert(`Brak zapisanego planu dla ${konto}. Najpierw zapisz plan restart.`); return; }
+
+  const status = document.getElementById('adsTrackerStatus');
+  if (status) { status.textContent = 'Czytam raport...'; status.style.color = '#38bdf8'; }
+
+  try {
+    if (typeof aaLoadSheetJS === 'function') await aaLoadSheetJS();
+    const adsData = await aaParseFile(file, 'ads');
+
+    // Oblicz dni od startu
+    const startDate = new Date(plan.startDate);
+    const today = new Date();
+    const daysSinceStart = Math.round((today - startDate) / 86400000);
+
+    // Zbuduj checkpoint
+    const checkpoint = {
+      date: today.toISOString().slice(0, 10),
+      dateLocal: today.toLocaleDateString('pl-PL'),
+      daysSinceStart,
+      label: daysSinceStart <= 10 ? '7d' : daysSinceStart <= 17 ? '14d' : '30d',
+      totKoszt: adsData.totKoszt,
+      totSprzedaz: adsData.totSprzedaz,
+      totRoas: adsData.totRoas,
+      campaignCount: adsData.kampanie.length,
+      // Per kampania breakdown
+      campaigns: adsData.kampanie.map(k => ({
+        name: k.kampania,
+        koszt: k.koszt,
+        sprzedaz: k.sprzedaz,
+        roas: k.roas,
+        ctr: k.ctr,
+        aukcjeCount: k.aukcje.length,
+        grupy: (k.grupy || []).map(g => ({
+          name: g.grupa,
+          koszt: g.koszt,
+          sprzedaz: g.sprzedaz,
+          roas: g.roas,
+        }))
+      }))
+    };
+
+    plan.checkpoints.push(checkpoint);
+    adsTrackerSavePlanData(konto, plan);
+    adsTrackerRender();
+
+    if (status) { status.textContent = `✓ Checkpoint ${checkpoint.label} dodany (dzień ${daysSinceStart})`; status.style.color = '#34d399'; }
+    input.value = '';
+  } catch(err) {
+    if (status) { status.textContent = '✗ Błąd: ' + err.message; status.style.color = '#ef4444'; }
+  }
+}
+
+// Render dashboard per konto
+function adsTrackerRender() {
+  const konto = document.getElementById('adsTrackerKonto')?.value;
+  const dashboard = document.getElementById('adsTrackerDashboard');
+  const alertEl = document.getElementById('adsTrackerAlert');
+  if (!dashboard) return;
+
+  if (!konto) {
+    dashboard.innerHTML = '<div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:10px;background:var(--bg);border-radius:6px">Wybierz konto powyżej.</div>';
+    if (alertEl) alertEl.style.display = 'none';
+    return;
+  }
+
+  const plan = adsTrackerGetPlan(konto);
+
+  // Auto-alert
+  if (alertEl) {
+    if (plan) {
+      const startDate = new Date(plan.startDate);
+      const daysSince = Math.round((new Date() - startDate) / 86400000);
+      const hasCheckpoint = (label) => plan.checkpoints.some(c => c.label === label);
+
+      if (daysSince >= 7 && !hasCheckpoint('7d')) {
+        alertEl.style.display = 'block';
+        alertEl.innerHTML = `⚠️ ${plan.kontoName}: minęło <b>${daysSince} dni</b> od restartu (${plan.startDateLocal}). Czas na <b>checkpoint 7d</b>! Wgraj raport Ads.`;
+      } else if (daysSince >= 14 && !hasCheckpoint('14d')) {
+        alertEl.style.display = 'block';
+        alertEl.innerHTML = `⚠️ ${plan.kontoName}: minęło <b>${daysSince} dni</b>. Czas na <b>checkpoint 14d + PIERWSZA OPTYMALIZACJA</b>!`;
+      } else if (daysSince >= 30 && !hasCheckpoint('30d')) {
+        alertEl.style.display = 'block';
+        alertEl.innerHTML = `📊 ${plan.kontoName}: minęło <b>${daysSince} dni</b>. Czas na <b>ocenę miesiąca</b>.`;
+      } else {
+        alertEl.style.display = 'none';
+      }
+    } else {
+      alertEl.style.display = 'none';
+    }
+  }
+
+  if (!plan) {
+    dashboard.innerHTML = `<div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:10px;background:var(--bg);border-radius:6px">
+      Brak zapisanego planu dla ${(AC_META[konto]||{}).name||konto}.<br>
+      <b>Krok 1:</b> Wygeneruj Total Restart w AI Architect (sekcja 4 powyżej)<br>
+      <b>Krok 2:</b> Klik "💾 Zapisz plan restart"
+    </div>`;
+    return;
+  }
+
+  // Header planu
+  const meta = AC_META[konto] || {};
+  let html = `
+    <div style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+        <div>
+          <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:#34d399">${plan.kontoName}</span>
+          <span style="font-size:10px;color:var(--text3);margin-left:8px">${meta.badge || ''} ${meta.role || ''}</span>
+        </div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">Start: ${plan.startDateLocal} | ${plan.campaignCount} kampanii · ${plan.groupCount} grup</div>
+      </div>
+
+      <!-- Checkpointy timeline -->
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <div style="flex:1;padding:6px 10px;background:var(--bg);border-radius:4px;text-align:center;border:1px solid #34d399">
+          <div style="font-size:8px;color:var(--text3);text-transform:uppercase">START</div>
+          <div style="font-size:11px;font-family:var(--mono);color:var(--text)">${plan.startDateLocal}</div>
+        </div>
+        ${['7d','14d','30d'].map(label => {
+          const cp = plan.checkpoints.find(c => c.label === label);
+          const border = cp ? '1px solid #34d399' : '1px dashed var(--border)';
+          const bg = cp ? 'var(--bg)' : 'transparent';
+          return `<div style="flex:1;padding:6px 10px;background:${bg};border-radius:4px;text-align:center;border:${border}">
+            <div style="font-size:8px;color:var(--text3);text-transform:uppercase">${label}</div>
+            ${cp
+              ? `<div style="font-size:11px;font-family:var(--mono);color:${cp.totRoas >= 6 ? '#34d399' : cp.totRoas >= 3 ? '#f5a623' : '#ef4444'}">ROAS ${cp.totRoas.toFixed(2)}</div>
+                 <div style="font-size:9px;color:var(--text3)">${cp.totKoszt.toFixed(0)} zł → ${cp.totSprzedaz.toFixed(0)} zł</div>`
+              : `<div style="font-size:10px;color:var(--text3)">—</div>`
+            }
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+
+  // Tabela kampanii z checkpointami
+  if (plan.checkpoints.length) {
+    const latest = plan.checkpoints[plan.checkpoints.length - 1];
+    html += `
+      <div style="font-size:10px;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:6px">
+        KAMPANIE — CHECKPOINT ${latest.label} (${latest.dateLocal}, dzień ${latest.daysSinceStart})
+      </div>
+      <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:2fr 80px 80px 60px 80px;gap:4px;padding:6px 10px;background:var(--bg);font-size:8px;font-family:var(--mono);text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)">
+          <div>Kampania</div><div style="text-align:right">Koszt</div><div style="text-align:right">Sprzedaż</div><div style="text-align:right">ROAS</div><div style="text-align:center">Status</div>
+        </div>
+    `;
+
+    latest.campaigns.sort((a,b) => b.koszt - a.koszt).forEach(c => {
+      const roasColor = c.roas >= 6 ? '#34d399' : c.roas >= 3 ? '#f5a623' : '#ef4444';
+      const statusText = c.roas >= 10 ? '⭐ SKALUJ' : c.roas >= 6 ? '✅ OK' : c.roas >= 3 ? '⚠️ OBSERWUJ' : c.roas > 0 ? '🔴 ZAMKNIJ' : '— brak danych';
+      html += `
+        <div style="display:grid;grid-template-columns:2fr 80px 80px 60px 80px;gap:4px;padding:5px 10px;border-bottom:1px solid var(--border);font-size:10px;font-family:var(--mono);align-items:center">
+          <div style="color:var(--text)">${c.name}</div>
+          <div style="text-align:right;color:var(--text2)">${c.koszt.toFixed(0)} zł</div>
+          <div style="text-align:right;color:var(--text2)">${c.sprzedaz.toFixed(0)} zł</div>
+          <div style="text-align:right;color:${roasColor};font-weight:600">${c.roas.toFixed(2)}</div>
+          <div style="text-align:center;font-size:9px">${statusText}</div>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
+
+    // Podsumowanie
+    html += `
+      <div style="margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono)">
+        <div>Łącznie: <b>${latest.totKoszt.toFixed(0)} zł</b> koszt → <b>${latest.totSprzedaz.toFixed(0)} zł</b> sprzedaż</div>
+        <div>ROAS: <b style="color:${latest.totRoas >= 6 ? '#34d399' : '#f5a623'}">${latest.totRoas.toFixed(2)}</b> vs BE 6.30</div>
+      </div>
+    `;
+  }
+
+  // Trend jeśli jest więcej niż 1 checkpoint
+  if (plan.checkpoints.length > 1) {
+    html += `<div style="margin-top:10px;font-size:10px;font-family:var(--mono);color:var(--text3)">TREND ROAS: `;
+    plan.checkpoints.forEach((cp, i) => {
+      const arrow = i > 0 ? (cp.totRoas > plan.checkpoints[i-1].totRoas ? ' ↑ ' : ' ↓ ') : '';
+      html += `${arrow}<b style="color:${cp.totRoas >= 6 ? '#34d399' : '#f5a623'}">${cp.label}: ${cp.totRoas.toFixed(2)}</b> `;
+    });
+    html += `</div>`;
+  }
+
+  // Button usunięcia planu
+  html += `<div style="margin-top:10px;display:flex;justify-content:flex-end">
+    <button onclick="if(confirm('Usunąć plan ${plan.kontoName}?')){const a=adsTrackerGetPlans();delete a['${konto}'];localStorage.setItem(ADS_TRACKER_KEY,JSON.stringify(a));adsTrackerRender()}" style="font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">🗑 Usuń plan</button>
+  </div>`;
+
+  dashboard.innerHTML = html;
+}
+
 function caGetSavedCampaignsForKonto(konto) {
   try {
     const all = JSON.parse(localStorage.getItem(CA_KEY) || '{}');
@@ -12702,7 +13012,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.25</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.26</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
