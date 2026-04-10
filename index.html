@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.27</title>
+<title>MPlace Hub v6.28</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.27</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.28</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -11920,12 +11920,23 @@ function adsTrackerParsePlanText(text) {
       currentCampaign.groups.push(currentGroup);
     }
 
-    // Wykryj IDs: "IDs:123 456 789" lub "IDs: 123 456"
-    const idsMatch = line.match(/^IDs?\s*[:=]\s*(.+)/i);
-    if (idsMatch && currentGroup) {
+    // Wykryj IDs: "IDs:123 456 789" lub "IDs 123 456" lub "IDs\t123456"
+    const idsMatch = line.match(/^IDs?\s*[:=\t ]?\s*(.+)/i);
+    if (idsMatch) {
       const idsStr = idsMatch[1].replace(/[,;|·]/g, ' ');
       const ids = idsStr.match(/\d{8,}/g) || [];
-      currentGroup.ids = ids;
+      if (ids.length > 0 && currentGroup) {
+        currentGroup.ids = [...(currentGroup.ids || []), ...ids];
+      }
+    }
+
+    // Fallback: linia z samymi numerami aukcji (np. "17565030433 17564932513 17564915568")
+    if (currentGroup && !idsMatch && !campMatch && !groupMatch) {
+      const bareIds = line.match(/^\d{8,}(\s+\d{8,})*$/);
+      if (bareIds) {
+        const ids = line.match(/\d{8,}/g) || [];
+        if (ids.length > 0) currentGroup.ids = [...(currentGroup.ids || []), ...ids];
+      }
     }
 
     // Wykryj CPC: "CPC: 1.40 zł" lub "Dynamic CPC start 1.40"
@@ -13264,7 +13275,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.27</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.28</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
