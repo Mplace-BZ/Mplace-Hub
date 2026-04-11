@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.53</title>
+<title>MPlace Hub v6.54</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.53</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.54</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -10479,6 +10479,60 @@ function aaTRValidate(text, roasMap, beRoas) {
   roasMap = roasMap || {};
   beRoas = beRoas || 5;
 
+  // ═══ POST-PROCESSOR: transformuj format Agenta do wzoru MK ═══
+
+  // PP-1. Tytuł: wymusz "TOTAL RESTART KAMPANII ADS"
+  text = text.replace(/^#\s+(?:PERFEKT CIĘCIE|MOBELKAP|MEBLE NA CZASIE|[A-ZĘÓĄŚŁŻŹĆŃ\s]+)\s*[—–-]\s*(?:RESTRUKTURYZACJA|PLAN NOWYCH|PLAN KAMPANII)[^\n]*/m, (match) => {
+    const kontoMatch = match.match(/(?:PERFEKT CIĘCIE|Perfekt Cięcie|MOBELKAP|MobelKap|MEBLE NA CZASIE|Meble na Czasie)/i);
+    const konto = kontoMatch ? kontoMatch[0] : 'Konto';
+    return `# TOTAL RESTART KAMPANII ADS — ${konto}`;
+  });
+
+  // PP-2. Nagłówek Plan FINALNY — dodaj jeśli brakuje
+  if (!text.includes('Plan FINALNY')) {
+    text = text.replace(/^(# TOTAL RESTART[^\n]*\n)/m, '$1## Plan FINALNY | Data startu: 12.04.2026 | N kampanii · N grup · N aukcji\n');
+  }
+
+  // PP-3. Numeracja kampanii: "KAMPANIA 1" → "KAMPANIA 001", "KAMPANIA 2" → "KAMPANIA 002"
+  text = text.replace(/##\s*(?:🏆|🔼|🪑|🚿|🪞|🌸|✨|📋|🔴|🟠|🟡|🟢|❌)?\s*KAMPANIA\s+(\d{1,2})\b/g, (match, num) => {
+    return `## KAMPANIA ${num.padStart(3, '0')}`;
+  });
+
+  // PP-4. Bloki kodu IDs → tabela | Pole | Wartość |
+  // Matchuje: ```\nIDs:\n12345 67890\n``` lub ```\nIDs: 12345 67890\n```
+  text = text.replace(/```\s*\n\s*IDs?:\s*\n?\s*([\s\S]*?)\n\s*Dynamic CPC start:\s*([\d.,]+\s*zł)\s*\n\s*Budżet dzienny:\s*([\d.,]+\s*zł)\s*\n\s*```/g, (match, ids, cpc, budget) => {
+    const cleanIds = ids.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ');
+    return `| Pole | Wartość |\n|---|---|\n| IDs | ${cleanIds} |\n| Dynamic CPC start | ${cpc.trim()} |\n| Budżet dzienny | ${budget.trim()} |`;
+  });
+
+  // PP-4b. Bloki kodu z samymi IDs (bez CPC/budżet w bloku) + tabela Parametr poniżej
+  text = text.replace(/```\s*\n\s*IDs?:\s*\n?\s*([\s\S]*?)\n\s*```\s*\n+\|\s*(?:Parametr|Pole)\s*\|\s*(?:Wartość)\s*\|\s*\n\|[-\s|]*\|\s*\n(?:\|\s*Dynamic CPC start\s*\|\s*\*?\*?([\d.,]+\s*zł)\*?\*?\s*\|\s*\n)?(?:\|\s*Budżet dzienny\s*\|\s*\*?\*?([\d.,]+\s*zł)\*?\*?\s*\|)?/g, (match, ids, cpc, budget) => {
+    const cleanIds = ids.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ');
+    const cpcVal = cpc ? cpc.trim() : '1.00 zł';
+    const budgetVal = budget ? budget.trim() : '10 zł';
+    return `| Pole | Wartość |\n|---|---|\n| IDs | ${cleanIds} |\n| Dynamic CPC start | ${cpcVal} |\n| Budżet dzienny | ${budgetVal} |`;
+  });
+
+  // PP-5. Tabela "Parametr" → "Pole"
+  text = text.replace(/\|\s*Parametr\s*\|/g, '| Pole |');
+
+  // PP-6. Usuń opisy/blockquotes pod tabelami grup ("> ..." po tabeli)
+  text = text.replace(/(\|\s*Budżet dzienny\s*\|[^\n]*\n)\s*\n>\s*[^\n]+/g, '$1');
+
+  // PP-7. Usuń "Uzasadnienie:", "Anchor:", "Uwaga:" wiersze z tabel
+  text = text.replace(/\|\s*(?:Uzasadnienie|Anchor|Uwaga|Targetowanie|Placement|Wykluczenia)\s*\|[^\n]*\n/g, '');
+
+  // PP-8. Nagłówki kampanii: "### 🏆 KAMPANIA 1 — KARO 92 HERO" → "### /001/D/ KARO92_HERO"
+  text = text.replace(/###\s*(?:🏆|🔼|🪑|🚿|🪞|🌸|✨|📋|🔴|🟠|🟡|🟢|❌)?\s*KAMPANIA\s+\d+\s*[—–-]\s*/g, '### ');
+
+  // PP-9. Usuń bold z wartości w tabelach: **1.50 zł** → 1.50 zł
+  text = text.replace(/\|\s*\*\*([^*|]+)\*\*\s*\|/g, '| $1 |');
+
+  // PP-10. Fałszywe IDs w komórkach IDs — usuń (>11 cyfr)
+  // (walidator robi to dalej, ale post-processor czyści bloki kodu wcześniej)
+
+  // ═══ KONIEC POST-PROCESSORA ═══
+
   // 1. Wyciągnij IDs z grup kampanii (tabele "| IDs | ... |")
   const grupIds = new Set();
   const idTableMatches = [...text.matchAll(/\|\s*IDs\s*\|\s*([^|]+)\|/g)];
@@ -13754,7 +13808,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.53</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.54</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
