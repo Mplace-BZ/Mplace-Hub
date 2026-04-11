@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.32</title>
+<title>MPlace Hub v6.33</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.32</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.33</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2131,6 +2131,9 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
       <button onclick="aaSaveTemplate()" style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.06);color:#38bdf8;cursor:pointer">+ zapisz jako szablon</button>
     </div>
     <textarea id="aaUwagi" placeholder="Wpisz swoje spostrzeżenia — co zauważyłeś, jakie masz wątpliwości, jaki kontekst (święta, sezon, zmiany). Agent uwzględni to w analizie." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:80px;box-sizing:border-box;line-height:1.5"></textarea>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+      <button onclick="document.getElementById('aaUwagi').value='TOTAL RESTART — czysta karta kampanii. Wygeneruj plan nowych kampanii od zera wg szablonu MK.'" style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,107,53,.4);background:rgba(255,107,53,.1);color:#ff6b35;cursor:pointer;font-weight:600">TOTAL RESTART</button>
+    </div>
     <div id="aaTemplates" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
   </div>
 
@@ -10029,33 +10032,95 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     });
   }
 
-  p += `\n== ZADANIE ==\n`;
-  p += `BE ROAS tego konta: ${be.toFixed(2)} — próg rentowności.\n\n`;
-  p += `METODA ANALIZY (obowiązkowa kolejność):\n`;
-  p += `A) Zacznij od PODSUMOWANIA PER AUKCJA (agregaty) — to jest PRAWDA. Dane per-kampania to tylko kontekst struktury.\n`;
-  p += `B) Sortuj aukcje PO KOSZCIE malejąco — tam gdzie wydajesz najwięcej, tam tracisz najwięcej jeśli ROAS jest zły.\n`;
-  p += `C) ROAS < 3 = WYŁĄCZ natychmiast (groźne). ROAS 3-4 = poważne ostrzeżenie. ROAS 4-BE = optymalizuj stawkę. ROAS > BE = OK.\n`;
-  p += `D) Aukcja z 1-2 transakcjami i wysokim ROAS = PRZYPADEK, nie gwiazda. Minimum 3 transakcje żeby rekomendować skalowanie.\n`;
-  p += `E) Wysoki CTR + niska sprzedaż = problem z ofertą (cena/zdjęcia), NIE z kampanią. Sprawdź czy ruch migruje do konkurencji.\n`;
-  p += `F) Dane główne = 14 dni (lub bieżący okres). Dane 30d = kontekst historyczny. Opieraj decyzje na GŁÓWNYCH danych, 30d jako weryfikacja.\n`;
-  p += `G) Jeśli ROAS główny < BE ale ROAS 30d > BE = efekt sezonowy, NIE wyłączaj.\n`;
-  p += `H) Jeśli ROAS główny < 3 I ROAS 30d < 3 = strukturalnie martwa, WYŁĄCZ.\n`;
-  p += `I) KANIBALIZACJA: jeśli aukcja w wielu kampaniach ma ŁĄCZNIE < 3 transakcji — NIE rekomenduj wykluczenia z żadnej kampanii. Porównanie ROAS 36 vs 6 przy 1 transakcji w każdej = przypadek, nie dane. Oznacz "obserwuj 14 dni".\n\n`;
-  p += `RAPORT w 8 sekcjach. Konkretne liczby. Po polsku.\n\n`;
-  p += `1. DIAGNOZA — ile dokładnie tracisz na Ads miesięcznie (kwota w zł), ROAS vs BE, marża\n`;
-  p += `2. WYŁĄCZ (ROAS < 3 lub ROAS=0 przy koszt>=30zł) — groźne, natychmiast: [numer] | koszt X zł | ROAS X | strata X zł/mies.\n`;
-  p += `3. OSTRZEŻENIE (ROAS 3-4) — poważne, decyzja w 7 dni: optymalizuj lub wyłącz\n`;
-  p += `4. OPTYMALIZUJ (ROAS 4 do ${be.toFixed(1)}) — tnij stawkę: [numer] | koszt X zł | ROAS X vs BE ${be.toFixed(2)} | o ile % obniżyć\n`;
-  p += `5. SKALUJ (ROAS > BE, min 3 transakcje) — TYLKO potwierdzone gwiazdy. 1-2 transakcje = "obserwuj", NIE skaluj\n`;
-  p += `6. KANIBALIZACJA — aukcje w wielu kampaniach: pokaż ŁĄCZNY wynik (agregat) vs per-kampania, wskaż duplikaty do wyłączenia. WARUNEK: minimum 3 transakcje łącznie żeby rekomendować jakąkolwiek decyzję. Mniej = "obserwuj", brak akcji.\n`;
-  p += `7. CTR vs KONWERSJA — wysokie CTR bez sprzedaży: diagnoza (cena? zdjęcia? migracja ruchu?), konkretna rekomendacja\n`;
-  p += `8. PLACEMENT — Wyniki wyszukiwania vs Strona produktu: który działa, rekomendacja\n`;
-  p += `9. KANDYDACI DO SMART — wykorzystując CENNIKI DOSTAWY z katalogu: które aukcje DPD 2/3 paczki mają wysoką liczbę wizyt + porzuconych koszyków + niską konwersję? Pokaż TOP 5 z szacunkiem wzrostu transakcji (konwersja Smart ~2% vs obecna). WAŻNE: jeśli aukcja ma tag [DPD2] w danych Ads ALE tag [SMART] w katalogu → to znaczy że CENNIK ZOSTAŁ JUŻ ZMIENIONY na Smart. Nie rekomenduj migracji (już jest!) — rekomenduj "OBSERWUJ 14 dni konwersję po migracji" i podaj szacunek oczekiwanej konwersji.\n`;
-  p += `10. CHRIS DO ZROBIENIA — 5 najważniejszych działań sortowane po kwocie oszczędności/zysku: [PILNE/WAŻNE] Co dokładnie zrobić → W którym panelu Allegro → Konkretne ID/nazwy do skopiowania → Oszczędność/zysk zł/mies. Przy każdej nowej kampanii/grupie podaj PEŁNĄ NAZWĘ wg konwencji Format A v2 (/NNN/ KAT_LINIA_WYMIAR + [KONTO][NNN][WW][RW] LINIA_WYMIAR_KOLOR) i IDs do wklejenia oddzielone spacjami.\n`;
+  // ═══ TRYB: TOTAL RESTART vs DIAGNOSTYKA ═══
+  const isTotalRestart = uwagi && uwagi.toUpperCase().includes('TOTAL RESTART');
+
+  if (isTotalRestart) {
+    // ─── TOTAL RESTART MODE ───
+    const kontoSkrot = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC' }[kontoKey] || 'MK';
+    p += `\n== ZADANIE: TOTAL RESTART KAMPANII ADS ==\n`;
+    p += `Generujesz plan TOTAL RESTART — czysta karta kampanii Ads dla konta ${konto}.\n`;
+    p += `BE ROAS: ${be.toFixed(2)} | Konto: ${kontoSkrot} | Budżet: 100 zł/kampanię (chyba że dane uzasadniają inaczej)\n\n`;
+    p += `ZASADY KRYTYCZNE:\n`;
+    p += `- IDs MUSZĄ być dokładnie 11-cyfrowe, z danych XLSX. NIGDY nie wymyślaj IDs.\n`;
+    p += `- Jeśli nie masz 11-cyfrowego ID oferty → wpisz "(ID: sprawdź w panelu — NAZWA OFERTY)" — NIC więcej.\n`;
+    p += `- NIE wypisuj IDs które mają więcej lub mniej niż 11 cyfr — nawet z flagą "sprawdź".\n`;
+    p += `- Minimum 3 transakcje (Ads lub organika) żeby wrzucić ofertę do kampanii. 1-2 trans = obserwuj.\n`;
+    p += `- Nazwy kampanii: /NNN/D/ KATEGORIA_LINIA\n`;
+    p += `- Nazwy grup: [${kontoSkrot}][NNN][WW][RW] LINIA_WYMIAR_KOLOR\n`;
+    p += `- Dynamic CPC start: 0.80-1.50 zł (hero wyżej, niszowe niżej)\n\n`;
+    p += `FORMAT RAPORTU (IDENTYCZNY dla każdego konta — wzór MK):\n\n`;
+    p += `# TOTAL RESTART KAMPANII ADS — ${konto}\n`;
+    p += `## Plan FINALNY | Data startu: [DATA] | N kampanii · N grup · N aukcji\n\n`;
+    p += `## WSTĘPNA ANALIZA DANYCH\n`;
+    p += `- Dane Ads (okres): koszt | sprzedaż | ROAS\n`;
+    p += `- Dane Sprzedaż: Est. EOM | AOV\n`;
+    p += `- Udział Ads w sprzedaży: %\n`;
+    p += `- Kluczowe obserwacje (2-3 bullet points)\n\n`;
+    p += `## STRUKTURA KAMPANII — OVERVIEW (tabela)\n`;
+    p += `| Nr | Kampania | Kategoria | Budżet/dzień |\n`;
+    p += `Łączny budżet dzienny: X zł\n\n`;
+    p += `## PER KAŻDA KAMPANIA:\n`;
+    p += `## KAMPANIA NNN\n`;
+    p += `### /NNN/D/ NAZWA KAMPANII\n\n`;
+    p += `#### Grupa NNN-A\n`;
+    p += `[${kontoSkrot}][NNN][WW][RW] NAZWA_GRUPY\n\n`;
+    p += `| Pole | Wartość |\n|---|---|\n`;
+    p += `| IDs | [11-cyfrowe numery z danych, oddzielone spacjami] |\n`;
+    p += `| Dynamic CPC start | X.XX zł |\n`;
+    p += `| Budżet dzienny | XX zł |\n`;
+    p += `| ROAS hist. | X.XX× |\n`;
+    p += `| Transakcje Ads | N |\n`;
+    p += `| Sprzedaż Ads | X XXX zł |\n`;
+    p += `| Nota | [1 zdanie kontekstu — KRÓTKO] |\n\n`;
+    p += `Powtórz dla każdej grupy w kampanii. Ostatnia kampania = BESTSELLER AUTOMAT.\n\n`;
+    p += `## BESTSELLER AUTOMAT — WYKLUCZENIA\n`;
+    p += `Wszystkie IDs z kampanii CORE w jednym bloku (oddzielone spacjami).\n\n`;
+    p += `## WYRÓŻNIENIA\n`;
+    p += `FLAT 19.90/10d od startu:\n[lista IDs + krótki powód]\n\n`;
+    p += `ELASTIC 2.90/d [okres]:\n[lista IDs + krótki powód]\n\n`;
+    p += `NIE PROMOWAĆ (0 trans mimo ruchu):\n[lista IDs + powód]\n\n`;
+    p += `## PODSUMOWANIE BUDŻETOWE\n`;
+    p += `Tabela: kampania | budżet/dzień | miesięcznie\n`;
+    p += `Wyróżnienia miesięcznie: X zł\n`;
+    p += `Łączny koszt mktg: X zł (X% EOM)\n`;
+    p += `Scenariusze ROAS: konserwatywny | optymistyczny | BE\n\n`;
+    p += `## HARMONOGRAM\n`;
+    p += `Tabela dat: start, faza nauki (7d), pierwsza ocena, druga ocena, miesięczna.\n\n`;
+    p += `## UWAGI KOŃCOWE — DO ZROBIENIA PRZED STARTEM\n`;
+    p += `Numerowana lista 5-7 konkretnych kroków.\n\n`;
+    p += `STYL: zero verbose, zero warning boxów, zero uzasadnień per kampania. Czyste tabele, krótkie noty (1 zdanie max). Copy-paste ready do panelu Allegro.\n`;
+  } else {
+    // ─── DIAGNOSTYKA MODE (domyślny) ───
+    p += `\n== ZADANIE ==\n`;
+    p += `BE ROAS tego konta: ${be.toFixed(2)} — próg rentowności.\n\n`;
+    p += `METODA ANALIZY (obowiązkowa kolejność):\n`;
+    p += `A) Zacznij od PODSUMOWANIA PER AUKCJA (agregaty) — to jest PRAWDA. Dane per-kampania to tylko kontekst struktury.\n`;
+    p += `B) Sortuj aukcje PO KOSZCIE malejąco — tam gdzie wydajesz najwięcej, tam tracisz najwięcej jeśli ROAS jest zły.\n`;
+    p += `C) ROAS < 3 = WYŁĄCZ natychmiast (groźne). ROAS 3-4 = poważne ostrzeżenie. ROAS 4-BE = optymalizuj stawkę. ROAS > BE = OK.\n`;
+    p += `D) Aukcja z 1-2 transakcjami i wysokim ROAS = PRZYPADEK, nie gwiazda. Minimum 3 transakcje żeby rekomendować skalowanie.\n`;
+    p += `E) Wysoki CTR + niska sprzedaż = problem z ofertą (cena/zdjęcia), NIE z kampanią. Sprawdź czy ruch migruje do konkurencji.\n`;
+    p += `F) Dane główne = 14 dni (lub bieżący okres). Dane 30d = kontekst historyczny. Opieraj decyzje na GŁÓWNYCH danych, 30d jako weryfikacja.\n`;
+    p += `G) Jeśli ROAS główny < BE ale ROAS 30d > BE = efekt sezonowy, NIE wyłączaj.\n`;
+    p += `H) Jeśli ROAS główny < 3 I ROAS 30d < 3 = strukturalnie martwa, WYŁĄCZ.\n`;
+    p += `I) KANIBALIZACJA: jeśli aukcja w wielu kampaniach ma ŁĄCZNIE < 3 transakcji — NIE rekomenduj wykluczenia z żadnej kampanii. Porównanie ROAS 36 vs 6 przy 1 transakcji w każdej = przypadek, nie dane. Oznacz "obserwuj 14 dni".\n\n`;
+    p += `RAPORT w 8 sekcjach. Konkretne liczby. Po polsku.\n\n`;
+    p += `1. DIAGNOZA — ile dokładnie tracisz na Ads miesięcznie (kwota w zł), ROAS vs BE, marża\n`;
+    p += `2. WYŁĄCZ (ROAS < 3 lub ROAS=0 przy koszt>=30zł) — groźne, natychmiast: [numer] | koszt X zł | ROAS X | strata X zł/mies.\n`;
+    p += `3. OSTRZEŻENIE (ROAS 3-4) — poważne, decyzja w 7 dni: optymalizuj lub wyłącz\n`;
+    p += `4. OPTYMALIZUJ (ROAS 4 do ${be.toFixed(1)}) — tnij stawkę: [numer] | koszt X zł | ROAS X vs BE ${be.toFixed(2)} | o ile % obniżyć\n`;
+    p += `5. SKALUJ (ROAS > BE, min 3 transakcje) — TYLKO potwierdzone gwiazdy. 1-2 transakcje = "obserwuj", NIE skaluj\n`;
+    p += `6. KANIBALIZACJA — aukcje w wielu kampaniach: pokaż ŁĄCZNY wynik (agregat) vs per-kampania, wskaż duplikaty do wyłączenia. WARUNEK: minimum 3 transakcje łącznie żeby rekomendować jakąkolwiek decyzję. Mniej = "obserwuj", brak akcji.\n`;
+    p += `7. CTR vs KONWERSJA — wysokie CTR bez sprzedaży: diagnoza (cena? zdjęcia? migracja ruchu?), konkretna rekomendacja\n`;
+    p += `8. PLACEMENT — Wyniki wyszukiwania vs Strona produktu: który działa, rekomendacja\n`;
+    p += `9. KANDYDACI DO SMART — wykorzystując CENNIKI DOSTAWY z katalogu: które aukcje DPD 2/3 paczki mają wysoką liczbę wizyt + porzuconych koszyków + niską konwersję? Pokaż TOP 5 z szacunkiem wzrostu transakcji (konwersja Smart ~2% vs obecna). WAŻNE: jeśli aukcja ma tag [DPD2] w danych Ads ALE tag [SMART] w katalogu → to znaczy że CENNIK ZOSTAŁ JUŻ ZMIENIONY na Smart. Nie rekomenduj migracji (już jest!) — rekomenduj "OBSERWUJ 14 dni konwersję po migracji" i podaj szacunek oczekiwanej konwersji.\n`;
+    p += `10. CHRIS DO ZROBIENIA — 5 najważniejszych działań sortowane po kwocie oszczędności/zysku: [PILNE/WAŻNE] Co dokładnie zrobić → W którym panelu Allegro → Konkretne ID/nazwy do skopiowania → Oszczędność/zysk zł/mies. Przy każdej nowej kampanii/grupie podaj PEŁNĄ NAZWĘ wg konwencji Format A v2 (/NNN/ KAT_LINIA_WYMIAR + [KONTO][NNN][WW][RW] LINIA_WYMIAR_KOLOR) i IDs do wklejenia oddzielone spacjami.\n`;
+  }
 
   // ═══ ADS DISCOVERER — cross-reference katalog × Ads × Odwiedziny ═══
   // Szuka aukcji BEZ kampanii Ads ale Z ruchem organicznym → kandydaci do NOWYCH kampanii
-  if (cat && cat.oferty && cat.oferty.length && (sprzedaz || konwersja)) {
+  // W trybie TOTAL RESTART pomijamy Discoverer — Agent ma inne zadanie
+  if (!isTotalRestart && cat && cat.oferty && cat.oferty.length && (sprzedaz || konwersja)) {
     // Zbiór ID aukcji aktywnych w Ads
     const adsAukcjeIds = new Set();
     if (ads && ads.kampanie) {
@@ -10247,11 +10312,13 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     }
   }
 
-  p += `\n== PODSUMOWANIE SEKCJI 11-13 ==\n`;
-  p += `Sekcja 11 (Ads Discoverer): NOWE kampanie na aukcjach z udowodnioną organiką\n`;
-  p += `Sekcja 12 (Wyróżnienia Discoverer): promowanie aukcji bez wyróżnień\n`;
-  p += `Sekcja 13 (Napraw Ofertę): NIE dawaj Ads dopóki nie naprawisz listingu\n`;
-  p += `Priorytet: NAJPIERW sekcja 13 (napraw) → potem 12 (wyróżnienia) → potem 11 (nowe Ads)\n`;
+  if (!isTotalRestart) {
+    p += `\n== PODSUMOWANIE SEKCJI 11-13 ==\n`;
+    p += `Sekcja 11 (Ads Discoverer): NOWE kampanie na aukcjach z udowodnioną organiką\n`;
+    p += `Sekcja 12 (Wyróżnienia Discoverer): promowanie aukcji bez wyróżnień\n`;
+    p += `Sekcja 13 (Napraw Ofertę): NIE dawaj Ads dopóki nie naprawisz listingu\n`;
+    p += `Priorytet: NAJPIERW sekcja 13 (napraw) → potem 12 (wyróżnienia) → potem 11 (nowe Ads)\n`;
+  }
 
   return p;
 }
@@ -13335,7 +13402,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.32</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.33</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
