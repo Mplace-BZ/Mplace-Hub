@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.47</title>
+<title>MPlace Hub v6.48</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.47</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.48</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -10552,7 +10552,7 @@ function aaTRValidate(text, roasMap, beRoas) {
     }
   }
 
-  // 3d. CHECK: duplikaty — ten sam ID w 2+ grupach (kanibalizacja)
+  // 3d. AUTO-FIX: duplikaty — ten sam ID w 2+ grupach → usuń z późniejszej grupy
   const idToGroups = {};
   const grupSections = [...text.matchAll(/####\s*Grupa\s*(\S+)[\s\S]*?\|\s*IDs\s*\|\s*([^|]+)\|/g)];
   grupSections.forEach(m => {
@@ -10566,20 +10566,31 @@ function aaTRValidate(text, roasMap, beRoas) {
   const dupIds = Object.entries(idToGroups).filter(([id, gs]) => gs.length > 1);
   if (dupIds.length > 0) {
     dupIds.forEach(([id, gs]) => {
-      errors.push(`DUPLIKAT: ${id} w grupach ${gs.join(' i ')} — kanibalizacja CPC`);
+      // Usuń z OSTATNIEJ grupy (zachowaj pierwszą — wcześniejsza kampania = priorytet)
+      for (let i = 1; i < gs.length; i++) {
+        text = text.replace(new RegExp('(####\\s*Grupa\\s*' + gs[i].replace(/[-]/g, '\\-') + '[\\s\\S]*?\\|\\s*IDs\\s*\\|\\s*)([^|]*\\b' + id + '\\b[^|]*)(\\|)', 'g'), (match, pre, ids, post) => {
+          const cleaned = ids.replace(new RegExp('\\b' + id + '\\b'), '').replace(/\s+/g, ' ').trim();
+          return cleaned ? pre + cleaned + post : pre + '(usunięto duplikat) ' + post;
+        });
+      }
+      errors.push(`DUPLIKAT ${id} usunięto z grupy ${gs.slice(1).join(', ')} (zachowano w ${gs[0]})`);
     });
     fixes.push('duplikaty-cross');
   }
 
-  // 3e. CHECK: KARO 65 Wotan (17701061220) nie powinien być w MK
+  // 3e. AUTO-FIX: KARO 65 Wotan (17701061220) → usuń z grupy MK
   if (grupIds.has('17701061220')) {
-    errors.push(`KARO 65 Wotan [17701061220] w kampanii MK — specjalizacja MnC, usuń z kampanii`);
+    text = text.replace(new RegExp('(\\|\\s*IDs\\s*\\|\\s*)([^|]*\\b17701061220\\b[^|]*)(\\|)', 'g'), (match, pre, ids, post) => {
+      const cleaned = ids.replace(/\b17701061220\b/, '').replace(/\s+/g, ' ').trim();
+      return cleaned ? pre + cleaned + post : pre + '(usunięto KARO65) ' + post;
+    });
+    grupIds.delete('17701061220');
+    errors.push(`KARO 65 Wotan [17701061220] usunięto z kampanii MK — specjalizacja MnC`);
     fixes.push('karo65');
   }
 
-  // 3f. CHECK: oferty usunięte z kampanii (ROAS<3) nie mogą być w ELASTIC/FLAT
-  const removedByValidator = new Set();
-  toxicInGrups && toxicInGrups.forEach && toxicInGrups.forEach(id => removedByValidator.add(id));
+  // 3f. Zbierz usunięte oferty do sprawdzenia wyróżnień
+  const removedByValidator = new Set(toxicInGrups);
 
   // 4. Wyciągnij IDs z FLAT i ELASTIC
   const flatSection = text.match(/FLAT[^\n]*promować[^\n]*\n([\s\S]*?)(?=\n### |$)/);
@@ -10590,12 +10601,30 @@ function aaTRValidate(text, roasMap, beRoas) {
   const elasticIds = new Set();
   if (elasticSection) [...elasticSection[1].matchAll(/\|\s*(\d{11})\s*\|/g)].forEach(m => elasticIds.add(m[1]));
 
-  // 5. FLAT/ELASTIC muszą być w kampaniach + nie mogą być usunięte przez walidator
+  // 5. AUTO-FIX: FLAT/ELASTIC — usuń toksyczne (ROAS<3) i nieistniejące w kampaniach
   [...flatIds].forEach(id => { if (!grupIds.has(id)) errors.push(`FLAT ${id} nie jest w żadnej kampanii`); });
+  const toxicInElastic = [];
   [...elasticIds].forEach(id => {
     if (!grupIds.has(id)) errors.push(`ELASTIC ${id} nie jest w żadnej kampanii`);
-    if (toxicInGrups.includes(id)) errors.push(`ELASTIC ${id} ma ROAS < 3 (${roasMap[id]?.toFixed(2)}×) — usuń z wyróżnień`);
+    if (toxicInGrups.includes(id)) toxicInElastic.push(id);
   });
+  if (toxicInElastic.length > 0) {
+    // Usuń toksyczne IDs z linii ELASTIC
+    toxicInElastic.forEach(id => {
+      text = text.replace(new RegExp('\\b' + id + '\\b', 'g'), (match) => {
+        // Tylko w sekcji ELASTIC (nie wszędzie)
+        return '';
+      });
+    });
+    // Czystsza metoda: znajdź linię ELASTIC z IDs i usuń toksyczne
+    const elasticLine = text.match(/(ELASTIC[^\n]*\n)([\d\s]+)/);
+    if (elasticLine) {
+      const cleanedIds = elasticLine[2].trim().split(/\s+/).filter(id => !toxicInElastic.includes(id)).join(' ');
+      text = text.replace(elasticLine[2].trim(), cleanedIds);
+    }
+    errors.push(`${toxicInElastic.length} toksycznych IDs usunięto z ELASTIC: ${toxicInElastic.join(', ')}`);
+    fixes.push('elastic-toxic');
+  }
 
   // 6. Policz faktycznie
   const kampCount = (text.match(/^## KAMPANIA \d+/gm) || []).length;
@@ -13725,7 +13754,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.47</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.48</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
