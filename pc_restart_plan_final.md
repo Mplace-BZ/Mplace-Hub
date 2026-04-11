@@ -1,5 +1,5 @@
 # TOTAL RESTART KAMPANII ADS — Perfekt Cięcie
-## Plan FINALNY | Data startu: 12.04.2026 | 6 kampanii · 11 grup · 16 aukcji
+## Plan FINALNY | Data startu: 12.04.2026 | 6 kampanii · 11 grup · 17 aukcji
 
 ## WSTĘPNA ANALIZA DANYCH
 
