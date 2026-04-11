@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.31</title>
+<title>MPlace Hub v6.32</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.31</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.32</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -9755,9 +9755,10 @@ async function aaParseFile(file, type) {
             }
           }
           if (!rows.length) { rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: 0 }); }
-          console.log('[Konwersja Parser] Sheets:', wb.SheetNames.join(', '), '| Target sheet idx:', targetSheetIdx, '| Rows:', rows.length, '| Headers:', rows[0] ? Object.keys(rows[0]).slice(0,8).join(' | ') : 'none');
+          console.log('[Konwersja Parser] Sheets:', wb.SheetNames.join(', '), '| Target sheet idx:', targetSheetIdx, '| Rows:', rows.length, '| ALL Headers:', rows[0] ? Object.keys(rows[0]).join(' | ') : 'none');
           const fk = (row, ...names) => { for (const n of names) { for (const k of Object.keys(row)) { if (k.includes(n)) return row[k]; } } return 0; };
           const oferty = rows.map(row => ({
+            id: String(fk(row, 'ID oferty', 'id ofert', 'Nr oferty', 'ID', 'Numer oferty') || '').replace(/[^\d]/g,'') || '',
             oferta: String(fk(row, 'Nazwa ofert', 'Produkt', 'Nazwa ofer') || '').substring(0, 60),
             transakcje: parseInt(fk(row, 'Liczba trans', 'transakcj', 'Transakcje')) || 0,
             sztuki: parseInt(fk(row, 'Sprzedane', 'sztuk')) || 0,
@@ -13334,7 +13335,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.31</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.32</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -14174,9 +14175,10 @@ function scrBuildFilesContext() {
           const totTrans = p.totTransakcje || p.oferty.reduce((s,o)=>s+(o.transakcje||0),0);
           const aov = totTrans > 0 ? ((p.totWartosc||0) / totTrans) : 0;
           ctx += `Łącznie transakcji: ${totTrans} | AOV: ${aov.toFixed(0)} zł\n`;
-          ctx += `Top ofert po wartości (${Math.min(30, p.oferty.length)} z ${totalOfert}):\n`;
-          p.oferty.slice(0,30).forEach(o => {
-            ctx += `  ${(o.oferta||'').substring(0,50)} | Trans:${o.transakcje||0} Szt:${o.sztuki||0} Wartość:${(o.wartosc||0).toFixed(0)}zł Cena:${(o.cena||0).toFixed(0)}zł ${o.kategoria?'Kat:'+o.kategoria:''}\n`;
+          ctx += `Top ofert po wartości (${Math.min(50, p.oferty.length)} z ${totalOfert}):\n`;
+          ctx += `WAŻNE: Numery w [nawiasach] to prawdziwe ID ofert z Allegro. UŻYWAJ TYLKO tych numerów.\n`;
+          p.oferty.slice(0,50).forEach(o => {
+            ctx += `  ${o.id?'['+o.id+'] ':'[ID:brak] '}${(o.oferta||'').substring(0,50)} | Trans:${o.transakcje||0} Szt:${o.sztuki||0} Wartość:${(o.wartosc||0).toFixed(0)}zł Cena:${(o.cena||0).toFixed(0)}zł ${o.kategoria?'Kat:'+o.kategoria:''}\n`;
           });
         }
       }
@@ -14184,7 +14186,8 @@ function scrBuildFilesContext() {
   });
 
   ctx += `\n=== KONIEC DANYCH PLIKÓW ===\n`;
-  ctx += `Powyższe dane są dostępne dla całej rozmowy. Odpowiadaj na pytania użytkownika opierając się na nich. Możesz cytować konkretne kampanie, aukcje, ID, wartości. Dla pytań o AOV: AOV = łączna sprzedaż / łączna liczba transakcji.\n\n`;
+  ctx += `Powyższe dane są dostępne dla całej rozmowy. Odpowiadaj na pytania użytkownika opierając się na nich. Możesz cytować konkretne kampanie, aukcje, ID, wartości. Dla pytań o AOV: AOV = łączna sprzedaż / łączna liczba transakcji.\n`;
+  ctx += `KRYTYCZNA ZASADA: NIGDY nie wymyślaj numerów ID ofert. Używaj TYLKO IDs które widzisz w danych powyżej (w nawiasach kwadratowych [ID]). Jeśli oferta nie ma ID w danych — napisz "(ID: sprawdź w panelu)" zamiast wymyślać numer. Halucynowanie fałszywych IDs jest NIEDOPUSZCZALNE.\n\n`;
   return ctx;
 }
 
