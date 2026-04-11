@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.38</title>
+<title>MPlace Hub v6.39</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.38</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.39</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -10470,6 +10470,114 @@ function aaUpdateWyrInfo() {
   list.innerHTML = wyr.map(id => `<span style="display:inline-block;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:3px;padding:2px 6px;margin:2px">[${id}]</span>`).join('');
 }
 
+// ═══ TOTAL RESTART WALIDATOR ═══
+// Sprawdza i naprawia output Agenta PRZED wyświetleniem
+function aaTRValidate(text) {
+  const errors = [];
+  const fixes = [];
+
+  // 1. Wyciągnij IDs z grup kampanii (tabele "| IDs | ... |")
+  const grupIds = new Set();
+  const idTableMatches = [...text.matchAll(/\|\s*IDs\s*\|\s*([^|]+)\|/g)];
+  idTableMatches.forEach(m => {
+    m[1].trim().split(/\s+/).forEach(id => { if (/^\d{11}$/.test(id)) grupIds.add(id); });
+  });
+
+  // 2. Wyciągnij IDs z NIE PROMOWAĆ (tabela po nagłówku)
+  const niePromSection = text.match(/NIE PROMOWAĆ[^\n]*\n([\s\S]*?)(?=\n---|\n## [A-Z])/);
+  const niePromIds = new Set();
+  if (niePromSection) {
+    [...niePromSection[1].matchAll(/\|\s*(\d{11})\s*\|/g)].forEach(m => niePromIds.add(m[1]));
+  }
+
+  // 3. FIX: ID w kampanii I w NIE PROMOWAĆ → usuń z NIE PROMOWAĆ
+  const duplikaty = [...grupIds].filter(id => niePromIds.has(id));
+  if (duplikaty.length > 0) {
+    errors.push(`${duplikaty.length} ID w kampanii I w NIE PROMOWAĆ: ${duplikaty.join(', ')} → usunięto z NIE PROMOWAĆ`);
+    duplikaty.forEach(id => {
+      // Usuń wiersz tabeli z tym ID
+      text = text.replace(new RegExp('\\|\\s*' + id + '\\s*\\|[^\\n]*\\n', 'g'), '');
+      niePromIds.delete(id);
+    });
+    fixes.push('duplikaty');
+  }
+
+  // 4. Wyciągnij IDs z FLAT i ELASTIC
+  const flatSection = text.match(/FLAT[^\n]*promować[^\n]*\n([\s\S]*?)(?=\n### |$)/);
+  const flatIds = new Set();
+  if (flatSection) [...flatSection[1].matchAll(/\|\s*(\d{11})\s*\|/g)].forEach(m => flatIds.add(m[1]));
+
+  const elasticSection = text.match(/ELASTIC BOOST[^\n]*\n([\s\S]*?)(?=\n### |$)/);
+  const elasticIds = new Set();
+  if (elasticSection) [...elasticSection[1].matchAll(/\|\s*(\d{11})\s*\|/g)].forEach(m => elasticIds.add(m[1]));
+
+  // 5. FLAT/ELASTIC muszą być w kampaniach
+  [...flatIds].forEach(id => { if (!grupIds.has(id)) errors.push(`FLAT ${id} nie jest w żadnej kampanii`); });
+  [...elasticIds].forEach(id => { if (!grupIds.has(id)) errors.push(`ELASTIC ${id} nie jest w żadnej kampanii`); });
+
+  // 6. Policz faktycznie
+  const kampCount = (text.match(/^## KAMPANIA \d+/gm) || []).length;
+  const hasAutomat = /BESTSELLER.AUTOMAT/i.test(text);
+  const totalKamp = kampCount + (hasAutomat && kampCount === (text.match(/^## KAMPANIA/gm) || []).length ? 0 : 0);
+  // Automat jest osobną sekcją "## KAMPANIA" lub "## BESTSELLER" — policzmy ## z /NNN/ + Automat
+  const allKampHeaders = (text.match(/^###?\s*\/\d{3}/gm) || []).length + (hasAutomat ? 1 : 0);
+  const grupy = (text.match(/^#### Grupa/gm) || []).length;
+  const aukcje = grupIds.size;
+
+  // 7. FIX nagłówek
+  const headerMatch = text.match(/(\d+)\s*kampanii\s*·\s*(\d+)\s*grup\s*·\s*(\d+)\s*aukc/);
+  if (headerMatch) {
+    const hKamp = parseInt(headerMatch[1]);
+    const hGrup = parseInt(headerMatch[2]);
+    const hAukc = parseInt(headerMatch[3]);
+    if (hKamp !== allKampHeaders || hGrup !== grupy || hAukc !== aukcje) {
+      const oldH = headerMatch[0];
+      const newH = `${allKampHeaders} kampanii · ${grupy} grup · ${aukcje} aukcji`;
+      text = text.replace(oldH, newH);
+      errors.push(`Nagłówek: "${oldH}" → "${newH}"`);
+      fixes.push('nagłówek');
+    }
+  }
+
+  // 8. Sprawdź budżet OVERVIEW vs tabela
+  const overviewM = text.match(/Łączny budżet dzienny[^:]*:\s*(\d+)/);
+  const sumaM = text.match(/\*\*SUMA\*\*\s*\|\s*\*\*(\d+)/);
+  if (overviewM && sumaM && overviewM[1] !== sumaM[1]) {
+    errors.push(`Budżet: overview ${overviewM[1]} zł ≠ tabela ${sumaM[1]} zł → naprawiono overview`);
+    text = text.replace(overviewM[0], overviewM[0].replace(overviewM[1], sumaM[1]));
+    fixes.push('budżet');
+  }
+
+  // 9. FIX wykluczenia — muszą = IDs z grup
+  const wyklMatch = text.match(/(BESTSELLER AUTOMAT — WYKLUCZENIA\s*\n\n)([\d\s]+)/);
+  if (wyklMatch && grupIds.size > 0) {
+    const wyklIds = new Set(wyklMatch[2].trim().split(/\s+/).filter(id => /^\d{11}$/.test(id)));
+    const missing = [...grupIds].filter(id => !wyklIds.has(id));
+    const extra = [...wyklIds].filter(id => !grupIds.has(id));
+    if (missing.length > 0 || extra.length > 0) {
+      const corrected = [...grupIds].join(' ');
+      text = text.replace(wyklMatch[2].trim(), corrected);
+      if (missing.length) errors.push(`Wykluczenia: dodano ${missing.length} brakujących IDs`);
+      if (extra.length) errors.push(`Wykluczenia: usunięto ${extra.length} nadmiarowych IDs`);
+      fixes.push('wykluczenia');
+    }
+  }
+
+  // 10. Wstaw banner
+  if (errors.length > 0) {
+    const banner = `\n\n> **WALIDATOR — naprawiono ${errors.length} problemów:**\n` +
+      errors.map(e => `> - ${e}`).join('\n') + '\n\n';
+    const firstHr = text.indexOf('\n---\n');
+    if (firstHr > -1) text = text.slice(0, firstHr) + banner + text.slice(firstHr);
+  } else {
+    const okBanner = `\n\n> **WALIDACJA OK** — spójność IDs, nagłówek, budżety, wykluczenia sprawdzone.\n\n`;
+    const firstHr = text.indexOf('\n---\n');
+    if (firstHr > -1) text = text.slice(0, firstHr) + okBanner + text.slice(firstHr);
+  }
+
+  return text;
+}
+
 async function aaRunAnalysis() {
   const btn = document.getElementById('aaRunBtn');
   const thinking = document.getElementById('aaThinking');
@@ -10539,7 +10647,13 @@ async function aaRunAnalysis() {
         messages: [{ role: 'user', content: prompt }]
       })
     });
-    const text = await readSSE(resp);
+    let text = await readSSE(resp);
+
+    // ═══ TOTAL RESTART WALIDATOR — auto-fix przed wyświetleniem ═══
+    if (isTotalRestart && text.includes('TOTAL RESTART')) {
+      text = aaTRValidate(text);
+    }
+
     const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
     const now = new Date();
 
@@ -13514,7 +13628,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.38</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.39</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
