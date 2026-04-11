@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.48</title>
+<title>MPlace Hub v6.49</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.48</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.49</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -10762,7 +10762,7 @@ async function aaRunAnalysis() {
 
     // ═══ TOTAL RESTART WALIDATOR — auto-fix przed wyświetleniem ═══
     const _isTR = uwagi && uwagi.toUpperCase().includes('TOTAL RESTART');
-    if (_isTR && text.includes('TOTAL RESTART')) {
+    if (_isTR && (text.includes('TOTAL RESTART') || text.includes('PLAN NOWYCH KAMPANII') || text.includes('Plan FINALNY') || text.includes('KAMPANIA 001') || text.includes('## KAMPANIA 1'))) {
       // Buduj mapę ROAS per aukcja (agregat cross-kampania)
       const _roasMap = {};
       if (adsData && adsData.kampanie) {
@@ -13754,7 +13754,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.48</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.49</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -14697,15 +14697,19 @@ function scrBuildFilesContext() {
 
     ctx += `--- KONIEC WZORU ---\n\n`;
 
-    ctx += `ZASADY FORMATU (BEZWZGLĘDNE):\n`;
-    ctx += `1. Nazwa grupy = plain text, NIE bold. Przykład: [${ks}][001][WW][RW] NAZWA (nie **[${ks}]...**)\n`;
-    ctx += `2. Tabela grupy = TYLKO 3 wiersze: IDs | Dynamic CPC start | Budżet dzienny. ZERO dodatkowych wierszy.\n`;
-    ctx += `3. Wiersz IDs = TYLKO 11-cyfrowe liczby oddzielone spacjami. BEZ nazw, opisów, nawiasów, komentarzy.\n`;
-    ctx += `4. BEZ opisów/notek pod tabelą grupy. BEZ "> ..." bloków. BEZ "Nota:", "Uwaga:", emoji.\n`;
-    ctx += `5. BEZ italic opisów pod nagłówkiem kampanii.\n`;
-    ctx += `6. WYKLUCZENIA = jedna linia, IDs oddzielone spacjami.\n`;
-    ctx += `7. WYRÓŻNIENIA = prosty format: "FLAT 19.90/10d od startu:" + linia z IDs. "ELASTIC 2.90/d niedziela+poniedziałek+wtorek:" + linia z IDs.\n`;
-    ctx += `8. Dodaj sekcje: WSTĘPNA ANALIZA (5 linii), OVERVIEW tabela, PODSUMOWANIE BUDŻETOWE, HARMONOGRAM, UWAGI KOŃCOWE.\n`;
+    ctx += `ZASADY FORMATU (BEZWZGLĘDNE — ZŁAMANIE = ODRZUCENIE RAPORTU):\n`;
+    ctx += `1. TYTUŁ MUSI być: "# TOTAL RESTART KAMPANII ADS — ${kontoName}" — dokładnie ten tekst, nie inny.\n`;
+    ctx += `2. Nagłówek: "## Plan FINALNY | Data startu: 12.04.2026 | N kampanii · N grup · N aukcji"\n`;
+    ctx += `3. Nagłówek kampanii: "## KAMPANIA 001" + "### /001/D/ NAZWA" — NUMERACJA 001, 002, 003...\n`;
+    ctx += `4. Nazwa grupy = plain text: [${ks}][001][WW][RW] NAZWA — NIE bold, NIE italic.\n`;
+    ctx += `5. Tabela grupy = nagłówek "| Pole | Wartość |" + TYLKO 3 wiersze danych: IDs, Dynamic CPC start, Budżet dzienny.\n`;
+    ctx += `6. Wiersz IDs = TYLKO 11-cyfrowe liczby oddzielone spacjami. BEZ nazw, opisów, nawiasów. NIE w bloku kodu (\`\`\`).\n`;
+    ctx += `7. ZERO treści pod tabelą grupy. ZERO bloków "> ...". ZERO "Nota:", "Uwaga:", "Anchor:", "Uzasadnienie".\n`;
+    ctx += `8. ZERO emoji (BEZ ⚠️ 🟢 🔴 🔵 ℹ️). ZERO bold w treści grup.\n`;
+    ctx += `9. WYKLUCZENIA = jedna linia, IDs oddzielone spacjami (nie blok kodu).\n`;
+    ctx += `10. WYRÓŻNIENIA = "FLAT 19.90/10d od startu:" + linia IDs. "ELASTIC 2.90/d niedziela+poniedziałek+wtorek:" + linia IDs. Proste 2 linie per typ.\n`;
+    ctx += `11. Dodaj: WSTĘPNA ANALIZA (5 linii), OVERVIEW tabela, PODSUMOWANIE BUDŻETOWE, HARMONOGRAM, UWAGI KOŃCOWE.\n`;
+    ctx += `12. PATRZ NA WZÓR POWYŻEJ — skopiuj DOSŁOWNIE jego format. Każde odstępstwo = błąd.\n`;
   }
 
   return ctx;
@@ -14867,7 +14871,7 @@ async function scrSend() {
     let text = await readSSE(resp);
 
     // TOTAL RESTART walidacja w Screenerze
-    if (window._scrTotalRestartMode && text.includes('TOTAL RESTART')) {
+    if (window._scrTotalRestartMode && (text.includes('TOTAL RESTART') || text.includes('PLAN NOWYCH KAMPANII') || text.includes('Plan FINALNY') || text.includes('KAMPANIA 001') || text.includes('## KAMPANIA 1'))) {
       // Buduj mapę ROAS z plików Ads
       const _roasMap = {};
       const _adsFiles = (window._scrFiles || []).filter(f => f.type === 'ads' && f.parsed);
