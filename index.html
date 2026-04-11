@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.41</title>
+<title>MPlace Hub v6.42</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.41</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.42</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -10473,9 +10473,11 @@ function aaUpdateWyrInfo() {
 
 // ═══ TOTAL RESTART WALIDATOR ═══
 // Sprawdza i naprawia output Agenta PRZED wyświetleniem
-function aaTRValidate(text) {
+function aaTRValidate(text, roasMap, beRoas) {
   const errors = [];
   const fixes = [];
+  roasMap = roasMap || {};
+  beRoas = beRoas || 5;
 
   // 1. Wyciągnij IDs z grup kampanii (tabele "| IDs | ... |")
   const grupIds = new Set();
@@ -10501,6 +10503,32 @@ function aaTRValidate(text) {
       niePromIds.delete(id);
     });
     fixes.push('duplikaty');
+  }
+
+  // 3b. FIX: ID z ROAS < 3 w kampanii → usuń z grupy, przenieś do NIE PROMOWAĆ
+  if (Object.keys(roasMap).length > 0) {
+    const toxicInGrups = [...grupIds].filter(id => roasMap[id] !== undefined && roasMap[id] < 3 && roasMap[id] > 0);
+    if (toxicInGrups.length > 0) {
+      toxicInGrups.forEach(id => {
+        const r = roasMap[id].toFixed(2);
+        // Usuń ID z tabeli IDs grupy
+        text = text.replace(new RegExp('(\\|\\s*IDs\\s*\\|\\s*)([^|]*\\b' + id + '\\b[^|]*)(\\|)', 'g'), (match, pre, ids, post) => {
+          const cleaned = ids.replace(new RegExp('\\b' + id + '\\b'), '').replace(/\s+/g, ' ').trim();
+          return cleaned ? pre + cleaned + post : match; // nie usuwaj jeśli jedyny ID
+        });
+        grupIds.delete(id);
+        // Dodaj do NIE PROMOWAĆ jeśli sekcja istnieje
+        if (niePromSection && !niePromIds.has(id)) {
+          const insertPoint = text.indexOf('\n---', text.indexOf('NIE PROMOWAĆ'));
+          if (insertPoint > -1) {
+            text = text.slice(0, insertPoint) + `| ${id} | (auto-walidator) | ROAS łączny ${r}× < 3 — toksyczna, usunięta z kampanii |\n` + text.slice(insertPoint);
+            niePromIds.add(id);
+          }
+        }
+      });
+      errors.push(`${toxicInGrups.length} ofert z ROAS < 3 usunięto z kampanii: ${toxicInGrups.map(id => id + ' (ROAS ' + roasMap[id].toFixed(2) + '×)').join(', ')}`);
+      fixes.push('roas-toxic');
+    }
   }
 
   // 4. Wyciągnij IDs z FLAT i ELASTIC
@@ -10653,7 +10681,21 @@ async function aaRunAnalysis() {
     // ═══ TOTAL RESTART WALIDATOR — auto-fix przed wyświetleniem ═══
     const _isTR = uwagi && uwagi.toUpperCase().includes('TOTAL RESTART');
     if (_isTR && text.includes('TOTAL RESTART')) {
-      text = aaTRValidate(text);
+      // Buduj mapę ROAS per aukcja (agregat cross-kampania)
+      const _roasMap = {};
+      if (adsData && adsData.kampanie) {
+        const _aggr = {};
+        adsData.kampanie.forEach(k => k.aukcje.forEach(a => {
+          if (!a.nr) return;
+          if (!_aggr[a.nr]) _aggr[a.nr] = { koszt: 0, sprzedaz: 0 };
+          _aggr[a.nr].koszt += a.koszt;
+          _aggr[a.nr].sprzedaz += a.sprzedaz;
+        }));
+        Object.entries(_aggr).forEach(([nr, d]) => {
+          _roasMap[nr] = d.koszt > 0 ? d.sprzedaz / d.koszt : 0;
+        });
+      }
+      text = aaTRValidate(text, _roasMap, beRoas);
     }
 
     const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
@@ -13630,7 +13672,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.41</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.42</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
