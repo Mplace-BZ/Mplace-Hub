@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>MPlace Hub — Dziennik sesji</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;font-size:12px;color:#1f2937;max-width:860px;margin:0 auto;padding:1.5rem 2rem;line-height:1.7;background:#fff}
+.header{font-family:'DM Mono',monospace;padding-bottom:10px;border-bottom:3px solid #111;margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center}
+.header-title{font-size:20px;font-weight:700;color:#111;font-family:'DM Mono',monospace}
+.header-sub{font-size:10px;color:#6b7280;font-family:'DM Mono',monospace}
+
+.sesja{border:1px solid #e5e7eb;border-radius:10px;margin-bottom:2rem;overflow:hidden;page-break-inside:avoid}
+.sesja-header{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e7eb}
+.sesja-date{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:#111}
+.sesja-meta{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;text-align:right}
+.sesja-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px;margin-left:6px}
+.badge-dev{background:#dbeafe;color:#1e40af}
+.badge-ops{background:#dcfce7;color:#166534}
+.badge-strategy{background:#fae8ff;color:#86198f}
+.badge-fix{background:#fef3c7;color:#92400e}
+
+.sesja-body{padding:16px 18px}
+
+.sesja-section{margin-bottom:12px}
+.sesja-section-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:#111;padding:4px 8px;background:#f3f4f6;border-left:3px solid #b47fff;border-radius:0 4px 4px 0;margin-bottom:6px}
+.sesja-section-title.red{border-left-color:#ef4444;background:#fef2f2}
+.sesja-section-title.green{border-left-color:#34d399;background:#f0fdf4}
+.sesja-section-title.orange{border-left-color:#ff6b35;background:#fff7ed}
+.sesja-section-title.blue{border-left-color:#38bdf8;background:#f0f9ff}
+
+ul{padding-left:1.4rem;margin:.3rem 0}
+li{margin:.2rem 0;font-size:11px}
+li strong{color:#111}
+
+.tag-list{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.tag{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid}
+.tag-done{background:#dcfce7;border-color:#86efac;color:#166534}
+.tag-open{background:#fef3c7;border-color:#fcd34d;color:#92400e}
+.tag-blocked{background:#fef2f2;border-color:#fca5a5;color:#991b1b}
+
+table{width:100%;border-collapse:collapse;margin:6px 0;font-size:11px}
+th{background:#f9fafb;font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.04em;padding:5px 8px;text-align:left;border:1px solid #e5e7eb;font-weight:700}
+td{padding:4px 8px;border:1px solid #e5e7eb;vertical-align:top}
+tr:nth-child(even) td{background:#fafafa}
+
+.footer{margin-top:2rem;padding-top:10px;border-top:3px solid #111;font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;text-align:center}
+
+@media print{
+  body{padding:1rem;font-size:11px}
+  .sesja{page-break-inside:avoid;margin-bottom:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">MPlace Hub — Dziennik sesji</div>
+    <div class="header-sub">Historia pracy z Claude Code | Chronologicznie od najnowszej</div>
+  </div>
+  <div class="header-sub">Komenda: /sesja</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SESJA 2: 11.04.2026 (wieczór) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sesja" style="border-color:#b47fff">
+  <div class="sesja-header" style="background:#faf5ff">
+    <div>
+      <span class="sesja-date">11.04.2026 (wieczór)</span>
+      <span class="sesja-badge badge-dev">DEV</span>
+      <span class="sesja-badge badge-ops">OPS</span>
+    </div>
+    <div class="sesja-meta">
+      v6.42 → v6.58<br>
+      17 commitów | ~6h
+    </div>
+  </div>
+  <div class="sesja-body">
+
+    <div class="sesja-section">
+      <div class="sesja-section-title red">TEMAT GŁÓWNY</div>
+      <p><strong>Total Restart JSON Renderer</strong> — Agent zwraca JSON, JS renderuje format. Koniec walki z formatem markdown (10+ iteracji promptu nie pomogło).</p>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title green">CO ZROBIONE</div>
+      <ul>
+        <li><strong>Fix parsera ofert</strong> — slice 40→100, 15→30. Agent widzi pełne dane z XLSX.</li>
+        <li><strong>Walidator Total Restart</strong> — auto-fix: ROAS < 3, duplikaty cross-grupa, KARO 65 na MK, fake IDs, toksyczne w ELASTIC/FLAT.</li>
+        <li><strong>JSON renderer (v6.56)</strong> — aaTRExtractJSON() + aaTRValidateJSON() + aaTRRender(). Agent zwraca dane, JS formatuje. Nazwy /NNN/D/ i [KS][NNN][WW][RW] zawsze poprawne.</li>
+        <li><strong>Plan MK finalny</strong> — 8 kampanii · 17 grup · 34 aukcji (mk_restart_plan_final.md)</li>
+        <li><strong>Plan PC finalny</strong> — 9 kampanii · 13 grup · 12 aukcji (pc_restart_plan_final.md)</li>
+        <li><strong>Plan MnC finalny</strong> — 11 kampanii · 15 grup · 26 aukcji (mnc_restart_plan_final.md)</li>
+        <li><strong>Tryb konkurencyjny (v6.58)</strong> — multi-konto upload, detekcja TARGET, prompt konkurencyjny dla Semmi</li>
+        <li><strong>Help do wydruku</strong> — help_zakladki.html, 8 zakładek + TOTAL RESTART step-by-step</li>
+        <li><strong>Emoji w raportach</strong> — priorytety 🔴🟠🟡🟢❌ dozwolone w raportach TR</li>
+      </ul>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title orange">DECYZJE</div>
+      <ul>
+        <li><strong>Nie swapujemy ról MK↔MnC</strong> — dane AOV potwierdzają obecne role. Rewizja w maju.</li>
+        <li><strong>JSON renderer > markdown template</strong> — NIGDY nie wracać do podejścia "prompt + regex".</li>
+        <li><strong>Emoji dozwolone w raportach</strong> — czytelniejsze niż plain text.</li>
+        <li><strong>Restart kampanii 12.04 (niedziela)</strong> — plany gotowe dla 3 kont MEBLE.</li>
+        <li><strong>Strategia portfelowa bez zmian</strong> — MK=SCALE, PC=NICHE, MnC=PREMIUM +2.5%.</li>
+      </ul>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title blue">OTWARTE / NASTĘPNE KROKI</div>
+      <div class="tag-list">
+        <span class="tag tag-open">Semmi analiza konkurencyjna (nowy wątek)</span>
+        <span class="tag tag-open">Restart kampanii 12.04</span>
+        <span class="tag tag-open">Checkpoint 19.04 (7 dni po restarcie)</span>
+        <span class="tag tag-open">pc_restart_plan_final.md — aktualizacja z raportu JSON</span>
+      </div>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title">PLIKI ZMIENIONE</div>
+      <table>
+        <tr><th>Plik</th><th>Zmiana</th></tr>
+        <tr><td>index.html</td><td>v6.42→v6.58: parser, walidator, JSON renderer, tryb konkurencyjny, prompt</td></tr>
+        <tr><td>mk_restart_plan_final.md</td><td>Bez zmian (gotowy z wczoraj)</td></tr>
+        <tr><td>pc_restart_plan_final.md</td><td>Przebudowany z raportu JSON (9 kamp, 13 grup)</td></tr>
+        <tr><td>mnc_restart_plan_final.md</td><td>Nowy (11 kamp, 15 grup, 26 aukcji)</td></tr>
+        <tr><td>help_zakladki.html</td><td>Nowy — przewodnik po zakładkach do wydruku</td></tr>
+        <tr><td>sesje.html</td><td>Nowy — dziennik sesji (ten plik)</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SESJA 1: 10-11.04.2026 (noc) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sesja" style="border-color:#ff6b35">
+  <div class="sesja-header" style="background:#fff7ed">
+    <div>
+      <span class="sesja-date">10–11.04.2026 (noc)</span>
+      <span class="sesja-badge badge-dev">DEV</span>
+      <span class="sesja-badge badge-strategy">STRATEGY</span>
+    </div>
+    <div class="sesja-meta">
+      v6.24 → v6.41<br>
+      18 commitów | ~8h
+    </div>
+  </div>
+  <div class="sesja-body">
+
+    <div class="sesja-section">
+      <div class="sesja-section-title red">TEMAT GŁÓWNY</div>
+      <p><strong>Total Restart MEBLE + Strategia portfelowa</strong> — wdrożenie ról MK/PC/MnC, Format A v2, walidator JS, plan MK od zera.</p>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title green">CO ZROBIONE</div>
+      <ul>
+        <li><strong>Strategia portfelowa MEBLE</strong> — MK=SCALE, PC=NICHE, MnC=PREMIUM +2.5%. Role, specjalizacje, targety Ads% i wyróżnień.</li>
+        <li><strong>Format A v2</strong> — konwencja nazewnictwa: /NNN/ KAT_LINIA + [KONTO][NNN][WW][RW]. Regex walidator.</li>
+        <li><strong>Agent dyrygent</strong> — buildAgentContext() z pełnym kontekstem portfelowym.</li>
+        <li><strong>Smart migration detection</strong> — auto-wykrywanie zmiany dostawy DPD→Smart w danych.</li>
+        <li><strong>Ads Tracker</strong> — checkpointy 7/14/30d po restarcie z benchmarkiem.</li>
+        <li><strong>Anti-halucynacja</strong> — parser wyciąga IDs z XLSX, Agent nie wymyśla numerów.</li>
+        <li><strong>Tryb TOTAL RESTART w Analizie</strong> — dosłowny wzór, reguły spójności IDs/budżetów/wykluczeń.</li>
+        <li><strong>Walidator JS aaTRValidate()</strong> — auto-fix output Agenta: nagłówek, IDs, budżety, wykluczenia.</li>
+        <li><strong>Plan MK finalny</strong> — 9 kampanii, 11 grup, zbudowany ręcznie w Screenerze.</li>
+        <li><strong>Plan PC v3</strong> — 7 kampanii, 12 grup (wymaga przebudowy budżetów).</li>
+      </ul>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title orange">DECYZJE</div>
+      <ul>
+        <li><strong>Wyróżnienie ≠ Ads</strong> — wyróżnienie = organika, Ads = płatne. Nie wyłączaj wyróżnienia bo ROAS Ads niski.</li>
+        <li><strong>Logika budżetowa 100/50/30</strong> — cap nie cel, Allegro wydaje 40-60% realnie.</li>
+        <li><strong>Min 3 transakcje do decyzji</strong> — obowiązuje dla skalowania, kanibalizacji i wykluczeń.</li>
+        <li><strong>Dynamic CPC default</strong> — 7 dni nauki, max 1 zmiana stawki/tydzień w niedzielę.</li>
+        <li><strong>Screener iteracyjny > jednorazowy Agent Analizy</strong> — lepsze wyniki przez iterację.</li>
+        <li><strong>KARO 65 Wotan = MnC</strong> — nie promować z MK ani PC.</li>
+      </ul>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title blue">OTWARTE (zamknięte w sesji 11.04)</div>
+      <div class="tag-list">
+        <span class="tag tag-done">PC plan finalny — przebudowa budżetów</span>
+        <span class="tag tag-done">MnC plan — wygenerowany i zapisany</span>
+        <span class="tag tag-done">JSON renderer — wdrożony</span>
+      </div>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title">KLUCZOWE ZASADY USTALONE</div>
+      <table>
+        <tr><th>Zasada</th><th>Wartość</th></tr>
+        <tr><td>ROAS < 3</td><td>WYŁĄCZ natychmiast</td></tr>
+        <tr><td>ROAS 3-4</td><td>Zostawiamy (obserwuj)</td></tr>
+        <tr><td>Min transakcje</td><td>3 (Ads + organika)</td></tr>
+        <tr><td>Dynamic CPC</td><td>7 dni nauki, 0.80-1.50 zł</td></tr>
+        <tr><td>BE ROAS MK</td><td>4.79×</td></tr>
+        <tr><td>BE ROAS PC</td><td>7.17×</td></tr>
+        <tr><td>BE ROAS MnC</td><td>~5.00×</td></tr>
+        <tr><td>Ads target MK</td><td>6.5%</td></tr>
+        <tr><td>Ads target PC</td><td>5.5%</td></tr>
+        <tr><td>Ads target MnC</td><td>6.5%</td></tr>
+        <tr><td>Wyróżnienia MK</td><td>5%</td></tr>
+        <tr><td>Wyróżnienia PC</td><td>3%</td></tr>
+        <tr><td>Wyróżnienia MnC</td><td>4.5%</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  MPlace Hub — Dziennik sesji · Ostatnia aktualizacja: 11.04.2026 · mplace-bz.github.io/Mplace-Hub
+</div>
+
+</body>
+</html>
