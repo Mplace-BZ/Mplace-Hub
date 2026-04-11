@@ -1,22 +1,22 @@
 # TOTAL RESTART KAMPANII ADS — Perfekt Cięcie
-## Plan FINALNY | Data startu: 12.04.2026 | 7 kampanii · 10 grup · 23 aukcji
+## Plan FINALNY | Data startu: 12.04.2026 | 7 kampanii · 12 grup · 25 aukcji
 
 ## WSTĘPNA ANALIZA DANYCH
 
 - Dane Ads (10.03–09.04.2026): koszt 8 299 zł | sprzedaż 58 536 zł | ROAS 7.05
 - Dane Sprzedaż: Est. EOM 105 638 zł | AOV 258 zł
-- Udział Ads w sprzedaży: 7.9% (cel 5.5% — restart redukuje do limitu)
-- Hero konta [11516146737] KARO 92 Lancelot generuje 37.5% sprzedaży Ads przy ROAS 9.74× — był w 6 kampaniach, restart konsoliduje do 1 grupy
-- Kampania KWIETNIKI-SEZON przepalała 595 zł przy ROAS 3.00× — aukcje poniżej BE wyłączone
+- Udział Ads w sprzedaży: 7.9% (cel 5.5%)
+- Hero [11516146737] w 6 kampaniach = kanibalizacja → restart konsoliduje do 1 grupy
+- Bestsellery organiczne z wyróżnieniami TRZYMAMY — wyróżnienie napędza organikę, nie Ads
 
 ## STRUKTURA KAMPANII — OVERVIEW
 
 | Nr | Kampania | Kategoria | Budżet/dzień |
 |---|---|---|---|
 | 001 | /001/D/ SALON_STOLIKI_KARO | Meble/Stoliki | 55 zł |
-| 002 | /002/D/ SALON_STOLIKI_TOP | Meble/Stoliki | 30 zł |
-| 003 | /003/D/ LAZIENKA_SZAFKI_PRALKI | Meble/Łazienka | 45 zł |
-| 004 | /004/D/ LAZIENKA_SZAFKI_LUSTRO | Meble/Łazienka | 20 zł |
+| 002 | /002/D/ SALON_STOLIKI_TOP | Meble/Stoliki | 40 zł |
+| 003 | /003/D/ LAZIENKA_SZAFKI_PRALKI | Meble/Łazienka | 40 zł |
+| 004 | /004/D/ LAZIENKA_SZAFKI_LUSTRO | Meble/Łazienka | 15 zł |
 | 005 | /005/D/ DONICE_CRAFT | Wyposażenie/Donice | 15 zł |
 | 006 | /006/D/ DONICE_LANCELOT | Wyposażenie/Donice | 14 zł |
 | 007 | /007/ BESTSELLER_AUTOMAT | All | 15 zł |
@@ -29,7 +29,7 @@
 ### /001/D/ SALON_STOLIKI_KARO
 
 #### Grupa 001-A
-[PC][001][WW][RW] KARO_92_LANCELOT_CZARNY
+[PC][001][WW][RW] KARO92_LANCELOT_CZARNY
 
 | Pole | Wartość |
 |---|---|
@@ -38,7 +38,7 @@
 | Budżet dzienny | 40 zł |
 
 #### Grupa 001-B
-[PC][001][WW][RW] KARO_92_POZOSTALE_KOLORY
+[PC][001][WW][RW] KARO92_POZOSTALE_KOLORY
 
 | Pole | Wartość |
 |---|---|
@@ -52,13 +52,31 @@
 ### /002/D/ SALON_STOLIKI_TOP
 
 #### Grupa 002-A
-[PC][002][WW][RW] TOP92_PODNOSZONY_SONOMA_WOTAN
+[PC][002][WW][RW] TOP92_PODNOSZONY_SONOMA
 
 | Pole | Wartość |
 |---|---|
-| IDs | 17953954907 17953955121 |
+| IDs | 17953954907 |
 | Dynamic CPC start | 1.40 zł |
-| Budżet dzienny | 30 zł |
+| Budżet dzienny | 20 zł |
+
+#### Grupa 002-B
+[PC][002][WW][RW] TOP92_PODNOSZONY_WOTAN_ARTISAN
+
+| Pole | Wartość |
+|---|---|
+| IDs | 17953955121 |
+| Dynamic CPC start | 1.20 zł |
+| Budżet dzienny | 10 zł |
+
+#### Grupa 002-C
+[PC][002][WW][RW] TOP92_ROZKLADANY_PODNOSZONY
+
+| Pole | Wartość |
+|---|---|
+| IDs | 18322621554 18322621636 18322621460 18322621590 |
+| Dynamic CPC start | 1.20 zł |
+| Budżet dzienny | 10 zł |
 
 ---
 
@@ -84,13 +102,13 @@
 | Budżet dzienny | 10 zł |
 
 #### Grupa 003-C
-[PC][003][WW][RW] SZAFKA_PRALKA_BIALA_UNIVERSAL
+[PC][003][WW][RW] SZAFKA_PRALKA_BIALA
 
 | Pole | Wartość |
 |---|---|
 | IDs | 15283267828 |
 | Dynamic CPC start | 1.00 zł |
-| Budżet dzienny | 15 zł |
+| Budżet dzienny | 10 zł |
 
 ---
 
@@ -98,13 +116,13 @@
 ### /004/D/ LAZIENKA_SZAFKI_LUSTRO
 
 #### Grupa 004-A
-[PC][004][WW][RW] SZAFKA_LUSTRO_SONOMA_WOTAN
+[PC][004][WW][RW] SZAFKA_LUSTRO_SLUPEK
 
 | Pole | Wartość |
 |---|---|
-| IDs | 17981685626 17892924943 |
-| Dynamic CPC start | 1.10 zł |
-| Budżet dzienny | 20 zł |
+| IDs | 17892924943 17981685626 |
+| Dynamic CPC start | 1.00 zł |
+| Budżet dzienny | 15 zł |
 
 ---
 
@@ -112,7 +130,7 @@
 ### /005/D/ DONICE_CRAFT
 
 #### Grupa 005-A
-[PC][005][WW][RW] DONICA_CRAFT_45x22
+[PC][005][WW][RW] CRAFT_ZLOTY_45x22
 
 | Pole | Wartość |
 |---|---|
@@ -126,7 +144,7 @@
 ### /006/D/ DONICE_LANCELOT
 
 #### Grupa 006-A
-[PC][006][WW][RW] DONICA_LANCELOT_SLIM_22
+[PC][006][WW][RW] LANCELOT_45x22
 
 | Pole | Wartość |
 |---|---|
@@ -135,7 +153,7 @@
 | Budżet dzienny | 7 zł |
 
 #### Grupa 006-B
-[PC][006][WW][RW] DONICA_LANCELOT_WOTAN_DUZE
+[PC][006][WW][RW] LANCELOT_WOTAN_DUZE
 
 | Pole | Wartość |
 |---|---|
@@ -147,44 +165,53 @@
 
 ## BESTSELLER AUTOMAT — WYKLUCZENIA
 
-11516146737 11521040620 11521059636 11521073049 11521111751 11524779826 11592963116 11592974256 11592978177 11592982686 11592989108 11593006170 17953954907 17953955121 12840113580 13577282373 16609034526 15283267828 17981685626 17892924943 18322621341 15299086134 17247869268
+11516146737 11521040620 11521059636 11521073049 11521111751 11524779826 11592963116 11592974256 11592978177 11592982686 11592989108 11593006170 17953954907 17953955121 18322621554 18322621636 18322621460 18322621590 12840113580 13577282373 16609034526 15283267828 17892924943 17981685626 18322621341 15299086134 17247869268
 
 ---
 
 ## WYRÓŻNIENIA — PLAN OD DNIA 1
 
 ### FLAT 19.90 zł / 10 dni — promować od startu
-Aukcje z potwierdzonym ROAS >15× i min 8 trans:
+Bestsellery organiczne — wyróżnienie napędza pozycję i wizyty:
 
 | ID | Produkt | Powód |
 |---|---|---|
-| 11516146737 | Stolik KARO 92 Lancelot/Czarny | ROAS 9.74×, konwersja 2.8%, top sprzedaż 21 956 zł, 124 trans |
-| 15299086134 | Donica Lancelot 45x22,6 | ROAS 16.21×, 9 trans Ads |
+| 11516146737 | KARO 92 Lancelot/Czarny | 100 szt/mies, 3643 wizyt, hero konta |
+| 17953954907 | TOP 92 Podnoszony Sonoma | 21 szt, konwersja 4.0%, ROAS Ads 12.44× |
+| 17355976987 | Szafka Biały Mat Lustro | 16 szt, 818 wizyt — wyróżnienie trzyma pozycję |
+| 12840113580 | Szafka pralka Lancelot | 7 szt, 623 wizyt, 4072 polubień — ROAS Ads 8.63× |
+| 17892924943 | Szafka słupek łazienkowa | 7 szt, 266 wizyt — wyróżnienie aktywne |
 
-**Koszt flat miesięczny: 2 aukcje × 19.90 zł × 3 odnowienia/mies = ~119 zł/mies**
+**Koszt flat miesięczny: 5 aukcji × 19.90 zł × 3 odnowienia/mies = ~299 zł/mies**
 
 ### ELASTIC BOOST — Niedziela/Pon/Wt (2.90 zł/dzień × 3 dni = 8.70 zł/tydz = ~37.70 zł/mies per aukcja)
-Aukcje z dobrym ROAS ale wrażliwe na dzień tygodnia (peak pon-wt):
+Sezonowe/testowe — boost w peak tygodnia:
 
 | ID | Produkt | Powód |
 |---|---|---|
-| 17953954907 | TOP 92 Podnoszony Sonoma/Czarny | ROAS 12.44×, konwersja 4.0%, 14 trans |
-| 12840113580 | Szafka pralka Lancelot słupek | ROAS 8.63×, 7 trans, top łazienka |
+| 18322621341 | Donica Craft Złoty 45x22 | ROAS 31.27×, 13 trans — sezon wiosna |
+| 15299086134 | Donica Lancelot 45x22 | ROAS 16.21×, 9 trans — sezon wiosna |
 
 **Koszt elastic miesięczny: 2 aukcje × 37.70 zł = ~75 zł/mies**
 
-### NIE PROMOWAĆ — wyróżnienia nieuzasadnione
+### WYŁĄCZ ADS — ale TRZYMAJ wyróżnienie
+Oferty sprzedające się organicznie, ale Ads na nich traci:
+
+| ID | Produkt | Sprzedaż org. | ROAS Ads | Decyzja |
+|---|---|---|---|---|
+| 12077994614 | KORA 95cm Loft | 12 szt/mies | 0 (przepalone 122 zł) | WYŁĄCZ Ads, TRZYMAJ wyróżnienie |
+| 17247730482 | Kwietnik Lancelot 45x64 | 13 szt/mies | 3.33× | WYŁĄCZ Ads, TRZYMAJ wyróżnienie |
+| 17967722216 | Szafka Wotan Lustro | ? | 1.95× | WYŁĄCZ Ads, sprawdź organikę |
+
+### NIE PROMOWAĆ — ani Ads ani wyróżnienie
+Oferty bez danych lub specjalizacja innego konta:
 
 | ID | Produkt | Powód |
 |---|---|---|
-| 17967722216 | Szafka lustro Wotan mat | ROAS 1.95× — poniżej BE 5.00× |
-| 17355976987 | Szafka lustro Biały mat | ROAS 4.70× — poniżej BE 5.00× |
-| 17247730482 | Donica Lancelot 45x64,5 | ROAS 3.33× — poniżej BE |
-| 17239884167 | Donica Lancelot Duo 99,8 | ROAS 1.43× — strukturalnie nierentowna |
-| 15279819039 | Donica Lancelot 50x44 | ROAS poniżej BE |
-| 12077994614 | Stolik KORA 95cm Loft | 122 zł przepalone, 0 sprzedaży Ads |
-| 11536302867 | Stolik KARO 65 retro loft | Specjalizacja MnC — nie wrzucaj do PC |
-| 17892924908 | Szafka łazienka słupek | <3 trans Ads — brak danych |
+| 11536302867 | KARO 65 retro loft | Specjalizacja MnC — nie wrzucaj do PC |
+| 17239884167 | Donica Lancelot Duo 99,8 | ROAS 1.43×, <3 trans Ads |
+| 15279819039 | Donica Lancelot 50x44 | <3 trans Ads |
+| 17892924908 | Szafka słupek (wariant) | <3 trans Ads |
 
 ---
 
@@ -195,9 +222,9 @@ Aukcje z dobrym ROAS ale wrażliwe na dzień tygodnia (peak pon-wt):
 | Kampania | Budżet/dzień | Mies. (×30) |
 |---|---|---|
 | /001/D/ SALON_STOLIKI_KARO | 55 zł | 1 650 zł |
-| /002/D/ SALON_STOLIKI_TOP | 30 zł | 900 zł |
-| /003/D/ LAZIENKA_SZAFKI_PRALKI | 45 zł | 1 350 zł |
-| /004/D/ LAZIENKA_SZAFKI_LUSTRO | 20 zł | 600 zł |
+| /002/D/ SALON_STOLIKI_TOP | 40 zł | 1 200 zł |
+| /003/D/ LAZIENKA_SZAFKI_PRALKI | 40 zł | 1 200 zł |
+| /004/D/ LAZIENKA_SZAFKI_LUSTRO | 15 zł | 450 zł |
 | /005/D/ DONICE_CRAFT | 15 zł | 450 zł |
 | /006/D/ DONICE_LANCELOT | 14 zł | 420 zł |
 | /007/ BESTSELLER_AUTOMAT | 15 zł | 450 zł |
@@ -207,21 +234,21 @@ Aukcje z dobrym ROAS ale wrażliwe na dzień tygodnia (peak pon-wt):
 
 | Poziom | Szacowany koszt |
 |---|---|
-| Flat (2 oferty) | ~119 zł |
+| Flat (5 ofert) | ~299 zł |
 | Elastic (2 oferty, ~4 tyg.) | ~75 zł |
-| **Suma wyróżnień** | **~194 zł** |
+| **Suma wyróżnień** | **~374 zł** |
 
 ### Łączny koszt marketingowy
 
 | Pozycja | Kwota |
 |---|---|
 | Ads miesięcznie | 5 820 zł |
-| Wyróżnienia miesięcznie | 194 zł |
-| **RAZEM** | **6 014 zł** |
+| Wyróżnienia miesięcznie | 374 zł |
+| **RAZEM** | **6 194 zł** |
 | Est. EOM sprzedaż | 105 638 zł |
 | Ads% EOM | 5.5% |
-| Wyróżnienia% EOM | 0.2% |
-| **Łączny koszt mktg%** | **5.7%** |
+| Wyróżnienia% EOM | 0.4% |
+| **Łączny koszt mktg%** | **5.9%** |
 
 ### Szacowany ROAS po restarcie
 
@@ -238,7 +265,7 @@ Aukcje z dobrym ROAS ale wrażliwe na dzień tygodnia (peak pon-wt):
 
 | Data | Akcja |
 |---|---|
-| 12.04.2026 (niedziela) | Zamknij stare kampanie. Wystaw nowe 001–007. Wgraj 23 wykluczenia do Automatu. |
+| 12.04.2026 (niedziela) | Zamknij stare kampanie. Wystaw nowe 001–007. Wgraj 27 wykluczeń do Automatu. |
 | 13.04 (poniedziałek) | Dzień 1 — nie oceniaj wyników. Dynamic CPC faza nauki. |
 | 13–19.04 | Faza nauki (7 dni). Nie zmieniaj stawek. |
 | 19.04 (niedziela) | Pierwsza ocena — ROAS per kampania. |
@@ -253,10 +280,10 @@ Aukcje z dobrym ROAS ale wrażliwe na dzień tygodnia (peak pon-wt):
 **Obowiązkowe przed 12.04.2026:**
 
 1. Zamknij stare kampanie: Stoliki Polska, Łazienka PRalki-Wiszace, Formularz wystawiania, /002/D/ SALON STOLIKI, /010/D/ Kolor Craft Złoty, KWIETNIKI-SEZON, /002/D/ KWIETNIKI, [ALL] Bestseller Automat, /002/D/ ŁAZIENKA, /000/D/ NOWOŚCI
-2. Wgraj wykluczenia do Automatu (23 IDs z sekcji BESTSELLER AUTOMAT — WYKLUCZENIA)
-3. Aktywuj wyróżnienia FLAT dla: 11516146737, 15299086134
-4. Aktywuj wyróżnienia ELASTIC dla: 17953954907, 12840113580
-5. Wyłącz wyróżnienia z listy NIE PROMOWAĆ: 17967722216, 17355976987, 17247730482, 17239884167, 15279819039, 12077994614, 11536302867, 17892924908
-6. KARO 65 [11536302867] = specjalizacja MnC — nie wrzucaj do kampanii PC
+2. Wgraj wykluczenia do Automatu (27 IDs z sekcji BESTSELLER AUTOMAT — WYKLUCZENIA)
+3. Aktywuj wyróżnienia FLAT dla: 11516146737, 17953954907, 17355976987, 12840113580, 17892924943
+4. Aktywuj wyróżnienia ELASTIC dla: 18322621341, 15299086134
+5. Sekcja WYŁĄCZ ADS: wyłącz Ads dla 12077994614, 17247730482, 17967722216 — ale TRZYMAJ ich wyróżnienia
+6. KARO 65 [11536302867] = specjalizacja MnC — wyłącz Ads i wyróżnienie na PC
 7. Dynamic CPC — max jedna zmiana stawki tygodniowo, w niedzielę
 8. Budżet Ads% kontrola: przy Est. EOM 105 638 zł target Ads% = 5.5% → max Ads = 5 810 zł/mies. Obecny plan = 5 820 zł (5.5%) — bezpieczna.
