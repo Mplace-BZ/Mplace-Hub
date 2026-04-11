@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.55</title>
+<title>MPlace Hub v6.56</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.55</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.56</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -10767,6 +10767,223 @@ function aaTRValidate(text, roasMap, beRoas) {
   return text;
 }
 
+// ═══ TOTAL RESTART — JSON RENDERER ═══
+
+function aaTRExtractJSON(text) {
+  const m = text.match(/```json\s*([\s\S]*?)\s*```/);
+  if (!m) return { ok: false, raw: text };
+  try {
+    // Fix trailing commas before parsing
+    let clean = m[1].replace(/,\s*([}\]])/g, '$1');
+    const data = JSON.parse(clean);
+    if (!data.kampanie || !Array.isArray(data.kampanie)) return { ok: false, raw: text };
+    return { ok: true, data };
+  } catch(e) {
+    console.warn('[TR] JSON parse failed:', e.message);
+    return { ok: false, raw: text };
+  }
+}
+
+function aaTRValidateJSON(data, roasMap, beRoas) {
+  const errors = [];
+  roasMap = roasMap || {};
+  beRoas = beRoas || 5;
+
+  // Zbierz wszystkie IDs z kampanii
+  const allIds = new Set();
+  const idToGrupa = {};
+
+  data.kampanie.forEach((k, ki) => {
+    k.grupy.forEach((g, gi) => {
+      // Filtruj fake IDs (nie 11-cyfrowe)
+      const validIds = [];
+      const fakeIds = [];
+      g.ids.forEach(id => {
+        if (/^\d{11}$/.test(id)) validIds.push(id);
+        else fakeIds.push(id);
+      });
+      if (fakeIds.length) errors.push(`${fakeIds.length} fałszywych IDs usunięto z ${k.nazwa} grupa ${g.suffix}: ${fakeIds.join(', ')}`);
+      g.ids = validIds;
+
+      // ROAS < 3 → usuń z grupy, dodaj do niePromowac
+      const toxic = [];
+      g.ids = g.ids.filter(id => {
+        if (roasMap[id] !== undefined && roasMap[id] < 3 && roasMap[id] > 0) {
+          toxic.push(id);
+          return false;
+        }
+        return true;
+      });
+      if (toxic.length) {
+        toxic.forEach(id => {
+          errors.push(`ROAS ${roasMap[id].toFixed(2)}× < 3: ${id} usunięto z kampanii ${k.nazwa}`);
+          if (!data.wyroznienia) data.wyroznienia = {};
+          if (!data.wyroznienia.niePromowac) data.wyroznienia.niePromowac = [];
+          data.wyroznienia.niePromowac.push({ id, powod: `ROAS ${roasMap[id].toFixed(2)}× < 3 — auto-walidator` });
+        });
+      }
+
+      // Duplikaty cross-grupa
+      g.ids.forEach(id => {
+        if (idToGrupa[id]) {
+          errors.push(`DUPLIKAT ${id} usunięto z ${k.nazwa}/${g.suffix} (zachowano w ${idToGrupa[id]})`);
+        } else {
+          idToGrupa[id] = `${k.nazwa}/${g.suffix}`;
+          allIds.add(id);
+        }
+      });
+      // Usuń duplikaty
+      g.ids = g.ids.filter(id => idToGrupa[id] === `${k.nazwa}/${g.suffix}`);
+    });
+  });
+
+  // KARO 65 Wotan check (MK only)
+  if (allIds.has('17701061220')) {
+    data.kampanie.forEach(k => {
+      k.grupy.forEach(g => {
+        if (g.ids.includes('17701061220')) {
+          g.ids = g.ids.filter(id => id !== '17701061220');
+          errors.push(`KARO 65 Wotan [17701061220] usunięto — specjalizacja MnC`);
+        }
+      });
+    });
+  }
+
+  // Usuń toksyczne z FLAT/ELASTIC
+  if (data.wyroznienia) {
+    const toxicSet = new Set((data.wyroznienia.niePromowac || []).map(n => n.id));
+    if (data.wyroznienia.flat) {
+      const before = data.wyroznienia.flat.length;
+      data.wyroznienia.flat = data.wyroznienia.flat.filter(id => !toxicSet.has(id));
+      if (data.wyroznienia.flat.length < before) errors.push(`Usunięto toksyczne IDs z FLAT`);
+    }
+    if (data.wyroznienia.elastic) {
+      const before = data.wyroznienia.elastic.length;
+      data.wyroznienia.elastic = data.wyroznienia.elastic.filter(id => !toxicSet.has(id));
+      if (data.wyroznienia.elastic.length < before) errors.push(`Usunięto toksyczne IDs z ELASTIC`);
+    }
+  }
+
+  // Auto-generuj wykluczenia BA
+  data._wykluczenia = [...allIds];
+
+  return { data, errors };
+}
+
+function aaTRRender(data, kontoKey) {
+  const ks = { MobelKap:'MK', PerfektCiecie:'PC', MeblenaCzasie:'MC' }[kontoKey] || 'MK';
+  const kontoName = (typeof AC_META !== 'undefined' && AC_META[kontoKey]) ? AC_META[kontoKey].name : kontoKey;
+
+  // Policz totale
+  const totalGrupy = data.kampanie.reduce((s, k) => s + k.grupy.length, 0);
+  const totalAukcje = new Set(data.kampanie.flatMap(k => k.grupy.flatMap(g => g.ids))).size;
+  const totalKamp = data.kampanie.length;
+
+  let md = '';
+  md += `# TOTAL RESTART KAMPANII ADS — ${kontoName}\n`;
+  md += `## Plan FINALNY | Data startu: 12.04.2026 | ${totalKamp} kampanii · ${totalGrupy} grup · ${totalAukcje} aukcji\n\n`;
+
+  // WSTĘPNA ANALIZA
+  md += `## WSTĘPNA ANALIZA\n\n`;
+  (data.analiza || []).forEach((l, i) => { md += `${i+1}. ${l}\n`; });
+  md += `\n---\n\n`;
+
+  // OVERVIEW
+  const prioEmoji = { 'KRYTYCZNY':'🔴', 'WYSOKI':'🟠', 'UTRZYMAJ':'🟡', 'SKALUJ':'🟢', 'WYLACZ':'❌', 'OBSERWUJ':'🟡' };
+  md += `## OVERVIEW\n\n`;
+  md += `| Nr | Kampania | Priorytet | Budżet/dzień |\n`;
+  md += `|---|---|---|---|\n`;
+  data.kampanie.forEach((k, i) => {
+    const nnn = String(i + 1).padStart(3, '0');
+    const emoji = prioEmoji[k.priorytet] || '';
+    const budzet = k.grupy.reduce((s, g) => s + (g.budzet || 0), 0);
+    md += `| ${nnn} | /${nnn}/D/ ${k.nazwa} | ${emoji} ${k.priorytet || ''} | ${budzet} zł |\n`;
+  });
+  if (data.bestsellerAutomat) {
+    md += `| BA | BESTSELLER AUTOMAT | ${data.bestsellerAutomat.akcja === 'WYLACZ' ? '❌ WYŁĄCZ' : '🟡 UTRZYMAJ'} | ${data.bestsellerAutomat.budzet || 15} zł |\n`;
+  }
+  md += `\n---\n\n`;
+
+  // KAMPANIE
+  data.kampanie.forEach((k, i) => {
+    const nnn = String(i + 1).padStart(3, '0');
+    md += `## KAMPANIA ${nnn}\n`;
+    md += `### /${nnn}/D/ ${k.nazwa}\n\n`;
+
+    k.grupy.forEach(g => {
+      md += `#### Grupa ${nnn}-${g.suffix}\n`;
+      md += `[${ks}][${nnn}][WW][RW] ${g.nazwaGrupy}\n\n`;
+      md += `| Pole | Wartość |\n|---|---|\n`;
+      md += `| IDs | ${g.ids.length ? g.ids.join(' ') : '(ID: sprawdź w panelu)'} |\n`;
+      md += `| Dynamic CPC start | ${(g.cpc || 1.00).toFixed(2)} zł |\n`;
+      md += `| Budżet dzienny | ${g.budzet || 10} zł |\n\n`;
+    });
+    md += `---\n\n`;
+  });
+
+  // BESTSELLER AUTOMAT — WYKLUCZENIA
+  md += `## BESTSELLER AUTOMAT — WYKLUCZENIA\n\n`;
+  md += `${(data._wykluczenia || []).join(' ')}\n\n`;
+  md += `---\n\n`;
+
+  // WYRÓŻNIENIA
+  md += `## WYRÓŻNIENIA\n\n`;
+  if (data.wyroznienia) {
+    if (data.wyroznienia.flat && data.wyroznienia.flat.length) {
+      md += `FLAT 19.90/10d od startu:\n`;
+      md += `${data.wyroznienia.flat.join(' ')}\n\n`;
+    }
+    if (data.wyroznienia.elastic && data.wyroznienia.elastic.length) {
+      md += `ELASTIC 2.90/d niedziela+poniedziałek+wtorek:\n`;
+      md += `${data.wyroznienia.elastic.join(' ')}\n\n`;
+    }
+    if (data.wyroznienia.niePromowac && data.wyroznienia.niePromowac.length) {
+      md += `NIE PROMOWAĆ:\n`;
+      md += `| ID | Powód |\n|---|---|\n`;
+      data.wyroznienia.niePromowac.forEach(n => {
+        md += `| ${n.id || '(sprawdź)'} | ${n.powod || ''} |\n`;
+      });
+      md += `\n`;
+    }
+  }
+  md += `---\n\n`;
+
+  // PODSUMOWANIE BUDŻETOWE
+  md += `## 💰 PODSUMOWANIE BUDŻETOWE\n\n`;
+  md += `| Kampania | Budżet/dzień | Mies. (×30) |\n|---|---|---|\n`;
+  let suma = 0;
+  data.kampanie.forEach((k, i) => {
+    const nnn = String(i + 1).padStart(3, '0');
+    const budzet = k.grupy.reduce((s, g) => s + (g.budzet || 0), 0);
+    suma += budzet;
+    md += `| /${nnn}/D/ ${k.nazwa} | ${budzet} zł | ${budzet * 30} zł |\n`;
+  });
+  if (data.bestsellerAutomat) {
+    const baBudzet = data.bestsellerAutomat.budzet || 15;
+    suma += baBudzet;
+    md += `| BESTSELLER AUTOMAT | ${baBudzet} zł | ${baBudzet * 30} zł |\n`;
+  }
+  md += `| **SUMA** | **${suma} zł** | **${suma * 30} zł** |\n\n`;
+  md += `Realny wydatek (50%): ~${Math.round(suma * 0.5)} zł/dzień = ~${Math.round(suma * 0.5 * 30)} zł/mies\n\n`;
+  md += `---\n\n`;
+
+  // HARMONOGRAM
+  md += `## 📅 HARMONOGRAM\n\n`;
+  md += `| Data | Akcja |\n|---|---|\n`;
+  (data.harmonogram || []).forEach(h => {
+    md += `| ${h.data} | ${h.akcja} |\n`;
+  });
+  md += `\n---\n\n`;
+
+  // UWAGI KOŃCOWE
+  md += `## 📌 UWAGI KOŃCOWE\n\n`;
+  (data.uwagi || []).forEach((u, i) => {
+    md += `${i + 1}. ${u}\n`;
+  });
+
+  return md;
+}
+
 async function aaRunAnalysis() {
   const btn = document.getElementById('aaRunBtn');
   const thinking = document.getElementById('aaThinking');
@@ -13832,7 +14049,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.55</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.56</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -14708,97 +14925,63 @@ function scrBuildFilesContext() {
     const maxAdsBudget = eomEst > 0 ? Math.round(eomEst * adsTargetPct / 100) : 0;
     const maxDailyBudget = maxAdsBudget > 0 ? Math.round(maxAdsBudget / 30) : 150;
 
-    ctx += `\n=== TRYB TOTAL RESTART — WZÓR FORMATU ===\n`;
+    ctx += `\n=== TRYB TOTAL RESTART — ZWRÓĆ JSON ===\n`;
     ctx += `User chce TOTAL RESTART kampanii Ads. Generujesz plan nowych kampanii od zera.\n`;
     ctx += `Konto: ${kontoName} (${ks}) | Rola: ${(meta.role || 'scale').toUpperCase()} | Ads target: ${adsTargetPct}%\n`;
     if (eomEst > 0) ctx += `Est. EOM: ${eomEst.toFixed(0)} zł | Max budżet Ads: ${maxAdsBudget} zł/mies (~${maxDailyBudget} zł/dzień)\n`;
-    ctx += `\nZASADY:\n`;
-    ctx += `- Tabela grupy: TYLKO 3 wiersze (IDs, Dynamic CPC start, Budżet dzienny). BEZ dodatkowych wierszy.\n`;
-    ctx += `- Wiersz IDs: TYLKO liczby 11-cyfrowe oddzielone spacjami. BEZ nazw produktów, BEZ nawiasów, BEZ opisów.\n`;
-    ctx += `- IDs z sekcji [ADS] i [ODWIEDZINY] SĄ PRAWDZIWE — wpisuj je śmiało. Mają 11 cyfr.\n`;
-    ctx += `- IDs z sekcji [SPRZEDAŻ] mogą mieć inny format — matchuj po nazwie z [ODWIEDZINY] żeby znaleźć 11-cyfrowy ID.\n`;
-    ctx += `- Tylko jeśli oferta nie ma 11-cyfrowego ID w ŻADNEJ sekcji → "(ID: sprawdź w panelu — NAZWA)".\n`;
-    ctx += `- WIĘKSZOŚĆ ofert MA 11-cyfrowe ID w danych. Używaj ich. Nie pisz "sprawdź w panelu" jeśli ID jest dostępne.\n`;
+
+    ctx += `\nZASADY MERYTORYCZNE:\n`;
     ctx += `- Min 3 transakcje (Ads + organika) żeby wrzucić ofertę do kampanii.\n`;
-    ctx += `- ROAS łączny < 3 → NIE wrzucaj do kampanii. Wrzuć do NIE PROMOWAĆ.\n`;
-    ctx += `- ROAS 3-4 → można wrzucić ale z niskim CPC.\n`;
+    ctx += `- ROAS łączny < 3 → do niePromowac, nie do kampanii.\n`;
+    ctx += `- ROAS 3-4 → można wrzucić ale z niskim CPC (0.85-1.00 zł).\n`;
+    ctx += `- Dynamic CPC start: 0.80-1.50 zł (hero wyżej, niszowe niżej).\n`;
     ctx += `- Łączny budżet dzienny musi mieścić się w ~${maxDailyBudget} zł/dzień.\n`;
-    ctx += `- Dynamic CPC start: 0.80-1.50 zł (hero wyżej, niszowe niżej)\n`;
-    ctx += `- Nazwy kampanii: /NNN/D/ KATEGORIA_LINIA\n`;
-    ctx += `- Nazwy grup: [${ks}][NNN][WW][RW] LINIA_WYMIAR_KOLOR\n`;
-    ctx += `- Bestseller Automat: /NNN/ BESTSELLER_AUTOMAT, budżet 15 zł/dzień\n`;
-    ctx += `- Wykluczenia BA = wszystkie IDs z kampanii CORE\n\n`;
-
-    ctx += `ZASADY MERYTORYCZNE:\n`;
-    ctx += `- Bestseller Automat z ROAS < 3 → WYŁĄCZ (nie restrukturyzuj). Podbija CPC kampanii CORE o 20-40%.\n`;
-    ctx += `- Martwe punkty (>80 wizyt, 0 trans) → sekcja NIE PROMOWAĆ z notatką "wymaga CRO". Wyróżnienie na CR 0% = strata.\n`;
     ctx += `- Hero konta (najwyższa sprzedaż) → osobna kampania z najwyższym CPC i budżetem.\n`;
-    ctx += `- Każda kampania powinna mieć "Uzasadnienie" (1 zdanie pod nagłówkiem ### — dlaczego ta kampania istnieje).\n`;
-    ctx += `- Oferty z CR < 0.5% przy >300 wizytach → flaguj jako "priorytet CRO przed skalowaniem Ads".\n`;
-    ctx += `- WYRÓŻNIENIA sekcja NIE PROMOWAĆ: wymień oferty z 0 trans + oferty z ROAS < BE + oferty z < 3 trans + specjalizacje innego konta.\n`;
-    ctx += `- PODSUMOWANIE: pokaż realne wydatki (50-60% CAP) i porównaj z celem Ads%.\n`;
-    ctx += `- Kampanie istniejące z dobrym ROAS (>10) → zachowaj strukturę, nie restartuj (np. Formularz, Nowości).\n`;
-    ctx += `- Cross-account: flaguj aukcje które mogą nakładać się z innymi kontami grupy MEBLE.\n\n`;
+    ctx += `- Bestseller Automat z ROAS < 3 → WYLACZ. Podbija CPC o 20-40%.\n`;
+    ctx += `- Martwe punkty (>80 wizyt, 0 trans) → niePromowac z notatką "wymaga CRO".\n`;
+    ctx += `- Kampanie istniejące z ROAS >10 → zachowaj (np. Formularz, Nowości).\n`;
+    ctx += `- Cross-account: flaguj nakładanie z innymi kontami MEBLE.\n`;
+    ctx += `- IDs z [ADS] i [ODWIEDZINY] SĄ PRAWDZIWE 11-cyfrowe. Używaj ich.\n`;
+    ctx += `- IDs z [SPRZEDAŻ] mogą mieć inny format → matchuj po nazwie z [ODWIEDZINY].\n`;
+    ctx += `- Brak 11-cyfrowego ID → nie wpisuj żadnego ID dla tej oferty (pomiń lub wstaw pustą tablicę).\n\n`;
 
-    ctx += `WZÓR RAPORTU — skopiuj format. Tabela grupy = 3 wiersze. Uzasadnienie kampanii = 1 zdanie pod ###.\n\n`;
+    ctx += `NAZWY KAMPANII I GRUP (WAŻNE — system renderuje je automatycznie z pola "nazwa" i "nazwaGrupy"):\n`;
+    ctx += `- nazwa kampanii: użyj formatu KATEGORIA — LINIA np. "SZAFKA PRALKOWA — PÓŁKA WYSUWANA", "STOLIK KAWOWY — KARO 92 HERO", "DONICA CRAFT ZŁOTY — SEZON"\n`;
+    ctx += `- nazwaGrupy: użyj formatu LINIA_KOLOR np. "POLKA-WYSUWANA_BIALA", "KARO92_LANCELOT", "TOP92_SONOMA-WOTAN"\n`;
+    ctx += `- System automatycznie doda prefiksy /NNN/D/ i [${ks}][NNN][WW][RW] — Ty podajesz TYLKO nazwę.\n\n`;
 
-    ctx += `--- POCZĄTEK WZORU (MobelKap — REFERENCJA FORMATU) ---\n\n`;
+    ctx += `ODPOWIEDŹ: Zwróć WYŁĄCZNIE blok \\\`\\\`\\\`json ... \\\`\\\`\\\` z poniższym schematem. Żadnego markdowna przed ani po.\n\n`;
 
-    ctx += `# TOTAL RESTART KAMPANII ADS — MobelKap\n`;
-    ctx += `## Plan FINALNY | Data startu: 12.04.2026 | 8 kampanii · 17 grup · 34 aukcji\n\n`;
-
-    ctx += `## KAMPANIA 001\n`;
-    ctx += `### /001/D/ SZAFKA PRALKOWA — PÓŁKA WYSUWANA\n\n`;
-    ctx += `#### Grupa 001-A\n`;
-    ctx += `[MK][001][WW][RW] POLKA-WYSUWANA_BIALA\n\n`;
-    ctx += `| Pole | Wartość |\n|---|---|\n`;
-    ctx += `| IDs | 18403395102 |\n`;
-    ctx += `| Dynamic CPC start | 1.40 zł |\n`;
-    ctx += `| Budżet dzienny | 12 zł |\n\n`;
-    ctx += `#### Grupa 001-B\n`;
-    ctx += `[MK][001][WW][RW] POLKA-WYSUWANA_DAB-WOTAN\n\n`;
-    ctx += `| Pole | Wartość |\n|---|---|\n`;
-    ctx += `| IDs | 18403386447 |\n`;
-    ctx += `| Dynamic CPC start | 1.40 zł |\n`;
-    ctx += `| Budżet dzienny | 8 zł |\n\n`;
-
-    ctx += `## KAMPANIA 002\n`;
-    ctx += `### /002/D/ SZAFKA PRALKOWA — CLASSIC\n\n`;
-    ctx += `#### Grupa 002-A\n`;
-    ctx += `[MK][002][WW][RW] SZAFKA-PRALKOWA_CLASSIC-MIX\n\n`;
-    ctx += `| Pole | Wartość |\n|---|---|\n`;
-    ctx += `| IDs | 17565030433 17564932513 17564915568 |\n`;
-    ctx += `| Dynamic CPC start | 1.20 zł |\n`;
-    ctx += `| Budżet dzienny | 10 zł |\n\n`;
-
-    ctx += `(kontynuuj tak dla każdej kampanii i grupy)\n\n`;
-
-    ctx += `## BESTSELLER AUTOMAT — WYKLUCZENIA\n\n`;
-    ctx += `18403395102 18403386447 18403374586 17565030433 17564932513 (wszystkie IDs z kampanii, jedna linia, spacje)\n\n`;
-
-    ctx += `## WYRÓŻNIENIA\n\n`;
-    ctx += `FLAT 19.90/10d od startu:\n`;
-    ctx += `18403395102 18403386447 18403374586 18403336268\n\n`;
-    ctx += `ELASTIC 2.90/d niedziela+poniedziałek+wtorek:\n`;
-    ctx += `17892806059 17620212843 17617165511 17953861449 17953861375 17766097005\n\n`;
-
-    ctx += `--- KONIEC WZORU ---\n\n`;
-
-    ctx += `ZASADY FORMATU:\n`;
-    ctx += `1. TYTUŁ: "# TOTAL RESTART KAMPANII ADS — ${kontoName}"\n`;
-    ctx += `2. Nagłówek: "## Plan FINALNY | Data startu: 12.04.2026 | N kampanii · N grup · N aukcji"\n`;
-    ctx += `3. Nagłówek kampanii: "## KAMPANIA 001" + "### /001/D/ NAZWA"\n`;
-    ctx += `4. Nazwa grupy: [${ks}][001][WW][RW] NAZWA\n`;
-    ctx += `5. Tabela grupy: "| Pole | Wartość |" + TYLKO 3 wiersze: IDs, Dynamic CPC start, Budżet dzienny.\n`;
-    ctx += `6. Wiersz IDs = TYLKO 11-cyfrowe liczby oddzielone spacjami. BEZ nazw, opisów. NIE w bloku kodu.\n`;
-    ctx += `7. ZERO treści pod tabelą grupy. ZERO "Nota:", "Anchor:", "Uzasadnienie".\n`;
-    ctx += `8. EMOJI DOZWOLONE w nagłówkach kampanii i sekcji:\n`;
-    ctx += `   - OVERVIEW kolumna Priorytet: 🔴 KRYTYCZNY | 🟠 WYSOKI | 🟡 UTRZYMAJ | 🟢 SKALUJ | ❌ WYŁĄCZ\n`;
-    ctx += `   - Nagłówki kampanii: emoji priorytetu (np. "### 🔴 /001/D/ KARO92_HERO")\n`;
-    ctx += `   - Sekcje: 💰 PODSUMOWANIE | 📅 HARMONOGRAM | 📌 UWAGI | 🏷️ WYRÓŻNIENIA | ❌ BESTSELLER WYŁĄCZ\n`;
-    ctx += `9. WYKLUCZENIA = jedna linia, IDs oddzielone spacjami.\n`;
-    ctx += `10. WYRÓŻNIENIA = "FLAT 19.90/10d:" + linia IDs. "ELASTIC 2.90/d ndz+pon+wt:" + linia IDs.\n`;
-    ctx += `11. Sekcje: WSTĘPNA ANALIZA (5 linii), OVERVIEW, kampanie, WYKLUCZENIA, 🏷️ WYRÓŻNIENIA, 💰 PODSUMOWANIE, 📅 HARMONOGRAM, 📌 UWAGI.\n`;
+    ctx += `SCHEMAT JSON:\n`;
+    ctx += `{\n`;
+    ctx += `  "analiza": ["linia 1 (max 5 linii)", "linia 2", ...],\n`;
+    ctx += `  "kampanie": [\n`;
+    ctx += `    {\n`;
+    ctx += `      "nazwa": "SZAFKA PRALKOWA — PÓŁKA WYSUWANA",\n`;
+    ctx += `      "priorytet": "KRYTYCZNY",\n`;
+    ctx += `      "grupy": [\n`;
+    ctx += `        {\n`;
+    ctx += `          "suffix": "A",\n`;
+    ctx += `          "nazwaGrupy": "POLKA-WYSUWANA_BIALA",\n`;
+    ctx += `          "ids": ["18403395102"],\n`;
+    ctx += `          "cpc": 1.40,\n`;
+    ctx += `          "budzet": 12\n`;
+    ctx += `        }\n`;
+    ctx += `      ]\n`;
+    ctx += `    }\n`;
+    ctx += `  ],\n`;
+    ctx += `  "bestsellerAutomat": { "budzet": 15, "akcja": "WYLACZ" },\n`;
+    ctx += `  "wyroznienia": {\n`;
+    ctx += `    "flat": ["18403395102", "18403386447"],\n`;
+    ctx += `    "elastic": ["17892806059"],\n`;
+    ctx += `    "niePromowac": [{ "id": "17565004695", "powod": "0 trans, 314 wizyt — martwy punkt" }]\n`;
+    ctx += `  },\n`;
+    ctx += `  "harmonogram": [{ "data": "12.04 (niedziela)", "akcja": "Zamknij stare. Wystaw nowe." }],\n`;
+    ctx += `  "uwagi": ["uwaga 1", "uwaga 2"]\n`;
+    ctx += `}\n\n`;
+    ctx += `PRIORYTETY: KRYTYCZNY | WYSOKI | UTRZYMAJ | SKALUJ | OBSERWUJ | WYLACZ\n`;
+    ctx += `IDs: TYLKO 11-cyfrowe liczby w tablicy strings. Żadnych opisów, nazw, nawiasów w tablicy ids.\n`;
+    ctx += `WAŻNE: Zwróć TYLKO JSON w bloku kodu. Żadnego tekstu przed ani po bloku json.\n`;
   }
 
   return ctx;
@@ -14959,8 +15142,8 @@ async function scrSend() {
     });
     let text = await readSSE(resp);
 
-    // TOTAL RESTART walidacja w Screenerze
-    if (window._scrTotalRestartMode && (text.includes('TOTAL RESTART') || text.includes('PLAN NOWYCH KAMPANII') || text.includes('Plan FINALNY') || text.includes('KAMPANIA 001') || text.includes('## KAMPANIA 1') || text.includes('PLAN KAMPANII') || text.includes('Budżet dzienny'))) {
+    // TOTAL RESTART — JSON renderer lub fallback markdown
+    if (window._scrTotalRestartMode) {
       // Buduj mapę ROAS z plików Ads
       const _roasMap = {};
       const _adsFiles = (window._scrFiles || []).filter(f => f.type === 'ads' && f.parsed);
@@ -14977,7 +15160,24 @@ async function scrSend() {
           _roasMap[nr] = d.koszt > 0 ? d.sprzedaz / d.koszt : 0;
         });
       });
-      text = aaTRValidate(text, _roasMap, 5);
+
+      // Próba JSON
+      const jsonResult = aaTRExtractJSON(text);
+      if (jsonResult.ok) {
+        const kontoKey = window._scrFiles[0]?.konto || '';
+        const validated = aaTRValidateJSON(jsonResult.data, _roasMap, 5);
+        text = aaTRRender(validated.data, kontoKey);
+        if (validated.errors.length > 0) {
+          const banner = `> **WALIDATOR — naprawiono ${validated.errors.length} problemów:**\n` +
+            validated.errors.map(e => `> - ${e}`).join('\n') + '\n\n';
+          text = text.replace(/^(# TOTAL RESTART[^\n]*\n[^\n]*\n)/, '$1\n' + banner + '\n');
+        }
+        console.log('[TR] JSON renderer: OK, ' + validated.errors.length + ' fixes');
+      } else {
+        // Fallback: stara ścieżka markdown
+        console.log('[TR] JSON extraction failed, fallback to markdown validator');
+        text = aaTRValidate(text, _roasMap, 5);
+      }
     }
 
     const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
