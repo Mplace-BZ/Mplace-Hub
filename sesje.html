@@ -154,6 +154,18 @@ tr:nth-child(even) td{background:#fafafa}
       </table>
     </div>
 
+    <div class="sesja-section">
+      <div class="sesja-section-title red" style="font-size:12px;padding:8px 12px">💡 LEKCJA SESJI</div>
+      <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:12px 16px;margin-top:4px;font-size:11px;line-height:1.8">
+        <p style="font-weight:700;color:#991b1b;margin-bottom:6px">Problem: Sonnet nigdy nie kopiuje formatu dokładnie</p>
+        <p>Mimo 10+ iteracji promptu, dosłownego wzoru MK w kontekście, 12 reguł formatu — Agent za każdym razem "twórczo interpretował" szablon: bloki kodu zamiast tabel, "Parametr" zamiast "Pole", brak /001/D/ i [PC][001][WW][RW], opisy i emoji gdzie nie powinno być. 10 regex post-procesorów (PP-1 do PP-10) łatało dziury ale Agent za każdym razem znajdował nowy sposób na inny format.</p>
+        <p style="font-weight:700;color:#991b1b;margin:8px 0 4px">Rozwiązanie: odebrane AI kontrolę nad formatem</p>
+        <p>Zamiast prosić "skopiuj ten format" → kazaliśmy zwrócić <strong>surowe dane jako JSON</strong>. Format generuje <strong>kod JS</strong> (aaTRRender()) — zawsze identycznie. /001/D/ — kod dodaje. [PC][001][WW][RW] — kod dodaje. Tabela 3-wierszowa — kod generuje.</p>
+        <p style="font-weight:700;color:#991b1b;margin:8px 0 4px">Zasada na przyszłość</p>
+        <p><strong>AI jest dobry w analizie danych i podejmowaniu decyzji. Jest słaby w kopiowaniu formatu.</strong> Gdy potrzebujesz stałego formatu → Agent zwraca JSON, JS renderuje. Nigdy nie polegaj na AI w kwestii pixel-perfect formatowania. To strata czasu.</p>
+      </div>
+    </div>
+
   </div>
 </div>
 
