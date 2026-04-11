@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.33</title>
+<title>MPlace Hub v6.34</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.33</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.34</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -10060,9 +10060,10 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += `## STRUKTURA KAMPANII — OVERVIEW (tabela)\n`;
     p += `| Nr | Kampania | Kategoria | Budżet/dzień |\n`;
     p += `Łączny budżet dzienny: X zł\n\n`;
-    p += `## PER KAŻDA KAMPANIA:\n`;
+    p += `## PER KAŻDA KAMPANIA — format IDENTYCZNY jak poniżej:\n\n`;
     p += `## KAMPANIA NNN\n`;
     p += `### /NNN/D/ NAZWA KAMPANII\n\n`;
+    p += `(BEZ "Uzasadnienie:" — zero verbose, zero opisów kampanii)\n\n`;
     p += `#### Grupa NNN-A\n`;
     p += `[${kontoSkrot}][NNN][WW][RW] NAZWA_GRUPY\n\n`;
     p += `| Pole | Wartość |\n|---|---|\n`;
@@ -10072,24 +10073,59 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += `| ROAS hist. | X.XX× |\n`;
     p += `| Transakcje Ads | N |\n`;
     p += `| Sprzedaż Ads | X XXX zł |\n`;
-    p += `| Nota | [1 zdanie kontekstu — KRÓTKO] |\n\n`;
-    p += `Powtórz dla każdej grupy w kampanii. Ostatnia kampania = BESTSELLER AUTOMAT.\n\n`;
+    p += `| Nota | [1 zdanie — MAKSYMALNIE] |\n\n`;
+    p += `Powtórz #### Grupa NNN-B, NNN-C itd. dla każdej grupy w kampanii.\n`;
+    p += `NIE dodawaj bloków "⚠️ UWAGA", inline ostrzeżeń, ani "NIE WRZUCAĆ" per kampania.\n`;
+    p += `Oferty poniżej progu 3 transakcji → po prostu POMIŃ (nie wymieniaj ich wcale).\n`;
+    p += `Ostatnia kampania = BESTSELLER AUTOMAT.\n\n`;
     p += `## BESTSELLER AUTOMAT — WYKLUCZENIA\n`;
     p += `Wszystkie IDs z kampanii CORE w jednym bloku (oddzielone spacjami).\n\n`;
-    p += `## WYRÓŻNIENIA\n`;
-    p += `FLAT 19.90/10d od startu:\n[lista IDs + krótki powód]\n\n`;
-    p += `ELASTIC 2.90/d [okres]:\n[lista IDs + krótki powód]\n\n`;
-    p += `NIE PROMOWAĆ (0 trans mimo ruchu):\n[lista IDs + powód]\n\n`;
-    p += `## PODSUMOWANIE BUDŻETOWE\n`;
-    p += `Tabela: kampania | budżet/dzień | miesięcznie\n`;
-    p += `Wyróżnienia miesięcznie: X zł\n`;
-    p += `Łączny koszt mktg: X zł (X% EOM)\n`;
-    p += `Scenariusze ROAS: konserwatywny | optymistyczny | BE\n\n`;
-    p += `## HARMONOGRAM\n`;
-    p += `Tabela dat: start, faza nauki (7d), pierwsza ocena, druga ocena, miesięczna.\n\n`;
-    p += `## UWAGI KOŃCOWE — DO ZROBIENIA PRZED STARTEM\n`;
-    p += `Numerowana lista 5-7 konkretnych kroków.\n\n`;
-    p += `STYL: zero verbose, zero warning boxów, zero uzasadnień per kampania. Czyste tabele, krótkie noty (1 zdanie max). Copy-paste ready do panelu Allegro.\n`;
+    p += `## WYRÓŻNIENIA — PLAN OD DNIA 1\n\n`;
+    p += `IDENTYCZNY FORMAT jak poniżej — nie zmieniaj struktury, nagłówków, ani kalkulacji:\n\n`;
+    p += `### Podsekcja 1: FLAT\n`;
+    p += `Nagłówek DOKŁADNIE: "FLAT 19.90 zł / 10 dni — promować od startu"\n`;
+    p += `Pod nagłówkiem kryteria: "Aukcje z potwierdzonym ROAS >15× i min 8 trans:"\n`;
+    p += `Tabela z kolumnami: | ID | Produkt | Powód |\n`;
+    p += `Pod tabelą KALKULACJA: "Koszt flat miesięczny: N aukcje × 19.90 zł × 3 odnowienia/mies = ~X zł/mies"\n\n`;
+    p += `### Podsekcja 2: ELASTIC BOOST\n`;
+    p += `Nagłówek DOKŁADNIE: "ELASTIC BOOST — Niedziela/Pon/Wt (2.90 zł/dzień × 3 dni = 8.70 zł/tydz = ~37.70 zł/mies per aukcja)"\n`;
+    p += `Pod nagłówkiem kryteria: "Aukcje z dobrym ROAS ale wrażliwe na dzień tygodnia (peak pon-wt):"\n`;
+    p += `Tabela z kolumnami: | ID | Produkt | Powód |\n`;
+    p += `Pod tabelą KALKULACJA: "Koszt elastic miesięczny: N aukcji × 37.70 zł = ~X zł/mies"\n\n`;
+    p += `### Podsekcja 3: NIE PROMOWAĆ\n`;
+    p += `Nagłówek DOKŁADNIE: "NIE PROMOWAĆ — wyróżnienia nieuzasadnione"\n`;
+    p += `Tabela z kolumnami: | ID | Produkt | Powód |\n\n`;
+    p += `WAŻNE: użyj DOKŁADNIE tych nagłówków i kalkulacji. Nie zmieniaj formatu.\n\n`;
+    p += `## PODSUMOWANIE BUDŻETOWE\n\n`;
+    p += `### Tabela 1: Ads dzienny / miesięczny\n`;
+    p += `| Kampania | Budżet/dzień | Mies. (×30) |\n`;
+    p += `Wiersz SUMA na końcu.\n\n`;
+    p += `### Tabela 2: Wyróżnienia miesięcznie\n`;
+    p += `| Poziom | Szacowany koszt |\n`;
+    p += `Wiersze: Flat (N ofert), Elastic (N ofert, ~N tyg.), Suma wyróżnień.\n\n`;
+    p += `### Tabela 3: Łączny koszt marketingowy\n`;
+    p += `| Pozycja | Kwota |\n`;
+    p += `Wiersze: Ads miesięcznie, Wyróżnienia miesięcznie, RAZEM, Est. EOM sprzedaż, Ads% EOM, Wyróżnienia% EOM, Łączny koszt mktg%.\n\n`;
+    p += `### Tabela 4: Szacowany ROAS po restarcie\n`;
+    p += `| Scenariusz | ROAS Ads |\n`;
+    p += `Wiersze: Konserwatywny, Optymistyczny, BE ROAS, Cel minimum.\n\n`;
+    p += `## HARMONOGRAM\n\n`;
+    p += `Tabela DOKŁADNIE z tymi kolumnami:\n`;
+    p += `| Data | Akcja |\n`;
+    p += `Wiersze: data startu (zamknij stare + wystaw nowe), dzień 1 (nie oceniaj), faza nauki 7d (nie zmieniaj stawek), pierwsza ocena (niedziela +7d), druga ocena (+14d), ocena miesięczna, majówka/święta jeśli dotyczy, skalowanie sezonowe.\n`;
+    p += `Każda data = konkretny dzień (np. "19.04.2026 (niedziela)"), nie "za 7 dni".\n\n`;
+    p += `## UWAGI KOŃCOWE — DO ZROBIENIA PRZED STARTEM\n\n`;
+    p += `Nagłówek: "Obowiązkowe przed [DATA STARTU]:"\n`;
+    p += `Numerowana lista 5-7 kroków. Każdy krok = 1 zdanie z konkretną akcją.\n`;
+    p += `Ostatni krok = "Budżet Ads% kontrola: przy Est. EOM X zł target Ads% = Y% → max Ads = Z zł/mies. Obecny plan = W zł (V%) — [bezpieczna/przekroczona]."\n\n`;
+    p += `== STYL RAPORTU — ZASADY BEZWZGLĘDNE ==\n`;
+    p += `- ZERO bloków "Uzasadnienie:" per kampania\n`;
+    p += `- ZERO bloków "⚠️ UWAGA" / inline ostrzeżeń\n`;
+    p += `- ZERO list "NIE WRZUCAĆ" per kampania — oferty poniżej progu po prostu POMIŃ\n`;
+    p += `- ZERO verbose not — nota w tabeli = JEDNO zdanie max\n`;
+    p += `- Wyróżnienia: DOKŁADNIE format z nagłówkami, kryteriami i kalkulacją kosztów jak opisano\n`;
+    p += `- Podsumowanie budżetowe: DOKŁADNIE 4 tabele (Ads, Wyróżnienia, Łączny koszt, ROAS)\n`;
+    p += `- Copy-paste ready do panelu Allegro\n`;
   } else {
     // ─── DIAGNOSTYKA MODE (domyślny) ───
     p += `\n== ZADANIE ==\n`;
@@ -13402,7 +13438,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.33</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.34</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
