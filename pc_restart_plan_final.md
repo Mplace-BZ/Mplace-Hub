@@ -12,7 +12,7 @@
 ---
 
 ## KAMPANIA 001
-### /001/D/ KARO92_HERO
+### /001/D/ STOLIK KAWOWY — KARO 92 HERO
 
 #### Grupa 001-A
 [PC][001][WW][RW] KARO92_LANCELOT
@@ -26,10 +26,10 @@
 ---
 
 ## KAMPANIA 002
-### /002/D/ STOLIKI_PODNOSZONE
+### /002/D/ STOLIK KAWOWY — PODNOSZONE ROZKŁADANE
 
 #### Grupa 002-A
-[PC][002][WW][RW] STOLIKI_PODNOSZONE_MIX
+[PC][002][WW][RW] STOLIKI-PODNOSZONE_MIX
 
 | Pole | Wartość |
 |---|---|
@@ -40,10 +40,10 @@
 ---
 
 ## KAMPANIA 003
-### /003/D/ TOP92_PODNOSZONY
+### /003/D/ STOLIK KAWOWY — TOP92 PODNOSZONY
 
 #### Grupa 003-A
-[PC][003][WW][RW] TOP92_SONOMA_WOTAN_ART
+[PC][003][WW][RW] TOP92_SONOMA-WOTAN-ART
 
 | Pole | Wartość |
 |---|---|
@@ -54,10 +54,10 @@
 ---
 
 ## KAMPANIA 004
-### /004/D/ LAZIENKA_LUSTRO
+### /004/D/ SZAFKA ŁAZIENKOWA — LUSTRO
 
 #### Grupa 004-A
-[PC][004][WW][RW] SZAFKA_LUSTRO_BIALY_WOTAN
+[PC][004][WW][RW] SZAFKA-LUSTRO_BIALY-WOTAN
 
 | Pole | Wartość |
 |---|---|
@@ -68,10 +68,10 @@
 ---
 
 ## KAMPANIA 005
-### /005/D/ LAZIENKA_SLUPEK
+### /005/D/ SZAFKA ŁAZIENKOWA — SŁUPEK WĄSKI
 
 #### Grupa 005-A
-[PC][005][WW][RW] SLUPEK_WOTAN_LANCELOT
+[PC][005][WW][RW] SLUPEK-LAZIENKOWY_WOTAN-LANCELOT
 
 | Pole | Wartość |
 |---|---|
@@ -82,10 +82,10 @@
 ---
 
 ## KAMPANIA 006
-### /006/D/ PRALKOWE_LANCELOT
+### /006/D/ SZAFKA PRALKOWA — LANCELOT SŁUPEK
 
 #### Grupa 006-A
-[PC][006][WW][RW] PRALKA_LANCELOT_SLUPEK
+[PC][006][WW][RW] SZAFKA-PRALKOWA_LANCELOT
 
 | Pole | Wartość |
 |---|---|
@@ -96,10 +96,10 @@
 ---
 
 ## KAMPANIA 007
-### /007/D/ DONICE_CRAFT_ZLOTY
+### /007/D/ DONICA CRAFT ZŁOTY — SEZON
 
 #### Grupa 007-A
-[PC][007][WW][RW] CRAFT_ZLOTY_DONICA
+[PC][007][WW][RW] CRAFT-ZLOTY_DONICA
 
 | Pole | Wartość |
 |---|---|
@@ -110,10 +110,10 @@
 ---
 
 ## KAMPANIA 008
-### /008/D/ DONICE_LANCELOT
+### /008/D/ DONICA LANCELOT — SEZON
 
 #### Grupa 008-A
-[PC][008][WW][RW] LANCELOT_DONICE_MIX
+[PC][008][WW][RW] LANCELOT-DONICA_MIX
 
 | Pole | Wartość |
 |---|---|
@@ -124,7 +124,7 @@
 ---
 
 ## KAMPANIA 009
-### /009/D/ NOWOSCI
+### /009/D/ NOWOŚCI
 
 #### Grupa 009-A
 [PC][009][WW][RW] NOWOSCI_MIX
@@ -160,15 +160,15 @@ NIE PROMOWAĆ:
 
 | Kampania | Budżet/dzień | Mies. (×30) |
 |---|---|---|
-| /001/D/ KARO92_HERO | 40 zł | 1 200 zł |
-| /002/D/ STOLIKI_PODNOSZONE | 20 zł | 600 zł |
-| /003/D/ TOP92_PODNOSZONY | 20 zł | 600 zł |
-| /004/D/ LAZIENKA_LUSTRO | 15 zł | 450 zł |
-| /005/D/ LAZIENKA_SLUPEK | 12 zł | 360 zł |
-| /006/D/ PRALKOWE_LANCELOT | 15 zł | 450 zł |
-| /007/D/ DONICE_CRAFT_ZLOTY | 20 zł | 600 zł |
-| /008/D/ DONICE_LANCELOT | 18 zł | 540 zł |
-| /009/D/ NOWOSCI | 10 zł | 300 zł |
+| /001/D/ STOLIK KAWOWY — KARO 92 HERO | 40 zł | 1 200 zł |
+| /002/D/ STOLIK KAWOWY — PODNOSZONE ROZKŁADANE | 20 zł | 600 zł |
+| /003/D/ STOLIK KAWOWY — TOP92 PODNOSZONY | 20 zł | 600 zł |
+| /004/D/ SZAFKA ŁAZIENKOWA — LUSTRO | 15 zł | 450 zł |
+| /005/D/ SZAFKA ŁAZIENKOWA — SŁUPEK WĄSKI | 12 zł | 360 zł |
+| /006/D/ SZAFKA PRALKOWA — LANCELOT SŁUPEK | 15 zł | 450 zł |
+| /007/D/ DONICA CRAFT ZŁOTY — SEZON | 20 zł | 600 zł |
+| /008/D/ DONICA LANCELOT — SEZON | 18 zł | 540 zł |
+| /009/D/ NOWOŚCI | 10 zł | 300 zł |
 | **SUMA** | **170 zł** | **5 100 zł** |
 
 Realny wydatek (50%): ~85 zł/dzień = ~2 550 zł/mies = 3.4% EOM (cel 5.5%)
