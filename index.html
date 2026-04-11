@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.44</title>
+<title>MPlace Hub v6.45</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.44</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.45</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -13692,7 +13692,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.44</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.45</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -14546,12 +14546,11 @@ function scrBuildFilesContext() {
 
   ctx += `\n=== KONIEC DANYCH PLIKÓW ===\n`;
   ctx += `Powyższe dane są dostępne dla całej rozmowy. Odpowiadaj na pytania użytkownika opierając się na nich. Możesz cytować konkretne kampanie, aukcje, ID, wartości. Dla pytań o AOV: AOV = łączna sprzedaż / łączna liczba transakcji.\n`;
-  ctx += `KRYTYCZNA ZASADA ANTY-HALUCYNACJA:\n`;
-  ctx += `- NIGDY nie wymyślaj numerów ID ofert. Używaj TYLKO IDs z danych powyżej (w nawiasach [ID]).\n`;
-  ctx += `- KAŻDY ID Allegro ma DOKŁADNIE 11 CYFR. Jeśli generujesz ID z 12, 14, 18, 22 cyframi — to HALUCYNACJA.\n`;
-  ctx += `- Jeśli oferta nie ma ID w danych → napisz "(ID: sprawdź w panelu)" — NIE wymyślaj numeru.\n`;
-  ctx += `- W tabeli IDs wpisuj TYLKO 11-cyfrowe liczby oddzielone spacjami. BEZ nazw, opisów, nawiasów.\n`;
-  ctx += `- Walidator automatycznie oznaczy każdy ID który nie ma 11 cyfr jako [FAŁSZYWE ID!].\n\n`;
+  ctx += `ZASADA IDs:\n`;
+  ctx += `- IDs z sekcji [ADS] i [ODWIEDZINY] powyżej SĄ PRAWDZIWE 11-cyfrowe IDs Allegro — UŻYWAJ ICH.\n`;
+  ctx += `- IDs z sekcji [SPRZEDAŻ] mogą mieć inny format — matchuj oferty po nazwie z sekcją [ODWIEDZINY] żeby znaleźć prawdziwy 11-cyfrowy ID.\n`;
+  ctx += `- NIGDY nie wymyślaj numerów. Jeśli oferta nie ma 11-cyfrowego ID w żadnej sekcji → "(ID: sprawdź w panelu)".\n`;
+  ctx += `- W tabeli IDs: TYLKO 11-cyfrowe liczby oddzielone spacjami. BEZ nazw, opisów, nawiasów.\n\n`;
 
   // Detekcja TOTAL RESTART — wstrzyknij szablon formatu
   if (window._scrTotalRestartMode) {
@@ -14575,10 +14574,11 @@ function scrBuildFilesContext() {
     if (eomEst > 0) ctx += `Est. EOM: ${eomEst.toFixed(0)} zł | Max budżet Ads: ${maxAdsBudget} zł/mies (~${maxDailyBudget} zł/dzień)\n`;
     ctx += `\nZASADY:\n`;
     ctx += `- Tabela grupy: TYLKO 3 wiersze (IDs, Dynamic CPC start, Budżet dzienny). BEZ ROAS, Transakcji, Noty, opisów.\n`;
-    ctx += `- Wiersz IDs: TYLKO liczby 11-cyfrowe oddzielone spacjami. BEZ nazw produktów, BEZ nawiasów, BEZ opisów w tej komórce.\n`;
-    ctx += `- KAŻDY ID MUSI mieć DOKŁADNIE 11 CYFR. Jeśli ID ma mniej lub więcej niż 11 cyfr — jest FAŁSZYWY. NIE WPISUJ GO.\n`;
-    ctx += `- IDs bierzesz WYŁĄCZNIE z danych XLSX powyżej (numery w [nawiasach kwadratowych]). NIGDY nie generuj IDs z pamięci.\n`;
-    ctx += `- Jeśli nie masz 11-cyfrowego ID dla oferty → napisz "(ID: sprawdź w panelu — NAZWA)" — ale NIE WYMYŚLAJ numeru.\n`;
+    ctx += `- Wiersz IDs: TYLKO liczby 11-cyfrowe oddzielone spacjami. BEZ nazw produktów, BEZ nawiasów, BEZ opisów.\n`;
+    ctx += `- IDs z sekcji [ADS] i [ODWIEDZINY] SĄ PRAWDZIWE — wpisuj je śmiało. Mają 11 cyfr.\n`;
+    ctx += `- IDs z sekcji [SPRZEDAŻ] mogą mieć inny format — matchuj po nazwie z [ODWIEDZINY] żeby znaleźć 11-cyfrowy ID.\n`;
+    ctx += `- Tylko jeśli oferta nie ma 11-cyfrowego ID w ŻADNEJ sekcji → "(ID: sprawdź w panelu — NAZWA)".\n`;
+    ctx += `- WIĘKSZOŚĆ ofert MA 11-cyfrowe ID w danych. Używaj ich. Nie pisz "sprawdź w panelu" jeśli ID jest dostępne.\n`;
     ctx += `- Min 3 transakcje (Ads + organika) żeby wrzucić ofertę do kampanii.\n`;
     ctx += `- ROAS łączny < 3 → NIE wrzucaj do kampanii. Wrzuć do NIE PROMOWAĆ.\n`;
     ctx += `- ROAS 3-4 → można wrzucić ale z niskim CPC.\n`;
