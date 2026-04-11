@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.36</title>
+<title>MPlace Hub v6.37</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.36</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.37</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -10087,8 +10087,9 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += `- Dane Ads (okres): koszt X zł | sprzedaż X zł | ROAS X.XX\n`;
     p += `- Dane Sprzedaż: Est. EOM X zł | AOV X zł\n`;
     p += `- Udział Ads w sprzedaży: X.X%\n`;
-    p += `- Obserwacja 1\n`;
-    p += `- Obserwacja 2\n\n`;
+    p += `- Obserwacja 1 (1 zdanie)\n`;
+    p += `- Obserwacja 2 (1 zdanie)\n\n`;
+    p += `(DOKŁADNIE 5 linii jak powyżej. Nie więcej. Nie mniej.)\n\n`;
     p += `## STRUKTURA KAMPANII — OVERVIEW\n\n`;
     p += `| Nr | Kampania | Kategoria | Budżet/dzień |\n`;
     p += `|---|---|---|---|\n`;
@@ -10186,11 +10187,12 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += `- Skopiuj DOKŁADNIE powyższy format. Nie dodawaj sekcji, nagłówków, bloków, ostrzeżeń.\n`;
     p += `- Tabela grupy: TYLKO 3 wiersze (IDs, Dynamic CPC start, Budżet dzienny). BEZ ROAS/Transakcji/Sprzedaży/Noty.\n`;
     p += `- ZERO bloków "Uzasadnienie:", "⚠️ UWAGA", "⚑", "NIE WRZUCAĆ", warning boxów.\n`;
-    p += `- ZERO ofert z <3 transakcjami — nie wymieniaj ich NIGDZIE w raporcie.\n`;
-    p += `- Liczby w nagłówku (N kampanii · N grup · N aukcji) = policz FAKTYCZNIE z treści.\n`;
+    p += `- WSTĘPNA ANALIZA: DOKŁADNIE 5 linii (Ads, Sprzedaż, Udział, Obserwacja1, Obserwacja2). Nie więcej.\n`;
+    p += `- Oferty z <3 transakcjami (Ads + organika łącznie) NIE ISTNIEJĄ. Nie wrzucaj ich do grup, nie wymieniaj w wyróżnieniach, nie wspominaj nigdzie.\n`;
+    p += `- PRZED WYGENEROWANIEM policz: ile kampanii, ile grup (####), ile unikalnych 11-cyfrowych IDs. Te 3 liczby wpisz w nagłówek.\n`;
     p += `- Łączny budżet w OVERVIEW = SUMA w tabeli budżetowej = MUSI być ta sama kwota.\n`;
     p += `- Łączny budżet dzienny MUSI mieścić się w limicie ~${maxDailyBudget} zł/dzień.\n`;
-    p += `- BE ROAS = ${be.toFixed(2)}× — ta wartość, nie inna.\n`;
+    p += `- BE ROAS = ${be.toFixed(2)}× — ta wartość, nie inna. Nie obliczaj sam.\n`;
   } else {
     // ─── DIAGNOSTYKA MODE (domyślny) ───
     p += `\n== ZADANIE ==\n`;
@@ -10515,7 +10517,7 @@ async function aaRunAnalysis() {
     const curMonth = MONTHS[new Date().getMonth()];
     const curData = getData(konto).find(d => d.m === curMonth);
     const C = curData ? calc(curData, prod) : null;
-    const beRoas = C && C.beRoasAds ? C.beRoasAds : 6;
+    const beRoas = C && C.beRoasGlob ? C.beRoasGlob : (C && C.mBefore > 0 ? 1 / (C.mBefore / 100) : 6);
     const prompt = aaBuildPrompt(kontoName, okres || 'bieżący', uwagi, adsData || {totKoszt:0,totSprzedaz:0,totRoas:0,kampanie:[],zgnile:[],kosztZgnile:0,gwiazdy:[]}, sprzedazData, konwersjaData, beRoas, ads30dData);
 
     const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
@@ -13503,7 +13505,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.36</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.37</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
