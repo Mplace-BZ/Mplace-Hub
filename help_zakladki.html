@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>MPlace Hub — Przewodnik po zakładkach</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;font-size:12px;color:#1f2937;max-width:820px;margin:0 auto;padding:1.5rem 2rem;line-height:1.7;background:#fff}
+.header{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;padding-bottom:8px;border-bottom:3px solid #111;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center}
+.header-title{font-size:18px;font-weight:700;color:#111;font-family:'DM Mono',monospace}
+.header-sub{font-size:10px;color:#6b7280}
+
+h1{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:#fff;margin:2rem 0 .75rem;padding:10px 14px;background:#111;border-radius:6px;page-break-after:avoid}
+h1 .emoji{font-size:18px;margin-right:8px}
+h1 .tag{font-size:9px;font-weight:400;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle}
+
+h2{font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:#111;margin:1.2rem 0 .4rem;padding:6px 10px;background:#f8f9fa;border-left:4px solid #ff6b35;border-radius:0 4px 4px 0}
+
+h3{font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:#374151;margin:.8rem 0 .3rem}
+
+p{margin:.4rem 0}
+strong{color:#111;font-weight:700}
+
+.card{border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;margin:10px 0;background:#fafafa}
+.card-accent{border-left:4px solid #ff6b35}
+.card-green{border-left:4px solid #34d399}
+.card-blue{border-left:4px solid #38bdf8}
+.card-purple{border-left:4px solid #b47fff}
+.card-red{border-left:4px solid #ef4444}
+
+.badge{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px;vertical-align:middle}
+.badge-daily{background:#dcfce7;color:#166534}
+.badge-weekly{background:#fef3c7;color:#92400e}
+.badge-monthly{background:#dbeafe;color:#1e40af}
+.badge-ondemand{background:#fae8ff;color:#86198f}
+
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:11px}
+th{background:#111;color:#fff;font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;text-align:left}
+td{padding:6px 10px;border:1px solid #e5e7eb;vertical-align:top}
+tr:nth-child(even) td{background:#f9fafb}
+
+.case{background:#fffbeb;border:1px solid #fbbf24;border-radius:6px;padding:10px 14px;margin:8px 0;font-size:11px}
+.case-title{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;color:#92400e;margin-bottom:4px}
+
+.flow{background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:10px 14px;margin:8px 0;font-size:11px}
+.flow-title{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;color:#166534;margin-bottom:4px}
+
+.warning{background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:8px 12px;margin:8px 0;font-size:11px;color:#991b1b}
+
+.separator{border:none;border-top:2px dashed #e5e7eb;margin:1.5rem 0}
+
+.footer{margin-top:2rem;padding-top:10px;border-top:3px solid #111;font-family:'DM Mono',monospace;font-size:9px;color:#9ca3af;text-align:center}
+
+@media print{
+  body{padding:1rem;font-size:11px}
+  h1{break-before:auto;page-break-after:avoid;margin-top:1.5rem}
+  table{page-break-inside:avoid}
+  .card,.case,.flow{page-break-inside:avoid}
+  .no-print{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">MPlace Hub — Przewodnik po zakładkach</div>
+    <div class="header-sub">Wersja v6.58 | Kwiecień 2026 | Dla: Chris (MPlace Agency)</div>
+  </div>
+  <div class="header-sub">Wydrukuj i trzymaj przy monitorze</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1><span class="emoji">▶</span> PLAY (Cockpit)<span class="tag">CODZIENNIE</span></h1>
+
+<h2>Co to jest</h2>
+<p>Codzienny cockpit operacyjny. 3-krokowy workflow: <strong>Data → Upload XLSX → 23 zadań</strong>. Agent AI generuje listę zadań na dziś na podstawie wgranych raportów (Ads + Sprzedaż + Konwersja per konto).</p>
+
+<h2>Kiedy używać</h2>
+<div class="card card-accent">
+  <strong>Rano, codziennie.</strong> Wgrywasz raporty z poprzedniego dnia, Agent generuje 23 zadań podzielonych na PILNE / WAŻNE / INFO. Checkboxy, progress bar, streak, timer, Did You Know.
+</div>
+
+<h2>Przykład użycia</h2>
+<div class="case">
+  <div class="case-title">CASE: Poniedziałek rano, 8:00</div>
+  1. Klik ▶ → wybierz datę (wczoraj)<br>
+  2. Wgraj 9 plików (3 typy × 3 konta MEBLE)<br>
+  3. Agent generuje 23 kart z zadaniami<br>
+  4. Odhaaczasz checkboxy w trakcie pracy w panelu Allegro<br>
+  5. Progress bar pokazuje postęp, streak motywuje
+</div>
+
+<h2>Czego NIE robi</h2>
+<p>Nie analizuje głęboko — daje szybki przegląd dnia. Do głębokiej analizy → Analiza lub Screener.</p>
+
+<hr class="separator">
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1><span class="emoji">📊</span> Dashboard<span class="tag">CODZIENNIE</span></h1>
+
+<h2>Co to jest</h2>
+<p>Główny panel z liczbami. Sprzedaż, koszty Ads, ROAS, marża, wyróżnienia — per konto i per grupa. Wpisujesz dane ręcznie (brutto, dzień N = dane za dzień N-1). EOM projection dla bieżącego miesiąca.</p>
+
+<h2>Kiedy używać</h2>
+<div class="card card-green">
+  <strong>Codziennie po wpisaniu danych.</strong> Sprawdź: czy marża rośnie, czy Ads% w celu, czy ROAS > BE. Porównanie m/m automatyczne.
+</div>
+
+<h2>Kluczowe metryki</h2>
+<table>
+  <tr><th>Metryka</th><th>Cel MK</th><th>Cel PC</th><th>Cel MnC</th><th>Alarm</th></tr>
+  <tr><td>ROAS Ads</td><td>>6.30</td><td>>7.17</td><td>>5.00</td><td>< BE = czerwony</td></tr>
+  <tr><td>Ads%</td><td>6.5%</td><td>5.5%</td><td>6.5%</td><td>> cel = pomarańczowy</td></tr>
+  <tr><td>Wyróżnienia%</td><td>5%</td><td>3%</td><td>4.5%</td><td>> 5% sprzedaży</td></tr>
+  <tr><td>Marża</td><td>>8%</td><td>>7%</td><td>>10%</td><td>< 5% = alarm</td></tr>
+</table>
+
+<hr class="separator">
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1><span class="emoji">🤖</span> Agent<span class="tag">NA ŻĄDANIE</span></h1>
+
+<h2>Co to jest</h2>
+<p>Chat z AI bez plików. Zadajesz pytania o strategię, Allegro Ads, optymalizację. Agent zna kontekst Twojego portfela (9 kont, 3 grupy, marże, ROAS).</p>
+
+<h2>Kiedy używać</h2>
+<div class="card card-blue">
+  <strong>Gdy potrzebujesz porady strategicznej</strong> — "Czy powinienem podnieść CPC na KARO 92?", "Jak przygotować się do Dnia Matki?", "Co zrobić z marżą 4.3% na PC?"
+</div>
+
+<h2>Czego NIE robi</h2>
+<p>Nie widzi plików XLSX. Jeśli chcesz analizę danych → Analiza lub Screener.</p>
+
+<hr class="separator">
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1><span class="emoji">🔬</span> Analiza<span class="tag">CO TYDZIEŃ</span></h1>
+
+<h2>Co to jest</h2>
+<p>Głęboka analiza ofert per konto. Wgrywasz 3 pliki XLSX (Ads + Sprzedaż + Odwiedziny) + opcjonalnie Ads 30d. Agent analizuje ROAS per aukcja, konwersję, martwe punkty i generuje raport 8-sekcyjny (Diagnoza → Wyłącz → Ostrzeżenie → Optymalizuj → Skaluj → Kanibalizacja → CTR vs Konwersja → Placement).</p>
+
+<h2>Kiedy używać</h2>
+<div class="card card-purple">
+  <strong>Co niedzielę — ocena tygodnia.</strong> Wgrywasz raporty 7d lub 14d i sprawdzasz co działa, co wyłączyć, co skalować.
+</div>
+
+<h2>Tryb TOTAL RESTART</h2>
+<div class="flow">
+  <div class="flow-title">FLOW: Total Restart kampanii (czysta karta)</div>
+  1. Wybierz konto, wgraj 3 pliki<br>
+  2. W uwagach wpisz: <strong>"TOTAL RESTART"</strong><br>
+  3. Agent zwraca <strong>JSON</strong> z kampaniami, grupami, IDs, CPC, budżetami<br>
+  4. JS renderuje raport z poprawnymi nazwami: /NNN/D/ i [KS][NNN][WW][RW]<br>
+  5. Walidator automatycznie: usuwa ROAS < 3, duplikaty, fake IDs, KARO 65 z MK<br>
+  6. Gotowy raport z buttonami Kopiuj / HTML / Drukuj
+</div>
+
+<div class="case">
+  <div class="case-title">CASE: Restart PC (11.04.2026)</div>
+  Wgraliśmy 3 pliki PC → wpisali "TOTAL RESTART — Perfekt Cięcie" →<br>
+  Agent wygenerował 9 kampanii z IDs → walidator usunął 17967722216 (ROAS 2.12×) →<br>
+  Raport gotowy: /001/D/ STOLIK KAWOWY — KARO 92 HERO z [PC][001][WW][RW] KARO92_LANCELOT
+</div>
+
+<h2>Tryb diagnostyczny (domyślny)</h2>
+<p>Bez "TOTAL RESTART" w uwagach → Agent generuje raport diagnostyczny: co wyłączyć, co skalować, co zoptymalizować. Nie restartuje kampanii, analizuje istniejące.</p>
+
+<hr class="separator">
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1><span class="emoji">⭐</span> Wyróżnienia<span class="tag">CO TYDZIEŃ</span></h1>
+
+<h2>Co to jest</h2>
+<p>Manager wyróżnień Allegro per konto. Dodajesz IDs aukcji które mają aktywne wyróżnienia. Agent w Analizie i Screenerze widzi te wyróżnienia i uwzględnia je w rekomendacjach.</p>
+
+<h2>Kiedy używać</h2>
+<div class="card card-accent">
+  <strong>Po każdej zmianie wyróżnień w panelu Allegro.</strong> Aktualizuj listę żeby Agent wiedział co jest promowane.
+</div>
+
+<h2>Dwa typy</h2>
+<table>
+  <tr><th>Typ</th><th>Koszt</th><th>Kiedy</th><th>Dla kogo</th></tr>
+  <tr><td><strong>FLAT</strong></td><td>19.90 zł / 10 dni</td><td>Stałe, odnawialne</td><td>Hero z ROAS > 9×, min 8 trans</td></tr>
+  <tr><td><strong>ELASTIC</strong></td><td>2.90 zł / dzień</td><td>Ndz + Pon + Wt (peak)</td><td>Dobre oferty wrażliwe na dzień tygodnia</td></tr>
+</table>
+
+<div class="warning">
+  <strong>Wyróżnienie ≠ Ads.</strong> Wyróżnienie = organika (pozycja w listingu). Ads = płatne kliknięcia. Nie wyłączaj wyróżnienia bo ROAS Ads niski — to dwa osobne kanały.
+</div>
+
+<hr class="separator">
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1><span class="emoji">📋</span> Strategia<span class="tag">CO MIESIĄC</span></h1>
+
+<h2>Co to jest</h2>
+<p>Strategia portfelowa grupy kont. Definiuje role kont (SCALE / NICHE / PREMIUM), podziały linii produktowych, cele Ads% i wyróżnień per konto.</p>
+
+<h2>Kiedy używać</h2>
+<div class="card card-green">
+  <strong>Raz na miesiąc lub przy zmianie strategii.</strong> Przegląd ról, rewizja podziału linii, aktualizacja celów.
+</div>
+
+<h2>Aktualne role — grupa MEBLE</h2>
+<table>
+  <tr><th>Konto</th><th>Rola</th><th>Specjalizacja</th><th>Ads target</th><th>Wyr. target</th></tr>
+  <tr><td><strong>MobelKap</strong></td><td>SCALE</td><td>Szafki pralkowe, półki wysuwane, KARO 92</td><td>6.5%</td><td>5%</td></tr>
+  <tr><td><strong>Perfekt Cięcie</strong></td><td>NICHE</td><td>Donice, kwietniki, KARO 92 Lancelot hero</td><td>5.5%</td><td>3%</td></tr>
+  <tr><td><strong>Meble na Czasie</strong></td><td>PREMIUM +2.5%</td><td>TOP92, KARO 65, ława rozkładana, T-BOX</td><td>6.5%</td><td>4.5%</td></tr>
+</table>
+
+<hr class="separator">
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1><span class="emoji">🎯</span> Centrum Ads<span class="tag">CO TYDZIEŃ</span></h1>
+
+<h2>Co to jest</h2>
+<p>Panel Ads z dwoma narzędziami: <strong>AI Architect</strong> (plan reorganizacji 3 kont) i <strong>Ads Tracker</strong> (checkpointy 7/14/30d po restarcie).</p>
+
+<h2>AI Architect</h2>
+<div class="card card-blue">
+  <strong>Wgraj 3 raporty Ads (MK + PC + MnC)</strong> → Agent buduje globalną mapę kampanii, wykrywa kanibalizację cross-account i wewnątrz kont, proponuje reorganizację wg ról portfelowych.
+</div>
+
+<div class="case">
+  <div class="case-title">CASE: Reorganizacja 33 kampanii (10.04.2026)</div>
+  Wgraliśmy 3 raporty Ads → AI Architect wykrył 47 aukcji cross-account i 23 duplikaty →<br>
+  Wygenerował tabelę z akcjami per kampania: ZACHOWAJ / OCZYŚĆ / ZAMKNIJ / PRZENIEŚ →<br>
+  Sekcja PODSUMOWANIE GRUP z IDs do wklejenia w panelu Allegro
+</div>
+
+<h2>Ads Tracker</h2>
+<p>Po restarcie kampanii — wgrywasz raporty co 7 dni i porównujesz ROAS z benchmarkiem. Alerty jeśli ROAS spada poniżej BE.</p>
+
+<h2>Kiedy Centrum Ads vs Analiza?</h2>
+<table>
+  <tr><th>Potrzebujesz</th><th>Użyj</th></tr>
+  <tr><td>Analiza JEDNEGO konta (co wyłączyć, co skalować)</td><td><strong>Analiza</strong></td></tr>
+  <tr><td>Porównanie 3 kont, kanibalizacja, reorganizacja</td><td><strong>Centrum Ads → AI Architect</strong></td></tr>
+  <tr><td>Total Restart od zera (nowe kampanie)</td><td><strong>Analiza</strong> (tryb TOTAL RESTART) lub <strong>Screener</strong></td></tr>
+  <tr><td>Monitoring po restarcie (checkpointy)</td><td><strong>Centrum Ads → Ads Tracker</strong></td></tr>
+</table>
+
+<hr class="separator">
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1><span class="emoji">💬</span> Screener<span class="tag">NA ŻĄDANIE</span></h1>
+
+<h2>Co to jest</h2>
+<p>Najbardziej elastyczne narzędzie. Chat z Agentem + upload plików XLSX + wklejanie screenshotów (Ctrl+V). Multi-turn: pełna historia konwersacji. Agent widzi pliki, obrazki i odpowiada na pytania.</p>
+
+<h2>Kiedy używać</h2>
+<div class="card card-purple">
+  <strong>Gdy potrzebujesz iteracji.</strong> Analiza daje jeden raport. Screener pozwala dopytywać, korygować, drążyć. "Pokaż mi AOV per konto", "Porównaj TOP92 na MK vs MnC", "Dlaczego ta oferta nie konwertuje?"
+</div>
+
+<h2>Tryby pracy</h2>
+<table>
+  <tr><th>Tryb</th><th>Jak aktywować</th><th>Co robi</th></tr>
+  <tr><td><strong>Chat bez plików</strong></td><td>Napisz pytanie</td><td>Jak Agent, ale z historią konwersacji</td></tr>
+  <tr><td><strong>Chat z plikami</strong></td><td>Wgraj XLSX + pytanie</td><td>Agent widzi dane z plików i odpowiada</td></tr>
+  <tr><td><strong>TOTAL RESTART</strong></td><td>Wgraj pliki + "TOTAL RESTART"</td><td>Agent zwraca JSON → JS renderuje plan kampanii</td></tr>
+  <tr><td><strong>TOTAL RESTART KONKURENCYJNY</strong></td><td>Wgraj pliki z wielu kont + "TOTAL RESTART — Semmi"</td><td>Agent porównuje konta i generuje plan dla TARGET</td></tr>
+  <tr><td><strong>Screenshot</strong></td><td>Ctrl+V screenshot</td><td>Agent analizuje obraz (vision)</td></tr>
+</table>
+
+<div class="case">
+  <div class="case-title">CASE: Total Restart PC w Screenerze (11.04.2026)</div>
+  1. Wgraliśmy 3 pliki PC (Ads + Sprzedaż + Odwiedziny)<br>
+  2. Wpisali: "TOTAL RESTART — Perfekt Cięcie. KARO 92 Lancelot = hero, donice = specjalizacja PC"<br>
+  3. Agent zwrócił JSON z 9 kampaniami<br>
+  4. JS wyrenderował raport z /001/D/ nazwami i [PC][001][WW][RW] grupami<br>
+  5. Walidator usunął toksyczną ofertę (ROAS 2.12×)<br>
+  6. Klik HTML → pobrany plik gotowy do użycia w panelu Allegro
+</div>
+
+<div class="case">
+  <div class="case-title">CASE: Porównanie AOV kont MEBLE</div>
+  1. Wgraliśmy 3 pliki Sprzedaży (MK + PC + MnC)<br>
+  2. Wpisali: "Policz AOV per konto MEBLE"<br>
+  3. Agent: MK 301 zł, MnC 268 zł, PC 246 zł<br>
+  4. Wnioski: MK = premium (półki 550 zł), MnC = wolumen (ława 291 zł), PC = niche (KARO 170 zł)
+</div>
+
+<hr class="separator">
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1><span class="emoji">📅</span> Codzienny workflow — kiedy co używać</h1>
+
+<table>
+  <tr><th>Godzina</th><th>Akcja</th><th>Zakładka</th></tr>
+  <tr><td><strong>8:00</strong></td><td>Wpisz dane za wczoraj (brutto)</td><td>Dashboard</td></tr>
+  <tr><td><strong>8:05</strong></td><td>Sprawdź metryki: marża, ROAS, Ads%</td><td>Dashboard</td></tr>
+  <tr><td><strong>8:10</strong></td><td>Wgraj raporty XLSX → 23 zadań na dziś</td><td>▶ Play</td></tr>
+  <tr><td><strong>8:30-12:00</strong></td><td>Wykonuj zadania w panelu Allegro</td><td>Panel Allegro</td></tr>
+  <tr><td><strong>Niedziela</strong></td><td>Tygodniowa analiza per konto</td><td>Analiza</td></tr>
+  <tr><td><strong>Niedziela</strong></td><td>Checkpoint Ads po restarcie</td><td>Centrum Ads → Tracker</td></tr>
+  <tr><td><strong>Na żądanie</strong></td><td>Głęboka analiza, pytania, porównania</td><td>Screener</td></tr>
+  <tr><td><strong>Raz/miesiąc</strong></td><td>Rewizja strategii portfelowej</td><td>Strategia</td></tr>
+</table>
+
+<hr class="separator">
+
+<!-- ═══════════════════════════════════════════════ -->
+<h1><span class="emoji">⚡</span> Szybka ściąga — który tool na jakie pytanie</h1>
+
+<table>
+  <tr><th>Pytanie</th><th>Zakładka</th></tr>
+  <tr><td>"Jaki mam ROAS dziś?"</td><td>Dashboard</td></tr>
+  <tr><td>"Co mam zrobić dzisiaj?"</td><td>▶ Play</td></tr>
+  <tr><td>"Czy powinienem podnieść CPC?"</td><td>Agent</td></tr>
+  <tr><td>"Co wyłączyć na koncie MK?"</td><td>Analiza (3 pliki MK)</td></tr>
+  <tr><td>"Zrestartuj kampanie PC od zera"</td><td>Screener + "TOTAL RESTART"</td></tr>
+  <tr><td>"Porównaj 3 konta MEBLE"</td><td>Centrum Ads → AI Architect</td></tr>
+  <tr><td>"Pokaż AOV per segment"</td><td>Screener z plikami</td></tr>
+  <tr><td>"Znajdź niszę Semmi vs Luxsen"</td><td>Screener + pliki 4 kont + "TOTAL RESTART — Semmi"</td></tr>
+  <tr><td>"Jakie wyróżnienia aktywować?"</td><td>Raport z Analizy (sekcja WYRÓŻNIENIA)</td></tr>
+  <tr><td>"Czy ta oferta się opłaca?" (screenshot)</td><td>Screener + Ctrl+V</td></tr>
+</table>
+
+<div class="footer">
+  MPlace Hub v6.58 · Przewodnik po zakładkach · Kwiecień 2026 · mplace-bz.github.io/Mplace-Hub
+</div>
+
+</body>
+</html>
