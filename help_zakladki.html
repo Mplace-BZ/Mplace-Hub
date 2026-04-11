@@ -72,6 +72,85 @@ tr:nth-child(even) td{background:#f9fafb}
 </div>
 
 <!-- ═══════════════════════════════════════════════ -->
+<h1 style="background:#ef4444;font-size:18px;padding:14px 18px"><span class="emoji">🚀</span> TOTAL RESTART — Step by Step<span class="tag" style="background:rgba(255,255,255,.3)">NAJWAŻNIEJSZE</span></h1>
+
+<h2>Krok 1 — Przygotuj pliki XLSX</h2>
+<div class="card card-red">
+  Per konto pobierz z panelu Allegro 3 raporty (okres: ostatnie 30 dni):
+  <table>
+    <tr><th>Raport</th><th>Skąd pobrać</th><th>Nazwa zakładki w XLSX</th></tr>
+    <tr><td><strong>Raport 1: Ads</strong></td><td>Panel Allegro → Reklama → Statystyki → Eksportuj</td><td>"Statystyki*"</td></tr>
+    <tr><td><strong>Raport 2: Odwiedziny</strong></td><td>Panel Allegro → Sprzedaż → Odwiedziny wg ofert → Eksportuj</td><td>"Odwiedziny wg ofert"</td></tr>
+    <tr><td><strong>Raport 3: Sprzedaż</strong></td><td>Panel Allegro → Sprzedaż → Wg ofert → Eksportuj</td><td>"Wg ofert"</td></tr>
+  </table>
+</div>
+
+<h2>Krok 2 — Otwórz Screener w MPlace Hub</h2>
+<div class="card card-accent">
+  Topbar → klik <strong>Screener</strong> (fioletowy button po prawej)
+</div>
+
+<h2>Krok 3 — Wgraj 3 pliki</h2>
+<div class="card card-accent">
+  Przeciągnij 3 pliki XLSX na pole uploadu w Screenerze. System automatycznie rozpozna typ każdego pliku (Ads / Odwiedziny / Sprzedaż) i konto. Sprawdź czy badge pokazuje <strong>3 / 3 plików</strong>.
+</div>
+
+<h2>Krok 4 — Wpisz prompt</h2>
+<div class="card card-green" style="font-family:'DM Mono',monospace;font-size:13px;padding:16px;background:#f0fdf4">
+  TOTAL RESTART — [nazwa konta]. [hero konta] = hero, [specjalizacja] = focus.
+</div>
+<p style="margin-top:6px">Przykłady:</p>
+<table>
+  <tr><th>Konto</th><th>Prompt</th></tr>
+  <tr><td>MobelKap</td><td><code>TOTAL RESTART — MobelKap. Półki wysuwane = hero, KARO 92 = specjalizacja MK, KARO 65 = MnC nie wrzucaj.</code></td></tr>
+  <tr><td>Perfekt Cięcie</td><td><code>TOTAL RESTART — Perfekt Cięcie. KARO 92 Lancelot = hero, donice Craft/Lancelot = specjalizacja PC, KARO 65 = MnC nie wrzucaj, TOP92 zostaw jeśli ROAS > 8.</code></td></tr>
+  <tr><td>Meble na Czasie</td><td><code>TOTAL RESTART — Meble na Czasie. TOP92 Wotan = hero, KARO 65 Wotan = specjalizacja MnC, stoliki podnoszone = premium +2.5%.</code></td></tr>
+  <tr><td>Semmi (konkurencyjny)</td><td><code>TOTAL RESTART — Semmi. Znajdź niszę rozmiarową gdzie Semmi może wygrać vs Luxsen, Materazzi, MtzzEU.</code><br><em>(wgraj 12 plików — 3 per konto × 4 konta)</em></td></tr>
+</table>
+
+<h2>Krok 5 — Czekaj na raport (~30-60 sek)</h2>
+<div class="card card-blue">
+  Agent zwraca JSON z danymi → JS renderuje raport z poprawnymi nazwami:<br>
+  <strong>/001/D/ NAZWA KAMPANII</strong> i <strong>[KS][001][WW][RW] NAZWA_GRUPY</strong><br><br>
+  Walidator automatycznie:<br>
+  ✓ Usuwa oferty z ROAS < 3 (toksyczne)<br>
+  ✓ Usuwa duplikaty cross-grupa (kanibalizacja CPC)<br>
+  ✓ Usuwa KARO 65 z MK (specjalizacja MnC)<br>
+  ✓ Filtruje fake IDs (nie 11-cyfrowe)<br>
+  ✓ Auto-generuje wykluczenia Bestseller Automat<br>
+  ✓ Banner z listą naprawionych problemów
+</div>
+
+<h2>Krok 6 — Sprawdź raport</h2>
+<div class="card card-purple">
+  <strong>Co sprawdzić:</strong><br>
+  ✓ Czy IDs są prawdziwe 11-cyfrowe (nie "sprawdź w panelu" na kluczowych)<br>
+  ✓ Czy hero konta ma najwyższy CPC i budżet<br>
+  ✓ Czy budżet łączny mieści się w celu Ads%<br>
+  ✓ Czy sekcja NIE PROMOWAĆ zawiera martwe punkty i specjalizacje innych kont<br>
+  ✓ Czy wykluczenia BA = wszystkie IDs z kampanii CORE
+</div>
+
+<h2>Krok 7 — Pobierz i wdrażaj</h2>
+<div class="card card-green">
+  Klik <strong>HTML</strong> pod raportem → pobrany plik .html<br>
+  Otwórz w przeglądarce obok panelu Allegro Ads → kopiuj nazwy kampanii, grupy, IDs<br><br>
+  <strong>Kolejność w panelu Allegro:</strong><br>
+  1. Zamknij stare kampanie (lista w UWAGI KOŃCOWE)<br>
+  2. Utwórz nowe kampanie wg planu (001, 002, 003...)<br>
+  3. W każdej kampanii utwórz grupy, wklej IDs, ustaw CPC i budżet<br>
+  4. Wgraj wykluczenia do Bestseller Automat<br>
+  5. Aktywuj wyróżnienia FLAT/ELASTIC<br>
+  6. Dynamic CPC ON → 7 dni ciszy → checkpoint 19.04
+</div>
+
+<div class="warning">
+  <strong>NIGDY</strong> nie oceniaj wyników Dynamic CPC przed upływem 7 dni. Algorytm się uczy. Spadek kliknięć w dniach 1-3 jest normalny. Pierwsza ocena: niedziela po 7 dniach.
+</div>
+
+<hr class="separator">
+
+<!-- ═══════════════════════════════════════════════ -->
 <h1><span class="emoji">▶</span> PLAY (Cockpit)<span class="tag">CODZIENNIE</span></h1>
 
 <h2>Co to jest</h2>
