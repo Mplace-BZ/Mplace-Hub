@@ -10505,7 +10505,27 @@ function aaTRValidate(text, roasMap, beRoas) {
     fixes.push('duplikaty');
   }
 
-  // 3b. FIX: ID z ROAS < 3 w kampanii → usuń z grupy, przenieś do NIE PROMOWAĆ
+  // 3b. FIX: fałszywe IDs (nie 11-cyfrowe) w tabelach grup → flaguj i usuń
+  const fakeIds = [];
+  const idTableAll = [...text.matchAll(/\|\s*IDs\s*\|\s*([^|]+)\|/g)];
+  idTableAll.forEach(m => {
+    const cell = m[1].trim();
+    // Wyciągnij wszystkie ciągi cyfr z komórki IDs
+    const allNums = cell.match(/\b\d{5,}\b/g) || [];
+    allNums.forEach(num => {
+      if (num.length !== 11) fakeIds.push(num);
+    });
+  });
+  if (fakeIds.length > 0) {
+    errors.push(`${fakeIds.length} fałszywych IDs (nie 11-cyfrowe) wykrytych i oznaczonych: ${fakeIds.slice(0,5).join(', ')}${fakeIds.length > 5 ? '...' : ''}`);
+    // Oznacz fałszywe IDs w tekście
+    fakeIds.forEach(fid => {
+      text = text.replace(new RegExp('\\b' + fid.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'g'), fid + ' [FAŁSZYWE ID!]');
+    });
+    fixes.push('fake-ids');
+  }
+
+  // 3c. FIX: ID z ROAS < 3 w kampanii → usuń z grupy, przenieś do NIE PROMOWAĆ
   if (Object.keys(roasMap).length > 0) {
     const toxicInGrups = [...grupIds].filter(id => roasMap[id] !== undefined && roasMap[id] < 3 && roasMap[id] > 0);
     if (toxicInGrups.length > 0) {
@@ -14526,7 +14546,12 @@ function scrBuildFilesContext() {
 
   ctx += `\n=== KONIEC DANYCH PLIKÓW ===\n`;
   ctx += `Powyższe dane są dostępne dla całej rozmowy. Odpowiadaj na pytania użytkownika opierając się na nich. Możesz cytować konkretne kampanie, aukcje, ID, wartości. Dla pytań o AOV: AOV = łączna sprzedaż / łączna liczba transakcji.\n`;
-  ctx += `KRYTYCZNA ZASADA: NIGDY nie wymyślaj numerów ID ofert. Używaj TYLKO IDs które widzisz w danych powyżej (w nawiasach kwadratowych [ID]). Jeśli oferta nie ma ID w danych — napisz "(ID: sprawdź w panelu)" zamiast wymyślać numer. Halucynowanie fałszywych IDs jest NIEDOPUSZCZALNE.\n\n`;
+  ctx += `KRYTYCZNA ZASADA ANTY-HALUCYNACJA:\n`;
+  ctx += `- NIGDY nie wymyślaj numerów ID ofert. Używaj TYLKO IDs z danych powyżej (w nawiasach [ID]).\n`;
+  ctx += `- KAŻDY ID Allegro ma DOKŁADNIE 11 CYFR. Jeśli generujesz ID z 12, 14, 18, 22 cyframi — to HALUCYNACJA.\n`;
+  ctx += `- Jeśli oferta nie ma ID w danych → napisz "(ID: sprawdź w panelu)" — NIE wymyślaj numeru.\n`;
+  ctx += `- W tabeli IDs wpisuj TYLKO 11-cyfrowe liczby oddzielone spacjami. BEZ nazw, opisów, nawiasów.\n`;
+  ctx += `- Walidator automatycznie oznaczy każdy ID który nie ma 11 cyfr jako [FAŁSZYWE ID!].\n\n`;
 
   // Detekcja TOTAL RESTART — wstrzyknij szablon formatu
   if (window._scrTotalRestartMode) {
@@ -14549,8 +14574,11 @@ function scrBuildFilesContext() {
     ctx += `Konto: ${kontoName} (${ks}) | Rola: ${(meta.role || 'scale').toUpperCase()} | Ads target: ${adsTargetPct}%\n`;
     if (eomEst > 0) ctx += `Est. EOM: ${eomEst.toFixed(0)} zł | Max budżet Ads: ${maxAdsBudget} zł/mies (~${maxDailyBudget} zł/dzień)\n`;
     ctx += `\nZASADY:\n`;
-    ctx += `- Tabela grupy: TYLKO 3 wiersze (IDs, Dynamic CPC start, Budżet dzienny). BEZ ROAS, Transakcji, Noty.\n`;
-    ctx += `- IDs MUSZĄ być 11-cyfrowe, z danych XLSX. Nigdy nie wymyślaj.\n`;
+    ctx += `- Tabela grupy: TYLKO 3 wiersze (IDs, Dynamic CPC start, Budżet dzienny). BEZ ROAS, Transakcji, Noty, opisów.\n`;
+    ctx += `- Wiersz IDs: TYLKO liczby 11-cyfrowe oddzielone spacjami. BEZ nazw produktów, BEZ nawiasów, BEZ opisów w tej komórce.\n`;
+    ctx += `- KAŻDY ID MUSI mieć DOKŁADNIE 11 CYFR. Jeśli ID ma mniej lub więcej niż 11 cyfr — jest FAŁSZYWY. NIE WPISUJ GO.\n`;
+    ctx += `- IDs bierzesz WYŁĄCZNIE z danych XLSX powyżej (numery w [nawiasach kwadratowych]). NIGDY nie generuj IDs z pamięci.\n`;
+    ctx += `- Jeśli nie masz 11-cyfrowego ID dla oferty → napisz "(ID: sprawdź w panelu — NAZWA)" — ale NIE WYMYŚLAJ numeru.\n`;
     ctx += `- Min 3 transakcje (Ads + organika) żeby wrzucić ofertę do kampanii.\n`;
     ctx += `- ROAS łączny < 3 → NIE wrzucaj do kampanii. Wrzuć do NIE PROMOWAĆ.\n`;
     ctx += `- ROAS 3-4 → można wrzucić ale z niskim CPC.\n`;
