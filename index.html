@@ -14205,6 +14205,7 @@ function scrClear() {
 
 window._scrFiles = window._scrFiles || []; // [{ konto, type, fileName, parsed, source }]
 window._scrFilesContextSent = false; // czy kontekst plików już wysłany do Agenta
+window._scrTotalRestartMode = false; // czy user napisał TOTAL RESTART
 
 // Detekcja konta z nazwy pliku (regex 3-warstwowy)
 function scrDetectKontoFromName(fileName) {
@@ -14374,6 +14375,7 @@ function scrClearFiles() {
   if (window._scrFiles.length && !confirm('Usunąć wszystkie wgrane pliki?')) return;
   window._scrFiles = [];
   window._scrFilesContextSent = false;
+  window._scrTotalRestartMode = false;
   scrRenderFilesList();
 }
 
@@ -14525,6 +14527,66 @@ function scrBuildFilesContext() {
   ctx += `\n=== KONIEC DANYCH PLIKÓW ===\n`;
   ctx += `Powyższe dane są dostępne dla całej rozmowy. Odpowiadaj na pytania użytkownika opierając się na nich. Możesz cytować konkretne kampanie, aukcje, ID, wartości. Dla pytań o AOV: AOV = łączna sprzedaż / łączna liczba transakcji.\n`;
   ctx += `KRYTYCZNA ZASADA: NIGDY nie wymyślaj numerów ID ofert. Używaj TYLKO IDs które widzisz w danych powyżej (w nawiasach kwadratowych [ID]). Jeśli oferta nie ma ID w danych — napisz "(ID: sprawdź w panelu)" zamiast wymyślać numer. Halucynowanie fałszywych IDs jest NIEDOPUSZCZALNE.\n\n`;
+
+  // Detekcja TOTAL RESTART — wstrzyknij szablon formatu
+  if (window._scrTotalRestartMode) {
+    // Znajdź konto z plików
+    const kontoKey = window._scrFiles[0]?.konto || '';
+    const kontoSkrotMap = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC' };
+    const ks = kontoSkrotMap[kontoKey] || 'MK';
+    const kontoName = (typeof AC_META !== 'undefined' && AC_META[kontoKey]) ? AC_META[kontoKey].name : kontoKey;
+    const meta = (typeof AC_META !== 'undefined') ? AC_META[kontoKey] : {};
+    const adsTargetPct = meta.adsTarget || 6.5;
+
+    // Oblicz BE ROAS i max budżet z danych
+    const konwFile = window._scrFiles.find(f => f.type === 'konwersja');
+    const eomEst = konwFile?.parsed?.totWartosc || 0;
+    const maxAdsBudget = eomEst > 0 ? Math.round(eomEst * adsTargetPct / 100) : 0;
+    const maxDailyBudget = maxAdsBudget > 0 ? Math.round(maxAdsBudget / 30) : 150;
+
+    ctx += `\n=== TRYB TOTAL RESTART — WZÓR FORMATU ===\n`;
+    ctx += `User chce TOTAL RESTART kampanii Ads. Generujesz plan nowych kampanii od zera.\n`;
+    ctx += `Konto: ${kontoName} (${ks}) | Rola: ${(meta.role || 'scale').toUpperCase()} | Ads target: ${adsTargetPct}%\n`;
+    if (eomEst > 0) ctx += `Est. EOM: ${eomEst.toFixed(0)} zł | Max budżet Ads: ${maxAdsBudget} zł/mies (~${maxDailyBudget} zł/dzień)\n`;
+    ctx += `\nZASADY:\n`;
+    ctx += `- Tabela grupy: TYLKO 3 wiersze (IDs, Dynamic CPC start, Budżet dzienny). BEZ ROAS, Transakcji, Noty.\n`;
+    ctx += `- IDs MUSZĄ być 11-cyfrowe, z danych XLSX. Nigdy nie wymyślaj.\n`;
+    ctx += `- Min 3 transakcje (Ads + organika) żeby wrzucić ofertę do kampanii.\n`;
+    ctx += `- ROAS łączny < 3 → NIE wrzucaj do kampanii. Wrzuć do NIE PROMOWAĆ.\n`;
+    ctx += `- ROAS 3-4 → można wrzucić ale z niskim CPC.\n`;
+    ctx += `- Łączny budżet dzienny musi mieścić się w ~${maxDailyBudget} zł/dzień.\n`;
+    ctx += `- Dynamic CPC start: 0.80-1.50 zł (hero wyżej, niszowe niżej)\n`;
+    ctx += `- Nazwy kampanii: /NNN/D/ KATEGORIA_LINIA\n`;
+    ctx += `- Nazwy grup: [${ks}][NNN][WW][RW] LINIA_WYMIAR_KOLOR\n`;
+    ctx += `- Bestseller Automat: /NNN/ BESTSELLER_AUTOMAT, budżet 15 zł/dzień\n`;
+    ctx += `- Wykluczenia BA = wszystkie IDs z kampanii CORE\n\n`;
+
+    ctx += `WZÓR RAPORTU (skopiuj format DOSŁOWNIE, zmień tylko dane):\n\n`;
+    ctx += `# TOTAL RESTART KAMPANII ADS — ${kontoName}\n`;
+    ctx += `## Plan FINALNY | Data startu: 12.04.2026 | N kampanii · N grup · N aukcji\n\n`;
+    ctx += `## WSTĘPNA ANALIZA DANYCH\n`;
+    ctx += `- Dane Ads (okres): koszt X zł | sprzedaż X zł | ROAS X.XX\n`;
+    ctx += `- Dane Sprzedaż: Est. EOM X zł | AOV X zł\n`;
+    ctx += `- Udział Ads w sprzedaży: X.X%\n`;
+    ctx += `- Obserwacja 1 (1 zdanie)\n`;
+    ctx += `- Obserwacja 2 (1 zdanie)\n\n`;
+    ctx += `## STRUKTURA KAMPANII — OVERVIEW\n`;
+    ctx += `| Nr | Kampania | Kategoria | Budżet/dzień |\n|---|---|---|---|\n`;
+    ctx += `| 001 | /001/D/ NAZWA | Kat | XX zł |\n\n`;
+    ctx += `## KAMPANIA 001\n### /001/D/ NAZWA\n\n`;
+    ctx += `#### Grupa 001-A\n[${ks}][001][WW][RW] LINIA_KOLOR\n\n`;
+    ctx += `| Pole | Wartość |\n|---|---|\n| IDs | 12345678901 |\n| Dynamic CPC start | 1.40 zł |\n| Budżet dzienny | 12 zł |\n\n`;
+    ctx += `## BESTSELLER AUTOMAT — WYKLUCZENIA\n12345678901 12345678902\n\n`;
+    ctx += `## WYRÓŻNIENIA — PLAN OD DNIA 1\n`;
+    ctx += `### FLAT 19.90/10d\n| ID | Produkt | Powód |\n|---|---|---|\n\n`;
+    ctx += `### ELASTIC BOOST Ndz/Pon/Wt\n| ID | Produkt | Powód |\n|---|---|---|\n\n`;
+    ctx += `### NIE PROMOWAĆ WYRÓŻNIENIEM\n| ID | Produkt | Powód |\n|---|---|---|\n\n`;
+    ctx += `## PODSUMOWANIE BUDŻETOWE\n(tabela kampania/budżet + wyróżnienia + łączny koszt mktg%)\n\n`;
+    ctx += `## HARMONOGRAM\n(tabela data/akcja — faza nauki 7d, checkpoint 14d/30d)\n\n`;
+    ctx += `## UWAGI KOŃCOWE\n(lista zamknij stare, wgraj wykluczenia, aktywuj wyróżnienia)\n\n`;
+    ctx += `=== KONIEC WZORU ===\n`;
+  }
+
   return ctx;
 }
 
@@ -14642,6 +14704,10 @@ async function scrSend() {
   // Build content for this message
   // Wstrzyknij kontekst plików XLSX (jeśli są wgrane i nie były jeszcze wysłane)
   let questionText = q || 'Co widzisz na tych screenshotach? Przeanalizuj.';
+  // Detekcja TOTAL RESTART w tekście usera
+  if (q && q.toUpperCase().includes('TOTAL RESTART')) {
+    window._scrTotalRestartMode = true;
+  }
   if (window._scrFiles && window._scrFiles.length && !window._scrFilesContextSent) {
     const filesCtx = scrBuildFilesContext();
     questionText = filesCtx + '\n\nPYTANIE UŻYTKOWNIKA:\n' + questionText;
@@ -14677,7 +14743,29 @@ async function scrSend() {
         messages: window._scrHistory
       })
     });
-    const text = await readSSE(resp);
+    let text = await readSSE(resp);
+
+    // TOTAL RESTART walidacja w Screenerze
+    if (window._scrTotalRestartMode && text.includes('TOTAL RESTART')) {
+      // Buduj mapę ROAS z plików Ads
+      const _roasMap = {};
+      const _adsFiles = (window._scrFiles || []).filter(f => f.type === 'ads' && f.parsed);
+      _adsFiles.forEach(f => {
+        if (!f.parsed.kampanie) return;
+        const _aggr = {};
+        f.parsed.kampanie.forEach(k => k.aukcje.forEach(a => {
+          if (!a.nr) return;
+          if (!_aggr[a.nr]) _aggr[a.nr] = { koszt: 0, sprzedaz: 0 };
+          _aggr[a.nr].koszt += a.koszt;
+          _aggr[a.nr].sprzedaz += a.sprzedaz;
+        }));
+        Object.entries(_aggr).forEach(([nr, d]) => {
+          _roasMap[nr] = d.koszt > 0 ? d.sprzedaz / d.koszt : 0;
+        });
+      });
+      text = aaTRValidate(text, _roasMap, 5);
+    }
+
     const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
 
     // Add assistant response to history
