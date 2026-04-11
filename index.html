@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.57</title>
+<title>MPlace Hub v6.58</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.57</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.58</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -14054,7 +14054,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.57</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.58</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -14916,22 +14916,55 @@ function scrBuildFilesContext() {
 
   // Detekcja TOTAL RESTART — wstrzyknij szablon formatu
   if (window._scrTotalRestartMode) {
-    // Znajdź konto z plików
-    const kontoKey = window._scrFiles[0]?.konto || '';
-    const kontoSkrotMap = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC' };
-    const ks = kontoSkrotMap[kontoKey] || 'MK';
+    // Wykryj ile unikalnych kont w plikach
+    const allKonta = [...new Set(window._scrFiles.map(f => f.konto))];
+    const isCompetitive = allKonta.length > 1;
+
+    // Znajdź konto TARGET (wymienione w pytaniu usera lub pierwsze)
+    const kontoKey = window._scrTotalRestartTarget || window._scrFiles[0]?.konto || '';
+    const kontoSkrotMap = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC', Luxsen: 'LX', Semmi: 'SM', BOTAVIT: 'BV', Materazzi: 'MTZ', MtzzEU: 'mEU', Ankado24: 'A24' };
+    const ks = kontoSkrotMap[kontoKey] || kontoKey.substring(0, 2).toUpperCase();
     const kontoName = (typeof AC_META !== 'undefined' && AC_META[kontoKey]) ? AC_META[kontoKey].name : kontoKey;
     const meta = (typeof AC_META !== 'undefined') ? AC_META[kontoKey] : {};
     const adsTargetPct = meta.adsTarget || 6.5;
 
-    // Oblicz BE ROAS i max budżet z danych
-    const konwFile = window._scrFiles.find(f => f.type === 'konwersja');
+    // Oblicz BE ROAS i max budżet z danych TARGET konta
+    const konwFile = window._scrFiles.find(f => f.type === 'konwersja' && f.konto === kontoKey);
     const eomEst = konwFile?.parsed?.totWartosc || 0;
     const maxAdsBudget = eomEst > 0 ? Math.round(eomEst * adsTargetPct / 100) : 0;
     const maxDailyBudget = maxAdsBudget > 0 ? Math.round(maxAdsBudget / 30) : 150;
 
-    ctx += `\n=== TRYB TOTAL RESTART — ZWRÓĆ JSON ===\n`;
-    ctx += `User chce TOTAL RESTART kampanii Ads. Generujesz plan nowych kampanii od zera.\n`;
+    if (isCompetitive) {
+      // ═══ TRYB KONKURENCYJNY — wiele kont ═══
+      const konkurencja = allKonta.filter(k => k !== kontoKey);
+      ctx += `\n=== TRYB TOTAL RESTART KONKURENCYJNY — ZWRÓĆ JSON ===\n`;
+      ctx += `Masz dane z ${allKonta.length} kont. GENERUJESZ PLAN TYLKO DLA KONTA TARGET.\n`;
+      ctx += `KONTO TARGET: ${kontoName} (${ks})\n`;
+      ctx += `KONTA KONKURENCJA: ${konkurencja.map(k => (AC_META && AC_META[k] ? AC_META[k].name : k)).join(', ')}\n\n`;
+
+      ctx += `KONTEKST: Wszystkie konta sprzedają PODOBNE produkty (np. materace w tych samych rozmiarach, pod różnymi nazwami). Rywalizacja jest BEZPOŚREDNIA — te same frazy kluczowe, ci sami klienci.\n\n`;
+
+      ctx += `ZADANIE:\n`;
+      ctx += `1. PORÓWNAJ dane per rozmiar/produkt across konta — które konto dominuje (najwyższy wolumen, konwersja, ROAS)\n`;
+      ctx += `2. ZNAJDŹ NISZE ${kontoName}: rozmiary/produkty gdzie ${kontoName} ma LEPSZE wyniki niż konkurencja LUB gdzie konkurencja jest SŁABA\n`;
+      ctx += `3. ZIDENTYFIKUJ PUŁAPKI: rozmiary/produkty gdzie konkurencja dominuje totalnie — ${kontoName} NIE powinno tam inwestować Ads\n`;
+      ctx += `4. GENERUJ PLAN KAMPANII TYLKO DLA ${kontoName} — skoncentruj budżet na niszach, nie rywalizuj gdzie Luxsen/Materazzi dominują\n\n`;
+
+      ctx += `W sekcji "analiza" JSON (5 linii) MUSISZ zawrzeć:\n`;
+      ctx += `- Które rozmiary/produkty ${kontoName} wygrywa (nisza)\n`;
+      ctx += `- Które rozmiary/produkty konkurencja dominuje (unikaj)\n`;
+      ctx += `- Łączna sprzedaż ${kontoName} vs konkurencja (skala różnicy)\n\n`;
+
+      ctx += `W "uwagi" JSON MUSISZ zawrzeć:\n`;
+      ctx += `- Konkretne rozmiary/produkty do UNIKANIA (dominacja konkurencji)\n`;
+      ctx += `- Rekomendacja: jak ${kontoName} może się wyróżnić (cena? zdjęcia? tytuł? dostawa?)\n\n`;
+
+    } else {
+      // ═══ TRYB STANDARDOWY — jedno konto ═══
+      ctx += `\n=== TRYB TOTAL RESTART — ZWRÓĆ JSON ===\n`;
+      ctx += `User chce TOTAL RESTART kampanii Ads. Generujesz plan nowych kampanii od zera.\n`;
+    }
+
     ctx += `Konto: ${kontoName} (${ks}) | Rola: ${(meta.role || 'scale').toUpperCase()} | Ads target: ${adsTargetPct}%\n`;
     if (eomEst > 0) ctx += `Est. EOM: ${eomEst.toFixed(0)} zł | Max budżet Ads: ${maxAdsBudget} zł/mies (~${maxDailyBudget} zł/dzień)\n`;
 
@@ -15109,6 +15142,12 @@ async function scrSend() {
   // Detekcja TOTAL RESTART w tekście usera
   if (q && q.toUpperCase().includes('TOTAL RESTART')) {
     window._scrTotalRestartMode = true;
+    // Detekcja konta TARGET z tekstu usera (dla trybu konkurencyjnego)
+    const allKontaNames = (window._scrFiles || []).map(f => f.konto);
+    window._scrTotalRestartTarget = allKontaNames.find(k =>
+      q.toUpperCase().includes(k.toUpperCase()) ||
+      q.toUpperCase().includes((typeof AC_META !== 'undefined' && AC_META[k] ? AC_META[k].name : '').toUpperCase())
+    ) || allKontaNames[0] || '';
   }
   if (window._scrFiles && window._scrFiles.length && !window._scrFilesContextSent) {
     const filesCtx = scrBuildFilesContext();
