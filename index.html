@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.45</title>
+<title>MPlace Hub v6.46</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.45</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.46</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -13692,7 +13692,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.45</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.46</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -14589,30 +14589,61 @@ function scrBuildFilesContext() {
     ctx += `- Bestseller Automat: /NNN/ BESTSELLER_AUTOMAT, budżet 15 zł/dzień\n`;
     ctx += `- Wykluczenia BA = wszystkie IDs z kampanii CORE\n\n`;
 
-    ctx += `WZÓR RAPORTU (skopiuj format DOSŁOWNIE, zmień tylko dane):\n\n`;
-    ctx += `# TOTAL RESTART KAMPANII ADS — ${kontoName}\n`;
-    ctx += `## Plan FINALNY | Data startu: 12.04.2026 | N kampanii · N grup · N aukcji\n\n`;
-    ctx += `## WSTĘPNA ANALIZA DANYCH\n`;
-    ctx += `- Dane Ads (okres): koszt X zł | sprzedaż X zł | ROAS X.XX\n`;
-    ctx += `- Dane Sprzedaż: Est. EOM X zł | AOV X zł\n`;
-    ctx += `- Udział Ads w sprzedaży: X.X%\n`;
-    ctx += `- Obserwacja 1 (1 zdanie)\n`;
-    ctx += `- Obserwacja 2 (1 zdanie)\n\n`;
-    ctx += `## STRUKTURA KAMPANII — OVERVIEW\n`;
-    ctx += `| Nr | Kampania | Kategoria | Budżet/dzień |\n|---|---|---|---|\n`;
-    ctx += `| 001 | /001/D/ NAZWA | Kat | XX zł |\n\n`;
-    ctx += `## KAMPANIA 001\n### /001/D/ NAZWA\n\n`;
-    ctx += `#### Grupa 001-A\n[${ks}][001][WW][RW] LINIA_KOLOR\n\n`;
-    ctx += `| Pole | Wartość |\n|---|---|\n| IDs | 12345678901 |\n| Dynamic CPC start | 1.40 zł |\n| Budżet dzienny | 12 zł |\n\n`;
-    ctx += `## BESTSELLER AUTOMAT — WYKLUCZENIA\n12345678901 12345678902\n\n`;
-    ctx += `## WYRÓŻNIENIA — PLAN OD DNIA 1\n`;
-    ctx += `### FLAT 19.90/10d\n| ID | Produkt | Powód |\n|---|---|---|\n\n`;
-    ctx += `### ELASTIC BOOST Ndz/Pon/Wt\n| ID | Produkt | Powód |\n|---|---|---|\n\n`;
-    ctx += `### NIE PROMOWAĆ WYRÓŻNIENIEM\n| ID | Produkt | Powód |\n|---|---|---|\n\n`;
-    ctx += `## PODSUMOWANIE BUDŻETOWE\n(tabela kampania/budżet + wyróżnienia + łączny koszt mktg%)\n\n`;
-    ctx += `## HARMONOGRAM\n(tabela data/akcja — faza nauki 7d, checkpoint 14d/30d)\n\n`;
-    ctx += `## UWAGI KOŃCOWE\n(lista zamknij stare, wgraj wykluczenia, aktywuj wyróżnienia)\n\n`;
-    ctx += `=== KONIEC WZORU ===\n`;
+    ctx += `WZÓR RAPORTU — skopiuj format DOSŁOWNIE. Zmień TYLKO dane i IDs.\n`;
+    ctx += `ZERO opisów pod grupami. ZERO emoji. ZERO bold na nazwie grupy. ZERO italic.\n`;
+    ctx += `Tabela grupy = DOKŁADNIE 3 wiersze. Nic więcej.\n\n`;
+
+    ctx += `--- POCZĄTEK WZORU (MobelKap — REFERENCJA FORMATU) ---\n\n`;
+
+    ctx += `# TOTAL RESTART KAMPANII ADS — MobelKap\n`;
+    ctx += `## Plan FINALNY | Data startu: 12.04.2026 | 8 kampanii · 17 grup · 34 aukcji\n\n`;
+
+    ctx += `## KAMPANIA 001\n`;
+    ctx += `### /001/D/ SZAFKA PRALKOWA — PÓŁKA WYSUWANA\n\n`;
+    ctx += `#### Grupa 001-A\n`;
+    ctx += `[MK][001][WW][RW] POLKA-WYSUWANA_BIALA\n\n`;
+    ctx += `| Pole | Wartość |\n|---|---|\n`;
+    ctx += `| IDs | 18403395102 |\n`;
+    ctx += `| Dynamic CPC start | 1.40 zł |\n`;
+    ctx += `| Budżet dzienny | 12 zł |\n\n`;
+    ctx += `#### Grupa 001-B\n`;
+    ctx += `[MK][001][WW][RW] POLKA-WYSUWANA_DAB-WOTAN\n\n`;
+    ctx += `| Pole | Wartość |\n|---|---|\n`;
+    ctx += `| IDs | 18403386447 |\n`;
+    ctx += `| Dynamic CPC start | 1.40 zł |\n`;
+    ctx += `| Budżet dzienny | 8 zł |\n\n`;
+
+    ctx += `## KAMPANIA 002\n`;
+    ctx += `### /002/D/ SZAFKA PRALKOWA — CLASSIC\n\n`;
+    ctx += `#### Grupa 002-A\n`;
+    ctx += `[MK][002][WW][RW] SZAFKA-PRALKOWA_CLASSIC-MIX\n\n`;
+    ctx += `| Pole | Wartość |\n|---|---|\n`;
+    ctx += `| IDs | 17565030433 17564932513 17564915568 |\n`;
+    ctx += `| Dynamic CPC start | 1.20 zł |\n`;
+    ctx += `| Budżet dzienny | 10 zł |\n\n`;
+
+    ctx += `(kontynuuj tak dla każdej kampanii i grupy)\n\n`;
+
+    ctx += `## BESTSELLER AUTOMAT — WYKLUCZENIA\n\n`;
+    ctx += `18403395102 18403386447 18403374586 17565030433 17564932513 (wszystkie IDs z kampanii, jedna linia, spacje)\n\n`;
+
+    ctx += `## WYRÓŻNIENIA\n\n`;
+    ctx += `FLAT 19.90/10d od startu:\n`;
+    ctx += `18403395102 18403386447 18403374586 18403336268\n\n`;
+    ctx += `ELASTIC 2.90/d niedziela+poniedziałek+wtorek:\n`;
+    ctx += `17892806059 17620212843 17617165511 17953861449 17953861375 17766097005\n\n`;
+
+    ctx += `--- KONIEC WZORU ---\n\n`;
+
+    ctx += `ZASADY FORMATU (BEZWZGLĘDNE):\n`;
+    ctx += `1. Nazwa grupy = plain text, NIE bold. Przykład: [${ks}][001][WW][RW] NAZWA (nie **[${ks}]...**)\n`;
+    ctx += `2. Tabela grupy = TYLKO 3 wiersze: IDs | Dynamic CPC start | Budżet dzienny. ZERO dodatkowych wierszy.\n`;
+    ctx += `3. Wiersz IDs = TYLKO 11-cyfrowe liczby oddzielone spacjami. BEZ nazw, opisów, nawiasów, komentarzy.\n`;
+    ctx += `4. BEZ opisów/notek pod tabelą grupy. BEZ "> ..." bloków. BEZ "Nota:", "Uwaga:", emoji.\n`;
+    ctx += `5. BEZ italic opisów pod nagłówkiem kampanii.\n`;
+    ctx += `6. WYKLUCZENIA = jedna linia, IDs oddzielone spacjami.\n`;
+    ctx += `7. WYRÓŻNIENIA = prosty format: "FLAT 19.90/10d od startu:" + linia z IDs. "ELASTIC 2.90/d niedziela+poniedziałek+wtorek:" + linia z IDs.\n`;
+    ctx += `8. Dodaj sekcje: WSTĘPNA ANALIZA (5 linii), OVERVIEW tabela, PODSUMOWANIE BUDŻETOWE, HARMONOGRAM, UWAGI KOŃCOWE.\n`;
   }
 
   return ctx;
