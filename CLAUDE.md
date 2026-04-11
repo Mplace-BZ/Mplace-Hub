@@ -56,6 +56,16 @@
 - Nigdy nie łataj jednego miejsca bez 
   sprawdzenia czy problem nie istnieje gdzie indziej
 
+## KRYTYCZNE — Anti-halucynacja Agenta i parserów
+- Parser MUSI czytać WSZYSTKIE pozycje z pliku XLSX (nie top 10)
+- Parser MUSI wyciągać ID oferty z KAŻDEGO typu pliku (Ads, Odwiedziny, Sprzedaż)
+- Jeśli parser nie znajduje kolumny → loguj WARNING, przekaż "[ID:brak]" do Agenta
+- Agent NIGDY nie wymyśla IDs, nazw, ani danych liczbowych
+- Jeśli Agent nie ma danych → pisze "BRAK — wymaga sprawdzenia kodu/danych"
+- Agent NIE generuje raportu z wymyślonymi danymi — lepiej odmówić niż skłamać
+- Po każdej zmianie parsera → TESTUJ czy dane docierają do kontekstu Agenta
+- Ten problem już występował wielokrotnie — ZAWSZE sprawdzaj czy ID trafia do kontekstu
+
 ## Konta
 - MEBLE (65%): MobelKap, PerfektCięcie, MeblenaCzasie
 - LUXSEN (60%): Luxsen, Semmi, BOTAVIT
