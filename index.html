@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.61</title>
+<title>MPlace Hub v6.62</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.61</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.62</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2297,6 +2297,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
             <option value="sprzedaz">Odwiedziny wg ofert</option>
             <option value="konwersja">Sprzedaż wg ofert</option>
             <option value="ads30d">Ads 30 dni (kontekst)</option>
+            <option value="oferta">Aktywne oferty (lista)</option>
           </select>
         </div>
         <div>
@@ -9772,6 +9773,24 @@ async function aaParseFile(file, type) {
             podkategoria: String(fk(row, 'Podkategoria 1', 'Podkategor') || '')
           })).filter(o => o.transakcje > 0 || o.wartosc > 0).sort((a, b) => b.wartosc - a.wartosc);
           resolve({ type:'konwersja', oferty: oferty.slice(0,100), totWartosc: oferty.reduce((s,o)=>s+o.wartosc,0), totalCount: oferty.length, totTransakcje: oferty.reduce((s,o)=>s+(o.transakcje||0),0) });
+        } else if (type === 'oferta') {
+          // Oferta — lista aktywnych ofert (export z Allegro)
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          let rows = [];
+          for (const rangeOpt of [{ defval: '' }, { defval: '', range: 1 }, { defval: '', range: 2 }]) {
+            const r = XLSX.utils.sheet_to_json(ws, rangeOpt);
+            if (r.length && r[0] && Object.keys(r[0]).some(k => /id|ofert|tytu|nazwa/i.test(k))) { rows = r; break; }
+          }
+          if (!rows.length) rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+          const fk = (row, ...names) => { for (const n of names) { for (const k of Object.keys(row)) { if (k.toLowerCase().includes(n.toLowerCase())) return row[k]; } } return ''; };
+          const oferty = rows.map(row => ({
+            id: String(fk(row, 'ID oferty', 'id ofert', 'Nr oferty', 'Numer oferty', 'ID aukcji', 'offer id') || '').replace(/[^\d]/g,'') || '',
+            oferta: String(fk(row, 'Nazwa ofert', 'Tytuł', 'Nazwa ofer', 'nazwa', 'title') || '').substring(0, 80),
+            cena: parseFloat(String(fk(row, 'cena', 'price', 'Cena oferty')).replace(/[^\d.,]/g,'').replace(',','.')) || 0,
+            stan: String(fk(row, 'Stan', 'Status', 'Aktywn', 'stan mag', 'stock') || 'aktywna'),
+          })).filter(o => o.id && o.id.length >= 8);
+          console.log('[Oferta Parser] Rows:', rows.length, '| Parsed:', oferty.length, '| Headers:', rows[0] ? Object.keys(rows[0]).join(' | ') : 'none');
+          resolve({ type:'oferta', oferty, totalCount: oferty.length });
         }
       } catch (err) { reject(err); }
     };
@@ -14061,7 +14080,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.61</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.62</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -14608,7 +14627,7 @@ function scrDetectKontoFromName(fileName) {
   if (/semmi|\bsem[\b_-]/.test(lower)) return 'Semmi';
   if (/botavit|\bbov[\b_-]/.test(lower)) return 'BOTAVIT';
   // ONE
-  if (/materazzi|\bmtz[\b_-]/.test(lower)) return 'Materazzi';
+  if (/materazzi|\bmtz[\b_-]|\bmaz[\b_-]/.test(lower)) return 'Materazzi';
   if (/mtzzeu|\bmeu[\b_-]/.test(lower)) return 'MtzzEU';
   if (/ankado24|\ba24[\b_-]/.test(lower)) return 'Ankado24';
   return null;
@@ -14666,6 +14685,17 @@ function scrDetectFileType(wb) {
   if (sheets.some(s => s.includes('statystyki'))) {
     return 'ads';
   }
+  // Oferta (lista aktywnych ofert) — fallback: jeśli zawiera kolumny ID/nazwa oferty
+  const ws0 = wb.Sheets[wb.SheetNames[0]];
+  if (ws0) {
+    const rows = XLSX.utils.sheet_to_json(ws0, { header: 1, range: 0, defval: '' });
+    if (rows.length > 0) {
+      const hdr = rows[0].map(c => String(c).toLowerCase());
+      if (hdr.some(h => /id\s*(oferty|aukcji)|numer\s*oferty|offer.?id/i.test(h)) || hdr.some(h => /nazwa\s*oferty|tytu/i.test(h))) {
+        return 'oferta';
+      }
+    }
+  }
   return null;
 }
 
@@ -14715,12 +14745,14 @@ async function scrAddFile(input) {
         continue;
       }
 
-      // 2. Detekcja TYPU: dropdown manual > zawartość workbook
+      // 2. Detekcja TYPU: dropdown manual > zawartość workbook > nazwa pliku
       let type;
       if (!useAutoType) {
         type = dropdownType;
       } else {
         type = scrDetectFileType(wb);
+        // Fallback: nazwa pliku zawiera "offers" / "oferty" → typ oferta
+        if (!type && /offer|ofert/i.test(file.name)) type = 'oferta';
       }
 
       if (!type) {
@@ -14907,6 +14939,15 @@ function scrBuildFilesContext() {
           ctx += `WAŻNE: Numery w [nawiasach] to prawdziwe ID ofert z Allegro. UŻYWAJ TYLKO tych numerów.\n`;
           p.oferty.slice(0,50).forEach(o => {
             ctx += `  ${o.id?'['+o.id+'] ':'[ID:brak] '}${(o.oferta||'').substring(0,50)} | Trans:${o.transakcje||0} Szt:${o.sztuki||0} Wartość:${(o.wartosc||0).toFixed(0)}zł Cena:${(o.cena||0).toFixed(0)}zł ${o.kategoria?'Kat:'+o.kategoria:''}\n`;
+          });
+        }
+      } else if (f.type === 'oferta') {
+        ctx += `\n[AKTYWNE OFERTY] ${f.fileName}\n`;
+        ctx += `Liczba aktywnych ofert: ${p.totalCount || p.oferty?.length || 0}\n`;
+        ctx += `KRYTYCZNE: Tylko oferty z tej listy ISTNIEJĄ. Jeśli ID z raportu Ads/Sprzedaż NIE ma na tej liście — oferta została usunięta, POMIŃ JĄ w planie kampanii.\n`;
+        if (p.oferty?.length) {
+          p.oferty.forEach(o => {
+            ctx += `  [${o.id}] ${o.oferta}${o.cena ? ' | Cena:'+o.cena.toFixed(0)+'zł' : ''}${o.stan && o.stan !== 'aktywna' ? ' | Stan:'+o.stan : ''}\n`;
           });
         }
       }
