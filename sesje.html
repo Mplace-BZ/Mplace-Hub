@@ -83,6 +83,80 @@ tr:nth-child(even) td{background:#fafafa}
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SESJA 3: 12.04.2026 — Semmi Total Restart Konkurencyjny -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sesja" style="border-color:#34d399">
+  <div class="sesja-header" style="background:#f0fdf4">
+    <div>
+      <span class="sesja-date">12.04.2026</span>
+      <span class="sesja-badge badge-dev">DEV</span>
+      <span class="sesja-badge badge-strategy">STRATEGY</span>
+    </div>
+    <div class="sesja-meta">v6.58 → v6.65 | 8 commitów | ~3h</div>
+  </div>
+  <div class="sesja-body">
+
+    <div class="sesja-section">
+      <div class="sesja-section-title green">TEMAT GLOWNY</div>
+      <p>Total Restart Konkurencyjny Semmi — tryb multi-konto w Screenerze, parser ofertowy, plan kampanii z analizą 4 kont materacowych</p>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title">CO ZROBIONE</div>
+      <ul>
+        <li><strong>Tryb KONKURENCYJNY</strong> (v6.58) — Screener wykrywa > 1 konto w plikach, prompt każe Agentowi porównać konta i szukać nisz dla TARGET</li>
+        <li><strong>Mapa skrótów 9 kont</strong> (v6.61) — SM/LX/BV/MZ/ME/AK zamiast fallback [MK]</li>
+        <li><strong>Parser ofertowy</strong> (v6.62, v6.65) — nowy typ pliku "Aktywne oferty", czyta arkusz "Szablon" z pliku Allegro, filtruje "Aktywna"/"Zakończona", walidator usuwa martwe oferty z planu</li>
+        <li><strong>Fix TARGET detekcja</strong> (v6.64) — regex po "TOTAL RESTART — X" zamiast pierwszego pliku</li>
+        <li><strong>Fix walidator</strong> (v6.63) — harmonogram oznacza usunięte IDs, nazwa pliku HTML = TARGET konto, MAZ → Materazzi</li>
+        <li><strong>Semmi plan finalny</strong> — 6 kampanii · 13 grup · 31 aukcji, budżet 83 zł/dzień (realny 42 zł)</li>
+        <li><strong>3 iteracje raportu Agenta</strong> — każda poprawiona ręcznie (usunięto VISCO, martwe IDs, przekroczony budżet)</li>
+      </ul>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title orange">DECYZJE</div>
+      <ul>
+        <li>VISCO usunięte z planu Semmi — Luxsen dominuje (48 trans, 3798 zł), kanibalizacja CPC wewnątrz grupy</li>
+        <li>POPPY 75x180 [17435856867] = hero konta, ROAS 31.84, CR 27.3% — skaluj agresywnie</li>
+        <li>3 filary Semmi: (1) POPPY dziecięce, (2) toppery piankowe tanie, (3) piankowy ortopedyczny</li>
+        <li>Semmi = producent → przewaga cenowa (130-190 zł vs Luxsen 249 zł)</li>
+        <li>42 oferty na liście NIE PROMOWAĆ (materace kieszeniowe, Visco, Prestige/Comfort/Maja)</li>
+        <li>Dzień Matki 26.05 = skaluj POPPY od 26.04</li>
+      </ul>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title blue">NASTEPNE KROKI</div>
+      <div class="tag-list">
+        <span class="tag tag-done">MK plan gotowy</span>
+        <span class="tag tag-done">PC plan gotowy</span>
+        <span class="tag tag-done">MnC plan gotowy</span>
+        <span class="tag tag-done">Semmi plan gotowy</span>
+        <span class="tag tag-open">Uzupełnij ID: POPPY 90x200</span>
+        <span class="tag tag-open">Uzupełnij ID: Topper H4 140x200</span>
+        <span class="tag tag-open">Uzupełnij ID: Nakładka H2 140x200</span>
+        <span class="tag tag-open">Wdrożenie 4 planów MEBLE+Semmi</span>
+        <span class="tag tag-open">Luxsen Total Restart</span>
+        <span class="tag tag-open">Checkpoint 19.04 (niedziela)</span>
+      </div>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title">PLIKI ZMIENIONE</div>
+      <table>
+        <tr><th>Plik</th><th>Zmiana</th></tr>
+        <tr><td>index.html</td><td>v6.58→v6.65: tryb konkurencyjny, parser ofertowy, fix TARGET, mapa skrótów, walidator martwe oferty</td></tr>
+        <tr><td>semmi_restart_plan_final.md</td><td>NOWY — plan kampanii Semmi, 6 kampanii · 13 grup · 31 aukcji</td></tr>
+        <tr><td>project_semmi_competitive.md</td><td>NOWY — memory: kontekst projektu Semmi konkurencyjny</td></tr>
+        <tr><td>session_handoff_12apr.md</td><td>NOWY — handoff sesji z pełnym stanem</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
 <!-- SESJA 2: 11.04.2026 (wieczór) -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div class="sesja" style="border-color:#b47fff">
