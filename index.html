@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.59</title>
+<title>MPlace Hub v6.60</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.59</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.60</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -11193,8 +11193,15 @@ function mhDownloadHtml(source) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  const slug = ((m.title || m.konto || 'raport') + '_' + (m.okres || '')).replace(/[^a-zA-Z0-9_-]/g, '_');
-  a.download = `${slug}_${new Date().toISOString().slice(0,10)}.html`;
+  // Nazwa pliku: Konto_TotalRestart_2026-04-12_14-30.html
+  const kontoName = (m.konto && m.konto !== 'Screener') ? m.konto : (window._scrFiles && window._scrFiles[0] ? (typeof AC_META !== 'undefined' && AC_META[window._scrFiles[0].konto] ? AC_META[window._scrFiles[0].konto].name : window._scrFiles[0].konto) : 'Raport');
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0,10);
+  const timeStr = now.toTimeString().slice(0,5).replace(':','-');
+  const isTR = (r.text || '').includes('TOTAL RESTART');
+  const typeLabel = isTR ? 'TotalRestart' : 'Raport';
+  const slug = `${kontoName}_${typeLabel}_${dateStr}_${timeStr}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+  a.download = `${slug}.html`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
@@ -14054,7 +14061,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.59</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.60</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
