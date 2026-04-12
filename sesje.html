@@ -65,7 +65,7 @@ tr:nth-child(even) td{background:#fafafa}
 
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:2rem">
   <div style="background:#f3f4f6;border-radius:8px;padding:12px 16px;text-align:center;border-left:4px solid #ef4444">
-    <div style="font-family:'DM Mono',monospace;font-size:24px;font-weight:700;color:#111">399</div>
+    <div style="font-family:'DM Mono',monospace;font-size:24px;font-weight:700;color:#111">404</div>
     <div style="font-family:'DM Mono',monospace;font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em">commitów</div>
   </div>
   <div style="background:#f3f4f6;border-radius:8px;padding:12px 16px;text-align:center;border-left:4px solid #b47fff">
@@ -79,6 +79,140 @@ tr:nth-child(even) td{background:#fafafa}
   <div style="background:#f3f4f6;border-radius:8px;padding:12px 16px;text-align:center;border-left:4px solid #34d399">
     <div style="font-family:'DM Mono',monospace;font-size:24px;font-weight:700;color:#111">22 dni</div>
     <div style="font-family:'DM Mono',monospace;font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em">22.03 → 12.04</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SESJA 5: 12.04.2026 (dzień) — MEBLE RESTART WDROŻENIE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sesja" style="border-color:#ff6b35">
+  <div class="sesja-header" style="background:#fff7ed">
+    <div>
+      <span class="sesja-date">12.04.2026 (dzień)</span>
+      <span class="sesja-badge badge-ops">OPS</span>
+    </div>
+    <div class="sesja-meta">
+      v6.59 → v6.60<br>
+      5 commitów | ~4h (13:00–17:00)
+    </div>
+  </div>
+  <div class="sesja-body">
+
+    <div class="sesja-section">
+      <div class="sesja-section-title red">TEMAT GŁÓWNY</div>
+      <p><strong>Wdrożenie Total Restart 3 kont MEBLE</strong> — zamknięcie starych kampanii, wystawienie nowych wg planów MK/PC/MnC, konfiguracja Ads Tracker.</p>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title green">CO ZROBIONE</div>
+      <ul>
+        <li><strong>v6.59 Fix wyróżnienie ≠ Ads</strong> — oferta z >8 trans organicznych nie trafia do NIE PROMOWAĆ mimo słabego ROAS Ads</li>
+        <li><strong>v6.60 Nazwa pliku HTML</strong> — pobierany plik: Konto_TotalRestart_2026-04-12_14-30.html zamiast długiego Screener_...</li>
+        <li><strong>Ściąga wyróżnień</strong> — wyroznienia_sciaga.html: FLAT/ELASTIC/NIE PROMOWAĆ per konto + IDs do kopiowania + oszczędności</li>
+        <li><strong>Nowy raport MnC</strong> — wygenerowany z JSON renderera, 10 kampanii, IDs prawdziwe</li>
+        <li><strong>Ads Tracker</strong> — wgrany plan + benchmark dzień 0 dla MK, PC, MnC</li>
+        <li><strong>ELASTIC cykl</strong> — 4 dni (ndz wieczór → śr wieczór wyłącz), koszt 50.23 zł/mies per aukcja</li>
+        <li><strong>Wdrożenie w panelu Allegro</strong> — zamknięte stare kampanie, wystawione nowe, wykluczenia BA, wyróżnienia</li>
+      </ul>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title orange">DECYZJE</div>
+      <ul>
+        <li><strong>ELASTIC 4 dni nie 3</strong> — środa też działa, wyłączamy wieczorem (żeby czwartek się nie załapał)</li>
+        <li><strong>Oszczędność wyróżnień ~8 477 zł/mies (-87%)</strong> — z ~9 787 zł do ~1 310 zł łącznie na 3 kontach</li>
+        <li><strong>Stary plan AI Architect</strong> — nieaktualny po restarcie, zastąpiony planami Total Restart</li>
+      </ul>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title blue">OTWARTE / NASTĘPNE KROKI</div>
+      <div class="tag-list">
+        <span class="tag tag-open">Checkpoint 7D — 19.04 (niedziela)</span>
+        <span class="tag tag-open">ELASTIC włącz niedziela 16:00, wyłącz środa 20:00</span>
+        <span class="tag tag-open">Semmi analiza konkurencyjna (nowy wątek)</span>
+        <span class="tag tag-open">BOTAVIT wdrożenie (nowy wątek)</span>
+      </div>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title red" style="font-size:12px;padding:8px 12px">💡 LEKCJA SESJI</div>
+      <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:12px 16px;margin-top:4px;font-size:11px;line-height:1.8">
+        <p style="font-weight:700;color:#991b1b;margin-bottom:6px">Wyróżnienie ≠ Ads — dwa osobne kanały</p>
+        <p>Agent kazał wyłączyć wyróżnienie na doniczce z 12 trans organicznych (ROAS Ads 3.33) a włączyć na doniczce z 3 trans (ROAS Ads 16.21). Patrzył na ROAS Ads zamiast na sprzedaż organiczną. Wyróżnienie napędza pozycję w listingu (organika), Ads napędza płatny ruch. Nie wyłączaj wyróżnienia bo ROAS Ads niski — jeśli oferta sprzedaje organicznie, wyróżnienie działa.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SESJA 4: 12.04.2026 (wieczor) — BOTAVIT Total Restart -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sesja" style="border-color:#2dd4a0">
+  <div class="sesja-header" style="background:#f0fdf4">
+    <div>
+      <span class="sesja-date">12.04.2026 (wieczor)</span>
+      <span class="sesja-badge badge-dev">DEV</span>
+      <span class="sesja-badge badge-strategy">STRATEGY</span>
+    </div>
+    <div class="sesja-meta">v6.65 (bez bump) | 0 commitow kodu<br>Watek: <strong>BOTAVIT Total Restart Ads</strong></div>
+  </div>
+  <div class="sesja-body">
+
+    <div class="sesja-section">
+      <div class="sesja-section-title green">TEMAT GLOWNY</div>
+      <p>Total Restart Ads dla konta BOTAVIT (suplementy diety, grupa LUXSEN) — kontekst kategorii w promptcie + plan finalny kampanii</p>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title">CO ZROBIONE</div>
+      <ul>
+        <li><strong>Kontekst kategorii suplementow</strong> — blok if(BOTAVIT) w Screener TR prompt: repurchase 30-60d, sezonowosc wiosna/jesien, brak kanibalizacji</li>
+        <li><strong>Dynamiczny cross-account</strong> — zamiast hardcoded "MEBLE", prompt teraz rozpoznaje grupe konta (MEBLE/LUXSEN/ONE)</li>
+        <li><strong>Przyklady nazw kampanii</strong> — BOTAVIT dostaje "WITAMINY — D3+K2" zamiast "SZAFKA PRALKOWA — POLKA WYSUWANA"</li>
+        <li><strong>BOTAVIT plan finalny</strong> — 6 kampanii · 13 grup · 15 aukcji, budzet 78 zl/dzien (=target 6.5%)</li>
+        <li><strong>Korekta budzetu</strong> — Agent wygenerował 87 zl/dzien (+12%), sciete do 78 zl przez redukcje OBSERWUJ/UTRZYMAJ</li>
+        <li><strong>9 ofert NIE PROMOWAC</strong> — martwe punkty + niski konwersja, CRO przed Ads</li>
+      </ul>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title orange">DECYZJE</div>
+      <ul>
+        <li>Nanoparasit [17434558555] = HERO konta (40% sprzedazy, 105 trans, konw. 8.6%) — osobna kampania, CPC 1.50</li>
+        <li>Kolagen rybi [17622583397] = CORE (166 trans, konw. 6.5%) — druga kampania, flat od startu</li>
+        <li>Andrographis lipo [18060364116] konw. 20.8% = najwyzsza na koncie — obserwuj czy 8 zl/dzien wystarczy</li>
+        <li>MENOPAUZA+ 60kaps [17619712194]: 400 wizyt, konw. 1.0% — CRO priorytet, NIE Ads</li>
+        <li>Bestseller Automat WYLACZ bezwarunkowo — maly budzet BOTAVIT nie toleruje +20-40% CPC</li>
+        <li>Dzien Matki 26.05: od 5.05 boost Kolagen (+50%) i Ashwagandha (+30%)</li>
+      </ul>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title blue">NASTEPNE KROKI</div>
+      <div class="tag-list">
+        <span class="tag tag-done">MK plan gotowy</span>
+        <span class="tag tag-done">PC plan gotowy</span>
+        <span class="tag tag-done">MnC plan gotowy</span>
+        <span class="tag tag-done">Semmi plan gotowy</span>
+        <span class="tag tag-done">BOTAVIT plan gotowy</span>
+        <span class="tag tag-open">Luxsen Total Restart</span>
+        <span class="tag tag-open">Wdrozenie 13.04: MEBLE + Semmi + BOTAVIT</span>
+        <span class="tag tag-open">Checkpoint 19.04 (niedziela)</span>
+        <span class="tag tag-open">Plan maja: Dzien Matki boost od 5.05</span>
+      </div>
+    </div>
+
+    <div class="sesja-section">
+      <div class="sesja-section-title">PLIKI ZMIENIONE</div>
+      <table>
+        <tr><th>Plik</th><th>Zmiana</th></tr>
+        <tr><td>index.html</td><td>Prompt TR: kontekst suplementow, dynamiczny cross-account, przyklady nazw kampanii BOTAVIT</td></tr>
+        <tr><td>botavit_restart_plan_final.md</td><td>NOWY — plan kampanii BOTAVIT, 6 kampanii · 13 grup · 15 aukcji</td></tr>
+      </table>
+    </div>
+
   </div>
 </div>
 
@@ -457,7 +591,7 @@ tr:nth-child(even) td{background:#fafafa}
 </div>
 
 <div class="footer">
-  MPlace Hub — Dziennik sesji · Ostatnia aktualizacja: 11.04.2026 · mplace-bz.github.io/Mplace-Hub
+  MPlace Hub — Dziennik sesji · Ostatnia aktualizacja: 12.04.2026 · mplace-bz.github.io/Mplace-Hub
 </div>
 
 </body>
