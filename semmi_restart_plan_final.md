@@ -1,5 +1,5 @@
 # TOTAL RESTART KAMPANII ADS — Semmi
-## Plan FINALNY | Data startu: 13.04.2026 | 5 kampanii · 9 grup · 29 aukcji
+## Plan FINALNY | Data startu: 13.04.2026 | 5 kampanii · 8 grup · 29 aukcji
 
 ## WSTĘPNA ANALIZA
 
