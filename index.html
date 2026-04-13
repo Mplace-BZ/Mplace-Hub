@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.65</title>
+<title>MPlace Hub v6.66</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.65</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.66</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -11312,12 +11312,27 @@ function mhSave(source, btn) {
     meta: m
   });
   if (sessions.length > 30) sessions.pop();
+  // Pozwól userowi nadać tytuł
+  const defaultTitle = m.title || m.konto || 'Raport';
+  const userTitle = prompt('Nazwa raportu:', defaultTitle);
+  if (userTitle === null) return; // anulowano
+  sessions[0].title = userTitle || defaultTitle;
+
   try {
     localStorage.setItem('mhSavedReports', JSON.stringify(sessions));
-    const orig = btn.textContent; btn.textContent = '✓ Zapisano';
-    setTimeout(() => { btn.textContent = orig; }, 2000);
+    const orig = btn.textContent; btn.textContent = '✓ Zapisano: ' + (userTitle || defaultTitle).substring(0, 30);
+    setTimeout(() => { btn.textContent = orig; }, 3000);
   } catch(e) {
-    alert('Nie udało się zapisać (localStorage pełny): ' + e.message);
+    // Jeśli za duży — skróć tekst i spróbuj ponownie
+    sessions[0].text = (sessions[0].text || '').substring(0, 5000) + '\n\n[...skrócono z powodu limitu localStorage]';
+    sessions[0].html = '';
+    try {
+      localStorage.setItem('mhSavedReports', JSON.stringify(sessions));
+      const orig = btn.textContent; btn.textContent = '✓ Zapisano (skrócono)';
+      setTimeout(() => { btn.textContent = orig; }, 3000);
+    } catch(e2) {
+      alert('Nie udało się zapisać (localStorage pełny): ' + e2.message);
+    }
   }
 }
 
@@ -14125,7 +14140,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.65</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.66</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -15059,6 +15074,14 @@ function scrBuildFilesContext() {
       // ═══ TRYB STANDARDOWY — jedno konto ═══
       ctx += `\n=== TRYB TOTAL RESTART — ZWRÓĆ JSON ===\n`;
       ctx += `User chce TOTAL RESTART kampanii Ads. Generujesz plan nowych kampanii od zera.\n`;
+      // Kontekst kategorii dla BOTAVIT (suplementy)
+      if (kontoKey === 'BOTAVIT') {
+        ctx += `\nKONTEKST KATEGORII: Suplementy diety.\n`;
+        ctx += `- Repurchase: klienci wracają co 30-60 dni (cykl zużycia opakowania)\n`;
+        ctx += `- Sezonowość: wiosna (odchudzanie, detox, witaminy), jesień (odporność)\n`;
+        ctx += `- Kluczowe metryki: AOV, powtarzalność zakupów, konwersja organiczna vs Ads\n`;
+        ctx += `- Brak kanibalizacji cross-account — jedyne konto z suplementami w portfelu\n`;
+      }
     }
 
     ctx += `Konto: ${kontoName} (${ks}) | Rola: ${(meta.role || 'scale').toUpperCase()} | Ads target: ${adsTargetPct}%\n`;
@@ -15077,14 +15100,19 @@ function scrBuildFilesContext() {
     ctx += `- Oferta z >8 trans ORGANICZNYCH → NIGDY do niePromowac wyróżnieniem, nawet jeśli ROAS Ads < BE. Sprzedaje się organicznie = wyróżnienie działa.\n`;
     ctx += `- niePromowac WYRÓŻNIENIEM = TYLKO: oferty z 0 trans (martwe), oferty z <3 trans łącznie, specjalizacje innego konta.\n`;
     ctx += `- Kampanie istniejące z ROAS >10 → zachowaj (np. Formularz, Nowości).\n`;
-    ctx += `- Cross-account: flaguj nakładanie z innymi kontami MEBLE.\n`;
+    ctx += `- Cross-account: ${meta.group === 'MEBLE' ? 'flaguj nakładanie z innymi kontami MEBLE' : kontoKey === 'BOTAVIT' ? 'brak kanibalizacji — jedyne konto suplementowe w portfelu' : 'flaguj nakładanie z innymi kontami ' + (meta.group || 'grupy')}.\n`;
     ctx += `- IDs z [ADS] i [ODWIEDZINY] SĄ PRAWDZIWE 11-cyfrowe. Używaj ich.\n`;
     ctx += `- IDs z [SPRZEDAŻ] mogą mieć inny format → matchuj po nazwie z [ODWIEDZINY].\n`;
     ctx += `- Brak 11-cyfrowego ID → nie wpisuj żadnego ID dla tej oferty (pomiń lub wstaw pustą tablicę).\n\n`;
 
     ctx += `NAZWY KAMPANII I GRUP (WAŻNE — system renderuje je automatycznie z pola "nazwa" i "nazwaGrupy"):\n`;
-    ctx += `- nazwa kampanii: użyj formatu KATEGORIA — LINIA np. "SZAFKA PRALKOWA — PÓŁKA WYSUWANA", "STOLIK KAWOWY — KARO 92 HERO", "DONICA CRAFT ZŁOTY — SEZON"\n`;
-    ctx += `- nazwaGrupy: użyj formatu LINIA_KOLOR np. "POLKA-WYSUWANA_BIALA", "KARO92_LANCELOT", "TOP92_SONOMA-WOTAN"\n`;
+    if (kontoKey === 'BOTAVIT') {
+      ctx += `- nazwa kampanii: użyj formatu KATEGORIA — LINIA np. "WITAMINY — WITAMINA D3+K2", "ODCHUDZANIE — FAT BURNER HERO", "ODPORNOŚĆ — CYNK+SELEN"\n`;
+      ctx += `- nazwaGrupy: użyj formatu PRODUKT_WARIANT np. "VIT-D3K2_60KAPS", "FAT-BURNER_90TAB", "CYNK-SELEN_120TAB"\n`;
+    } else {
+      ctx += `- nazwa kampanii: użyj formatu KATEGORIA — LINIA np. "SZAFKA PRALKOWA — PÓŁKA WYSUWANA", "STOLIK KAWOWY — KARO 92 HERO", "DONICA CRAFT ZŁOTY — SEZON"\n`;
+      ctx += `- nazwaGrupy: użyj formatu LINIA_KOLOR np. "POLKA-WYSUWANA_BIALA", "KARO92_LANCELOT", "TOP92_SONOMA-WOTAN"\n`;
+    }
     ctx += `- System automatycznie doda prefiksy /NNN/D/ i [${ks}][NNN][WW][RW] — Ty podajesz TYLKO nazwę.\n\n`;
 
     ctx += `ODPOWIEDŹ: Zwróć WYŁĄCZNIE blok \\\`\\\`\\\`json ... \\\`\\\`\\\` z poniższym schematem. Żadnego markdowna przed ani po.\n\n`;
