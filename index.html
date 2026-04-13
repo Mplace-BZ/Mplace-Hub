@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.71</title>
+<title>MPlace Hub v6.72</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.71</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.72</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2243,10 +2243,11 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <textarea id="cbUwagi" placeholder="Np. MK SK ma 12.4% zwrotow — sprawdzic co sie zwraca. PC lider CZ, skalowac Ads?" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:60px;box-sizing:border-box;line-height:1.5"></textarea>
   </div>
 
-  <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.5rem">
+  <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap">
     <button id="cbRunBtn" onclick="cbRunAnalysis()" style="font-family:var(--mono);font-size:12px;padding:10px 24px;border-radius:8px;border:1px solid rgba(59,130,246,.4);background:rgba(59,130,246,.12);color:#3b82f6;cursor:pointer;font-weight:500;letter-spacing:.04em">▸ Analizuj CZ/SK</button>
     <button onclick="cbReset()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">&#8634; Resetuj</button>
-    <button onclick="cbSaveData()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.06);color:#34d399;cursor:pointer">&#128190; Zapisz dane</button>
+    <button onclick="cbSaveSnapshot()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.06);color:#34d399;cursor:pointer">&#128190; Zapisz snapshot</button>
+    <span id="cbLastSave" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></span>
   </div>
 
   <div id="cbThinking" style="display:none;align-items:center;gap:.75rem;padding:1rem;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:8px;margin-bottom:1.5rem">
@@ -2255,6 +2256,11 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   </div>
 
   <div id="cbResult"></div>
+
+  <div id="cbHistoryWrap" style="margin-top:1.5rem;display:none">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.75rem;font-family:var(--mono)">Historia zapisow</div>
+    <div id="cbHistory"></div>
+  </div>
 </div>
 </div>
 
@@ -3205,6 +3211,7 @@ function showView(v){
     document.getElementById('viewCrossBorder').classList.add('active');
     document.getElementById('navCrossBorder').style.boxShadow='0 0 12px rgba(59,130,246,.6)';
     cbLoadData();
+    cbRenderHistory();
   } else if(v==='kanibalizator'){
     document.getElementById('viewKanibalizator').classList.add('active');
     document.getElementById('navKanibalizator').classList.add('active');
@@ -12658,8 +12665,122 @@ function cbReset() {
   document.getElementById('cbOkresLabel').textContent = '';
   document.getElementById('cbKursCZK').value = '0.17';
   document.getElementById('cbKursEUR').value = '4.28';
+  document.getElementById('cbKosztProd').value = '65';
   document.getElementById('cbResult').innerHTML = '';
   cbUpdateTable();
+}
+
+function cbSaveSnapshot() {
+  const okres = cbGetOkresText();
+  const now = new Date();
+  const snapshot = {
+    id: Date.now(),
+    date: now.toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+    okres: okres,
+    kosztProd: cbGetInputVal('cbKosztProd'),
+    kursCZK: cbGetInputVal('cbKursCZK'),
+    kursEUR: cbGetInputVal('cbKursEUR'),
+    rows: {}
+  };
+  CB_ROWS.forEach(r => {
+    const c = cbCalcRow(r);
+    if (c.sprzedaz <= 0) return;
+    snapshot.rows[r.id] = {
+      sprzedaz: c.sprzedaz, prowPct: c.prowPct, adsPct: c.adsPct,
+      zwrPct: c.zwrPct, rabPct: c.rabPct, pln: c.pln,
+      nettoPct: c.nettoPct, marzaPct: c.marzaPct,
+      zyskPln: c.pln * c.marzaPct / 100
+    };
+  });
+  // Sumy
+  let totPln = 0, totZysk = 0;
+  CB_ROWS.forEach(r => {
+    if (snapshot.rows[r.id]) {
+      totPln += snapshot.rows[r.id].pln;
+      totZysk += snapshot.rows[r.id].zyskPln;
+    }
+  });
+  snapshot.totPln = totPln;
+  snapshot.totZysk = totZysk;
+  snapshot.totMarzaPct = totPln > 0 ? (totZysk / totPln * 100) : 0;
+
+  let history = JSON.parse(localStorage.getItem('cbHistory') || '[]');
+  history.push(snapshot);
+  if (history.length > 20) history = history.slice(-20);
+  localStorage.setItem('cbHistory', JSON.stringify(history));
+  cbRenderHistory();
+
+  const el = document.getElementById('cbLastSave');
+  if (el) el.textContent = 'Zapisano ' + snapshot.date;
+}
+
+function cbRenderHistory() {
+  const wrap = document.getElementById('cbHistoryWrap');
+  const container = document.getElementById('cbHistory');
+  if (!wrap || !container) return;
+  const history = JSON.parse(localStorage.getItem('cbHistory') || '[]');
+  if (!history.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+
+  let html = '';
+  history.slice().reverse().forEach((s, idx) => {
+    const rowCount = Object.keys(s.rows || {}).length;
+    html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;background:var(--bg2)">
+      <div>
+        <div style="font-size:11px;color:var(--text);font-family:var(--mono)">${s.okres}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${s.date} · ${rowCount} kont · koszt prod. ${s.kosztProd || 65}%</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:#3b82f6;font-family:var(--mono);font-weight:600">${s.totPln ? s.totPln.toFixed(0) + ' zl' : '-'}</div>
+        <div style="font-size:10px;color:#34d399;font-family:var(--mono)">zysk ${s.totZysk ? s.totZysk.toFixed(0) + ' zl' : '-'} (${s.totMarzaPct ? s.totMarzaPct.toFixed(1) : '0'}%)</div>
+      </div>
+      <div style="display:flex;gap:4px;margin-left:8px">
+        <button onclick="cbLoadSnapshot(${s.id})" style="font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.06);color:#3b82f6;cursor:pointer">Wczytaj</button>
+        <button onclick="cbDeleteSnapshot(${s.id})" style="font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.06);color:#ef4444;cursor:pointer">X</button>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function cbLoadSnapshot(id) {
+  const history = JSON.parse(localStorage.getItem('cbHistory') || '[]');
+  const s = history.find(h => h.id === id);
+  if (!s) return;
+  // Fill inputs from snapshot
+  if (s.okres && s.okres !== 'biezacy') {
+    const parts = s.okres.split(' - ');
+    if (parts.length === 2) {
+      const toISO = d => { const p = d.trim().split('.'); return p.length === 3 ? p[2]+'-'+p[1]+'-'+p[0] : ''; };
+      document.getElementById('cbOkresOd').value = toISO(parts[0]);
+      document.getElementById('cbOkresDo').value = toISO(parts[1]);
+    }
+  }
+  if (s.kursCZK) document.getElementById('cbKursCZK').value = s.kursCZK;
+  if (s.kursEUR) document.getElementById('cbKursEUR').value = s.kursEUR;
+  if (s.kosztProd) document.getElementById('cbKosztProd').value = s.kosztProd;
+  cbRenderTable();
+  if (s.rows) {
+    CB_ROWS.forEach(r => {
+      const rd = s.rows[r.id];
+      if (!rd) return;
+      const set = (f, v) => { const el = document.getElementById('cb_' + r.id + '_' + f); if (el && v) el.value = v; };
+      set('sprzedaz', rd.sprzedaz);
+      set('prowizja', rd.prowPct);
+      set('ads', rd.adsPct);
+      set('zwroty', rd.zwrPct);
+      set('rabaty', rd.rabPct);
+    });
+  }
+  cbRecalc();
+  cbUpdateOkresLabel();
+}
+
+function cbDeleteSnapshot(id) {
+  let history = JSON.parse(localStorage.getItem('cbHistory') || '[]');
+  history = history.filter(h => h.id !== id);
+  localStorage.setItem('cbHistory', JSON.stringify(history));
+  cbRenderHistory();
 }
 
 function cbBuildPrompt() {
@@ -14608,7 +14729,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.71</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.72</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
