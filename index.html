@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.73</title>
+<title>MPlace Hub v6.74</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.73</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.74</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2280,8 +2280,13 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 
   <div id="cbResult"></div>
 
+  <div id="cbReportsWrap" style="margin-top:1.5rem;display:none">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#3b82f6;margin-bottom:.75rem;font-family:var(--mono)">Zapisane raporty AI</div>
+    <div id="cbReports"></div>
+  </div>
+
   <div id="cbHistoryWrap" style="margin-top:1.5rem;display:none">
-    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.75rem;font-family:var(--mono)">Historia zapisow</div>
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.75rem;font-family:var(--mono)">Historia snapshotow danych</div>
     <div id="cbHistory"></div>
   </div>
 </div>
@@ -3234,6 +3239,7 @@ function showView(v){
     document.getElementById('viewCrossBorder').classList.add('active');
     document.getElementById('navCrossBorder').style.boxShadow='0 0 12px rgba(59,130,246,.6)';
     cbLoadData();
+    cbRenderReports();
     cbRenderHistory();
   } else if(v==='kanibalizator'){
     document.getElementById('viewKanibalizator').classList.add('active');
@@ -11525,6 +11531,8 @@ function mhSave(source, btn) {
       alert('Nie udało się zapisać (localStorage pełny): ' + e2.message);
     }
   }
+  // Odśwież listę raportów jeśli panel CB jest aktywny
+  if (typeof cbRenderReports === 'function') cbRenderReports();
 }
 
 function mhSendToScreener(source) {
@@ -12823,6 +12831,66 @@ function cbDeleteSnapshot(id) {
   history = history.filter(h => h.id !== id);
   localStorage.setItem('cbHistory', JSON.stringify(history));
   cbRenderHistory();
+}
+
+function cbRenderReports() {
+  const wrap = document.getElementById('cbReportsWrap');
+  const container = document.getElementById('cbReports');
+  if (!wrap || !container) return;
+  const all = JSON.parse(localStorage.getItem('mhSavedReports') || '[]');
+  const reports = all.filter(r => r.source === 'crossborder');
+  if (!reports.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+
+  let html = '';
+  reports.forEach(r => {
+    const preview = (r.text || '').substring(0, 120).replace(/\n/g, ' ') + '...';
+    html += `<div style="padding:10px 12px;border:1px solid rgba(59,130,246,.2);border-radius:6px;margin-bottom:6px;background:rgba(59,130,246,.03)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;color:var(--text);font-family:var(--mono);font-weight:600">${r.title || 'Raport'}</div>
+          <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px">${r.date} · ${r.okres || ''}</div>
+          <div style="font-size:9px;color:var(--text3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${preview}</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          <button onclick="cbOpenReport(${r.id})" style="font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.06);color:#3b82f6;cursor:pointer">Otworz</button>
+          <button onclick="cbDownloadReport(${r.id})" style="font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.06);color:#34d399;cursor:pointer">HTML</button>
+          <button onclick="cbDeleteReport(${r.id})" style="font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.06);color:#ef4444;cursor:pointer">X</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function cbOpenReport(id) {
+  const all = JSON.parse(localStorage.getItem('mhSavedReports') || '[]');
+  const r = all.find(x => x.id === id);
+  if (!r) return;
+  const html = r.html || (typeof marked !== 'undefined' ? marked.parse(r.text || '') : (r.text || '').replace(/\n/g,'<br>'));
+  document.getElementById('cbResult').innerHTML = `<div class="agent-msg" style="border-left-color:#3b82f6">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+      <strong style="color:#3b82f6">${r.title || 'Raport'} — ${r.okres || ''}</strong>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${r.date}</span>
+    </div>
+    <div class="agent-md">${html}</div>
+  </div>`;
+  document.getElementById('cbResult').scrollIntoView({behavior:'smooth'});
+}
+
+function cbDownloadReport(id) {
+  const all = JSON.parse(localStorage.getItem('mhSavedReports') || '[]');
+  const r = all.find(x => x.id === id);
+  if (!r) return;
+  if (typeof mhSetReport === 'function') mhSetReport('crossborder', r.text, r.html, r.meta);
+  if (typeof mhDownloadHtml === 'function') mhDownloadHtml('crossborder');
+}
+
+function cbDeleteReport(id) {
+  let all = JSON.parse(localStorage.getItem('mhSavedReports') || '[]');
+  all = all.filter(x => x.id !== id);
+  localStorage.setItem('mhSavedReports', JSON.stringify(all));
+  cbRenderReports();
 }
 
 function cbBuildPrompt() {
@@ -14794,7 +14862,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.73</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.74</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
