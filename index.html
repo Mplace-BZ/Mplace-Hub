@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.72</title>
+<title>MPlace Hub v6.73</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.72</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.73</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2236,6 +2236,29 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
       </thead>
       <tbody id="cbTableBody"></tbody>
     </table>
+  </div>
+
+  <div style="margin-bottom:1rem">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#f5a623;margin-bottom:.4rem;font-family:var(--mono)">Statystyki Ads CZ (opcjonalne — ze Statystyk Allegro)</div>
+    <div style="font-size:9px;color:var(--text3);margin-bottom:.5rem;font-family:var(--mono)">Wpisz dane z panelu Statystyki &gt; Oferty sponsorowane &gt; allegro.cz. ROAS z Allegro = prawdziwy ROAS (nie wyliczany).</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--mono)">
+        <thead><tr style="background:rgba(245,166,35,.08)">
+          <th style="padding:4px 6px;text-align:left;border:1px solid var(--border);color:#f5a623;font-size:8px;text-transform:uppercase">Konto</th>
+          <th style="padding:4px 6px;text-align:right;border:1px solid var(--border);color:var(--text3);font-size:8px">Klikniecia</th>
+          <th style="padding:4px 6px;text-align:right;border:1px solid var(--border);color:var(--text3);font-size:8px">CPC (CZK)</th>
+          <th style="padding:4px 6px;text-align:right;border:1px solid var(--border);color:var(--text3);font-size:8px">Koszt (CZK)</th>
+          <th style="padding:4px 6px;text-align:right;border:1px solid var(--border);color:#f5a623;font-size:8px">ROAS</th>
+          <th style="padding:4px 6px;text-align:right;border:1px solid var(--border);color:var(--text3);font-size:8px">Szt.</th>
+          <th style="padding:4px 6px;text-align:right;border:1px solid var(--border);color:var(--text3);font-size:8px">Sprzedaz Ads (CZK)</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:3px 6px;border:1px solid var(--border);font-weight:600">MK CZ</td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mk_cz_klik" type="number" oninput="cbRecalc()" style="width:50px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mk_cz_cpc" type="number" step="0.01" oninput="cbRecalc()" style="width:50px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mk_cz_koszt" type="number" step="0.01" oninput="cbRecalc()" style="width:60px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mk_cz_roas" type="number" step="0.01" oninput="cbRecalc()" style="width:50px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right;color:#f5a623"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mk_cz_szt" type="number" oninput="cbRecalc()" style="width:40px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mk_cz_sprz" type="number" step="0.01" oninput="cbRecalc()" style="width:70px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td></tr>
+          <tr><td style="padding:3px 6px;border:1px solid var(--border);font-weight:600">PC CZ</td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_pc_cz_klik" type="number" oninput="cbRecalc()" style="width:50px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_pc_cz_cpc" type="number" step="0.01" oninput="cbRecalc()" style="width:50px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_pc_cz_koszt" type="number" step="0.01" oninput="cbRecalc()" style="width:60px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_pc_cz_roas" type="number" step="0.01" oninput="cbRecalc()" style="width:50px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right;color:#f5a623"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_pc_cz_szt" type="number" oninput="cbRecalc()" style="width:40px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_pc_cz_sprz" type="number" step="0.01" oninput="cbRecalc()" style="width:70px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td></tr>
+          <tr><td style="padding:3px 6px;border:1px solid var(--border);font-weight:600">MnC CZ</td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mnc_cz_klik" type="number" oninput="cbRecalc()" style="width:50px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mnc_cz_cpc" type="number" step="0.01" oninput="cbRecalc()" style="width:50px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mnc_cz_koszt" type="number" step="0.01" oninput="cbRecalc()" style="width:60px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mnc_cz_roas" type="number" step="0.01" oninput="cbRecalc()" style="width:50px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right;color:#f5a623"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mnc_cz_szt" type="number" oninput="cbRecalc()" style="width:40px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td><td style="padding:2px 4px;border:1px solid var(--border)"><input id="cbAds_mnc_cz_sprz" type="number" step="0.01" oninput="cbRecalc()" style="width:70px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:2px 4px;color:var(--text);font-size:9px;font-family:var(--mono);text-align:right"></td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div style="margin-bottom:1rem">
@@ -12628,6 +12651,14 @@ function cbSaveData() {
       rabaty: cbGetInputVal('cb_' + r.id + '_rabaty')
     };
   });
+  // Ads stats
+  data.adsStats = {};
+  ['mk_cz','pc_cz','mnc_cz'].forEach(k => {
+    data.adsStats[k] = {};
+    ['klik','cpc','koszt','roas','szt','sprz'].forEach(f => {
+      data.adsStats[k][f] = cbGetInputVal('cbAds_' + k + '_' + f);
+    });
+  });
   localStorage.setItem('cbData', JSON.stringify(data));
 }
 
@@ -12649,6 +12680,17 @@ function cbLoadData() {
         ['sprzedaz','prowizja','ads','zwroty','rabaty'].forEach(f => {
           const el = document.getElementById('cb_' + r.id + '_' + f);
           if (el && rd[f]) el.value = rd[f];
+        });
+      });
+    }
+    // Load Ads stats
+    if (data.adsStats) {
+      ['mk_cz','pc_cz','mnc_cz'].forEach(k => {
+        const ad = data.adsStats[k];
+        if (!ad) return;
+        ['klik','cpc','koszt','roas','szt','sprz'].forEach(f => {
+          const el = document.getElementById('cbAds_' + k + '_' + f);
+          if (el && ad[f]) el.value = ad[f];
         });
       });
     }
@@ -12805,15 +12847,38 @@ function cbBuildPrompt() {
     tableText += `${label} | ${r.rynek} | ${c.sprzedaz.toFixed(0)} ${c.waluta} | ${c.pln.toFixed(0)} zl | ${c.prowPct.toFixed(1)}% (${c.prowKwota.toFixed(0)} ${c.waluta}) | ${c.adsPct.toFixed(1)}% (${c.adsKwota.toFixed(0)} ${c.waluta}) | ${c.zwrPct.toFixed(1)}% (${c.zwrKwota.toFixed(0)} ${c.waluta}) | ${c.rabPct.toFixed(1)}% (${c.rabKwota.toFixed(0)} ${c.waluta}) | ${c.nettoPct.toFixed(1)}% | ${c.marzaPct.toFixed(1)}%\n`;
   });
 
+  // Ads stats from inputs
+  const adsKeys = ['mk_cz','pc_cz','mnc_cz'];
+  const adsLabels = {mk_cz:'MK CZ', pc_cz:'PC CZ', mnc_cz:'MnC CZ'};
+  let adsText = '';
+  adsKeys.forEach(k => {
+    const roas = cbGetInputVal('cbAds_' + k + '_roas');
+    const koszt = cbGetInputVal('cbAds_' + k + '_koszt');
+    const klik = cbGetInputVal('cbAds_' + k + '_klik');
+    const cpc = cbGetInputVal('cbAds_' + k + '_cpc');
+    const szt = cbGetInputVal('cbAds_' + k + '_szt');
+    const sprz = cbGetInputVal('cbAds_' + k + '_sprz');
+    if (roas > 0 || koszt > 0) {
+      adsText += `${adsLabels[k]}: ROAS ${roas}x, Koszt ${koszt} CZK, CPC ${cpc} CZK, Klikniecia ${klik}, Szt. ${szt}, Sprzedaz Ads ${sprz} CZK\n`;
+    }
+  });
+
   let prompt = tableText + '\n';
+  if (adsText) {
+    prompt += 'STATYSTYKI ADS CZ (z panelu Allegro — PRAWDZIWY ROAS, nie wyliczany):\n';
+    prompt += adsText + '\n';
+    prompt += 'BE ROAS (break-even) przy koszcie producenta ' + kp + '% = ' + (1 / (mb/100)).toFixed(2) + 'x\n';
+    prompt += 'ROAS ponizej BE = konto traci na Ads. ROAS > 10x = zdrowy. ROAS > 20x = headroom do skalowania.\n\n';
+  }
   prompt += 'ZADANIE: Przeanalizuj dane sprzedazy grupy MEBLE na rynkach Czechy (allegro.cz) i Slowacja (allegro.sk).\n\n';
+  prompt += 'WAZNE: NIE WYLICZAJ ROAS sam! Uzywaj TYLKO ROAS podanego w statystykach Ads (to ROAS z Allegro, mierzony po atrybucji klikniec). Jesli brak danych Ads — napisz "brak danych ROAS".\n\n';
   prompt += 'Odpowiedz na:\n';
   prompt += '1. RENTOWNOSC: Ile realnie zarabiamy na CZ i SK po przeliczeniu na PLN? Czy marze sie trzymaja vs PL?\n';
   prompt += '2. PROWIZJE: Czy prowizje CZ/SK + Ads + zwroty zostawiaja marze? Porownaj z PL (~8% prowizja, ~5-7% Ads).\n';
-  prompt += '3. ADS STRATEGIA: Czy warto skalowac Ads na CZ? Czy warto startowac Ads na SK? Uzasadnij liczbami.\n';
-  prompt += '4. ALERTY: Wskazywki dotyczace zwrotow, niskiej sprzedazy, lub nietypowych proporcji.\n';
-  prompt += '5. LIDER: Ktore konto powinno byc liderem na CZ? Ktore na SK? Dlaczego?\n';
-  prompt += '6. REKOMENDACJE: 3-5 konkretnych akcji do wykonania w najblizszym tygodniu.\n\n';
+  prompt += '3. ADS STRATEGIA: Uzyj PRAWDZIWEGO ROAS z danych Ads. Ktore konto skalowac? Ktore ma problem? BE ROAS = ' + (1 / (mb/100)).toFixed(2) + 'x.\n';
+  prompt += '4. ALERTY: Zwroty, niska sprzedaz, nietypowe proporcje, ROAS blisko lub ponizej BE.\n';
+  prompt += '5. LIDER: Ktore konto powinno byc liderem na CZ? Ktore na SK? Wg wolumenu I ROAS.\n';
+  prompt += '6. REKOMENDACJE: 3-5 konkretnych akcji na najblizszy tydzien.\n\n';
   prompt += 'Kazda kwote podawaj w walucie oryginalnej + w nawiasie PLN.\n';
   prompt += 'Format: tabele markdown, bullet points, bez lania wody.\n';
 
@@ -14729,7 +14794,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.72</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.73</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
