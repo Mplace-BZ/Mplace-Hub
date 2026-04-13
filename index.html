@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.66</title>
+<title>MPlace Hub v6.68</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.66</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.68</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1033,6 +1033,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 
 <div class="topbar">
   <div class="topbar-inner">
+    <button onclick="showView('crossborder')" id="navCrossBorder" title="Cross-Border CZ/SK" style="width:22px;height:22px;border-radius:50%;background:#3b82f6;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 6px rgba(59,130,246,.4);transition:transform .15s" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></button>
     <button onclick="showView('dzis')" id="navDzis" style="width:22px;height:22px;border-radius:50%;background:#ef4444;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 6px rgba(239,68,68,.4);transition:transform .15s" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><svg width="9" height="11" viewBox="0 0 12 14" fill="none"><path d="M2 1L11 7L2 13V1Z" fill="#fff"/></svg></button>
     <button class="nav-btn" onclick="showView('dashboard')" id="navDashboard" style="color:#f87171;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2)">Dashboard</button>
     <button class="nav-btn entry-btn active" onclick="showView('entry')" id="navEntry">Data</button>
@@ -1043,6 +1044,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <button class="nav-btn" onclick="showView('strategia')" id="navStrategia" style="color:#ff6b35;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Strategia</button>
     <button class="nav-btn" onclick="showView('centrumads')" id="navCentrumAds" style="color:#06b6d4;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2)">Centrum Ads</button>
     <button class="nav-btn" onclick="showView('screener')" id="navScreener" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Screener</button>
+    <button class="nav-btn" onclick="showView('titleanalyzer')" id="navTitleAnalyzer" style="color:#10b981;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2)">Tytuły</button>
     <button class="nav-btn" onclick="showView('importads')" id="navImportAds" style="color:#f472b6;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2)">Import Ads</button>
     <div class="nav-sep"></div>
     <button class="nav-btn" onclick="showView('months')" id="navMonths" style="color:#4d9fff;background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2)">Trend</button>
@@ -2179,6 +2181,69 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 </div>
 
+<!-- ═══ VIEW: CROSS-BORDER CZ/SK ═══ -->
+<div class="view" id="viewCrossBorder">
+<div class="container" style="max-width:920px">
+  <div style="margin-bottom:1rem">
+    <div class="ph-eyebrow" style="color:#3b82f6">► CROSS-BORDER CZ / SK</div>
+    <div class="ph-title">Scanner <span style="color:#3b82f6">Zagraniczny</span></div>
+    <div class="ph-sub">Dashboard opłat allegro.cz i allegro.sk — 3 konta MEBLE z przeliczeniem na PLN</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Okres</div>
+      <input id="cbOkres" type="text" placeholder="np. 01.04 – 12.04.2026" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;font-family:var(--mono);box-sizing:border-box">
+    </div>
+    <div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Kursy walut</div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1"><label style="font-size:9px;color:var(--text3);font-family:var(--mono)">1 CZK =</label><input id="cbKursCZK" type="number" step="0.01" value="0.17" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;font-family:var(--mono);box-sizing:border-box" oninput="cbRecalc()"> <span style="font-size:9px;color:var(--text3)">PLN</span></div>
+        <div style="flex:1"><label style="font-size:9px;color:var(--text3);font-family:var(--mono)">1 EUR =</label><input id="cbKursEUR" type="number" step="0.01" value="4.28" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;font-family:var(--mono);box-sizing:border-box" oninput="cbRecalc()"> <span style="font-size:9px;color:var(--text3)">PLN</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;margin-bottom:1.5rem">
+    <table id="cbTable" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--mono)">
+      <thead>
+        <tr style="background:rgba(59,130,246,.08)">
+          <th style="padding:6px 8px;text-align:left;border:1px solid var(--border);color:#3b82f6;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Konto</th>
+          <th style="padding:6px 8px;text-align:center;border:1px solid var(--border);color:#3b82f6;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Rynek</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Sprzedaz</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">PLN</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Prowizja</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Ads</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Zwroty</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Rabaty</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:#3b82f6;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Netto %</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:#34d399;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Marza %</th>
+        </tr>
+      </thead>
+      <tbody id="cbTableBody"></tbody>
+    </table>
+  </div>
+
+  <div style="margin-bottom:1rem">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Twoje uwagi / kontekst</div>
+    <textarea id="cbUwagi" placeholder="Np. MK SK ma 12.4% zwrotow — sprawdzic co sie zwraca. PC lider CZ, skalowac Ads?" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:60px;box-sizing:border-box;line-height:1.5"></textarea>
+  </div>
+
+  <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.5rem">
+    <button id="cbRunBtn" onclick="cbRunAnalysis()" style="font-family:var(--mono);font-size:12px;padding:10px 24px;border-radius:8px;border:1px solid rgba(59,130,246,.4);background:rgba(59,130,246,.12);color:#3b82f6;cursor:pointer;font-weight:500;letter-spacing:.04em">▸ Analizuj CZ/SK</button>
+    <button onclick="cbReset()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">&#8634; Resetuj</button>
+    <button onclick="cbSaveData()" style="font-family:var(--mono);font-size:11px;padding:8px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.06);color:#34d399;cursor:pointer">&#128190; Zapisz dane</button>
+  </div>
+
+  <div id="cbThinking" style="display:none;align-items:center;gap:.75rem;padding:1rem;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:8px;margin-bottom:1.5rem">
+    <div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div>
+    <div id="cbThinkingText" style="font-size:12px;color:#3b82f6;font-family:var(--mono)">Analizuje...</div>
+  </div>
+
+  <div id="cbResult"></div>
+</div>
+</div>
+
 <!-- ═══ VIEW: KANIBALIZATOR ═══ -->
 <div class="view" id="viewKanibalizator">
 <div class="container" style="max-width:1100px">
@@ -2327,6 +2392,78 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   <div id="scrHistoryWrap" style="margin-top:1.5rem;display:none">
     <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.5rem;font-family:var(--mono)">HISTORIA ROZMÓW</div>
     <div id="scrHistoryList"></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ VIEW: TITLE ANALYZER ═══ -->
+<div class="view" id="viewTitleAnalyzer">
+<div class="container" style="max-width:900px">
+  <div style="margin-bottom:1rem">
+    <div class="ph-eyebrow" style="color:#10b981">► OPTYMALIZACJA TYTUŁÓW OFERT</div>
+    <div class="ph-title">Title <span style="color:#10b981">Analyzer</span></div>
+    <div class="ph-sub">Wklej tytuły ofert z 3 kont MEBLE — Agent zaproponuje zoptymalizowane tytuły per rola konta</div>
+  </div>
+
+  <!-- Konto selector + info -->
+  <div style="display:grid;grid-template-columns:200px 1fr;gap:12px;align-items:start;margin-bottom:1rem">
+    <div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">KONTO</div>
+      <select id="taKonto" onchange="taUpdateRole()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:11px;font-family:var(--mono)">
+        <option value="MobelKap">MobelKap (MK) — SCALE</option>
+        <option value="PerfektCiecie">Perfekt Cięcie (PC) — NICHE</option>
+        <option value="MeblenaCzasie">Meble na Czasie (MnC) — PREMIUM</option>
+      </select>
+    </div>
+    <div id="taRoleInfo" style="padding:8px 12px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.15);border-radius:6px;font-size:10px;color:var(--text2);font-family:var(--mono);line-height:1.5">
+      <strong style="color:#10b981">SCALE</strong> — tytuły wolumenowe, popularne frazy, szerokie słowa kluczowe
+    </div>
+  </div>
+
+  <!-- Textarea: tytuły ofert -->
+  <div style="margin-bottom:1rem">
+    <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">TYTUŁY OFERT (1 per linia)</div>
+    <textarea id="taInput" rows="10" placeholder="Wklej tytuły ofert — jeden tytuł w każdej linii, np:&#10;Szafka pod pralkę biała 64&#10;Stolik kawowy podnoszony wotan&#10;Donica drewniana loft 40x40" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;line-height:1.5;min-height:160px"></textarea>
+    <div style="display:flex;justify-content:space-between;margin-top:4px">
+      <span id="taTitleCount" style="font-size:9px;color:var(--text3);font-family:var(--mono)">0 tytułów</span>
+      <span style="font-size:9px;color:var(--text3);font-family:var(--mono)">max 75 znaków per tytuł</span>
+    </div>
+  </div>
+
+  <!-- Cross-account: tytuły innych kont (collapsible) -->
+  <details style="margin-bottom:1rem;border:1px solid rgba(16,185,129,.2);border-radius:8px;background:rgba(16,185,129,.03)">
+    <summary style="padding:10px 14px;cursor:pointer;font-family:var(--mono);font-size:11px;color:#10b981;display:flex;justify-content:space-between;align-items:center">
+      <span>Cross-account — tytuły pozostałych kont (opcjonalne)</span>
+      <span style="font-size:9px;color:var(--text3)">rozwiń ▼</span>
+    </summary>
+    <div style="padding:10px 14px;border-top:1px solid rgba(16,185,129,.12)">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:8px;line-height:1.5">
+        Wklej tytuły z pozostałych kont — Agent sprawdzi czy tytuły się nie pokrywają i zaproponuje różnicowanie.
+      </div>
+      <div id="taCrossAccounts" style="display:grid;gap:10px"></div>
+    </div>
+  </details>
+
+  <!-- Uwagi persistent -->
+  <div style="margin-bottom:1rem">
+    <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">UWAGI (persistent)</div>
+    <textarea id="taUwagi" placeholder="Wpisz uwagi, np: SLIM, LOFT = dozwolone CAPS; nie używaj 'premium' na MK..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:11px;font-family:'DM Sans',sans-serif;resize:vertical;line-height:1.4;min-height:60px" oninput="taSaveUwagi()"></textarea>
+  </div>
+
+  <!-- Buttons -->
+  <div style="display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap">
+    <button onclick="taAnalyze()" id="taRunBtn" style="font-family:var(--mono);font-size:12px;padding:10px 24px;border-radius:6px;border:1px solid rgba(16,185,129,.4);background:rgba(16,185,129,.12);color:#10b981;cursor:pointer;font-weight:600">ANALIZUJ TYTUŁY</button>
+    <button onclick="taPreScore()" style="font-family:var(--mono);font-size:10px;padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Pre-score (bez AI)</button>
+    <button onclick="taClear()" style="font-family:var(--mono);font-size:10px;padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Wyczyść</button>
+  </div>
+
+  <!-- Results -->
+  <div id="taResult" style="min-height:40px"></div>
+
+  <!-- History -->
+  <div id="taHistoryWrap" style="margin-top:1.5rem;display:none">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.5rem;font-family:var(--mono)">HISTORIA ANALIZ</div>
+    <div id="taHistoryList"></div>
   </div>
 </div>
 </div>
@@ -2965,11 +3102,13 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
+  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewCrossBorder','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewTitleAnalyzer','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('navDzis').style.boxShadow='0 0 6px rgba(239,68,68,.4)';
+  document.getElementById('navCrossBorder').style.boxShadow='0 0 6px rgba(59,130,246,.4)';
   if(v==='dzis'){
     document.getElementById('viewDzis').classList.add('active');
     document.getElementById('navDzis').style.boxShadow='0 0 12px rgba(239,68,68,.6)';
@@ -3048,6 +3187,10 @@ function showView(v){
     document.getElementById('navAnaliza').classList.add('active');
     aaRenderHistory();
     aaRenderTemplates();
+  } else if(v==='crossborder'){
+    document.getElementById('viewCrossBorder').classList.add('active');
+    document.getElementById('navCrossBorder').style.boxShadow='0 0 12px rgba(59,130,246,.6)';
+    cbLoadData();
   } else if(v==='kanibalizator'){
     document.getElementById('viewKanibalizator').classList.add('active');
     document.getElementById('navKanibalizator').classList.add('active');
@@ -3076,6 +3219,10 @@ function showView(v){
   } else if(v==='screener'){
     document.getElementById('viewScreener').classList.add('active');
     document.getElementById('navScreener').classList.add('active');
+  } else if(v==='titleanalyzer'){
+    document.getElementById('viewTitleAnalyzer').classList.add('active');
+    document.getElementById('navTitleAnalyzer').classList.add('active');
+    taInit();
   } else if(v==='kalkulator'){
     document.getElementById('viewKalkulator').classList.add('active');
     document.getElementById('navKalkulator').classList.add('active');
@@ -12285,6 +12432,261 @@ function generateDzisRefresh() {
 }
 
 // ═══════════════════════════════════════════════════════════
+// CROSS-BORDER CZ/SK — Scanner zagraniczny
+// ═══════════════════════════════════════════════════════════
+
+const CB_ROWS = [
+  { id: 'mk_cz', konto: 'MobelKap', rynek: 'CZ', waluta: 'CZK', kursKey: 'cbKursCZK' },
+  { id: 'mk_sk', konto: 'MobelKap', rynek: 'SK', waluta: 'EUR', kursKey: 'cbKursEUR' },
+  { id: 'pc_cz', konto: 'PerfektCiecie', rynek: 'CZ', waluta: 'CZK', kursKey: 'cbKursCZK' },
+  { id: 'pc_sk', konto: 'PerfektCiecie', rynek: 'SK', waluta: 'EUR', kursKey: 'cbKursEUR' },
+  { id: 'mnc_cz', konto: 'MeblenaCzasie', rynek: 'CZ', waluta: 'CZK', kursKey: 'cbKursCZK' },
+  { id: 'mnc_sk', konto: 'MeblenaCzasie', rynek: 'SK', waluta: 'EUR', kursKey: 'cbKursEUR' },
+];
+
+const CB_KONTO_LABELS = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MnC' };
+const CB_MARZA = 0.65;
+
+function cbGetInputVal(id) {
+  const el = document.getElementById(id);
+  return el ? parseFloat(el.value) || 0 : 0;
+}
+
+function cbCalcRow(r) {
+  const kurs = cbGetInputVal(r.kursKey);
+  const sprzedaz = cbGetInputVal('cb_' + r.id + '_sprzedaz');
+  const prowizja = cbGetInputVal('cb_' + r.id + '_prowizja');
+  const ads = cbGetInputVal('cb_' + r.id + '_ads');
+  const zwroty = cbGetInputVal('cb_' + r.id + '_zwroty');
+  const rabaty = cbGetInputVal('cb_' + r.id + '_rabaty');
+  const pln = sprzedaz * kurs;
+  const oplatyNetto = prowizja + ads - zwroty - rabaty;
+  const nettoPct = sprzedaz > 0 ? (oplatyNetto / sprzedaz * 100) : 0;
+  const marzaPct = sprzedaz > 0 ? (CB_MARZA * 100 - nettoPct) : 0;
+  return { sprzedaz, prowizja, ads, zwroty, rabaty, pln, oplatyNetto, nettoPct, marzaPct, kurs, waluta: r.waluta };
+}
+
+function cbRenderTable() {
+  const tbody = document.getElementById('cbTableBody');
+  if (!tbody) return;
+  const inputStyle = 'width:70px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:3px 5px;color:var(--text);font-size:10px;font-family:var(--mono);text-align:right;box-sizing:border-box';
+  let html = '';
+  CB_ROWS.forEach(r => {
+    const label = CB_KONTO_LABELS[r.konto] || r.konto;
+    html += `<tr id="cbRow_${r.id}">
+      <td style="padding:5px 8px;border:1px solid var(--border);color:var(--text);font-weight:600">${label}</td>
+      <td style="padding:5px 8px;border:1px solid var(--border);text-align:center;color:var(--text2)">${r.rynek} <span style="font-size:9px;color:var(--text3)">${r.waluta}</span></td>
+      <td style="padding:3px 4px;border:1px solid var(--border);text-align:right"><input id="cb_${r.id}_sprzedaz" type="number" step="0.01" oninput="cbRecalc()" style="${inputStyle}"></td>
+      <td id="cb_${r.id}_pln" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6;font-weight:500">-</td>
+      <td style="padding:3px 4px;border:1px solid var(--border);text-align:right"><input id="cb_${r.id}_prowizja" type="number" step="0.01" oninput="cbRecalc()" style="${inputStyle}"></td>
+      <td style="padding:3px 4px;border:1px solid var(--border);text-align:right"><input id="cb_${r.id}_ads" type="number" step="0.01" oninput="cbRecalc()" style="${inputStyle}"></td>
+      <td id="cb_${r.id}_zwrotyCell" style="padding:3px 4px;border:1px solid var(--border);text-align:right"><input id="cb_${r.id}_zwroty" type="number" step="0.01" oninput="cbRecalc()" style="${inputStyle}"></td>
+      <td style="padding:3px 4px;border:1px solid var(--border);text-align:right"><input id="cb_${r.id}_rabaty" type="number" step="0.01" oninput="cbRecalc()" style="${inputStyle}"></td>
+      <td id="cb_${r.id}_netto" style="padding:5px 8px;border:1px solid var(--border);text-align:right;font-weight:600">-</td>
+      <td id="cb_${r.id}_marza" style="padding:5px 8px;border:1px solid var(--border);text-align:right;font-weight:600">-</td>
+    </tr>`;
+  });
+  // Sum placeholders
+  html += `<tr id="cbSumCZ" style="background:rgba(59,130,246,.04);font-weight:600"><td style="padding:5px 8px;border:1px solid var(--border);color:#3b82f6" colspan="2">SUMA CZ</td><td id="cbSumCZ_sprz" style="padding:5px 8px;border:1px solid var(--border);text-align:right">-</td><td id="cbSumCZ_pln" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumCZ_prow" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_ads" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_zwr" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_rab" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_netto" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumCZ_marza" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#34d399">-</td></tr>`;
+  html += `<tr id="cbSumSK" style="background:rgba(59,130,246,.04);font-weight:600"><td style="padding:5px 8px;border:1px solid var(--border);color:#3b82f6" colspan="2">SUMA SK</td><td id="cbSumSK_sprz" style="padding:5px 8px;border:1px solid var(--border);text-align:right">-</td><td id="cbSumSK_pln" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumSK_prow" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_ads" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_zwr" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_rab" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_netto" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumSK_marza" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#34d399">-</td></tr>`;
+  html += `<tr style="background:rgba(59,130,246,.08);font-weight:700"><td style="padding:6px 8px;border:1px solid var(--border);color:#3b82f6" colspan="2">TOTAL CZ+SK</td><td style="padding:6px 8px;border:1px solid var(--border)"></td><td id="cbTotal_pln" style="padding:6px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6;font-size:12px">-</td><td style="padding:6px 8px;border:1px solid var(--border)" colspan="4"></td><td id="cbTotal_netto" style="padding:6px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbTotal_marza" style="padding:6px 8px;border:1px solid var(--border);text-align:right;color:#34d399;font-size:12px">-</td></tr>`;
+  tbody.innerHTML = html;
+}
+
+function cbRecalc() {
+  const sumCZ = { pln: 0, sprzedaz: 0, prowizja: 0, ads: 0, zwroty: 0, rabaty: 0 };
+  const sumSK = { pln: 0, sprzedaz: 0, prowizja: 0, ads: 0, zwroty: 0, rabaty: 0 };
+
+  CB_ROWS.forEach(r => {
+    const c = cbCalcRow(r);
+    const sum = r.rynek === 'CZ' ? sumCZ : sumSK;
+    sum.pln += c.pln; sum.sprzedaz += c.sprzedaz; sum.prowizja += c.prowizja;
+    sum.ads += c.ads; sum.zwroty += c.zwroty; sum.rabaty += c.rabaty;
+
+    const plnEl = document.getElementById('cb_' + r.id + '_pln');
+    const nettoEl = document.getElementById('cb_' + r.id + '_netto');
+    const marzaEl = document.getElementById('cb_' + r.id + '_marza');
+    const zwrotyCell = document.getElementById('cb_' + r.id + '_zwrotyCell');
+    if (plnEl) plnEl.textContent = c.pln > 0 ? c.pln.toFixed(0) + ' zl' : '-';
+    if (nettoEl) { nettoEl.textContent = c.sprzedaz > 0 ? c.nettoPct.toFixed(1) + '%' : '-'; nettoEl.style.color = c.nettoPct > 13 ? '#ef4444' : '#3b82f6'; }
+    if (marzaEl) { marzaEl.textContent = c.sprzedaz > 0 ? c.marzaPct.toFixed(1) + '%' : '-'; marzaEl.style.color = c.marzaPct < 50 ? '#ef4444' : '#34d399'; }
+    if (zwrotyCell) zwrotyCell.style.background = (c.sprzedaz > 0 && c.zwroty / c.sprzedaz > 0.1) ? 'rgba(239,68,68,.1)' : '';
+  });
+
+  const kursCZK = cbGetInputVal('cbKursCZK');
+  const kursEUR = cbGetInputVal('cbKursEUR');
+  [{key:'CZ', sum: sumCZ, waluta:'CZK', kurs: kursCZK}, {key:'SK', sum: sumSK, waluta:'EUR', kurs: kursEUR}].forEach(g => {
+    const s = g.sum;
+    const netto = s.prowizja + s.ads - s.zwroty - s.rabaty;
+    const nettoPct = s.sprzedaz > 0 ? (netto / s.sprzedaz * 100) : 0;
+    const marzaPct = s.sprzedaz > 0 ? (CB_MARZA * 100 - nettoPct) : 0;
+    const pf = 'cbSum' + g.key + '_';
+    const el = id => document.getElementById(id);
+    if (el(pf+'sprz')) el(pf+'sprz').textContent = s.sprzedaz > 0 ? s.sprzedaz.toFixed(0) + ' ' + g.waluta : '-';
+    if (el(pf+'pln')) el(pf+'pln').textContent = s.pln > 0 ? s.pln.toFixed(0) + ' zl' : '-';
+    if (el(pf+'prow')) el(pf+'prow').textContent = s.sprzedaz > 0 ? (s.prowizja/s.sprzedaz*100).toFixed(1)+'%' : '-';
+    if (el(pf+'ads')) el(pf+'ads').textContent = s.sprzedaz > 0 ? (s.ads/s.sprzedaz*100).toFixed(1)+'%' : '-';
+    if (el(pf+'zwr')) el(pf+'zwr').textContent = s.sprzedaz > 0 ? (s.zwroty/s.sprzedaz*100).toFixed(1)+'%' : '-';
+    if (el(pf+'rab')) el(pf+'rab').textContent = s.sprzedaz > 0 ? (s.rabaty/s.sprzedaz*100).toFixed(1)+'%' : '-';
+    if (el(pf+'netto')) el(pf+'netto').textContent = s.sprzedaz > 0 ? nettoPct.toFixed(1)+'%' : '-';
+    if (el(pf+'marza')) el(pf+'marza').textContent = s.sprzedaz > 0 ? marzaPct.toFixed(1)+'%' : '-';
+  });
+
+  const totPln = sumCZ.pln + sumSK.pln;
+  const totOplaty = (sumCZ.prowizja + sumCZ.ads - sumCZ.zwroty - sumCZ.rabaty) * kursCZK + (sumSK.prowizja + sumSK.ads - sumSK.zwroty - sumSK.rabaty) * kursEUR;
+  const totNettoPct = totPln > 0 ? (totOplaty / totPln * 100) : 0;
+  const totMarzaPct = totPln > 0 ? (CB_MARZA * 100 - totNettoPct) : 0;
+  const el = id => document.getElementById(id);
+  if (el('cbTotal_pln')) el('cbTotal_pln').textContent = totPln > 0 ? totPln.toFixed(0) + ' zl' : '-';
+  if (el('cbTotal_netto')) el('cbTotal_netto').textContent = totPln > 0 ? totNettoPct.toFixed(1) + '%' : '-';
+  if (el('cbTotal_marza')) el('cbTotal_marza').textContent = totPln > 0 ? totMarzaPct.toFixed(1) + '%' : '-';
+}
+
+function cbUpdateTable() {
+  cbRenderTable();
+  cbRecalc();
+}
+
+function cbSaveData() {
+  const data = { okres: document.getElementById('cbOkres').value, kursCZK: cbGetInputVal('cbKursCZK'), kursEUR: cbGetInputVal('cbKursEUR'), rows: {} };
+  CB_ROWS.forEach(r => {
+    data.rows[r.id] = {
+      sprzedaz: cbGetInputVal('cb_' + r.id + '_sprzedaz'),
+      prowizja: cbGetInputVal('cb_' + r.id + '_prowizja'),
+      ads: cbGetInputVal('cb_' + r.id + '_ads'),
+      zwroty: cbGetInputVal('cb_' + r.id + '_zwroty'),
+      rabaty: cbGetInputVal('cb_' + r.id + '_rabaty')
+    };
+  });
+  localStorage.setItem('cbData', JSON.stringify(data));
+}
+
+function cbLoadData() {
+  const raw = localStorage.getItem('cbData');
+  cbRenderTable();
+  if (!raw) { cbRecalc(); return; }
+  try {
+    const data = JSON.parse(raw);
+    if (data.okres) document.getElementById('cbOkres').value = data.okres;
+    if (data.kursCZK) document.getElementById('cbKursCZK').value = data.kursCZK;
+    if (data.kursEUR) document.getElementById('cbKursEUR').value = data.kursEUR;
+    if (data.rows) {
+      CB_ROWS.forEach(r => {
+        const rd = data.rows[r.id];
+        if (!rd) return;
+        ['sprzedaz','prowizja','ads','zwroty','rabaty'].forEach(f => {
+          const el = document.getElementById('cb_' + r.id + '_' + f);
+          if (el && rd[f]) el.value = rd[f];
+        });
+      });
+    }
+    cbRecalc();
+  } catch(e) { cbRecalc(); }
+}
+
+function cbReset() {
+  if (!confirm('Wyczysc wszystkie dane Cross-Border?')) return;
+  localStorage.removeItem('cbData');
+  document.getElementById('cbOkres').value = '';
+  document.getElementById('cbKursCZK').value = '0.17';
+  document.getElementById('cbKursEUR').value = '4.28';
+  document.getElementById('cbResult').innerHTML = '';
+  cbUpdateTable();
+}
+
+function cbBuildPrompt() {
+  const okres = document.getElementById('cbOkres').value.trim() || 'biezacy';
+  const uwagi = document.getElementById('cbUwagi').value.trim();
+  const kursCZK = cbGetInputVal('cbKursCZK');
+  const kursEUR = cbGetInputVal('cbKursEUR');
+
+  let tableText = 'DANE CROSS-BORDER CZ/SK — grupa MEBLE (' + okres + ')\n';
+  tableText += 'Kursy: 1 CZK = ' + kursCZK + ' PLN, 1 EUR = ' + kursEUR + ' PLN\n';
+  tableText += 'Marza produktowa MEBLE: 65%\n';
+  tableText += 'Prowizje Allegro PL (benchmark): ~8%\n\n';
+  tableText += 'Konto | Rynek | Sprzedaz | PLN | Prowizja | Ads | Zwroty | Rabaty | Netto oplat % | Marza po oplatach %\n';
+  tableText += '------|-------|----------|-----|---------|-----|--------|--------|--------------|--------------------\n';
+
+  CB_ROWS.forEach(r => {
+    const c = cbCalcRow(r);
+    if (c.sprzedaz <= 0) return;
+    const label = CB_KONTO_LABELS[r.konto] || r.konto;
+    const prowPct = (c.prowizja / c.sprzedaz * 100).toFixed(1);
+    const adsPct = (c.ads / c.sprzedaz * 100).toFixed(1);
+    const zwrPct = (c.zwroty / c.sprzedaz * 100).toFixed(1);
+    const rabPct = (c.rabaty / c.sprzedaz * 100).toFixed(1);
+    tableText += `${label} | ${r.rynek} | ${c.sprzedaz.toFixed(0)} ${c.waluta} | ${c.pln.toFixed(0)} zl | ${prowPct}% (${c.prowizja.toFixed(0)} ${c.waluta}) | ${adsPct}% (${c.ads.toFixed(0)} ${c.waluta}) | ${zwrPct}% (${c.zwroty.toFixed(0)} ${c.waluta}) | ${rabPct}% (${c.rabaty.toFixed(0)} ${c.waluta}) | ${c.nettoPct.toFixed(1)}% | ${c.marzaPct.toFixed(1)}%\n`;
+  });
+
+  let prompt = tableText + '\n';
+  prompt += 'ZADANIE: Przeanalizuj dane sprzedazy grupy MEBLE na rynkach Czechy (allegro.cz) i Slowacja (allegro.sk).\n\n';
+  prompt += 'Odpowiedz na:\n';
+  prompt += '1. RENTOWNOSC: Ile realnie zarabiamy na CZ i SK po przeliczeniu na PLN? Czy marze sie trzymaja vs PL?\n';
+  prompt += '2. PROWIZJE: Czy prowizje CZ/SK + Ads + zwroty zostawiaja marze? Porownaj z PL (~8% prowizja, ~5-7% Ads).\n';
+  prompt += '3. ADS STRATEGIA: Czy warto skalowac Ads na CZ? Czy warto startowac Ads na SK? Uzasadnij liczbami.\n';
+  prompt += '4. ALERTY: Wskazywki dotyczace zwrotow, niskiej sprzedazy, lub nietypowych proporcji.\n';
+  prompt += '5. LIDER: Ktore konto powinno byc liderem na CZ? Ktore na SK? Dlaczego?\n';
+  prompt += '6. REKOMENDACJE: 3-5 konkretnych akcji do wykonania w najblizszym tygodniu.\n\n';
+  prompt += 'Kazda kwote podawaj w walucie oryginalnej + w nawiasie PLN.\n';
+  prompt += 'Format: tabele markdown, bullet points, bez lania wody.\n';
+
+  if (uwagi) prompt += '\nUWAGI UZYTKOWNIKA:\n' + uwagi + '\n';
+
+  return prompt;
+}
+
+async function cbRunAnalysis() {
+  const btn = document.getElementById('cbRunBtn');
+  const thinking = document.getElementById('cbThinking');
+  const thinkingText = document.getElementById('cbThinkingText');
+
+  // Check if any data entered
+  const hasData = CB_ROWS.some(r => cbGetInputVal('cb_' + r.id + '_sprzedaz') > 0);
+  if (!hasData) { alert('Wpisz dane sprzedazy dla przynajmniej jednego konta.'); return; }
+
+  btn.disabled = true;
+  thinking.style.display = 'flex';
+  document.getElementById('cbResult').innerHTML = '';
+  cbSaveData();
+
+  try {
+    thinkingText.textContent = 'Agent AI analizuje rynki CZ/SK...';
+    const prompt = cbBuildPrompt();
+
+    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 8192,
+        system: 'Jestes analitykiem e-commerce specjalizujacym sie w Allegro. Analizujesz sprzedaz na rynkach zagranicznych (Czechy, Slowacja). Odpowiadaj po polsku, konkretnie, z liczbami. Kazda kwote w walucie oryginalnej + (PLN w nawiasie).',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const text = await readSSE(resp);
+    const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+    const now = new Date();
+    const okres = document.getElementById('cbOkres').value.trim() || 'biezacy';
+
+    if (typeof mhSetReport === 'function') mhSetReport('crossborder', text, html, { title: 'Cross-Border CZ/SK', konto: 'MEBLE', okres: okres, date: now.toLocaleString('pl-PL') });
+
+    document.getElementById('cbResult').innerHTML = `<div class="agent-msg" style="border-left-color:#3b82f6">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+        <strong style="color:#3b82f6">Cross-Border CZ/SK — ${okres}</strong>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${now.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}</span>
+      </div>
+      <div class="agent-md">${html}</div>
+      ${typeof mhReportButtonsHTML === 'function' ? mhReportButtonsHTML('crossborder') : ''}
+    </div>`;
+
+  } catch(err) {
+    document.getElementById('cbResult').innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)"><strong>Blad analizy:</strong> ${err.message}</div>`;
+  }
+  btn.disabled = false;
+  thinking.style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════
 // KANIBALIZATOR — wykrywanie kanibalizacji między kontami MEBLE
 // ═══════════════════════════════════════════════════════════
 const KB_KONTA = ['mk','pc','mnc'];
@@ -14140,7 +14542,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.66</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.68</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -16161,6 +16563,397 @@ renderEntry();
 updateWkAgentStatus();
 
 // ═══════════════════════════════════════════════════════════
+// TITLE ANALYZER
+// ═══════════════════════════════════════════════════════════
+
+const TA_ROLES = {
+  MobelKap:      { short:'MK', role:'SCALE',   color:'#ff6b35', desc:'tytuły wolumenowe, popularne frazy, szerokie słowa kluczowe' },
+  PerfektCiecie: { short:'PC', role:'NICHE',   color:'#2dd4a0', desc:'tytuły niszowe, specyficzne frazy, linia produktowa, dekor w nazwie' },
+  MeblenaCzasie: { short:'MnC',role:'PREMIUM', color:'#10b981', desc:'tytuły premium, podkreślenie jakości, materiału, +2.5% cena' }
+};
+const TA_UWAGI_KEY = 'ta_uwagi';
+const TA_HISTORY_KEY = 'ta_history';
+const TA_MAX_HISTORY = 20;
+
+function taInit(){
+  taUpdateRole();
+  taLoadUwagi();
+  taRenderCrossAccounts();
+  taRenderHistory();
+  // Title counter
+  const inp = document.getElementById('taInput');
+  if(inp){
+    inp.addEventListener('input', ()=>{
+      const lines = inp.value.split('\n').filter(l=>l.trim());
+      document.getElementById('taTitleCount').textContent = lines.length + ' tytułów';
+    });
+  }
+}
+
+function taUpdateRole(){
+  const sel = document.getElementById('taKonto');
+  const info = document.getElementById('taRoleInfo');
+  if(!sel||!info) return;
+  const r = TA_ROLES[sel.value];
+  if(!r) return;
+  info.innerHTML = `<strong style="color:${r.color}">${r.role}</strong> — ${r.desc}`;
+  taRenderCrossAccounts();
+}
+
+function taRenderCrossAccounts(){
+  const sel = document.getElementById('taKonto');
+  const wrap = document.getElementById('taCrossAccounts');
+  if(!sel||!wrap) return;
+  const current = sel.value;
+  const others = Object.keys(TA_ROLES).filter(k=>k!==current);
+  wrap.innerHTML = others.map(k=>{
+    const r = TA_ROLES[k];
+    return `<div>
+      <div style="font-size:9px;color:${r.color};font-family:var(--mono);margin-bottom:3px">${r.short} — ${r.role}</div>
+      <textarea id="taCross_${k}" rows="4" placeholder="Tytuły ${r.short} (1 per linia)..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px;color:var(--text);font-size:11px;font-family:'DM Sans',sans-serif;resize:vertical;line-height:1.4"></textarea>
+    </div>`;
+  }).join('');
+}
+
+function taLoadUwagi(){
+  const el = document.getElementById('taUwagi');
+  if(!el) return;
+  const saved = localStorage.getItem(TA_UWAGI_KEY);
+  if(saved) el.value = saved;
+}
+
+function taSaveUwagi(){
+  const el = document.getElementById('taUwagi');
+  if(el) localStorage.setItem(TA_UWAGI_KEY, el.value);
+}
+
+function taClear(){
+  document.getElementById('taInput').value = '';
+  document.getElementById('taResult').innerHTML = '';
+  document.getElementById('taTitleCount').textContent = '0 tytułów';
+  // Clear cross-account
+  Object.keys(TA_ROLES).forEach(k=>{
+    const el = document.getElementById('taCross_'+k);
+    if(el) el.value = '';
+  });
+}
+
+// ── Pre-score (bez AI) ──
+function taPreScore(){
+  const konto = document.getElementById('taKonto').value;
+  const lines = document.getElementById('taInput').value.split('\n').filter(l=>l.trim());
+  if(!lines.length){ alert('Wklej tytuły ofert'); return; }
+
+  const results = lines.map((title,i) => taScoreTitle(title.trim(), konto));
+  taRenderPreScore(results, konto);
+}
+
+function taScoreTitle(title, konto){
+  const len = title.length;
+  const words = title.toLowerCase().split(/\s+/);
+  let score = 0;
+  const issues = [];
+  const tips = [];
+
+  // 1. Długość 40-75 znaków (20 pkt)
+  if(len >= 40 && len <= 75){ score += 20; }
+  else if(len < 40){ issues.push(`za krótki (${len}/75 znaków)`); tips.push('dodaj wymiary, kolor lub funkcję'); }
+  else { issues.push(`za długi (${len}/75 — Allegro ucina)`); tips.push('skróć do 75 znaków'); }
+
+  // 2. Wymiar w tekście (15 pkt)
+  if(/\d+\s*(cm|mm|x\d)/i.test(title)){ score += 15; }
+  else { issues.push('brak wymiaru'); tips.push('dodaj wymiar z jednostką (np. 64cm, 40x40cm)'); }
+
+  // 3. Brak powtórzeń słów (10 pkt)
+  const unique = new Set(words);
+  if(unique.size === words.length){ score += 10; }
+  else { const dups = words.filter((w,i)=>words.indexOf(w)!==i); issues.push(`powtórzenie: "${dups[0]}"`); }
+
+  // 4. Brak full CAPS (oprócz dozwolonych) (10 pkt)
+  const uwagi = (document.getElementById('taUwagi')?.value || '').toUpperCase();
+  const capsWords = words.filter(w=>w.length>2 && w === w.toUpperCase() && !/^\d+$/.test(w));
+  const illegitCaps = capsWords.filter(w=>!uwagi.includes(w.toUpperCase()));
+  if(illegitCaps.length === 0){ score += 10; }
+  else { issues.push(`CAPS: ${illegitCaps.join(', ')}`); tips.push('użyj małych liter lub dodaj do uwag jako dozwolone'); }
+
+  // 5. Kolor/dekor (10 pkt)
+  const colors = /biał|czarn|szar|wotan|sonoma|dąb|lancelot|beton|antracyt|orzech|grafit/i;
+  if(colors.test(title)){ score += 10; }
+  else { issues.push('brak koloru/dekoru'); tips.push('dodaj kolor: biała, Wotan, Lancelot...'); }
+
+  // 6. Funkcja/USP (15 pkt)
+  const funcs = /podnoszon|wysuwana|obrotow|rozkładan|regulowan|składan|stojąc|wisząc|narożn|slim|loft/i;
+  if(funcs.test(title)){ score += 15; }
+  else { tips.push('dodaj funkcję: podnoszony blat, półka wysuwana...'); }
+
+  // 7. Fraza kluczowa w pierwszych 3 słowach (20 pkt)
+  const furniture = /szafk|stoli|donic|półk|biurk|komoda|regał|szuflad|witryn|ławk|kwietnik|łóżk|fotel|kredens/i;
+  if(furniture.test(words.slice(0,3).join(' '))){ score += 20; }
+  else { issues.push('fraza kluczowa nie na początku'); tips.push('zacznij od nazwy produktu: Szafka, Stolik, Donica...'); }
+
+  return { title, score, issues, tips, len };
+}
+
+function taRenderPreScore(results, konto){
+  const r = TA_ROLES[konto];
+  const avg = results.length ? Math.round(results.reduce((s,r)=>s+r.score,0)/results.length) : 0;
+  const scoreColor = avg >= 70 ? '#2dd4a0' : avg >= 40 ? '#f5a623' : '#ef4444';
+
+  let html = `<div class="agent-msg" style="border-left:3px solid #10b981;padding:1rem;background:rgba(16,185,129,.04);border-radius:0 8px 8px 0;margin-bottom:1rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <strong style="color:#10b981">Pre-score: ${r.short} (${r.role})</strong>
+      <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:${scoreColor}">${avg}/100</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <tr style="border-bottom:1px solid var(--border)">
+        <th style="text-align:left;padding:6px 8px;font-family:var(--mono);font-size:9px;color:var(--text3)">#</th>
+        <th style="text-align:left;padding:6px 8px;font-family:var(--mono);font-size:9px;color:var(--text3)">TYTUŁ</th>
+        <th style="text-align:center;padding:6px 8px;font-family:var(--mono);font-size:9px;color:var(--text3)">ZN</th>
+        <th style="text-align:center;padding:6px 8px;font-family:var(--mono);font-size:9px;color:var(--text3)">SCORE</th>
+        <th style="text-align:left;padding:6px 8px;font-family:var(--mono);font-size:9px;color:var(--text3)">PROBLEMY</th>
+      </tr>`;
+
+  results.forEach((r,i)=>{
+    const sc = r.score >= 70 ? '#2dd4a0' : r.score >= 40 ? '#f5a623' : '#ef4444';
+    const lenC = r.len > 75 ? '#ef4444' : r.len < 40 ? '#f5a623' : 'var(--text2)';
+    html += `<tr style="border-bottom:1px solid rgba(255,255,255,.04)">
+      <td style="padding:6px 8px;font-family:var(--mono);font-size:10px;color:var(--text3)">${i+1}</td>
+      <td style="padding:6px 8px;color:var(--text);max-width:350px;word-break:break-word">${r.title}</td>
+      <td style="padding:6px 8px;text-align:center;font-family:var(--mono);color:${lenC}">${r.len}</td>
+      <td style="padding:6px 8px;text-align:center;font-family:var(--mono);font-weight:700;color:${sc}">${r.score}</td>
+      <td style="padding:6px 8px;font-size:10px;color:var(--text3)">${r.issues.length ? r.issues.join('; ') : '<span style="color:#2dd4a0">OK</span>'}${r.tips.length ? '<br><span style="color:#10b981">→ '+r.tips.join('; ')+'</span>' : ''}</td>
+    </tr>`;
+  });
+
+  html += '</table></div>';
+  document.getElementById('taResult').innerHTML = html;
+}
+
+// ── AI Analysis ──
+const TA_PROMPT = `Jesteś ekspertem od optymalizacji tytułów ofert na Allegro (marketplace PL).
+
+ZASADY TYTUŁÓW ALLEGRO:
+1. Max 75 znaków — Allegro ucina resztę w wynikach
+2. Główna fraza kluczowa na początku (pierwsze 2-3 słowa)
+3. Struktura: [FRAZA KLUCZOWA] [TYP] [WYMIAR cm] [FUNKCJA] [KOLOR/DEKOR] [MATERIAŁ]
+4. Wymiar ZAWSZE z jednostką (cm, mm)
+5. Bez powtórzeń słów w jednym tytule
+6. Bez CAPS LOCK (wyjątek: nazwy linii/serii zdefiniowane w uwagach)
+7. Bez "PROMOCJA", "HIT", "NOWOŚĆ", "OKAZJA" — marnowanie znaków
+8. Bez nazwy sklepu w tytule
+9. Kolor/dekor po wymiarze (Wotan, Biała, Lancelot — konwersyjne, nie wyszukiwawcze)
+10. Funkcja = USP: podnoszony blat, półka wysuwana, obrotowa, regulowana
+
+ROLE KONT (3 konta sprzedają podobne meble — tytuły MUSZĄ się różnić):
+- MK (SCALE): najszersza fraza, popularne synonimy, wolumen. Np. "Szafka pod pralkę 64cm..."
+- PC (NICHE): specyficzna fraza, dekor/linia w nazwie. Np. "Szafka SLIM pralkowa 64cm Lancelot..."
+- MnC (PREMIUM): jakość, materiał, cecha premium. Np. "Szafka łazienkowa pod pralkę 64cm premium..."
+
+CROSS-ACCOUNT: jeśli MK ma "Szafka pod pralkę", PC NIE MOŻE mieć "Szafka pod pralkę" — musi użyć innej frazy głównej.
+
+ODPOWIEDŹ: Zwróć JSON (TYLKO json, bez markdown):
+{
+  "titles": [
+    {
+      "original": "oryginalny tytuł",
+      "optimized": "nowy zoptymalizowany tytuł (max 75 znaków)",
+      "score": 85,
+      "changes": ["dodano wymiar cm", "reorder frazy kluczowej", "dodano kolor"],
+      "crossAccountNote": "różni się od PC/MnC bo używa szerszej frazy"
+    }
+  ],
+  "summary": "krótkie podsumowanie: ile tytułów poprawiono, średni score przed/po, główne wzorce problemów"
+}`;
+
+async function taAnalyze(){
+  const konto = document.getElementById('taKonto').value;
+  const lines = document.getElementById('taInput').value.split('\n').filter(l=>l.trim());
+  if(!lines.length){ alert('Wklej tytuły ofert'); return; }
+
+  const r = TA_ROLES[konto];
+  const uwagi = document.getElementById('taUwagi')?.value?.trim() || '';
+
+  // Collect cross-account titles
+  let crossCtx = '';
+  Object.keys(TA_ROLES).filter(k=>k!==konto).forEach(k=>{
+    const el = document.getElementById('taCross_'+k);
+    if(el && el.value.trim()){
+      const rr = TA_ROLES[k];
+      crossCtx += `\n\nTYTUŁY ${rr.short} (${rr.role}):\n${el.value.trim()}`;
+    }
+  });
+
+  const userMsg = `KONTO: ${r.short} (${r.role})
+ROLA: ${r.desc}
+${uwagi ? `\nUWAGI USERA: ${uwagi}` : ''}
+${crossCtx ? `\nCROSS-ACCOUNT KONTEKST:${crossCtx}` : ''}
+
+TYTUŁY DO OPTYMALIZACJI:
+${lines.map((l,i)=>`${i+1}. ${l.trim()}`).join('\n')}`;
+
+  // UI: loading state
+  const btn = document.getElementById('taRunBtn');
+  const origBtn = btn.textContent;
+  btn.textContent = 'Analizuję...';
+  btn.disabled = true;
+  document.getElementById('taResult').innerHTML = '<div style="color:var(--text3);font-family:var(--mono);font-size:11px;padding:1rem">Czekam na odpowiedź Agenta...</div>';
+
+  try {
+    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 8192,
+        system: TA_PROMPT,
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    });
+
+    const text = await readSSE(resp);
+
+    // Try parse JSON
+    let jsonData = null;
+    try {
+      // Extract JSON from possible markdown wrapper
+      const match = text.match(/```json\s*([\s\S]*?)```/) || text.match(/\{[\s\S]*\}/);
+      if(match){
+        const raw = match[1] || match[0];
+        jsonData = JSON.parse(raw);
+      }
+    } catch(e){ /* fallback to markdown */ }
+
+    if(jsonData && jsonData.titles){
+      taRenderAIResult(jsonData, konto, lines);
+      taSaveHistory(konto, lines, jsonData);
+    } else {
+      // Fallback: render raw markdown
+      const html = typeof marked !== 'undefined' ? marked.parse(text) : text.replace(/\n/g,'<br>');
+      document.getElementById('taResult').innerHTML = `<div class="agent-msg" style="border-left:3px solid #10b981;padding:1rem;background:rgba(16,185,129,.04);border-radius:0 8px 8px 0">
+        <div class="agent-md">${html}</div>
+        ${typeof mhReportButtonsHTML === 'function' ? mhReportButtonsHTML('titleanalyzer') : ''}
+      </div>`;
+    }
+  } catch(err){
+    document.getElementById('taResult').innerHTML = `<div style="color:#ef4444;font-family:var(--mono);font-size:11px;padding:1rem">Błąd: ${err.message}</div>`;
+  } finally {
+    btn.textContent = origBtn;
+    btn.disabled = false;
+  }
+}
+
+function taRenderAIResult(data, konto, originalLines){
+  const r = TA_ROLES[konto];
+  const titles = data.titles || [];
+  const avgScore = titles.length ? Math.round(titles.reduce((s,t)=>s+t.score,0)/titles.length) : 0;
+  const scoreColor = avgScore >= 70 ? '#2dd4a0' : avgScore >= 40 ? '#f5a623' : '#ef4444';
+
+  // Store for mhGetReport
+  const reportObj = {
+    text: titles.map((t,i)=>`${i+1}. ${t.original} → ${t.optimized} (${t.score}/100)\n   Zmiany: ${t.changes.join(', ')}${t.crossAccountNote ? '\n   Cross: '+t.crossAccountNote : ''}`).join('\n\n') + '\n\n' + (data.summary||''),
+    html: '',
+    meta: { title:'Title Analyzer', konto: r.short, date: new Date().toLocaleString('pl-PL') }
+  };
+  window._taLastReport = reportObj;
+  if(typeof window._mhReports !== 'undefined') window._mhReports.titleanalyzer = reportObj;
+
+  let html = `<div class="agent-msg" style="border-left:3px solid #10b981;padding:1rem;background:rgba(16,185,129,.04);border-radius:0 8px 8px 0;margin-bottom:1rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <strong style="color:#10b981">Title Analyzer: ${r.short} (${r.role})</strong>
+      <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:${scoreColor}">${avgScore}/100</span>
+    </div>`;
+
+  if(data.summary){
+    html += `<div style="font-size:11px;color:var(--text2);margin-bottom:1rem;padding:8px 12px;background:rgba(16,185,129,.06);border-radius:6px;line-height:1.5">${data.summary}</div>`;
+  }
+
+  html += `<div style="display:flex;flex-direction:column;gap:12px">`;
+
+  titles.forEach((t,i)=>{
+    const sc = t.score >= 70 ? '#2dd4a0' : t.score >= 40 ? '#f5a623' : '#ef4444';
+    const lenOk = (t.optimized||'').length <= 75;
+    html += `<div style="padding:10px 12px;background:var(--bg2);border-radius:6px;border:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">#${i+1}</span>
+        <span style="font-family:var(--mono);font-size:14px;font-weight:700;color:${sc}">${t.score}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);text-decoration:line-through;margin-bottom:4px">${t.original}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <div style="font-size:13px;color:var(--text);font-weight:500;flex:1">${t.optimized}</div>
+        <span style="font-family:var(--mono);font-size:9px;color:${lenOk?'var(--text3)':'#ef4444'}">${(t.optimized||'').length}/75</span>
+        <button onclick="navigator.clipboard.writeText('${(t.optimized||'').replace(/'/g,"\\'")}');this.textContent='OK';setTimeout(()=>this.textContent='Kopiuj',1500)" style="font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text3);cursor:pointer;flex-shrink:0">Kopiuj</button>
+      </div>
+      <div style="font-size:10px;color:#10b981;line-height:1.4">${(t.changes||[]).map(c=>'→ '+c).join('<br>')}</div>
+      ${t.crossAccountNote ? `<div style="font-size:10px;color:#f5a623;margin-top:4px">Cross: ${t.crossAccountNote}</div>` : ''}
+    </div>`;
+  });
+
+  html += `</div>`;
+
+  // Copy all button
+  html += `<div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
+    <button onclick="taCopyAll()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:5px;border:1px solid rgba(16,185,129,.3);background:rgba(16,185,129,.08);color:#10b981;cursor:pointer">Kopiuj wszystkie nowe tytuły</button>
+    ${typeof mhReportButtonsHTML === 'function' ? mhReportButtonsHTML('titleanalyzer') : ''}
+  </div>`;
+
+  html += `</div>`;
+  document.getElementById('taResult').innerHTML = html;
+
+  // Update report html
+  window._taLastReport.html = document.getElementById('taResult').innerHTML;
+  if(typeof window._mhReports !== 'undefined') window._mhReports.titleanalyzer = window._taLastReport;
+}
+
+function taCopyAll(){
+  const data = window._taLastReport;
+  if(!data) return;
+  navigator.clipboard.writeText(data.text).then(()=>{
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Skopiowano!';
+    setTimeout(()=>btn.textContent=orig, 1500);
+  });
+}
+
+// ── History ──
+function taSaveHistory(konto, lines, data){
+  try {
+    const hist = JSON.parse(localStorage.getItem(TA_HISTORY_KEY)||'[]');
+    hist.unshift({
+      date: new Date().toISOString(),
+      konto,
+      count: lines.length,
+      avgScore: data.titles ? Math.round(data.titles.reduce((s,t)=>s+t.score,0)/data.titles.length) : 0,
+      summary: data.summary || ''
+    });
+    if(hist.length > TA_MAX_HISTORY) hist.length = TA_MAX_HISTORY;
+    localStorage.setItem(TA_HISTORY_KEY, JSON.stringify(hist));
+    taRenderHistory();
+  } catch(e){}
+}
+
+function taRenderHistory(){
+  const wrap = document.getElementById('taHistoryWrap');
+  const list = document.getElementById('taHistoryList');
+  if(!wrap||!list) return;
+  try {
+    const hist = JSON.parse(localStorage.getItem(TA_HISTORY_KEY)||'[]');
+    if(!hist.length){ wrap.style.display='none'; return; }
+    wrap.style.display='';
+    list.innerHTML = hist.map(h=>{
+      const r = TA_ROLES[h.konto];
+      const d = new Date(h.date);
+      const sc = h.avgScore >= 70 ? '#2dd4a0' : h.avgScore >= 40 ? '#f5a623' : '#ef4444';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px">
+        <span style="color:var(--text3);font-family:var(--mono)">${d.toLocaleDateString('pl-PL')} ${d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}</span>
+        <span style="color:${r?r.color:'var(--text2)'}">${r?r.short:h.konto} · ${h.count} tytułów</span>
+        <span style="font-family:var(--mono);font-weight:700;color:${sc}">${h.avgScore}/100</span>
+      </div>`;
+    }).join('');
+  } catch(e){ wrap.style.display='none'; }
+}
+
+// ═══════════════════════════════════════════════════════════
 // WELCOME SCREEN
 // ═══════════════════════════════════════════════════════════
 (function(){
@@ -16465,6 +17258,7 @@ updateWkAgentStatus();
     {type:'tab', name:'Kalendarz',     action:()=>showView('kalendarz')},
     {type:'tab', name:'Analiza Ofert', action:()=>showView('analiza')},
     {type:'tab', name:'Screener',      action:()=>showView('screener')},
+    {type:'tab', name:'Tytuły',       action:()=>showView('titleanalyzer')},
     {type:'tab', name:'Kanibalizator', action:()=>showView('kanibalizator')},
     {type:'tab', name:'Kalkulator',    action:()=>showView('kalkulator')},
     {type:'tab', name:'Wiedza',        action:()=>showView('wiedza')},
