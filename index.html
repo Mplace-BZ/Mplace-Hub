@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.70</title>
+<title>MPlace Hub v6.71</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.70</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.71</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2229,8 +2229,9 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
           <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Ads <span style="text-transform:none;font-weight:400;color:var(--text3)">%</span></th>
           <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Zwroty <span style="text-transform:none;font-weight:400;color:var(--text3)">%</span></th>
           <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Rabaty <span style="text-transform:none;font-weight:400;color:var(--text3)">%</span></th>
-          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:#3b82f6;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Netto %</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:#3b82f6;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Oplaty %</th>
           <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:#34d399;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Marza %</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:#34d399;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Zysk PLN</th>
         </tr>
       </thead>
       <tbody id="cbTableBody"></tbody>
@@ -12500,12 +12501,13 @@ function cbRenderTable() {
       <td style="padding:3px 4px;border:1px solid var(--border);text-align:right"><input id="cb_${r.id}_rabaty" type="number" step="0.01" oninput="cbRecalc()" style="${inputStyle}"></td>
       <td id="cb_${r.id}_netto" style="padding:5px 8px;border:1px solid var(--border);text-align:right;font-weight:600">-</td>
       <td id="cb_${r.id}_marza" style="padding:5px 8px;border:1px solid var(--border);text-align:right;font-weight:600">-</td>
+      <td id="cb_${r.id}_zysk" style="padding:5px 8px;border:1px solid var(--border);text-align:right;font-weight:600;color:#34d399">-</td>
     </tr>`;
   });
   // Sum placeholders
-  html += `<tr id="cbSumCZ" style="background:rgba(59,130,246,.04);font-weight:600"><td style="padding:5px 8px;border:1px solid var(--border);color:#3b82f6" colspan="2">SUMA CZ</td><td id="cbSumCZ_sprz" style="padding:5px 8px;border:1px solid var(--border);text-align:right">-</td><td id="cbSumCZ_pln" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumCZ_prow" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_ads" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_zwr" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_rab" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_netto" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumCZ_marza" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#34d399">-</td></tr>`;
-  html += `<tr id="cbSumSK" style="background:rgba(59,130,246,.04);font-weight:600"><td style="padding:5px 8px;border:1px solid var(--border);color:#3b82f6" colspan="2">SUMA SK</td><td id="cbSumSK_sprz" style="padding:5px 8px;border:1px solid var(--border);text-align:right">-</td><td id="cbSumSK_pln" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumSK_prow" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_ads" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_zwr" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_rab" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_netto" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumSK_marza" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#34d399">-</td></tr>`;
-  html += `<tr style="background:rgba(59,130,246,.08);font-weight:700"><td style="padding:6px 8px;border:1px solid var(--border);color:#3b82f6" colspan="2">TOTAL CZ+SK</td><td style="padding:6px 8px;border:1px solid var(--border)"></td><td id="cbTotal_pln" style="padding:6px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6;font-size:12px">-</td><td style="padding:6px 8px;border:1px solid var(--border)" colspan="4"></td><td id="cbTotal_netto" style="padding:6px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbTotal_marza" style="padding:6px 8px;border:1px solid var(--border);text-align:right;color:#34d399;font-size:12px">-</td></tr>`;
+  html += `<tr id="cbSumCZ" style="background:rgba(59,130,246,.04);font-weight:600"><td style="padding:5px 8px;border:1px solid var(--border);color:#3b82f6" colspan="2">SUMA CZ</td><td id="cbSumCZ_sprz" style="padding:5px 8px;border:1px solid var(--border);text-align:right">-</td><td id="cbSumCZ_pln" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumCZ_prow" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_ads" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_zwr" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_rab" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumCZ_netto" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumCZ_marza" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#34d399">-</td><td id="cbSumCZ_zysk" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#34d399;font-weight:700">-</td></tr>`;
+  html += `<tr id="cbSumSK" style="background:rgba(59,130,246,.04);font-weight:600"><td style="padding:5px 8px;border:1px solid var(--border);color:#3b82f6" colspan="2">SUMA SK</td><td id="cbSumSK_sprz" style="padding:5px 8px;border:1px solid var(--border);text-align:right">-</td><td id="cbSumSK_pln" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumSK_prow" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_ads" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_zwr" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_rab" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:var(--text2)">-</td><td id="cbSumSK_netto" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbSumSK_marza" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#34d399">-</td><td id="cbSumSK_zysk" style="padding:5px 8px;border:1px solid var(--border);text-align:right;color:#34d399;font-weight:700">-</td></tr>`;
+  html += `<tr style="background:rgba(59,130,246,.08);font-weight:700"><td style="padding:6px 8px;border:1px solid var(--border);color:#3b82f6" colspan="2">TOTAL CZ+SK</td><td style="padding:6px 8px;border:1px solid var(--border)"></td><td id="cbTotal_pln" style="padding:6px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6;font-size:12px">-</td><td style="padding:6px 8px;border:1px solid var(--border)" colspan="4"></td><td id="cbTotal_netto" style="padding:6px 8px;border:1px solid var(--border);text-align:right;color:#3b82f6">-</td><td id="cbTotal_marza" style="padding:6px 8px;border:1px solid var(--border);text-align:right;color:#34d399;font-size:12px">-</td><td id="cbTotal_zysk" style="padding:6px 8px;border:1px solid var(--border);text-align:right;color:#34d399;font-size:12px;font-weight:700">-</td></tr>`;
   tbody.innerHTML = html;
 }
 
@@ -12535,6 +12537,8 @@ function cbRecalc() {
     const marzaBrutto = (1 - cbKosztProd()) * 100;
     if (nettoEl) { nettoEl.textContent = c.sprzedaz > 0 ? c.nettoPct.toFixed(1) + '%' : '-'; nettoEl.style.color = c.nettoPct > marzaBrutto * 0.5 ? '#ef4444' : c.nettoPct > marzaBrutto * 0.35 ? '#f5a623' : '#3b82f6'; }
     if (marzaEl) { marzaEl.textContent = c.sprzedaz > 0 ? c.marzaPct.toFixed(1) + '%' : '-'; marzaEl.style.color = c.marzaPct < marzaBrutto * 0.4 ? '#ef4444' : c.marzaPct < marzaBrutto * 0.6 ? '#f5a623' : '#34d399'; }
+    const zyskEl = document.getElementById('cb_' + r.id + '_zysk');
+    if (zyskEl) { const zyskPln = c.pln * c.marzaPct / 100; zyskEl.textContent = c.sprzedaz > 0 ? zyskPln.toFixed(0) + ' zl' : '-'; zyskEl.style.color = c.marzaPct < marzaBrutto * 0.4 ? '#ef4444' : '#34d399'; }
     if (zwrotyCell) zwrotyCell.style.background = (c.zwrPct > 10) ? 'rgba(239,68,68,.1)' : '';
   });
 
@@ -12556,6 +12560,7 @@ function cbRecalc() {
     if (el(pf+'rab')) el(pf+'rab').textContent = s.pln > 0 ? rabPct.toFixed(1)+'%' : '-';
     if (el(pf+'netto')) el(pf+'netto').textContent = s.pln > 0 ? nettoPct.toFixed(1)+'%' : '-';
     if (el(pf+'marza')) el(pf+'marza').textContent = s.pln > 0 ? marzaPct.toFixed(1)+'%' : '-';
+    if (el(pf+'zysk')) el(pf+'zysk').textContent = s.pln > 0 ? (s.pln * marzaPct / 100).toFixed(0) + ' zl' : '-';
   });
 
   const totPln = sumCZ.pln + sumSK.pln;
@@ -12566,6 +12571,7 @@ function cbRecalc() {
   if (el('cbTotal_pln')) el('cbTotal_pln').textContent = totPln > 0 ? totPln.toFixed(0) + ' zl' : '-';
   if (el('cbTotal_netto')) el('cbTotal_netto').textContent = totPln > 0 ? totNettoPct.toFixed(1) + '%' : '-';
   if (el('cbTotal_marza')) el('cbTotal_marza').textContent = totPln > 0 ? totMarzaPct.toFixed(1) + '%' : '-';
+  if (el('cbTotal_zysk')) el('cbTotal_zysk').textContent = totPln > 0 ? (totPln * totMarzaPct / 100).toFixed(0) + ' zl' : '-';
 }
 
 function cbUpdateTable() {
@@ -14602,7 +14608,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.70</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.71</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
