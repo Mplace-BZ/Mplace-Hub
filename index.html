@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.68</title>
+<title>MPlace Hub v6.69</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.68</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.69</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2190,10 +2190,15 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <div class="ph-sub">Dashboard opłat allegro.cz i allegro.sk — 3 konta MEBLE z przeliczeniem na PLN</div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;align-items:end">
     <div>
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Okres</div>
-      <input id="cbOkres" type="text" placeholder="np. 01.04 – 12.04.2026" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;font-family:var(--mono);box-sizing:border-box">
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="cbOkresOd" type="date" onchange="cbUpdateOkresLabel()" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;font-family:var(--mono);box-sizing:border-box">
+        <span style="color:var(--text3);font-size:11px">—</span>
+        <input id="cbOkresDo" type="date" onchange="cbUpdateOkresLabel()" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;font-family:var(--mono);box-sizing:border-box">
+      </div>
+      <div id="cbOkresLabel" style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:4px"></div>
     </div>
     <div>
       <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Kursy walut</div>
@@ -2201,6 +2206,14 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
         <div style="flex:1"><label style="font-size:9px;color:var(--text3);font-family:var(--mono)">1 CZK =</label><input id="cbKursCZK" type="number" step="0.01" value="0.17" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;font-family:var(--mono);box-sizing:border-box" oninput="cbRecalc()"> <span style="font-size:9px;color:var(--text3)">PLN</span></div>
         <div style="flex:1"><label style="font-size:9px;color:var(--text3);font-family:var(--mono)">1 EUR =</label><input id="cbKursEUR" type="number" step="0.01" value="4.28" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;font-family:var(--mono);box-sizing:border-box" oninput="cbRecalc()"> <span style="font-size:9px;color:var(--text3)">PLN</span></div>
       </div>
+    </div>
+    <div>
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-family:var(--mono)">Koszt producenta</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input id="cbKosztProd" type="number" step="1" value="65" min="0" max="100" oninput="cbRecalc()" style="width:70px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:11px;font-family:var(--mono);box-sizing:border-box;text-align:right">
+        <span style="font-size:11px;color:var(--text3);font-family:var(--mono)">%</span>
+      </div>
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px">Marza brutto = <span id="cbMarzaBrutto" style="color:#34d399">35%</span></div>
     </div>
   </div>
 
@@ -2210,12 +2223,12 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
         <tr style="background:rgba(59,130,246,.08)">
           <th style="padding:6px 8px;text-align:left;border:1px solid var(--border);color:#3b82f6;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Konto</th>
           <th style="padding:6px 8px;text-align:center;border:1px solid var(--border);color:#3b82f6;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Rynek</th>
-          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Sprzedaz</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Sprzedaz <span style="text-transform:none;font-weight:400;color:var(--text3)">(kwota)</span></th>
           <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">PLN</th>
-          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Prowizja</th>
-          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Ads</th>
-          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Zwroty</th>
-          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Rabaty</th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Prowizja <span style="text-transform:none;font-weight:400;color:var(--text3)">%</span></th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Ads <span style="text-transform:none;font-weight:400;color:var(--text3)">%</span></th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Zwroty <span style="text-transform:none;font-weight:400;color:var(--text3)">%</span></th>
+          <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:var(--text2);font-size:9px;text-transform:uppercase;letter-spacing:.06em">Rabaty <span style="text-transform:none;font-weight:400;color:var(--text3)">%</span></th>
           <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:#3b82f6;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Netto %</th>
           <th style="padding:6px 8px;text-align:right;border:1px solid var(--border);color:#34d399;font-size:9px;text-transform:uppercase;letter-spacing:.06em">Marza %</th>
         </tr>
@@ -12445,7 +12458,7 @@ const CB_ROWS = [
 ];
 
 const CB_KONTO_LABELS = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MnC' };
-const CB_MARZA = 0.65;
+function cbKosztProd() { return (cbGetInputVal('cbKosztProd') || 65) / 100; }
 
 function cbGetInputVal(id) {
   const el = document.getElementById(id);
@@ -12455,15 +12468,18 @@ function cbGetInputVal(id) {
 function cbCalcRow(r) {
   const kurs = cbGetInputVal(r.kursKey);
   const sprzedaz = cbGetInputVal('cb_' + r.id + '_sprzedaz');
-  const prowizja = cbGetInputVal('cb_' + r.id + '_prowizja');
-  const ads = cbGetInputVal('cb_' + r.id + '_ads');
-  const zwroty = cbGetInputVal('cb_' + r.id + '_zwroty');
-  const rabaty = cbGetInputVal('cb_' + r.id + '_rabaty');
+  const prowPct = cbGetInputVal('cb_' + r.id + '_prowizja');
+  const adsPct = cbGetInputVal('cb_' + r.id + '_ads');
+  const zwrPct = cbGetInputVal('cb_' + r.id + '_zwroty');
+  const rabPct = cbGetInputVal('cb_' + r.id + '_rabaty');
   const pln = sprzedaz * kurs;
-  const oplatyNetto = prowizja + ads - zwroty - rabaty;
-  const nettoPct = sprzedaz > 0 ? (oplatyNetto / sprzedaz * 100) : 0;
-  const marzaPct = sprzedaz > 0 ? (CB_MARZA * 100 - nettoPct) : 0;
-  return { sprzedaz, prowizja, ads, zwroty, rabaty, pln, oplatyNetto, nettoPct, marzaPct, kurs, waluta: r.waluta };
+  const nettoPct = prowPct + adsPct - zwrPct - rabPct;
+  const marzaPct = sprzedaz > 0 ? ((1 - cbKosztProd()) * 100 - nettoPct) : 0;
+  const prowKwota = sprzedaz * prowPct / 100;
+  const adsKwota = sprzedaz * adsPct / 100;
+  const zwrKwota = sprzedaz * zwrPct / 100;
+  const rabKwota = sprzedaz * rabPct / 100;
+  return { sprzedaz, prowPct, adsPct, zwrPct, rabPct, prowKwota, adsKwota, zwrKwota, rabKwota, pln, nettoPct, marzaPct, kurs, waluta: r.waluta };
 }
 
 function cbRenderTable() {
@@ -12494,14 +12510,22 @@ function cbRenderTable() {
 }
 
 function cbRecalc() {
-  const sumCZ = { pln: 0, sprzedaz: 0, prowizja: 0, ads: 0, zwroty: 0, rabaty: 0 };
-  const sumSK = { pln: 0, sprzedaz: 0, prowizja: 0, ads: 0, zwroty: 0, rabaty: 0 };
+  cbAutoSave();
+  // Update marza brutto label
+  const mbEl = document.getElementById('cbMarzaBrutto');
+  if (mbEl) mbEl.textContent = ((1 - cbKosztProd()) * 100).toFixed(0) + '%';
+  // Sumy: ważone PLN-em (prowKwota w walucie lokalnej * kurs = PLN)
+  const sumCZ = { pln: 0, sprzedaz: 0, prowPln: 0, adsPln: 0, zwrPln: 0, rabPln: 0 };
+  const sumSK = { pln: 0, sprzedaz: 0, prowPln: 0, adsPln: 0, zwrPln: 0, rabPln: 0 };
 
   CB_ROWS.forEach(r => {
     const c = cbCalcRow(r);
     const sum = r.rynek === 'CZ' ? sumCZ : sumSK;
-    sum.pln += c.pln; sum.sprzedaz += c.sprzedaz; sum.prowizja += c.prowizja;
-    sum.ads += c.ads; sum.zwroty += c.zwroty; sum.rabaty += c.rabaty;
+    sum.pln += c.pln; sum.sprzedaz += c.sprzedaz;
+    sum.prowPln += c.prowKwota * c.kurs;
+    sum.adsPln += c.adsKwota * c.kurs;
+    sum.zwrPln += c.zwrKwota * c.kurs;
+    sum.rabPln += c.rabKwota * c.kurs;
 
     const plnEl = document.getElementById('cb_' + r.id + '_pln');
     const nettoEl = document.getElementById('cb_' + r.id + '_netto');
@@ -12510,32 +12534,33 @@ function cbRecalc() {
     if (plnEl) plnEl.textContent = c.pln > 0 ? c.pln.toFixed(0) + ' zl' : '-';
     if (nettoEl) { nettoEl.textContent = c.sprzedaz > 0 ? c.nettoPct.toFixed(1) + '%' : '-'; nettoEl.style.color = c.nettoPct > 13 ? '#ef4444' : '#3b82f6'; }
     if (marzaEl) { marzaEl.textContent = c.sprzedaz > 0 ? c.marzaPct.toFixed(1) + '%' : '-'; marzaEl.style.color = c.marzaPct < 50 ? '#ef4444' : '#34d399'; }
-    if (zwrotyCell) zwrotyCell.style.background = (c.sprzedaz > 0 && c.zwroty / c.sprzedaz > 0.1) ? 'rgba(239,68,68,.1)' : '';
+    if (zwrotyCell) zwrotyCell.style.background = (c.zwrPct > 10) ? 'rgba(239,68,68,.1)' : '';
   });
 
-  const kursCZK = cbGetInputVal('cbKursCZK');
-  const kursEUR = cbGetInputVal('cbKursEUR');
-  [{key:'CZ', sum: sumCZ, waluta:'CZK', kurs: kursCZK}, {key:'SK', sum: sumSK, waluta:'EUR', kurs: kursEUR}].forEach(g => {
+  [{key:'CZ', sum: sumCZ}, {key:'SK', sum: sumSK}].forEach(g => {
     const s = g.sum;
-    const netto = s.prowizja + s.ads - s.zwroty - s.rabaty;
-    const nettoPct = s.sprzedaz > 0 ? (netto / s.sprzedaz * 100) : 0;
-    const marzaPct = s.sprzedaz > 0 ? (CB_MARZA * 100 - nettoPct) : 0;
+    const prowPct = s.pln > 0 ? (s.prowPln / s.pln * 100) : 0;
+    const adsPct = s.pln > 0 ? (s.adsPln / s.pln * 100) : 0;
+    const zwrPct = s.pln > 0 ? (s.zwrPln / s.pln * 100) : 0;
+    const rabPct = s.pln > 0 ? (s.rabPln / s.pln * 100) : 0;
+    const nettoPct = prowPct + adsPct - zwrPct - rabPct;
+    const marzaPct = s.pln > 0 ? ((1 - cbKosztProd()) * 100 - nettoPct) : 0;
     const pf = 'cbSum' + g.key + '_';
     const el = id => document.getElementById(id);
-    if (el(pf+'sprz')) el(pf+'sprz').textContent = s.sprzedaz > 0 ? s.sprzedaz.toFixed(0) + ' ' + g.waluta : '-';
+    if (el(pf+'sprz')) el(pf+'sprz').textContent = s.pln > 0 ? s.pln.toFixed(0) + ' zl' : '-';
     if (el(pf+'pln')) el(pf+'pln').textContent = s.pln > 0 ? s.pln.toFixed(0) + ' zl' : '-';
-    if (el(pf+'prow')) el(pf+'prow').textContent = s.sprzedaz > 0 ? (s.prowizja/s.sprzedaz*100).toFixed(1)+'%' : '-';
-    if (el(pf+'ads')) el(pf+'ads').textContent = s.sprzedaz > 0 ? (s.ads/s.sprzedaz*100).toFixed(1)+'%' : '-';
-    if (el(pf+'zwr')) el(pf+'zwr').textContent = s.sprzedaz > 0 ? (s.zwroty/s.sprzedaz*100).toFixed(1)+'%' : '-';
-    if (el(pf+'rab')) el(pf+'rab').textContent = s.sprzedaz > 0 ? (s.rabaty/s.sprzedaz*100).toFixed(1)+'%' : '-';
-    if (el(pf+'netto')) el(pf+'netto').textContent = s.sprzedaz > 0 ? nettoPct.toFixed(1)+'%' : '-';
-    if (el(pf+'marza')) el(pf+'marza').textContent = s.sprzedaz > 0 ? marzaPct.toFixed(1)+'%' : '-';
+    if (el(pf+'prow')) el(pf+'prow').textContent = s.pln > 0 ? prowPct.toFixed(1)+'%' : '-';
+    if (el(pf+'ads')) el(pf+'ads').textContent = s.pln > 0 ? adsPct.toFixed(1)+'%' : '-';
+    if (el(pf+'zwr')) el(pf+'zwr').textContent = s.pln > 0 ? zwrPct.toFixed(1)+'%' : '-';
+    if (el(pf+'rab')) el(pf+'rab').textContent = s.pln > 0 ? rabPct.toFixed(1)+'%' : '-';
+    if (el(pf+'netto')) el(pf+'netto').textContent = s.pln > 0 ? nettoPct.toFixed(1)+'%' : '-';
+    if (el(pf+'marza')) el(pf+'marza').textContent = s.pln > 0 ? marzaPct.toFixed(1)+'%' : '-';
   });
 
   const totPln = sumCZ.pln + sumSK.pln;
-  const totOplaty = (sumCZ.prowizja + sumCZ.ads - sumCZ.zwroty - sumCZ.rabaty) * kursCZK + (sumSK.prowizja + sumSK.ads - sumSK.zwroty - sumSK.rabaty) * kursEUR;
-  const totNettoPct = totPln > 0 ? (totOplaty / totPln * 100) : 0;
-  const totMarzaPct = totPln > 0 ? (CB_MARZA * 100 - totNettoPct) : 0;
+  const totOplatyPln = (sumCZ.prowPln + sumCZ.adsPln - sumCZ.zwrPln - sumCZ.rabPln) + (sumSK.prowPln + sumSK.adsPln - sumSK.zwrPln - sumSK.rabPln);
+  const totNettoPct = totPln > 0 ? (totOplatyPln / totPln * 100) : 0;
+  const totMarzaPct = totPln > 0 ? ((1 - cbKosztProd()) * 100 - totNettoPct) : 0;
   const el = id => document.getElementById(id);
   if (el('cbTotal_pln')) el('cbTotal_pln').textContent = totPln > 0 ? totPln.toFixed(0) + ' zl' : '-';
   if (el('cbTotal_netto')) el('cbTotal_netto').textContent = totPln > 0 ? totNettoPct.toFixed(1) + '%' : '-';
@@ -12547,8 +12572,39 @@ function cbUpdateTable() {
   cbRecalc();
 }
 
+function cbUpdateOkresLabel() {
+  const od = document.getElementById('cbOkresOd').value;
+  const doVal = document.getElementById('cbOkresDo').value;
+  const label = document.getElementById('cbOkresLabel');
+  if (od && doVal && label) {
+    const d1 = new Date(od), d2 = new Date(doVal);
+    const days = Math.round((d2 - d1) / 86400000) + 1;
+    label.textContent = days > 0 ? days + ' dni' : '';
+  } else if (label) { label.textContent = ''; }
+  cbAutoSave();
+}
+
+function cbGetOkresText() {
+  const od = document.getElementById('cbOkresOd').value;
+  const doVal = document.getElementById('cbOkresDo').value;
+  if (!od && !doVal) return 'biezacy';
+  const fmt = d => { const p = d.split('-'); return p[2] + '.' + p[1] + '.' + p[0]; };
+  return (od ? fmt(od) : '?') + ' - ' + (doVal ? fmt(doVal) : '?');
+}
+
+function cbAutoSave() {
+  cbSaveData();
+}
+
 function cbSaveData() {
-  const data = { okres: document.getElementById('cbOkres').value, kursCZK: cbGetInputVal('cbKursCZK'), kursEUR: cbGetInputVal('cbKursEUR'), rows: {} };
+  const data = {
+    okresOd: document.getElementById('cbOkresOd').value,
+    okresDo: document.getElementById('cbOkresDo').value,
+    kursCZK: cbGetInputVal('cbKursCZK'),
+    kursEUR: cbGetInputVal('cbKursEUR'),
+    kosztProd: cbGetInputVal('cbKosztProd'),
+    rows: {}
+  };
   CB_ROWS.forEach(r => {
     data.rows[r.id] = {
       sprzedaz: cbGetInputVal('cb_' + r.id + '_sprzedaz'),
@@ -12567,9 +12623,11 @@ function cbLoadData() {
   if (!raw) { cbRecalc(); return; }
   try {
     const data = JSON.parse(raw);
-    if (data.okres) document.getElementById('cbOkres').value = data.okres;
+    if (data.okresOd) document.getElementById('cbOkresOd').value = data.okresOd;
+    if (data.okresDo) document.getElementById('cbOkresDo').value = data.okresDo;
     if (data.kursCZK) document.getElementById('cbKursCZK').value = data.kursCZK;
     if (data.kursEUR) document.getElementById('cbKursEUR').value = data.kursEUR;
+    if (data.kosztProd) document.getElementById('cbKosztProd').value = data.kosztProd;
     if (data.rows) {
       CB_ROWS.forEach(r => {
         const rd = data.rows[r.id];
@@ -12580,6 +12638,7 @@ function cbLoadData() {
         });
       });
     }
+    cbUpdateOkresLabel();
     cbRecalc();
   } catch(e) { cbRecalc(); }
 }
@@ -12587,7 +12646,9 @@ function cbLoadData() {
 function cbReset() {
   if (!confirm('Wyczysc wszystkie dane Cross-Border?')) return;
   localStorage.removeItem('cbData');
-  document.getElementById('cbOkres').value = '';
+  document.getElementById('cbOkresOd').value = '';
+  document.getElementById('cbOkresDo').value = '';
+  document.getElementById('cbOkresLabel').textContent = '';
   document.getElementById('cbKursCZK').value = '0.17';
   document.getElementById('cbKursEUR').value = '4.28';
   document.getElementById('cbResult').innerHTML = '';
@@ -12595,14 +12656,16 @@ function cbReset() {
 }
 
 function cbBuildPrompt() {
-  const okres = document.getElementById('cbOkres').value.trim() || 'biezacy';
+  const okres = cbGetOkresText();
   const uwagi = document.getElementById('cbUwagi').value.trim();
   const kursCZK = cbGetInputVal('cbKursCZK');
   const kursEUR = cbGetInputVal('cbKursEUR');
 
   let tableText = 'DANE CROSS-BORDER CZ/SK — grupa MEBLE (' + okres + ')\n';
   tableText += 'Kursy: 1 CZK = ' + kursCZK + ' PLN, 1 EUR = ' + kursEUR + ' PLN\n';
-  tableText += 'Marza produktowa MEBLE: 65%\n';
+  const kp = (cbKosztProd() * 100).toFixed(0);
+  const mb = (100 - kp).toFixed(0);
+  tableText += 'Koszt producenta MEBLE: ' + kp + '% przychodu (fixed). Marza brutto = ' + mb + '%. Marza netto = ' + mb + '% - oplaty Allegro.\n';
   tableText += 'Prowizje Allegro PL (benchmark): ~8%\n\n';
   tableText += 'Konto | Rynek | Sprzedaz | PLN | Prowizja | Ads | Zwroty | Rabaty | Netto oplat % | Marza po oplatach %\n';
   tableText += '------|-------|----------|-----|---------|-----|--------|--------|--------------|--------------------\n';
@@ -12611,11 +12674,7 @@ function cbBuildPrompt() {
     const c = cbCalcRow(r);
     if (c.sprzedaz <= 0) return;
     const label = CB_KONTO_LABELS[r.konto] || r.konto;
-    const prowPct = (c.prowizja / c.sprzedaz * 100).toFixed(1);
-    const adsPct = (c.ads / c.sprzedaz * 100).toFixed(1);
-    const zwrPct = (c.zwroty / c.sprzedaz * 100).toFixed(1);
-    const rabPct = (c.rabaty / c.sprzedaz * 100).toFixed(1);
-    tableText += `${label} | ${r.rynek} | ${c.sprzedaz.toFixed(0)} ${c.waluta} | ${c.pln.toFixed(0)} zl | ${prowPct}% (${c.prowizja.toFixed(0)} ${c.waluta}) | ${adsPct}% (${c.ads.toFixed(0)} ${c.waluta}) | ${zwrPct}% (${c.zwroty.toFixed(0)} ${c.waluta}) | ${rabPct}% (${c.rabaty.toFixed(0)} ${c.waluta}) | ${c.nettoPct.toFixed(1)}% | ${c.marzaPct.toFixed(1)}%\n`;
+    tableText += `${label} | ${r.rynek} | ${c.sprzedaz.toFixed(0)} ${c.waluta} | ${c.pln.toFixed(0)} zl | ${c.prowPct.toFixed(1)}% (${c.prowKwota.toFixed(0)} ${c.waluta}) | ${c.adsPct.toFixed(1)}% (${c.adsKwota.toFixed(0)} ${c.waluta}) | ${c.zwrPct.toFixed(1)}% (${c.zwrKwota.toFixed(0)} ${c.waluta}) | ${c.rabPct.toFixed(1)}% (${c.rabKwota.toFixed(0)} ${c.waluta}) | ${c.nettoPct.toFixed(1)}% | ${c.marzaPct.toFixed(1)}%\n`;
   });
 
   let prompt = tableText + '\n';
@@ -12666,7 +12725,7 @@ async function cbRunAnalysis() {
     const text = await readSSE(resp);
     const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
     const now = new Date();
-    const okres = document.getElementById('cbOkres').value.trim() || 'biezacy';
+    const okres = cbGetOkresText();
 
     if (typeof mhSetReport === 'function') mhSetReport('crossborder', text, html, { title: 'Cross-Border CZ/SK', konto: 'MEBLE', okres: okres, date: now.toLocaleString('pl-PL') });
 
@@ -14542,7 +14601,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.68</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.69</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
