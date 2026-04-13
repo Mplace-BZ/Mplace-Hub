@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.76</title>
+<title>MPlace Hub v6.77</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1018,7 +1018,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.76</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.77</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -8333,6 +8333,15 @@ async function adsParseXlsx(file) {
         const rows = XLSX.utils.sheet_to_json(ws, {header:1});
         if(rows.length<2){ reject('Brak danych'); return; }
 
+        // Wykryj walutę z nagłówków (np. "Koszt(CZK)", "ROAS(CZK)", "Koszt(PLN)")
+        let detectedCurrency = 'PLN';
+        const headerRow = rows[0] || [];
+        for (const h of headerRow) {
+          const hs = String(h || '');
+          const m = hs.match(/\((CZK|EUR|PLN)\)/i);
+          if (m) { detectedCurrency = m[1].toUpperCase(); break; }
+        }
+
         // Kolumny: 0=kampania,1=grupa,2=oferta,3=nr,4=wysw,5=klik,6=zaint,7=cpc,8=ctr,9=koszt,10=roas,11=sztuki,12=sprzedaz
         const aukcje = [];
         for(let i=1;i<rows.length;i++){
@@ -8391,7 +8400,7 @@ async function adsParseXlsx(file) {
         // Gwiazdy: ROAS>7, sprzedaz>0
         const gwiazdy = aukcje.filter(a=>a.sprzedaz>0&&a.koszt>0&&a.sprzedaz/a.koszt>7).map(a=>calc(a)).sort((a,b)=>b.roas-a.roas);
 
-        resolve({kampanie, totKoszt, totSprzedaz, totRoas:totKoszt>0?totSprzedaz/totKoszt:0, zgnile, kosztZgnile, gwiazdy, aukcje});
+        resolve({kampanie, totKoszt, totSprzedaz, totRoas:totKoszt>0?totSprzedaz/totKoszt:0, zgnile, kosztZgnile, gwiazdy, aukcje, currency: detectedCurrency});
       } catch(err){ reject(err.message); }
     };
     reader.readAsArrayBuffer(file);
@@ -9777,10 +9786,10 @@ async function aaParseFile(file, type) {
     reader.onload = e => {
       try {
         const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-        // Parse PLN values: "1 234,56 PLN" → 1234.56, "1.234,56 PLN" → 1234.56
+        // Parse currency values: "1 234,56 PLN" or "1 234,56 CZK" or "1 234,56 EUR" → 1234.56
         const pln = v => {
           let s = String(v || 0);
-          s = s.replace(/PLN/gi, '').trim();
+          s = s.replace(/PLN|CZK|EUR/gi, '').trim();
           s = s.replace(/\s/g, ''); // remove spaces (thousands sep)
           // Handle European: 1.234,56 → remove dots before comma
           if (s.includes(',') && s.includes('.')) s = s.replace(/\./g, '');
@@ -14943,7 +14952,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.76</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.77</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -15748,7 +15757,9 @@ function scrBuildFilesContext() {
         }
       });
       ctx += `REGUŁA: respektuj role w rekomendacjach. MK=SCALE (wolumen), PC=NICHE (donice/kwietniki), MC=PREMIUM (gwiazdy).\n`;
-      ctx += `ROAS < 3 = wyłącz. ROAS 3-4 = zostawiamy (obserwuj). Min 3 transakcje do decyzji.\n\n`;
+      ctx += `ROAS < 3 = wyłącz. ROAS 3-4 = zostawiamy (obserwuj). Min 3 transakcje do decyzji.\n`;
+      ctx += `NOISE ROAS: ROAS > 50x przy koszcie < 50 jednostek waluty = szum statystyczny (mikro-spend, 1-2 trans. zawyżają). NIE oznaczaj jako "skaluj" — oznacz jako "za mało danych, monitoruj". Min spend 50+ waluty + min 2 trans. żeby rekomendować skalowanie.\n`;
+      ctx += `WALUTA: Sprawdź walutę w nagłówkach pliku (CZK = Czechy, EUR = Słowacja, PLN = Polska). NIE zakładaj że dane są z PL jeśli waluta to CZK/EUR. Podawaj kwoty w walucie z pliku.\n\n`;
     }
   }
 
@@ -15765,18 +15776,19 @@ function scrBuildFilesContext() {
       const p = f.parsed || {};
       if (f.type === 'ads' || f.type === 'ads30d') {
         const label = f.type === 'ads30d' ? 'ADS 30 DNI' : 'ADS';
-        ctx += `\n[${label}] ${f.fileName}\n`;
-        ctx += `Łącznie: ${(p.totKoszt||0).toFixed(0)} zł koszt | ${(p.totSprzedaz||0).toFixed(0)} zł sprzedaż | ROAS ${(p.totRoas||0).toFixed(2)} | ${p.kampanie?.length || 0} kampanii\n`;
+        const cur = p.currency || 'PLN';
+        ctx += `\n[${label}] ${f.fileName} (waluta: ${cur})\n`;
+        ctx += `Łącznie: ${(p.totKoszt||0).toFixed(0)} ${cur} koszt | ${(p.totSprzedaz||0).toFixed(0)} ${cur} sprzedaż | ROAS ${(p.totRoas||0).toFixed(2)} | ${p.kampanie?.length || 0} kampanii\n`;
         if (p.kampanie?.length) {
           ctx += `Top 10 kampanii po koszcie:\n`;
           p.kampanie.slice().sort((a,b) => b.koszt - a.koszt).slice(0,10).forEach(k => {
-            ctx += `  "${k.kampania}" | Koszt:${k.koszt.toFixed(0)}zł Sprzedaż:${k.sprzedaz.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} (${k.aukcje?.length||0} aukcji)\n`;
+            ctx += `  "${k.kampania}" | Koszt:${k.koszt.toFixed(0)} ${cur} Sprzedaż:${k.sprzedaz.toFixed(0)} ${cur} ROAS:${k.roas.toFixed(2)} (${k.aukcje?.length||0} aukcji)\n`;
           });
         }
         if (p.aggregated?.length) {
           ctx += `Top 10 aukcji po sprzedaży (agregat across kampanii):\n`;
           p.aggregated.slice(0,10).forEach(a => {
-            ctx += `  [${a.nr}] ${(a.oferta||'').substring(0,50)} | Koszt:${a.koszt.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Trans:${a.sztuki||0}\n`;
+            ctx += `  [${a.nr}] ${(a.oferta||'').substring(0,50)} | Koszt:${a.koszt.toFixed(0)} ${cur} ROAS:${a.roas.toFixed(2)} Trans:${a.sztuki||0}\n`;
           });
         }
       } else if (f.type === 'sprzedaz') {
