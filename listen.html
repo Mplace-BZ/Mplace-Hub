@@ -44,7 +44,7 @@
       <div class="progress-wrap" onclick="seek(event)"><div class="progress-bar" id="progressBar"></div></div>
       <div class="time"><span id="timeCur">0:00</span><span id="timeDur">0:00</span></div>
       <div class="script" id="pScript"></div>
-      <div id="pMetrics" style="display:none;margin-top:1.25rem;display:flex;gap:12px;justify-content:center;flex-wrap:wrap"></div>
+      <div id="pMetrics" style="display:none;margin-top:1.25rem;gap:12px;justify-content:center;flex-wrap:wrap"></div>
     </div>
     <div class="footer" style="display:flex;flex-direction:column;align-items:center;gap:6px">
       <div style="font-size:20px">&#128293;</div>
@@ -82,7 +82,7 @@
           document.getElementById('pTitle').textContent = d.title || 'MPlace Briefing';
           document.getElementById('pDate').textContent = d.date || '';
           if (d.script) document.getElementById('pScript').textContent = d.script + '...';
-          if (d.metrics) {
+          if (d.metrics && d.metrics.length > 0) {
             const m = document.getElementById('pMetrics');
             m.style.display = 'flex';
             d.metrics.forEach(mt => {
