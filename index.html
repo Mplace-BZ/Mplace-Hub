@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.82</title>
+<title>MPlace Hub v6.83</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1029,7 +1029,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.82</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.83</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6355,6 +6355,10 @@ async function agentSend(){
           style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.07);color:#34d399;cursor:pointer">&#9679; Czytaj</button>
         <button onclick="stopSpeaking()"
           style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.07);color:#ef4444;cursor:pointer">&#9632; Stop</button>
+        <button onclick="replayVoice()"
+          style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(168,139,250,.3);background:rgba(168,139,250,.07);color:#a78bfa;cursor:pointer">&#9654; Powtórz</button>
+        <button onclick="saveVoice()"
+          style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(244,114,182,.3);background:rgba(244,114,182,.07);color:#f472b6;cursor:pointer">&#8595; MP3</button>
         <button onclick="document.getElementById('agentResponse').innerHTML='';document.getElementById('agentInput').value=''"
           style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer">✕ Wyczyść</button>
       </div>
@@ -8392,6 +8396,8 @@ const _11L_VOICE = 'EXAVITQu4vr4xnSDxMaL'; // Sarah — kobieta, free tier, mult
 const _11L_MODEL = 'eleven_multilingual_v2';
 let _ttsAudio = null;
 let _ttsSpeaking = false;
+let _ttsLastBlob = null; // cache last audio for replay/save
+let _ttsLastSpoken = ''; // cache last spoken text
 
 async function speakText(text) {
   stopSpeaking();
@@ -8461,11 +8467,13 @@ ZASADY:
       return;
     }
     const blob = await resp.blob();
+    _ttsLastBlob = blob; // cache for replay/save
+    _ttsLastSpoken = trimmed;
     const url = URL.createObjectURL(blob);
     _ttsAudio = new Audio(url);
     _ttsSpeaking = true;
-    _ttsAudio.onended = () => { _ttsSpeaking = false; setVoiceState('idle'); URL.revokeObjectURL(url); };
-    _ttsAudio.onerror = () => { _ttsSpeaking = false; setVoiceState('idle'); URL.revokeObjectURL(url); };
+    _ttsAudio.onended = () => { _ttsSpeaking = false; setVoiceState('idle'); };
+    _ttsAudio.onerror = () => { _ttsSpeaking = false; setVoiceState('idle'); };
     _ttsAudio.play();
   } catch(e) {
     console.warn('ElevenLabs TTS failed:', e);
@@ -8494,6 +8502,28 @@ function stopSpeaking() {
   _ttsSpeaking = false;
   if (window.speechSynthesis) speechSynthesis.cancel();
   setVoiceState('idle');
+}
+
+function replayVoice() {
+  if (!_ttsLastBlob) return;
+  stopSpeaking();
+  const url = URL.createObjectURL(_ttsLastBlob);
+  _ttsAudio = new Audio(url);
+  _ttsSpeaking = true;
+  setVoiceState('speaking');
+  _ttsAudio.onended = () => { _ttsSpeaking = false; setVoiceState('idle'); };
+  _ttsAudio.onerror = () => { _ttsSpeaking = false; setVoiceState('idle'); };
+  _ttsAudio.play();
+}
+
+function saveVoice() {
+  if (!_ttsLastBlob) return;
+  const time = new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(/[,:]/g,'-').replace(/\s/g,'_');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(_ttsLastBlob);
+  a.download = `MPlace_Agent_${time}.mp3`;
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 // Preload Web Speech voices (fallback)
@@ -15213,7 +15243,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.82</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.83</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
