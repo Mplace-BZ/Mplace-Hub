@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.01</title>
+<title>MPlace Hub v7.02</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1074,7 +1074,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.01</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.02</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -7225,74 +7225,109 @@ ZASADY:
   }
 }
 
-// ── Podcast Library — zapis i odtwarzanie ─────────────────
-const SK_PODCASTS = 'mplace_podcasts_v1';
-let _podcastPlaying = null; // {id, audio}
+// ── Podcast Library — IndexedDB + localStorage metadata ───
+const SK_PODCASTS = 'mplace_podcasts_meta_v2';
+const PCDB_NAME = 'mplace_podcasts_db';
+const PCDB_STORE = 'audio';
+let _podcastPlaying = null;
 
-function getPodcasts() { try { return JSON.parse(localStorage.getItem(SK_PODCASTS) || '[]'); } catch(e) { return []; } }
-function savePodcasts(list) { localStorage.setItem(SK_PODCASTS, JSON.stringify(list)); }
-
-function savePodcast(blob, script) {
+// IndexedDB helpers
+function openPodcastDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(PCDB_NAME, 1);
+    req.onupgradeneeded = (e) => { e.target.result.createObjectStore(PCDB_STORE); };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function savePodcastAudio(id, blob) {
+  const db = await openPodcastDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PCDB_STORE, 'readwrite');
+    tx.objectStore(PCDB_STORE).put(blob, id.toString());
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function getPodcastAudio(id) {
+  const db = await openPodcastDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(PCDB_STORE, 'readonly');
+    const req = tx.objectStore(PCDB_STORE).get(id.toString());
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function deletePodcastAudio(id) {
+  const db = await openPodcastDB();
   return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const pods = getPodcasts();
-      const entry = {
-        id: Date.now(),
-        title: 'MPlace Briefing',
-        date: new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
-        script: (script || '').substring(0, 500),
-        voice: _11L_VOICE,
-        audioB64: reader.result
-      };
-      pods.unshift(entry);
-      // Keep max 5 podcasts (localStorage ~5MB limit, each podcast ~2MB)
-      while (pods.length > 5) pods.pop();
-      try {
-        savePodcasts(pods);
-        console.log('Podcast saved, total:', pods.length);
-      } catch(e) {
-        // localStorage full — remove oldest and retry
-        console.warn('localStorage full, removing oldest podcast');
-        while (pods.length > 1) {
-          pods.pop();
-          try { savePodcasts(pods); break; } catch(e2) { continue; }
-        }
-      }
-      resolve(entry);
-    };
-    reader.onerror = () => { console.error('FileReader error'); resolve(null); };
-    reader.readAsDataURL(blob);
+    const tx = db.transaction(PCDB_STORE, 'readwrite');
+    tx.objectStore(PCDB_STORE).delete(id.toString());
+    tx.oncomplete = () => resolve();
   });
 }
 
-function deletePodcast(id) {
-  if (!confirm('Usunac podcast?')) return;
+// Metadata in localStorage (tiny, no audio)
+function getPodcasts() { try { return JSON.parse(localStorage.getItem(SK_PODCASTS) || '[]'); } catch(e) { return []; } }
+function savePodcastsMeta(list) { localStorage.setItem(SK_PODCASTS, JSON.stringify(list)); }
+
+// Migrate old podcasts (v1 with audioB64 in localStorage)
+(function migratePodcastsV1() {
+  try {
+    const old = JSON.parse(localStorage.getItem('mplace_podcasts_v1') || '[]');
+    if (!old.length) return;
+    const meta = old.map(p => ({ id: p.id, title: p.title, date: p.date, script: p.script, voice: p.voice }));
+    savePodcastsMeta(meta);
+    old.forEach(p => {
+      if (p.audioB64) {
+        fetch(p.audioB64).then(r => r.blob()).then(blob => savePodcastAudio(p.id, blob)).catch(()=>{});
+      }
+    });
+    localStorage.removeItem('mplace_podcasts_v1');
+    console.log('Migrated', old.length, 'podcasts v1 -> IndexedDB');
+  } catch(e) { console.warn('Podcast migration:', e); }
+})();
+
+async function savePodcast(blob, script) {
+  const id = Date.now();
+  const entry = {
+    id,
+    title: 'MPlace Briefing',
+    date: new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+    script: (script || '').substring(0, 500),
+    voice: _11L_VOICE
+  };
+  await savePodcastAudio(id, blob);
+  const pods = getPodcasts();
+  pods.unshift(entry);
+  while (pods.length > 50) { deletePodcastAudio(pods.pop().id); }
+  savePodcastsMeta(pods);
+  console.log('Podcast saved, id:', id, 'size:', blob.size, 'bytes');
+  return entry;
+}
+
+async function deletePodcast(id) {
+  if (!confirm('Delete podcast?')) return;
   stopPodcastPlayer();
-  const pods = getPodcasts().filter(p => p.id !== id);
-  savePodcasts(pods);
+  await deletePodcastAudio(id);
+  savePodcastsMeta(getPodcasts().filter(p => p.id !== id));
   renderPodcastList();
 }
 
-function playPodcast(id) {
-  // If same podcast playing, toggle pause
+async function playPodcast(id) {
   if (_podcastPlaying && _podcastPlaying.id === id) {
-    if (_podcastPlaying.audio.paused) {
-      _podcastPlaying.audio.play();
-      updatePodcastBtn(id, true);
-    } else {
-      _podcastPlaying.audio.pause();
-      updatePodcastBtn(id, false);
-    }
+    if (_podcastPlaying.audio.paused) { _podcastPlaying.audio.play(); updatePodcastBtn(id, true); }
+    else { _podcastPlaying.audio.pause(); updatePodcastBtn(id, false); }
     return;
   }
   stopPodcastPlayer();
-  const pod = getPodcasts().find(p => p.id === id);
-  if (!pod || !pod.audioB64) return;
-  const audio = new Audio(pod.audioB64);
-  _podcastPlaying = { id, audio };
+  const blob = await getPodcastAudio(id);
+  if (!blob) { alert('Audio not found'); return; }
+  const url = URL.createObjectURL(blob);
+  const audio = new Audio(url);
+  _podcastPlaying = { id, audio, url };
   updatePodcastBtn(id, true);
-  audio.onended = () => { _podcastPlaying = null; updatePodcastBtn(id, false); };
+  audio.onended = () => { _podcastPlaying = null; updatePodcastBtn(id, false); URL.revokeObjectURL(url); };
   audio.onerror = () => { _podcastPlaying = null; updatePodcastBtn(id, false); };
   audio.play();
 }
@@ -7302,6 +7337,7 @@ function stopPodcastPlayer() {
     _podcastPlaying.audio.pause();
     _podcastPlaying.audio.currentTime = 0;
     updatePodcastBtn(_podcastPlaying.id, false);
+    if (_podcastPlaying.url) URL.revokeObjectURL(_podcastPlaying.url);
     _podcastPlaying = null;
   }
 }
@@ -7313,20 +7349,23 @@ function updatePodcastBtn(id, playing) {
   else { btn.classList.remove('playing'); btn.innerHTML = '&#9654;'; }
 }
 
-function downloadPodcast(id) {
+async function downloadPodcast(id) {
   const pod = getPodcasts().find(p => p.id === id);
-  if (!pod || !pod.audioB64) return;
+  const blob = await getPodcastAudio(id);
+  if (!blob) { alert('Audio not found'); return; }
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = pod.audioB64;
-  a.download = `MPlace_Briefing_${pod.date.replace(/[,:\/\s]/g, '_')}.mp3`;
+  a.href = url;
+  a.download = 'MPlace_Briefing_' + (pod ? pod.date.replace(/[,:\/\s]/g, '_') : 'audio') + '.mp3';
   a.click();
+  URL.revokeObjectURL(url);
 }
 
 function generateWaveBars() {
   let html = '';
   for (let i = 0; i < 40; i++) {
     const h = 4 + Math.random() * 24;
-    html += `<div class="podcast-wave-bar" style="height:${h}px"></div>`;
+    html += '<div class="podcast-wave-bar" style="height:' + h + 'px"></div>';
   }
   return html;
 }
@@ -7338,75 +7377,49 @@ function renderPodcastList() {
   const pods = getPodcasts();
   if (!pods.length) { list.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
   if (empty) empty.style.display = 'none';
-
   list.innerHTML = pods.map(p => {
     const isPlaying = _podcastPlaying && _podcastPlaying.id === p.id && !_podcastPlaying.audio.paused;
     const voiceLabel = p.voice === 'chris' ? 'Chris' : 'Sarah';
-    return `<div class="podcast-card">
-      <div class="podcast-header">
-        <div>
-          <div class="podcast-title">${p.title}</div>
-          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">Glos: ${voiceLabel}</div>
-        </div>
-        <div class="podcast-date">${p.date}</div>
-      </div>
-      <div class="podcast-player">
-        <button class="podcast-play-btn ${isPlaying ? 'playing' : ''}" id="pcPlay_${p.id}" onclick="playPodcast(${p.id})">${isPlaying ? '&#10074;&#10074;' : '&#9654;'}</button>
-        <div class="podcast-wave">${generateWaveBars()}</div>
-      </div>
-      ${p.script ? `<div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;max-height:40px;overflow:hidden">${p.script}...</div>` : ''}
-      <div class="podcast-actions">
-        <button class="podcast-act-btn" onclick="downloadPodcast(${p.id})">&#8595; MP3</button>
-        <button class="podcast-act-btn" onclick="sharePodcast(${p.id}, this)" style="border-color:rgba(52,211,153,.3);color:#34d399">&#8599; Share Link</button>
-        <button class="podcast-act-btn" onclick="deletePodcast(${p.id})">&#10005; Usun</button>
-      </div>
-    </div>`;
+    return '<div class="podcast-card"><div class="podcast-header"><div><div class="podcast-title">' + p.title + '</div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">Voice: ' + voiceLabel + '</div></div><div class="podcast-date">' + p.date + '</div></div><div class="podcast-player"><button class="podcast-play-btn ' + (isPlaying ? 'playing' : '') + '" id="pcPlay_' + p.id + '" onclick="playPodcast(' + p.id + ')">' + (isPlaying ? '&#10074;&#10074;' : '&#9654;') + '</button><div class="podcast-wave">' + generateWaveBars() + '</div></div>' + (p.script ? '<div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;max-height:40px;overflow:hidden">' + p.script + '...</div>' : '') + '<div class="podcast-actions"><button class="podcast-act-btn" onclick="downloadPodcast(' + p.id + ')">&#8595; MP3</button><button class="podcast-act-btn" onclick="sharePodcast(' + p.id + ', this)" style="border-color:rgba(52,211,153,.3);color:#34d399">&#8599; Share</button><button class="podcast-act-btn" onclick="deletePodcast(' + p.id + ')">&#10005; Delete</button></div></div>';
   }).join('');
 }
 
-// ── Podcast Sharing — public links ────────────────────────
+// ── Podcast Sharing — Firestore chunks ────────────────────
 async function sharePodcastLatest(btn) {
   const pods = getPodcasts();
-  if (!pods.length) return;
+  if (!pods.length) { alert('No podcasts'); return; }
   await sharePodcast(pods[0].id, btn);
 }
 
 async function sharePodcast(id, btn) {
+  const blob = await getPodcastAudio(id);
   const pod = getPodcasts().find(p => p.id === id);
-  if (!pod || !pod.audioB64) { alert('Brak audio do udostępnienia'); return; }
+  if (!blob || !pod) { alert('Audio not found'); return; }
   const orig = btn ? btn.innerHTML : '';
   if (btn) { btn.textContent = 'Uploading...'; btn.disabled = true; }
-
-  const audio = pod.audioB64;
-  const CHUNK = 800000; // ~800KB per chunk (safe under 1MB Firestore limit)
-  const chunks = Math.ceil(audio.length / CHUNK);
-  console.log('Podcast size:', Math.round(audio.length/1024), 'KB, chunks:', chunks);
-
   try {
-    // Save metadata doc
+    const b64 = await new Promise((res) => {
+      const r = new FileReader(); r.onloadend = () => res(r.result); r.readAsDataURL(blob);
+    });
+    const CHUNK = 800000;
+    const chunks = Math.ceil(b64.length / CHUNK);
     await firebase.firestore().collection('publicPodcasts').doc(id.toString()).set({
-      title: pod.title || 'MPlace Briefing',
-      date: pod.date || '',
-      script: (pod.script || '').substring(0, 200),
-      chunks: chunks,
+      title: pod.title || 'MPlace Briefing', date: pod.date || '',
+      script: (pod.script || '').substring(0, 200), chunks: chunks,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-
-    // Save audio in chunks
     for (let i = 0; i < chunks; i++) {
-      if (btn) btn.textContent = `Uploading ${i+1}/${chunks}...`;
-      const slice = audio.substring(i * CHUNK, (i + 1) * CHUNK);
+      if (btn) btn.textContent = 'Upload ' + (i+1) + '/' + chunks + '...';
       await firebase.firestore().collection('publicPodcasts').doc(id.toString())
-        .collection('audio').doc('chunk_' + i).set({ data: slice });
+        .collection('audio').doc('chunk_' + i).set({ data: b64.substring(i * CHUNK, (i+1) * CHUNK) });
     }
-
-    const url = `https://mplace-bz.github.io/Mplace-Hub/listen.html?id=${id}`;
+    const url = 'https://mplace-bz.github.io/Mplace-Hub/listen.html?id=' + id;
     await navigator.clipboard.writeText(url);
-    if (btn) { btn.innerHTML = '&#10003; Link copied!'; setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 4000); }
+    if (btn) { btn.innerHTML = '&#10003; Copied!'; setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 4000); }
     alert('Link skopiowany!\n\n' + url);
   } catch(err) {
-    console.error('sharePodcast error:', err);
-    alert('Błąd: ' + (err.code || err.message || ''));
+    console.error('sharePodcast:', err);
+    alert('Share error: ' + (err.code || err.message || ''));
     if (btn) { btn.innerHTML = orig; btn.disabled = false; }
   }
 }
@@ -15799,7 +15812,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.01</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.02</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
