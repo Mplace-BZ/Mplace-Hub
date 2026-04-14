@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.02</title>
+<title>MPlace Hub v7.03</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1074,7 +1074,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.02</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.03</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -7150,6 +7150,18 @@ async function generatePodcast() {
   tables.forEach(t => reportText += t.innerText + '\n');
   if (aiBody) reportText += '\n' + aiBody.innerText;
 
+  // Extract key metrics from group table for podcast card
+  const _pcMetrics = [];
+  try {
+    const rows = tables[0]?.querySelectorAll('tbody tr');
+    if (rows) rows.forEach(r => {
+      const cells = r.querySelectorAll('td');
+      if (cells.length >= 4) {
+        _pcMetrics.push({ label: cells[0].textContent.trim(), value: cells[1].textContent.trim() });
+      }
+    });
+  } catch(e) {}
+
   if (!reportText.trim()) { if (btn) { btn.disabled = false; btn.innerHTML = '&#9679; Podcast'; } return; }
 
   try {
@@ -7207,7 +7219,7 @@ ZASADY:
     _ttsAudio.play();
 
     // Save podcast to library
-    await savePodcast(blob, podcastScript);
+    await savePodcast(blob, podcastScript, _pcMetrics);
 
     // Show replay/download buttons
     if (btn) { btn.innerHTML = '&#9679; Podcast'; btn.disabled = false; }
@@ -7288,14 +7300,15 @@ function savePodcastsMeta(list) { localStorage.setItem(SK_PODCASTS, JSON.stringi
   } catch(e) { console.warn('Podcast migration:', e); }
 })();
 
-async function savePodcast(blob, script) {
+async function savePodcast(blob, script, metrics) {
   const id = Date.now();
   const entry = {
     id,
     title: 'MPlace Briefing',
     date: new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
     script: (script || '').substring(0, 500),
-    voice: _11L_VOICE
+    voice: _11L_VOICE,
+    metrics: metrics || []
   };
   await savePodcastAudio(id, blob);
   const pods = getPodcasts();
@@ -7406,6 +7419,7 @@ async function sharePodcast(id, btn) {
     await firebase.firestore().collection('publicPodcasts').doc(id.toString()).set({
       title: pod.title || 'MPlace Briefing', date: pod.date || '',
       script: (pod.script || '').substring(0, 200), chunks: chunks,
+      metrics: pod.metrics || [],
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     for (let i = 0; i < chunks; i++) {
@@ -15812,7 +15826,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.02</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.03</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
