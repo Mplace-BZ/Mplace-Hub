@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.08</title>
+<title>MPlace Hub v7.09</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1074,7 +1074,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.08</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.09</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -7162,35 +7162,42 @@ async function generatePodcast() {
   const _pcMonth = _rhMeta?.querySelector('strong')?.textContent || '';
   const _pcTitle = _pcScope ? ('Briefing: ' + _pcScope) : ('Briefing ' + (_pcMonth || new Date().toLocaleDateString('pl-PL')));
 
-  // Extract key metrics from reportText (parse table text)
+  // Extract key metrics from account table (per-konto data)
   const _pcMetrics = [];
   try {
-    const lines = reportText.split('\n').map(l => l.trim()).filter(l => l);
-    // Look for lines with numbers that look like account/group data
-    const groupNames = ['MEBLE','LUXSEN','ONE'];
-    const accNames = ['MobelKap','PerfektCięcie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
-    lines.forEach(line => {
-      // Match group rows: "MEBLE	146 473 zł	350 000 zł	8.3%"
-      const gMatch = groupNames.find(g => line.startsWith(g));
-      if (gMatch) {
-        const nums = line.match(/[\d\s]+(?:zł|PLN)/g);
-        if (nums && nums[0]) _pcMetrics.push({ label: gMatch, value: nums[0].trim() });
-        return;
-      }
-      // Match account rows with ROAS
-      const aMatch = accNames.find(a => line.includes(a));
-      if (aMatch && _pcMetrics.length < 8) {
-        const roasMatch = line.match(/(\d+[.,]\d+)\s/g);
-        if (roasMatch) {
-          // Find a number that looks like ROAS (1-20 range)
-          for (const rm of roasMatch) {
-            const v = parseFloat(rm.replace(',','.'));
-            if (v > 1 && v < 25) { _pcMetrics.push({ label: aMatch, value: 'ROAS ' + rm.trim() }); break; }
+    // Account table (index 1): Konto | Sprzedaż MTD | Est. EOM | Marża | ROAS | BE ROAS | Status
+    const accTable = tables[1];
+    if (accTable) {
+      accTable.querySelectorAll('tbody tr').forEach(r => {
+        const c = r.querySelectorAll('td');
+        if (c.length >= 5) {
+          const name = c[0].textContent.trim();
+          // Check if this account is in scope (mentioned in title)
+          if (_pcScope && !_pcScope.includes('Wszystkie') && !_pcScope.includes(name)) return;
+          _pcMetrics.push({ label: 'Sprzedaz MTD', value: c[1].textContent.trim() });
+          _pcMetrics.push({ label: 'Marza', value: c[3].textContent.trim() });
+          _pcMetrics.push({ label: 'ROAS', value: c[4].textContent.trim() });
+        }
+      });
+    }
+    // Fallback: parse from reportText if DOM failed
+    if (!_pcMetrics.length) {
+      const lines = reportText.split('\n').map(l => l.trim()).filter(l => l);
+      const accNames = ['MobelKap','PerfektCięcie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
+      for (const line of lines) {
+        const aMatch = accNames.find(a => line.includes(a));
+        if (aMatch) {
+          const nums = line.match(/[\d\s,.]+/g);
+          if (nums && nums.length >= 3) {
+            _pcMetrics.push({ label: 'Sprzedaz', value: nums[0].trim() + ' zl' });
+            const roasNums = nums.filter(n => { const v = parseFloat(n.replace(/\s/g,'').replace(',','.')); return v > 1 && v < 25; });
+            if (roasNums[0]) _pcMetrics.push({ label: 'ROAS', value: roasNums[0].trim() });
+            break;
           }
         }
       }
-    });
-    if (_pcMetrics.length > 6) _pcMetrics.length = 6;
+    }
+    if (_pcMetrics.length > 3) _pcMetrics.length = 3;
     console.log('Podcast metrics:', _pcMetrics);
   } catch(e) { console.warn('Metrics extraction:', e); }
 
@@ -15858,7 +15865,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.08</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.09</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
