@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.87</title>
+<title>MPlace Hub v6.88</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1044,7 +1044,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.87</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.88</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -4230,7 +4230,10 @@ function renderEntryCard(k,dotColor,curM){
       <!-- NOTATKA -->
       <div style="margin-top:.4rem">
         <div style="font-size:8.5px;color:rgba(245,166,35,.7);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">📝 Notatka do tego miesiąca <span style="color:var(--text3)">(widoczna w historii)</span></div>
-        <textarea class="note-input" id="e_${k}_note" rows="1" placeholder="np. nowa kampania, allegro promo, zmiana budżetu, powód spadku ROAS...">${pfV('note')}</textarea>
+        <div style="display:flex;gap:6px;align-items:flex-start">
+          <textarea class="note-input" id="e_${k}_note" rows="1" placeholder="np. nowa kampania, allegro promo, zmiana budżetu, powód spadku ROAS..." style="flex:1">${pfV('note')}</textarea>
+          <button onclick="voiceNote('e_${k}_note')" title="Dyktuj notatke" style="flex-shrink:0;width:32px;height:32px;border-radius:50%;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.08);color:#f5a623;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s">&#9679;</button>
+        </div>
       </div>
       <!-- AUTO ROW -->
       <div class="aec-auto" id="eAuto_${k}">
@@ -7073,10 +7076,95 @@ function openReportWindow(aiText, curM, dayNum, snap, groups, selectedKeys) {
     <div class="ro-bar">
       <button class="ro-btn ro-close" onclick="document.getElementById('reportOverlay').style.display='none'">✕ Zamknij</button>
       <button class="ro-btn ro-print" onclick="printOverlay()">⎙ Drukuj / Zapisz PDF</button>
+      <button class="ro-btn" onclick="generatePodcast()" id="roPodcastBtn" style="background:#34d399;color:#fff;border-color:#34d399">&#9679; Podcast</button>
+      <button class="ro-btn" onclick="replayVoice()" id="roPodcastReplay" style="background:#a78bfa;color:#fff;border-color:#a78bfa;display:none">&#9654; Odsłuchaj</button>
+      <button class="ro-btn" onclick="saveVoice()" id="roPodcastDl" style="background:#f472b6;color:#fff;border-color:#f472b6;display:none">&#8595; MP3</button>
     </div>`;
   overlay.appendChild(inner);
   overlay.style.display = 'block';
   overlay.scrollTop = 0;
+}
+
+// ── PODCAST z raportu MTD ─────────────────────────────────
+async function generatePodcast() {
+  const btn = document.getElementById('roPodcastBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⟳ Generuję podcast...'; }
+
+  // Get report text from overlay
+  const aiBody = document.querySelector('#reportOverlay .ai-body');
+  const tables = document.querySelectorAll('#reportOverlay table');
+  let reportText = '';
+  tables.forEach(t => reportText += t.innerText + '\n');
+  if (aiBody) reportText += '\n' + aiBody.innerText;
+
+  if (!reportText.trim()) { if (btn) { btn.disabled = false; btn.innerHTML = '&#9679; Podcast'; } return; }
+
+  try {
+    // Step 1: Claude rephrase to podcast script
+    const rResp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2048,
+        system: `Jestes prezenterem podcastu "MPlace Briefing" — codziennego audio-podsumowania wyników e-commerce.
+Przerabiasz raport MTD na podcast do odsłuchania (1-2 minuty mówienia).
+
+ZASADY:
+- Zacznij od: "Cześć, tu MPlace Briefing. Oto podsumowanie wyników za bieżący miesiąc."
+- Mów naturalnie, jakbyś opowiadał koledze przy kawie
+- Liczby zaokrąglaj: "prawie siedem" nie "6.95", "około sto pięćdziesiąt tysięcy" nie "157 080 zł"
+- Skróty rozwiń: ROAS = "zwrot z reklam", BE = "próg rentowności", EOM = "prognoza na koniec miesiąca"
+- NIE czytaj tabel — wyciągnij kluczowe punkty
+- Podkreśl co działa dobrze i co wymaga uwagi
+- Zakończ: "To tyle na dziś. Powodzenia!"
+- Max 2000 znaków
+- TYLKO tekst do przeczytania na głos. Zero markdown.`,
+        messages: [{ role: 'user', content: 'Przeróbten raport na podcast:\n\n' + reportText.substring(0, 4000) }]
+      })
+    });
+    const podcastScript = await readSSE(rResp);
+    if (!podcastScript || podcastScript.length < 50) throw new Error('Empty podcast script');
+
+    if (btn) btn.textContent = '⟳ Generuję audio...';
+
+    // Step 2: ElevenLabs TTS
+    const ttsResp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${getVoiceId()}`, {
+      method: 'POST',
+      headers: { 'xi-api-key': _11L_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: podcastScript.substring(0, 2500),
+        model_id: _11L_MODEL,
+        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+      })
+    });
+    if (!ttsResp.ok) throw new Error('ElevenLabs ' + ttsResp.status);
+
+    const blob = await ttsResp.blob();
+    _ttsLastBlob = blob;
+    _ttsLastSpoken = podcastScript;
+
+    // Play
+    stopSpeaking();
+    const url = URL.createObjectURL(blob);
+    _ttsAudio = new Audio(url);
+    _ttsSpeaking = true;
+    setVoiceState('speaking');
+    _ttsAudio.onended = () => { _ttsSpeaking = false; setVoiceState('idle'); };
+    _ttsAudio.play();
+
+    // Show replay/download buttons
+    if (btn) { btn.innerHTML = '&#9679; Podcast'; btn.disabled = false; }
+    const replayBtn = document.getElementById('roPodcastReplay');
+    const dlBtn = document.getElementById('roPodcastDl');
+    if (replayBtn) replayBtn.style.display = 'inline-block';
+    if (dlBtn) dlBtn.style.display = 'inline-block';
+
+  } catch(e) {
+    console.warn('Podcast generation failed:', e);
+    if (btn) { btn.innerHTML = '&#9679; Podcast'; btn.disabled = false; }
+    alert('Nie udało się wygenerować podcastu: ' + e.message);
+  }
 }
 
 // ── PREZENTACJA (SLIDE REPORT) ────────────────────────────
@@ -8617,6 +8705,66 @@ function saveVoice() {
 if (window.speechSynthesis) {
   speechSynthesis.getVoices();
   speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+}
+
+// ── Voice Notes — dyktowanie notatek ──────────────────────
+let _voiceNoteTarget = null;
+let _voiceNoteRec = null;
+
+function voiceNote(textareaId) {
+  const ta = document.getElementById(textareaId);
+  if (!ta) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Przeglądarka nie wspiera rozpoznawania mowy. Użyj Chrome.'); return; }
+
+  // If already recording for this field, stop
+  if (_voiceNoteRec && _voiceNoteTarget === textareaId) {
+    _voiceNoteRec.stop();
+    _voiceNoteRec = null;
+    _voiceNoteTarget = null;
+    return;
+  }
+
+  // Stop any existing recording
+  if (_voiceNoteRec) _voiceNoteRec.stop();
+
+  const rec = new SR();
+  rec.lang = 'pl-PL';
+  rec.continuous = true;
+  rec.interimResults = true;
+  _voiceNoteTarget = textareaId;
+  _voiceNoteRec = rec;
+
+  const existingText = ta.value.trim();
+  const btn = ta.parentElement.querySelector('button');
+  if (btn) { btn.style.background = 'rgba(239,68,68,.2)'; btn.style.borderColor = '#ef4444'; btn.style.color = '#ef4444'; }
+
+  rec.onresult = (e) => {
+    let transcript = '';
+    for (let i = 0; i < e.results.length; i++) transcript += e.results[i][0].transcript;
+    // Check for stop trigger
+    const lower = transcript.toLowerCase();
+    if (lower.endsWith('koniec') || lower.endsWith('zapisz')) {
+      transcript = transcript.replace(/\s*(koniec|zapisz)[.,]?\s*$/i, '').trim();
+      ta.value = existingText ? existingText + '. ' + transcript : transcript;
+      rec.stop();
+      return;
+    }
+    ta.value = existingText ? existingText + '. ' + transcript : transcript;
+  };
+
+  rec.onend = () => {
+    _voiceNoteRec = null;
+    _voiceNoteTarget = null;
+    if (btn) { btn.style.background = 'rgba(245,166,35,.08)'; btn.style.borderColor = 'rgba(245,166,35,.3)'; btn.style.color = '#f5a623'; }
+  };
+
+  rec.onerror = (e) => {
+    console.warn('Voice note error:', e.error);
+    rec.onend();
+  };
+
+  rec.start();
 }
 
 // Init voice select
@@ -15333,7 +15481,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.87</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.88</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
