@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.80</title>
+<title>MPlace Hub v6.81</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1029,7 +1029,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.80</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.81</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -8388,14 +8388,14 @@ function setVoiceState(state) {
 // ── TTS — ElevenLabs (naturalny głos) ─────────────────────
 
 const _11L_KEY = 'sk_4aeac720bcf58c10a447532b1d35af57feda3fdcf12a4bb3';
-const _11L_VOICE = 'JBFqnCBsd6RMkjVDRZzb'; // default — zmień na wybrany głos PL
+const _11L_VOICE = 'kcQkGnn0HAT2JRDQ4Ljp'; // kobieta PL
 const _11L_MODEL = 'eleven_multilingual_v2';
 let _ttsAudio = null;
 let _ttsSpeaking = false;
 
 async function speakText(text) {
   stopSpeaking();
-  // Clean markdown for natural speech
+  // Clean markdown
   const clean = text
     .replace(/\*\*(.+?)\*\*/g, '$1')
     .replace(/\*(.+?)\*/g, '$1')
@@ -8408,8 +8408,37 @@ async function speakText(text) {
     .trim();
   if (!clean) return;
 
-  // Limit to ~2500 chars (ElevenLabs free tier)
-  const trimmed = clean.length > 2500 ? clean.substring(0, 2500) + '... to tyle w skrócie.' : clean;
+  setVoiceState('speaking');
+  // Rephrase via Claude — natural speech instead of reading raw report
+  let spoken = clean;
+  try {
+    const rResp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1024,
+        system: `Jesteś asystentką głosową agencji e-commerce MPlace. Dostajesz raport/odpowiedź tekstową.
+Twoim zadaniem jest przerobić ją na NATURALNĄ WYPOWIEDŹ MÓWIONĄ — jakbyś opowiadała kolegi co się dzieje.
+
+ZASADY:
+- Mów zwięźle, max 4-6 zdań. Wyciągnij najważniejsze punkty.
+- NIE czytaj tabel, numerów ofert, ani ID.
+- Liczby zaokrąglaj i mów naturalnie: "prawie siedem" zamiast "6.95", "około sto pięćdziesiąt siedem tysięcy" zamiast "157 080".
+- Skróty rozwiń: ROAS = "zwrot z reklam", BE = "próg rentowności", EOM = "prognoza na koniec miesiąca", MoM = "miesiąc do miesiąca".
+- Zamiast "8.3%" powiedz "osiem procent".
+- Ton: spokojny, profesjonalny, jak briefing poranny.
+- Jeśli jest alarm/problem — podkreśl go.
+- Odpowiadaj TYLKO przerobionym tekstem do przeczytania na głos. Zero markdown, zero formatowania.`,
+        messages: [{ role: 'user', content: 'Przeróbto na naturalną wypowiedź mówioną:\n\n' + clean.substring(0, 3000) }]
+      })
+    });
+    const rText = await readSSE(rResp);
+    if (rText && rText.length > 20) spoken = rText;
+  } catch(e) { console.warn('Voice rephrase failed, using raw text:', e); }
+
+  // Limit for ElevenLabs
+  const trimmed = spoken.length > 2500 ? spoken.substring(0, 2500) + '... to tyle w skrócie.' : spoken;
 
   setVoiceState('speaking');
   try {
@@ -15184,7 +15213,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.80</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.81</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
