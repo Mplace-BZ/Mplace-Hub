@@ -25,6 +25,9 @@
     .script{font-size:12px;color:#6b7280;line-height:1.6;text-align:center;max-height:60px;overflow:hidden;}
     .footer{margin-top:2rem;text-align:center;font-family:'DM Mono',monospace;font-size:8px;color:#333;letter-spacing:.08em;}
     .footer a{color:#ff6b35;text-decoration:none;}
+    .metric{background:#1a1b23;border:1px solid #2a2b35;border-radius:8px;padding:8px 14px;text-align:center;min-width:80px;}
+    .metric-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:600;color:#e5e7eb;}
+    .metric-label{font-family:'DM Mono',monospace;font-size:8px;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
     #status{text-align:center;padding:3rem;font-family:'DM Mono',monospace;font-size:12px;color:#6b7280;}
     #status.err{color:#ef4444;}
   </style>
@@ -41,8 +44,13 @@
       <div class="progress-wrap" onclick="seek(event)"><div class="progress-bar" id="progressBar"></div></div>
       <div class="time"><span id="timeCur">0:00</span><span id="timeDur">0:00</span></div>
       <div class="script" id="pScript"></div>
+      <div id="pMetrics" style="display:none;margin-top:1.25rem;display:flex;gap:12px;justify-content:center;flex-wrap:wrap"></div>
     </div>
-    <div class="footer">Powered by <a href="https://mplace-bz.github.io/Mplace-Hub/">MPlace Hub</a></div>
+    <div class="footer" style="display:flex;flex-direction:column;align-items:center;gap:6px">
+      <div style="font-size:20px">&#128293;</div>
+      <div>Mplace | Sprzedaz online bez przepalen</div>
+      <div style="margin-top:4px">Powered by <a href="https://mplace-bz.github.io/Mplace-Hub/">MPlace Hub</a></div>
+    </div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -74,6 +82,13 @@
           document.getElementById('pTitle').textContent = d.title || 'MPlace Briefing';
           document.getElementById('pDate').textContent = d.date || '';
           if (d.script) document.getElementById('pScript').textContent = d.script + '...';
+          if (d.metrics) {
+            const m = document.getElementById('pMetrics');
+            m.style.display = 'flex';
+            d.metrics.forEach(mt => {
+              m.innerHTML += '<div class="metric"><div class="metric-val">' + mt.value + '</div><div class="metric-label">' + mt.label + '</div></div>';
+            });
+          }
           document.title = (d.title || 'MPlace Briefing') + ' — ' + (d.date || '');
 
           // Load audio — chunked or direct
