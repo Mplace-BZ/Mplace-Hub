@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.04</title>
+<title>MPlace Hub v7.05</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1074,7 +1074,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.04</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.05</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -7151,21 +7151,32 @@ async function generatePodcast() {
   if (aiBody) reportText += '\n' + aiBody.innerText;
 
   // Extract title from report overlay
-  const _pcScope = document.querySelector('#reportOverlay .rh-meta span[style*="ff6b35"]')?.textContent || '';
-  const _pcMonth = document.querySelector('#reportOverlay .rh-meta strong')?.textContent || '';
-  const _pcTitle = _pcScope ? ('Briefing: ' + _pcScope) : 'MPlace Briefing';
+  const _rhMeta = document.querySelector('#reportOverlay .rh-meta');
+  const _pcScope = _rhMeta?.querySelector('span')?.textContent || '';
+  const _pcMonthEl = _rhMeta?.querySelector('strong');
+  const _pcMonth = _pcMonthEl?.textContent || '';
+  const _pcTitle = _pcScope && _pcScope !== 'Raport MTD' ? ('Briefing: ' + _pcScope) : ('Briefing ' + _pcMonth);
 
-  // Extract key metrics from group table for podcast card
+  // Extract key metrics from both tables
   const _pcMetrics = [];
   try {
-    const rows = tables[0]?.querySelectorAll('tbody tr');
-    if (rows) rows.forEach(r => {
-      const cells = r.querySelectorAll('td');
-      if (cells.length >= 4) {
-        _pcMetrics.push({ label: cells[0].textContent.trim(), value: cells[1].textContent.trim() });
-      }
-    });
-  } catch(e) {}
+    // Group table (index 0): Grupa | Sprzedaż MTD | Estymacja EOM | Śr. marża
+    if (tables[0]) {
+      tables[0].querySelectorAll('tbody tr').forEach(r => {
+        const c = r.querySelectorAll('td');
+        if (c.length >= 3) _pcMetrics.push({ label: c[0].textContent.trim() + ' MTD', value: c[1].textContent.trim() });
+      });
+    }
+    // Account table (index 1): Konto | Sprzedaż | EOM | Marża | ROAS | BE ROAS | Status
+    if (tables[1]) {
+      tables[1].querySelectorAll('tbody tr').forEach(r => {
+        const c = r.querySelectorAll('td');
+        if (c.length >= 5) _pcMetrics.push({ label: c[0].textContent.trim(), value: 'ROAS ' + c[4].textContent.trim() });
+      });
+    }
+    // Limit to 6 most important
+    if (_pcMetrics.length > 6) _pcMetrics.length = 6;
+  } catch(e) { console.warn('Metrics extraction:', e); }
 
   if (!reportText.trim()) { if (btn) { btn.disabled = false; btn.innerHTML = '&#9679; Podcast'; } return; }
 
@@ -15831,7 +15842,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.04</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.05</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
