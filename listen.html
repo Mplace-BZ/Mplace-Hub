@@ -66,7 +66,7 @@
       statusEl.textContent = 'Missing podcast ID.';
     } else {
       firebase.firestore().collection('publicPodcasts').doc(id).get()
-        .then(doc => {
+        .then(async doc => {
           if (!doc.exists) { statusEl.className = 'err'; statusEl.textContent = 'Podcast not found.'; return; }
           const d = doc.data();
           statusEl.style.display = 'none';
@@ -75,7 +75,20 @@
           document.getElementById('pDate').textContent = d.date || '';
           if (d.script) document.getElementById('pScript').textContent = d.script + '...';
           document.title = (d.title || 'MPlace Briefing') + ' — ' + (d.date || '');
-          audio = new Audio(d.audioUrl || d.audioB64);
+
+          // Load audio — chunked or direct
+          let audioSrc = d.audioUrl || d.audioB64 || '';
+          if (d.chunks && d.chunks > 0) {
+            statusEl.style.display = '';
+            statusEl.textContent = 'Loading audio...';
+            const chunkDocs = await firebase.firestore().collection('publicPodcasts').doc(id)
+              .collection('audio').orderBy(firebase.firestore.FieldPath.documentId()).get();
+            let assembled = '';
+            chunkDocs.forEach(c => { assembled += c.data().data; });
+            audioSrc = assembled;
+            statusEl.style.display = 'none';
+          }
+          audio = new Audio(audioSrc);
           audio.addEventListener('loadedmetadata', () => {
             document.getElementById('timeDur').textContent = fmtTime(audio.duration);
           });
