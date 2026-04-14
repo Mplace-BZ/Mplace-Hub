@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.84</title>
+<title>MPlace Hub v6.85</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1044,7 +1044,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.84</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.85</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -8405,6 +8405,13 @@ function toggleVoice() {
   }
 }
 
+function voiceSend() {
+  // Stop recording and send (same as saying "Realizuj")
+  if (_voiceRecognition) {
+    _voiceRecognition.stop(); // triggers onend → auto-send
+  }
+}
+
 function pauseVoice() {
   if (!_ttsAudio) return;
   if (_ttsAudio.paused) {
@@ -8423,6 +8430,7 @@ function setVoiceState(state) {
   const icon = document.getElementById('voiceFabIcon');
   const status = document.getElementById('voiceStatus');
   const vcRec = document.getElementById('vcRec');
+  const vcSend = document.getElementById('vcSend');
   const vcReplay = document.getElementById('vcReplay');
   const vcPause = document.getElementById('vcPause');
   const vcStop = document.getElementById('vcStop');
@@ -8433,22 +8441,27 @@ function setVoiceState(state) {
   if (state === 'listening') {
     fab.classList.add('listening');
     icon.innerHTML = '&#9899;';
-    if (status) status.textContent = 'Slucham... powiedz "Realizuj" aby wyslac';
-    if (vcRec) vcRec.innerHTML = '&#9632; Realizuj';
+    if (status) status.textContent = 'Slucham... kliknij Realizuj lub powiedz "Realizuj"';
+    if (vcRec) vcRec.style.display = 'none';
+    if (vcSend) vcSend.style.display = 'flex';
   } else if (state === 'speaking') {
     fab.classList.add('speaking');
     icon.innerHTML = '&#9638;';
     if (status) status.textContent = 'Agent mowi...';
-    if (vcRec) vcRec.innerHTML = '&#9679; Mów';
+    if (vcRec) vcRec.style.display = 'flex';
+    if (vcSend) vcSend.style.display = 'none';
     if (vcPause) { vcPause.disabled = false; vcPause.innerHTML = '&#10074;&#10074; Pauza'; }
     if (vcStop) vcStop.disabled = false;
   } else if (state === 'processing') {
     icon.innerHTML = '&#8987;';
     if (status) status.textContent = 'Generuje glos...';
+    if (vcRec) vcRec.style.display = 'flex';
+    if (vcSend) vcSend.style.display = 'none';
   } else {
     icon.innerHTML = '&#9679;';
     if (status) status.textContent = _ttsLastBlob ? 'Gotowy — dostepne powtórzenie' : 'Gotowy — kliknij mikrofon';
-    if (vcRec) vcRec.innerHTML = '&#9679; Mów';
+    if (vcRec) vcRec.style.display = 'flex';
+    if (vcSend) vcSend.style.display = 'none';
     if (vcPause) { vcPause.disabled = true; vcPause.innerHTML = '&#10074;&#10074; Pauza'; }
   }
   // Replay/Save enabled when we have cached audio
@@ -15310,7 +15323,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.84</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.85</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -18370,7 +18383,8 @@ self.addEventListener('fetch', e => e.respondWith(
     <div class="voice-panel-header"><span class="vp-dot"></span> Centrum Glosowe</div>
     <div class="voice-panel-status" id="voiceStatus">Gotowy — kliknij mikrofon</div>
     <div class="voice-controls">
-      <button class="vc-btn vc-rec" onclick="toggleVoice()" id="vcRec" title="Nagrywaj / Realizuj">&#9679; Mów</button>
+      <button class="vc-btn vc-rec" onclick="toggleVoice()" id="vcRec" title="Nagrywaj">&#9679; Mów</button>
+      <button class="vc-btn" onclick="voiceSend()" id="vcSend" title="Zatrzymaj i wyślij" style="display:none;border-color:rgba(52,211,153,.4);color:#34d399;font-weight:600">&#10148; Realizuj</button>
       <button class="vc-btn vc-play" onclick="replayVoice()" id="vcReplay" title="Odsłuchaj ponownie" disabled>&#9654; Powtórz</button>
       <button class="vc-btn" onclick="pauseVoice()" id="vcPause" title="Pauza / Wznów" disabled>&#10074;&#10074; Pauza</button>
       <button class="vc-btn" onclick="stopSpeaking()" id="vcStop" title="Stop">&#9632; Stop</button>
