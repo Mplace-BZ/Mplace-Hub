@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.89</title>
+<title>MPlace Hub v6.90</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -429,6 +429,23 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .notelog-more{font-family:var(--mono);font-size:9px;color:var(--accent);cursor:pointer;padding:4px 8px;text-align:center;}
 .notelog-add{font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:5px;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.08);color:#f5a623;cursor:pointer;white-space:nowrap;transition:all .15s;}
 .notelog-add:hover{background:rgba(245,166,35,.2);border-color:#f5a623;}
+/* Podcast cards */
+.podcast-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:border-color .15s;}
+.podcast-card:hover{border-color:rgba(52,211,153,.3);}
+.podcast-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.podcast-title{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--text1);}
+.podcast-date{font-family:var(--mono);font-size:9px;color:var(--text3);}
+.podcast-player{display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:8px;padding:8px 12px;}
+.podcast-play-btn{width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#34d399;color:#fff;font-size:14px;flex-shrink:0;transition:all .15s;}
+.podcast-play-btn:hover{transform:scale(1.08);box-shadow:0 2px 8px rgba(52,211,153,.4);}
+.podcast-play-btn.playing{background:#ef4444;}
+.podcast-wave{flex:1;height:32px;display:flex;align-items:center;gap:1px;overflow:hidden;}
+.podcast-wave-bar{width:3px;border-radius:2px;background:rgba(52,211,153,.3);transition:height .1s;}
+.podcast-wave-bar.active{background:#34d399;}
+.podcast-time{font-family:var(--mono);font-size:10px;color:var(--text3);min-width:40px;text-align:right;}
+.podcast-actions{display:flex;gap:6px;margin-top:8px;}
+.podcast-act-btn{font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;}
+.podcast-act-btn:hover{border-color:var(--accent);color:var(--text1);}
 .note-badge{
   display:inline-flex;align-items:center;gap:4px;
   font-family:var(--mono);font-size:9px;padding:1px 7px;
@@ -963,8 +980,8 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .klk-calc-btn{font-family:var(--mono);font-size:9px;letter-spacing:.05em;padding:4px 10px;border-radius:5px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.06);color:#34d399;cursor:pointer;white-space:nowrap;transition:all .15s;}
 .klk-calc-btn:hover{background:rgba(52,211,153,.15);border-color:#34d399;}
 /* Voice Control Center */
-.voice-hub{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
-.voice-fab{width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;color:#fff;font-size:22px;box-shadow:0 4px 16px rgba(255,107,53,.4);transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.voice-hub{position:fixed;bottom:80px;right:20px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.voice-fab{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;color:#fff;font-size:16px;box-shadow:0 3px 12px rgba(255,107,53,.35);transition:all .2s;display:flex;align-items:center;justify-content:center;}
 .voice-fab:hover{transform:scale(1.08);}
 .voice-fab.listening{background:#ef4444;animation:voice-pulse 1.2s infinite;}
 @keyframes voice-pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5);}50%{box-shadow:0 0 0 14px rgba(239,68,68,0);}}
@@ -986,7 +1003,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .vc-btn.vc-play:hover{background:rgba(52,211,153,.1);}
 .vc-btn.vc-save{border-color:rgba(244,114,182,.3);color:#f472b6;}
 .vc-btn.vc-save:hover{background:rgba(244,114,182,.1);}
-.voice-transcript-preview{position:fixed;bottom:30px;right:90px;z-index:10001;background:var(--bg2);border:1px solid var(--accent);border-radius:10px;padding:10px 14px;font-family:var(--mono);font-size:12px;color:var(--text1);max-width:400px;box-shadow:0 4px 16px rgba(0,0,0,.4);display:none;text-align:right;}
+.voice-transcript-preview{position:fixed;bottom:86px;right:76px;z-index:10001;background:var(--bg2);border:1px solid var(--accent);border-radius:10px;padding:10px 14px;font-family:var(--mono);font-size:12px;color:var(--text1);max-width:400px;box-shadow:0 4px 16px rgba(0,0,0,.4);display:none;text-align:right;}
 .voice-transcript-preview.active{display:block;}
 .knowledge-proposal-popup{position:fixed;bottom:24px;right:90px;width:380px;background:var(--bg2,#1a1b23);border:1px solid var(--accent,#ff6b35);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:9999;font-family:var(--sans);}
 .kp-header{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);}
@@ -1056,7 +1073,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.89</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.90</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1096,6 +1113,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <button class="nav-btn" onclick="showView('sim')" id="navSim" style="color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2)">Symulator</button>
     <button class="nav-btn" onclick="showView('kalendarz')" id="navKalendarz" style="color:#f97316;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2)">Kalendarz</button>
     <button class="nav-btn" onclick="showView('wiedza')" id="navWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza ✦</button>
+    <button class="nav-btn" onclick="showView('podcasts')" id="navPodcasts" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Podcasts</button>
     <div class="nav-sep"></div>
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biznes</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Rozliczenie</button>
@@ -1970,6 +1988,21 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 
   <!-- Entries list -->
   <div id="wkList"></div>
+</div>
+</div>
+
+<!-- ═══ VIEW: PODCASTS ═══ -->
+<div class="view" id="viewPodcasts">
+<div class="container">
+  <div style="margin-bottom:1rem">
+    <div class="ph-eyebrow" style="color:#34d399">▸ MPlace Briefing</div>
+    <div class="ph-title">Podcasts</div>
+    <div class="ph-sub">Głosowe podsumowania raportów — odsłuchaj, udostępnij, pobierz</div>
+  </div>
+  <div id="podcastEmpty" style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:2rem;text-align:center;border:1px dashed var(--border);border-radius:10px">
+    Brak nagrań. Wygeneruj raport MTD → kliknij "Podcast" aby stworzyć pierwszy briefing.
+  </div>
+  <div id="podcastList" style="display:flex;flex-direction:column;gap:12px"></div>
 </div>
 </div>
 
@@ -3216,7 +3249,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewImportAds','viewKalendar','viewAnaliza','viewCrossBorder','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewTitleAnalyzer','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
+  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewPodcasts','viewImportAds','viewKalendar','viewAnaliza','viewCrossBorder','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewTitleAnalyzer','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -3288,6 +3321,10 @@ function showView(v){
     document.getElementById('viewWiedza').classList.add('active');
     document.getElementById('navWiedza').classList.add('active');
     renderWkList();
+  } else if(v==='podcasts'){
+    document.getElementById('viewPodcasts').classList.add('active');
+    document.getElementById('navPodcasts').classList.add('active');
+    renderPodcastList();
   } else if(v==='importads'){
     document.getElementById('viewImportAds').classList.add('active');
     document.getElementById('navImportAds').classList.add('active');
@@ -7167,6 +7204,9 @@ ZASADY:
     _ttsAudio.onended = () => { _ttsSpeaking = false; setVoiceState('idle'); };
     _ttsAudio.play();
 
+    // Save podcast to library
+    savePodcast(blob, podcastScript);
+
     // Show replay/download buttons
     if (btn) { btn.innerHTML = '&#9679; Podcast'; btn.disabled = false; }
     const replayBtn = document.getElementById('roPodcastReplay');
@@ -7179,6 +7219,133 @@ ZASADY:
     if (btn) { btn.innerHTML = '&#9679; Podcast'; btn.disabled = false; }
     alert('Nie udało się wygenerować podcastu: ' + e.message);
   }
+}
+
+// ── Podcast Library — zapis i odtwarzanie ─────────────────
+const SK_PODCASTS = 'mplace_podcasts_v1';
+let _podcastPlaying = null; // {id, audio}
+
+function getPodcasts() { try { return JSON.parse(localStorage.getItem(SK_PODCASTS) || '[]'); } catch(e) { return []; } }
+function savePodcasts(list) { localStorage.setItem(SK_PODCASTS, JSON.stringify(list)); }
+
+function savePodcast(blob, script) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const pods = getPodcasts();
+      const entry = {
+        id: Date.now(),
+        title: 'MPlace Briefing',
+        date: new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+        script: (script || '').substring(0, 500),
+        voice: _11L_VOICE,
+        audioB64: reader.result // data:audio/mpeg;base64,...
+      };
+      pods.unshift(entry);
+      // Keep max 20 podcasts
+      if (pods.length > 20) pods.length = 20;
+      savePodcasts(pods);
+      resolve(entry);
+    };
+    reader.readAsDataURL(blob);
+  });
+}
+
+function deletePodcast(id) {
+  if (!confirm('Usunac podcast?')) return;
+  stopPodcastPlayer();
+  const pods = getPodcasts().filter(p => p.id !== id);
+  savePodcasts(pods);
+  renderPodcastList();
+}
+
+function playPodcast(id) {
+  // If same podcast playing, toggle pause
+  if (_podcastPlaying && _podcastPlaying.id === id) {
+    if (_podcastPlaying.audio.paused) {
+      _podcastPlaying.audio.play();
+      updatePodcastBtn(id, true);
+    } else {
+      _podcastPlaying.audio.pause();
+      updatePodcastBtn(id, false);
+    }
+    return;
+  }
+  stopPodcastPlayer();
+  const pod = getPodcasts().find(p => p.id === id);
+  if (!pod || !pod.audioB64) return;
+  const audio = new Audio(pod.audioB64);
+  _podcastPlaying = { id, audio };
+  updatePodcastBtn(id, true);
+  audio.onended = () => { _podcastPlaying = null; updatePodcastBtn(id, false); };
+  audio.onerror = () => { _podcastPlaying = null; updatePodcastBtn(id, false); };
+  audio.play();
+}
+
+function stopPodcastPlayer() {
+  if (_podcastPlaying) {
+    _podcastPlaying.audio.pause();
+    _podcastPlaying.audio.currentTime = 0;
+    updatePodcastBtn(_podcastPlaying.id, false);
+    _podcastPlaying = null;
+  }
+}
+
+function updatePodcastBtn(id, playing) {
+  const btn = document.getElementById('pcPlay_' + id);
+  if (!btn) return;
+  if (playing) { btn.classList.add('playing'); btn.innerHTML = '&#10074;&#10074;'; }
+  else { btn.classList.remove('playing'); btn.innerHTML = '&#9654;'; }
+}
+
+function downloadPodcast(id) {
+  const pod = getPodcasts().find(p => p.id === id);
+  if (!pod || !pod.audioB64) return;
+  const a = document.createElement('a');
+  a.href = pod.audioB64;
+  a.download = `MPlace_Briefing_${pod.date.replace(/[,:\/\s]/g, '_')}.mp3`;
+  a.click();
+}
+
+function generateWaveBars() {
+  let html = '';
+  for (let i = 0; i < 40; i++) {
+    const h = 4 + Math.random() * 24;
+    html += `<div class="podcast-wave-bar" style="height:${h}px"></div>`;
+  }
+  return html;
+}
+
+function renderPodcastList() {
+  const list = document.getElementById('podcastList');
+  const empty = document.getElementById('podcastEmpty');
+  if (!list) return;
+  const pods = getPodcasts();
+  if (!pods.length) { list.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
+  if (empty) empty.style.display = 'none';
+
+  list.innerHTML = pods.map(p => {
+    const isPlaying = _podcastPlaying && _podcastPlaying.id === p.id && !_podcastPlaying.audio.paused;
+    const voiceLabel = p.voice === 'chris' ? 'Chris' : 'Sarah';
+    return `<div class="podcast-card">
+      <div class="podcast-header">
+        <div>
+          <div class="podcast-title">${p.title}</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:2px">Glos: ${voiceLabel}</div>
+        </div>
+        <div class="podcast-date">${p.date}</div>
+      </div>
+      <div class="podcast-player">
+        <button class="podcast-play-btn ${isPlaying ? 'playing' : ''}" id="pcPlay_${p.id}" onclick="playPodcast(${p.id})">${isPlaying ? '&#10074;&#10074;' : '&#9654;'}</button>
+        <div class="podcast-wave">${generateWaveBars()}</div>
+      </div>
+      ${p.script ? `<div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5;max-height:40px;overflow:hidden">${p.script}...</div>` : ''}
+      <div class="podcast-actions">
+        <button class="podcast-act-btn" onclick="downloadPodcast(${p.id})">&#8595; Pobierz MP3</button>
+        <button class="podcast-act-btn" onclick="deletePodcast(${p.id})">&#10005; Usun</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ── PREZENTACJA (SLIDE REPORT) ────────────────────────────
@@ -8542,25 +8709,25 @@ function setVoiceState(state) {
 
   if (state === 'listening') {
     fab.classList.add('listening');
-    icon.innerHTML = '&#9899;';
+    icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>';
     if (status) status.textContent = 'Slucham... kliknij Realizuj lub powiedz "Realizuj"';
     if (vcRec) vcRec.style.display = 'none';
     if (vcSend) vcSend.style.display = 'flex';
   } else if (state === 'speaking') {
     fab.classList.add('speaking');
-    icon.innerHTML = '&#9638;';
+    icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
     if (status) status.textContent = 'Agent mowi...';
     if (vcRec) vcRec.style.display = 'flex';
     if (vcSend) vcSend.style.display = 'none';
     if (vcPause) { vcPause.disabled = false; vcPause.innerHTML = '&#10074;&#10074; Pauza'; }
     if (vcStop) vcStop.disabled = false;
   } else if (state === 'processing') {
-    icon.innerHTML = '&#8987;';
+    icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>';
     if (status) status.textContent = 'Generuje glos...';
     if (vcRec) vcRec.style.display = 'flex';
     if (vcSend) vcSend.style.display = 'none';
   } else {
-    icon.innerHTML = '&#9679;';
+    icon.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
     if (status) status.textContent = _ttsLastBlob ? 'Gotowy — dostepne powtórzenie' : 'Gotowy — kliknij mikrofon';
     if (vcRec) vcRec.style.display = 'flex';
     if (vcSend) vcSend.style.display = 'none';
@@ -15569,7 +15736,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.89</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.90</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -18292,6 +18459,7 @@ function taRenderHistory(){
     {type:'tab', name:'Kanibalizator', action:()=>showView('kanibalizator')},
     {type:'tab', name:'Kalkulator',    action:()=>showView('kalkulator')},
     {type:'tab', name:'Wiedza',        action:()=>showView('wiedza')},
+    {type:'tab', name:'Podcasts',      action:()=>showView('podcasts')},
     {type:'tab', name:'Biznes',        action:()=>showView('biznes')},
     {type:'tab', name:'Rozliczenie',   action:()=>showView('rozliczenie')},
     {type:'acc',  name:'MobelKap',       group:'MEBLE',  gcls:'g-meble',  action:()=>showView('MobelKap')},
@@ -18645,7 +18813,7 @@ self.addEventListener('fetch', e => e.respondWith(
     </div>
   </div>
   <button class="voice-fab" id="voiceFab" onclick="toggleVoiceHub()" title="Centrum Glosowe">
-    <span id="voiceFabIcon">&#9679;</span>
+    <span id="voiceFabIcon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></span>
   </button>
 </div>
 <div class="voice-transcript-preview" id="voiceTranscript"></div>
