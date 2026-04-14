@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.88</title>
+<title>MPlace Hub v6.89</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -417,6 +417,18 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 }
 .note-input:focus{border-color:var(--yellow);box-shadow:0 0 0 2px rgba(245,166,35,.1);}
 .note-input::placeholder{color:var(--text3);}
+.notelog{margin-top:6px;max-height:160px;overflow-y:auto;scrollbar-width:thin;}
+.notelog-entry{display:flex;align-items:flex-start;gap:6px;padding:4px 8px;border-radius:5px;font-size:11px;line-height:1.4;transition:background .1s;}
+.notelog-entry:hover{background:rgba(245,166,35,.06);}
+.notelog-date{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;min-width:90px;}
+.notelog-icon{font-size:10px;flex-shrink:0;}
+.notelog-text{color:var(--text2);flex:1;word-break:break-word;}
+.notelog-del{opacity:0;font-size:10px;color:var(--text3);cursor:pointer;flex-shrink:0;transition:opacity .15s;}
+.notelog-entry:hover .notelog-del{opacity:1;}
+.notelog-del:hover{color:#ef4444;}
+.notelog-more{font-family:var(--mono);font-size:9px;color:var(--accent);cursor:pointer;padding:4px 8px;text-align:center;}
+.notelog-add{font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:5px;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.08);color:#f5a623;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.notelog-add:hover{background:rgba(245,166,35,.2);border-color:#f5a623;}
 .note-badge{
   display:inline-flex;align-items:center;gap:4px;
   font-family:var(--mono);font-size:9px;padding:1px 7px;
@@ -1044,7 +1056,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.88</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.89</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -4227,13 +4239,15 @@ function renderEntryCard(k,dotColor,curM){
         <div class="fw bi"><label>Monety (zł)</label><input type="number" min="0" max="999999" id="e_${k}_coinsC" placeholder="0" value="${pfV('coinsC')}" oninput="updateAuto('${k}')"></div>
         <div class="fw bi"><label title="Wpisujesz dzień np. 20 = dane za 19 zakończony">Dzień wpisu <span style="color:var(--yellow);font-size:9px">(−1 auto)</span></label><input type="number" id="e_${k}_dzien" placeholder="globalny" value=""></div>
       </div>
-      <!-- NOTATKA -->
+      <!-- NOTATKA + DZIENNIK -->
       <div style="margin-top:.4rem">
-        <div style="font-size:8.5px;color:rgba(245,166,35,.7);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">📝 Notatka do tego miesiąca <span style="color:var(--text3)">(widoczna w historii)</span></div>
+        <div style="font-size:8.5px;color:rgba(245,166,35,.7);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">📝 Dziennik konta <span style="color:var(--text3)">(historia notatek)</span></div>
         <div style="display:flex;gap:6px;align-items:flex-start">
-          <textarea class="note-input" id="e_${k}_note" rows="1" placeholder="np. nowa kampania, allegro promo, zmiana budżetu, powód spadku ROAS..." style="flex:1">${pfV('note')}</textarea>
-          <button onclick="voiceNote('e_${k}_note')" title="Dyktuj notatke" style="flex-shrink:0;width:32px;height:32px;border-radius:50%;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.08);color:#f5a623;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s">&#9679;</button>
+          <textarea class="note-input" id="e_${k}_note" rows="1" placeholder="Wpisz notatke lub dyktuj..." style="flex:1">${pfV('note')}</textarea>
+          <button onclick="voiceNote('e_${k}_note','${k}')" title="Dyktuj notatke" style="flex-shrink:0;width:32px;height:32px;border-radius:50%;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.08);color:#f5a623;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s">&#9679;</button>
+          <button class="notelog-add" onclick="addNoteFromInput('${k}')">+ Dodaj</button>
         </div>
+        <div class="notelog" id="notelog_${k}"></div>
       </div>
       <!-- AUTO ROW -->
       <div class="aec-auto" id="eAuto_${k}">
@@ -8707,25 +8721,90 @@ if (window.speechSynthesis) {
   speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 }
 
+// ── Dziennik Notatek (Note Log) ───────────────────────────
+const SK_NOTELOG = 'mplace_notelog_v1';
+
+function getNoteLog() {
+  try { return JSON.parse(localStorage.getItem(SK_NOTELOG) || '[]'); } catch(e) { return []; }
+}
+function saveNoteLog(entries) { localStorage.setItem(SK_NOTELOG, JSON.stringify(entries)); }
+
+function addNoteLog(konto, text, source) {
+  if (!text || !text.trim()) return;
+  const entries = getNoteLog();
+  entries.unshift({
+    id: Date.now(),
+    konto: konto,
+    text: text.trim(),
+    date: new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+    source: source || 'typed'
+  });
+  saveNoteLog(entries);
+  renderNoteLog(konto);
+}
+
+function deleteNoteLog(id) {
+  const entries = getNoteLog().filter(e => e.id !== id);
+  saveNoteLog(entries);
+  // Re-render all visible logs
+  document.querySelectorAll('.notelog').forEach(el => {
+    const k = el.id.replace('notelog_','');
+    renderNoteLog(k);
+  });
+}
+
+function renderNoteLog(konto) {
+  const el = document.getElementById('notelog_' + konto);
+  if (!el) return;
+  const entries = getNoteLog().filter(e => e.konto === konto);
+  if (!entries.length) { el.innerHTML = '<div style="font-family:var(--mono);font-size:9px;color:var(--text3);padding:4px 8px">Brak notatek</div>'; return; }
+  const showMax = el.dataset.expanded === 'true' ? entries.length : 5;
+  let html = '';
+  entries.slice(0, showMax).forEach(e => {
+    const icon = e.source === 'voice' ? '<span class="notelog-icon" style="color:#ef4444">&#9679;</span>' : '<span class="notelog-icon" style="color:#f5a623">&#9998;</span>';
+    html += `<div class="notelog-entry">
+      <span class="notelog-date">${e.date}</span>
+      ${icon}
+      <span class="notelog-text">${e.text}</span>
+      <span class="notelog-del" onclick="if(confirm('Usunac?'))deleteNoteLog(${e.id})" title="Usun">&#10005;</span>
+    </div>`;
+  });
+  if (entries.length > 5 && showMax <= 5) {
+    html += `<div class="notelog-more" onclick="this.parentElement.dataset.expanded='true';renderNoteLog('${konto}')">+ jeszcze ${entries.length - 5} notatek</div>`;
+  } else if (entries.length > 5 && el.dataset.expanded === 'true') {
+    html += `<div class="notelog-more" onclick="this.parentElement.dataset.expanded='false';renderNoteLog('${konto}')">Zwiń</div>`;
+  }
+  el.innerHTML = html;
+}
+
+function addNoteFromInput(konto) {
+  const ta = document.getElementById('e_' + konto + '_note');
+  if (!ta || !ta.value.trim()) return;
+  addNoteLog(konto, ta.value.trim(), 'typed');
+  ta.value = '';
+}
+
+// Render all note logs on page load
+function initNoteLogs() {
+  ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'].forEach(k => renderNoteLog(k));
+}
+document.addEventListener('DOMContentLoaded', initNoteLogs);
+
 // ── Voice Notes — dyktowanie notatek ──────────────────────
 let _voiceNoteTarget = null;
+let _voiceNoteKonto = null;
 let _voiceNoteRec = null;
 
-function voiceNote(textareaId) {
+function voiceNote(textareaId, konto) {
   const ta = document.getElementById(textareaId);
   if (!ta) return;
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { alert('Przeglądarka nie wspiera rozpoznawania mowy. Użyj Chrome.'); return; }
 
-  // If already recording for this field, stop
   if (_voiceNoteRec && _voiceNoteTarget === textareaId) {
     _voiceNoteRec.stop();
-    _voiceNoteRec = null;
-    _voiceNoteTarget = null;
     return;
   }
-
-  // Stop any existing recording
   if (_voiceNoteRec) _voiceNoteRec.stop();
 
   const rec = new SR();
@@ -8733,35 +8812,44 @@ function voiceNote(textareaId) {
   rec.continuous = true;
   rec.interimResults = true;
   _voiceNoteTarget = textareaId;
+  _voiceNoteKonto = konto;
   _voiceNoteRec = rec;
 
-  const existingText = ta.value.trim();
   const btn = ta.parentElement.querySelector('button');
   if (btn) { btn.style.background = 'rgba(239,68,68,.2)'; btn.style.borderColor = '#ef4444'; btn.style.color = '#ef4444'; }
 
   rec.onresult = (e) => {
     let transcript = '';
     for (let i = 0; i < e.results.length; i++) transcript += e.results[i][0].transcript;
-    // Check for stop trigger
     const lower = transcript.toLowerCase();
     if (lower.endsWith('koniec') || lower.endsWith('zapisz')) {
       transcript = transcript.replace(/\s*(koniec|zapisz)[.,]?\s*$/i, '').trim();
-      ta.value = existingText ? existingText + '. ' + transcript : transcript;
+      ta.value = transcript;
       rec.stop();
       return;
     }
-    ta.value = existingText ? existingText + '. ' + transcript : transcript;
+    ta.value = transcript;
   };
 
   rec.onend = () => {
+    // Auto-save to notelog
+    const text = ta.value.trim();
+    if (text && _voiceNoteKonto) {
+      addNoteLog(_voiceNoteKonto, text, 'voice');
+      ta.value = '';
+    }
     _voiceNoteRec = null;
     _voiceNoteTarget = null;
+    _voiceNoteKonto = null;
     if (btn) { btn.style.background = 'rgba(245,166,35,.08)'; btn.style.borderColor = 'rgba(245,166,35,.3)'; btn.style.color = '#f5a623'; }
   };
 
   rec.onerror = (e) => {
     console.warn('Voice note error:', e.error);
-    rec.onend();
+    _voiceNoteRec = null;
+    _voiceNoteTarget = null;
+    _voiceNoteKonto = null;
+    if (btn) { btn.style.background = 'rgba(245,166,35,.08)'; btn.style.borderColor = 'rgba(245,166,35,.3)'; btn.style.color = '#f5a623'; }
   };
 
   rec.start();
@@ -15481,7 +15569,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.88</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.89</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
