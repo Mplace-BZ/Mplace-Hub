@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.78</title>
+<title>MPlace Hub v6.79</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1029,7 +1029,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.78</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.79</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -8284,12 +8284,30 @@ function initVoiceRecognition() {
   if (!SR) return null;
   const rec = new SR();
   rec.lang = 'pl-PL';
-  rec.continuous = false;
+  rec.continuous = true;
   rec.interimResults = true;
 
   rec.onresult = (e) => {
-    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+    // Build full transcript from all results
+    let transcript = '';
+    for (let i = 0; i < e.results.length; i++) {
+      transcript += e.results[i][0].transcript;
+    }
     const isFinal = e.results[e.results.length - 1].isFinal;
+    // Check for trigger word "realizuj" — stop and send
+    const lower = transcript.toLowerCase();
+    const triggerWords = ['realizuj', 'wyślij', 'koniec', 'wysyłaj'];
+    const foundTrigger = triggerWords.find(t => lower.endsWith(t) || lower.includes(t + '.') || lower.includes(t + ','));
+    if (foundTrigger && isFinal) {
+      // Remove trigger word from transcript
+      const cleanTranscript = transcript.replace(new RegExp('\\s*' + foundTrigger + '[.,]?\\s*$', 'i'), '').trim();
+      const target = getVoiceTarget();
+      if (target) target.value = cleanTranscript;
+      const preview = document.getElementById('voiceTranscript');
+      if (preview) { preview.textContent = cleanTranscript + ' → wysyłam...'; }
+      rec.stop();
+      return;
+    }
     // Show live preview
     const preview = document.getElementById('voiceTranscript');
     if (preview) {
@@ -15123,7 +15141,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.78</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.79</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -18180,7 +18198,7 @@ self.addEventListener('fetch', e => e.respondWith(
 </div>
 <button class="voice-fab" id="voiceFab" onclick="toggleVoice()" title="Mów do Agenta">
   <span id="voiceFabIcon">&#9679;</span>
-  <span class="voice-tooltip">Mów do Agenta</span>
+  <span class="voice-tooltip">Mów do Agenta → "Realizuj" aby wysłać</span>
 </button>
 <div class="voice-transcript-preview" id="voiceTranscript"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
