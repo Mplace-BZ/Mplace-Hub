@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.93</title>
+<title>MPlace Hub v6.94</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1073,7 +1073,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.93</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.94</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -2453,6 +2453,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
       <span style="font-family:var(--mono);font-size:9px;color:#666">↑↓ lub mysz · ESC = pauza</span>
       <button onclick="pongStart()" style="font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;border:1px solid #333;background:transparent;color:#2dd4a0;cursor:pointer">Nowa gra</button>
+      <button onclick="pongToggleMusic()" id="pongMusicBtn" style="font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;border:1px solid #333;background:transparent;color:#a78bfa;cursor:pointer">&#9835; Music ON</button>
       <button onclick="pongClose()" style="font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;border:1px solid #333;background:transparent;color:#ef4444;cursor:pointer">Zamknij</button>
     </div>
   </div>
@@ -15735,7 +15736,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.93</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.94</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -16094,13 +16095,138 @@ function kbDeleteHistoryEntry(id) {
 // PONG — klasyk Atari 1972
 // ═══════════════════════════════════════════════════════════
 let _pongAnim = null;
+let _pongMusic = null;
+let _pongMusicOn = false;
+
 function pongOpen() {
   document.getElementById('pongOverlay').style.display = 'flex';
   pongStart();
 }
 function pongClose() {
   if (_pongAnim) { cancelAnimationFrame(_pongAnim); _pongAnim = null; }
+  pongStopMusic();
   document.getElementById('pongOverlay').style.display = 'none';
+}
+
+// ── 80s Synthwave Music Generator ─────────────────────────
+function pongStartMusic() {
+  if (_pongMusic) return;
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (ctx.state === 'suspended') ctx.resume();
+  const master = ctx.createGain();
+  master.gain.value = 0.15;
+  master.connect(ctx.destination);
+
+  // Bass line — classic 80s synth bass
+  const bassNotes = [55, 55, 73.42, 73.42, 65.41, 65.41, 82.41, 82.41]; // A1, D2, C2, E2
+  let bassIdx = 0;
+  const bassOsc = ctx.createOscillator();
+  const bassGain = ctx.createGain();
+  const bassFilter = ctx.createBiquadFilter();
+  bassOsc.type = 'sawtooth';
+  bassFilter.type = 'lowpass';
+  bassFilter.frequency.value = 200;
+  bassFilter.Q.value = 8;
+  bassGain.gain.value = 0.4;
+  bassOsc.connect(bassFilter);
+  bassFilter.connect(bassGain);
+  bassGain.connect(master);
+  bassOsc.frequency.value = bassNotes[0];
+  bassOsc.start();
+
+  // Pad — lush 80s pad with detuned oscillators
+  const pad1 = ctx.createOscillator();
+  const pad2 = ctx.createOscillator();
+  const padGain = ctx.createGain();
+  const padFilter = ctx.createBiquadFilter();
+  pad1.type = 'sawtooth';
+  pad2.type = 'sawtooth';
+  pad1.frequency.value = 220;
+  pad2.frequency.value = 220.8; // slight detune for width
+  padFilter.type = 'lowpass';
+  padFilter.frequency.value = 800;
+  padGain.gain.value = 0.08;
+  pad1.connect(padFilter);
+  pad2.connect(padFilter);
+  padFilter.connect(padGain);
+  padGain.connect(master);
+  pad1.start();
+  pad2.start();
+
+  // Arp — 80s arpeggiated synth
+  const arpNotes = [440, 554.37, 659.25, 554.37, 440, 329.63, 440, 554.37]; // A4,C#5,E5...
+  let arpIdx = 0;
+  const arpOsc = ctx.createOscillator();
+  const arpGain = ctx.createGain();
+  const arpFilter = ctx.createBiquadFilter();
+  arpOsc.type = 'square';
+  arpFilter.type = 'lowpass';
+  arpFilter.frequency.value = 2000;
+  arpGain.gain.value = 0.06;
+  arpOsc.connect(arpFilter);
+  arpFilter.connect(arpGain);
+  arpGain.connect(master);
+  arpOsc.frequency.value = arpNotes[0];
+  arpOsc.start();
+
+  // Hi-hat — noise burst
+  const hatBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.02, ctx.sampleRate);
+  const hatData = hatBuffer.getChannelData(0);
+  for (let i = 0; i < hatData.length; i++) hatData[i] = (Math.random() * 2 - 1) * 0.3;
+
+  // Sequencer
+  const bpm = 120;
+  const stepTime = 60 / bpm / 4; // 16th notes
+  let step = 0;
+
+  const interval = setInterval(() => {
+    // Bass: change every 2 beats (8 steps)
+    if (step % 8 === 0) {
+      bassOsc.frequency.setValueAtTime(bassNotes[bassIdx % bassNotes.length], ctx.currentTime);
+      bassIdx++;
+      // Pad follows bass
+      const padRoot = bassNotes[(bassIdx - 1) % bassNotes.length] * 4;
+      pad1.frequency.setValueAtTime(padRoot, ctx.currentTime);
+      pad2.frequency.setValueAtTime(padRoot * 1.003, ctx.currentTime);
+    }
+    // Arp: every step
+    arpOsc.frequency.setValueAtTime(arpNotes[arpIdx % arpNotes.length], ctx.currentTime);
+    arpGain.gain.setValueAtTime(0.06, ctx.currentTime);
+    arpGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + stepTime * 0.8);
+    arpIdx++;
+    // Hi-hat on every other step
+    if (step % 2 === 0) {
+      const hat = ctx.createBufferSource();
+      hat.buffer = hatBuffer;
+      const hatG = ctx.createGain();
+      hatG.gain.value = 0.12;
+      hat.connect(hatG);
+      hatG.connect(master);
+      hat.start(ctx.currentTime);
+    }
+    step++;
+  }, stepTime * 1000);
+
+  _pongMusic = { ctx, interval, master, oscs: [bassOsc, pad1, pad2, arpOsc] };
+  _pongMusicOn = true;
+  const btn = document.getElementById('pongMusicBtn');
+  if (btn) { btn.textContent = '♫ Music OFF'; btn.style.color = '#ef4444'; }
+}
+
+function pongStopMusic() {
+  if (!_pongMusic) return;
+  clearInterval(_pongMusic.interval);
+  _pongMusic.oscs.forEach(o => { try { o.stop(); } catch(e){} });
+  try { _pongMusic.ctx.close(); } catch(e){}
+  _pongMusic = null;
+  _pongMusicOn = false;
+  const btn = document.getElementById('pongMusicBtn');
+  if (btn) { btn.textContent = '♫ Music ON'; btn.style.color = '#a78bfa'; }
+}
+
+function pongToggleMusic() {
+  if (_pongMusicOn) pongStopMusic();
+  else pongStartMusic();
 }
 function pongStart() {
   if (_pongAnim) cancelAnimationFrame(_pongAnim);
