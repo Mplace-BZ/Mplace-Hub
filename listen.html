@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MPlace Briefing</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f1117'/><text y='.9em' x='50%' text-anchor='middle' font-size='60'>&#127911;</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:#0f1117;color:#e5e7eb;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .player-wrap{width:100%;max-width:420px;padding:2rem;margin:1rem;}
+    .brand{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;text-align:center;margin-bottom:1.5rem;}
+    .brand span{color:#ff6b35;}
+    .cover{width:120px;height:120px;border-radius:20px;background:linear-gradient(135deg,#ff6b35 0%,#b47fff 50%,#34d399 100%);margin:0 auto 1.5rem;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(255,107,53,.3);}
+    .cover svg{width:48px;height:48px;fill:#fff;opacity:.9;}
+    .title{font-family:'DM Mono',monospace;font-size:16px;font-weight:600;text-align:center;margin-bottom:4px;}
+    .date{font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;text-align:center;margin-bottom:1.5rem;}
+    .play-btn{width:64px;height:64px;border-radius:50%;border:none;cursor:pointer;background:#ff6b35;color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;box-shadow:0 4px 20px rgba(255,107,53,.4);transition:all .2s;}
+    .play-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(255,107,53,.5);}
+    .play-btn.playing{background:#ef4444;}
+    .progress-wrap{width:100%;height:6px;background:#1a1b23;border-radius:3px;margin-bottom:.5rem;cursor:pointer;overflow:hidden;}
+    .progress-bar{height:100%;background:linear-gradient(90deg,#ff6b35,#34d399);border-radius:3px;width:0%;transition:width .3s linear;}
+    .time{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:9px;color:#6b7280;margin-bottom:1.5rem;}
+    .script{font-size:12px;color:#6b7280;line-height:1.6;text-align:center;max-height:60px;overflow:hidden;}
+    .footer{margin-top:2rem;text-align:center;font-family:'DM Mono',monospace;font-size:8px;color:#333;letter-spacing:.08em;}
+    .footer a{color:#ff6b35;text-decoration:none;}
+    #status{text-align:center;padding:3rem;font-family:'DM Mono',monospace;font-size:12px;color:#6b7280;}
+    #status.err{color:#ef4444;}
+  </style>
+</head>
+<body>
+  <div class="player-wrap">
+    <div class="brand">M<span>Place</span> Briefing</div>
+    <div id="status">Loading...</div>
+    <div id="playerUI" style="display:none">
+      <div class="cover"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="#fff" stroke-width="1.5"/><line x1="12" y1="19" x2="12" y2="23" stroke="#fff" stroke-width="1.5"/><line x1="8" y1="23" x2="16" y2="23" stroke="#fff" stroke-width="1.5"/></svg></div>
+      <div class="title" id="pTitle">MPlace Briefing</div>
+      <div class="date" id="pDate"></div>
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">&#9654;</button>
+      <div class="progress-wrap" onclick="seek(event)"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="time"><span id="timeCur">0:00</span><span id="timeDur">0:00</span></div>
+      <div class="script" id="pScript"></div>
+    </div>
+    <div class="footer">Powered by <a href="https://mplace-bz.github.io/Mplace-Hub/">MPlace Hub</a></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey:            "AIzaSyDY9auc3QvLCsCxELZZnVLiNTzseHt7cpQ",
+      authDomain:        "mplace-hub.firebaseapp.com",
+      projectId:         "mplace-hub",
+      storageBucket:     "mplace-hub.firebasestorage.app",
+      messagingSenderId: "301464643830",
+      appId:             "1:301464643830:web:e256a5434ec148f1b9e4d7"
+    });
+
+    let audio = null;
+    const id = new URLSearchParams(window.location.search).get('id');
+    const statusEl = document.getElementById('status');
+
+    if (!id) {
+      statusEl.className = 'err';
+      statusEl.textContent = 'Missing podcast ID.';
+    } else {
+      firebase.firestore().collection('publicPodcasts').doc(id).get()
+        .then(doc => {
+          if (!doc.exists) { statusEl.className = 'err'; statusEl.textContent = 'Podcast not found.'; return; }
+          const d = doc.data();
+          statusEl.style.display = 'none';
+          document.getElementById('playerUI').style.display = 'block';
+          document.getElementById('pTitle').textContent = d.title || 'MPlace Briefing';
+          document.getElementById('pDate').textContent = d.date || '';
+          if (d.script) document.getElementById('pScript').textContent = d.script + '...';
+          document.title = (d.title || 'MPlace Briefing') + ' — ' + (d.date || '');
+          audio = new Audio(d.audioB64);
+          audio.addEventListener('loadedmetadata', () => {
+            document.getElementById('timeDur').textContent = fmtTime(audio.duration);
+          });
+          audio.addEventListener('timeupdate', () => {
+            document.getElementById('timeCur').textContent = fmtTime(audio.currentTime);
+            const pct = audio.duration ? (audio.currentTime / audio.duration * 100) : 0;
+            document.getElementById('progressBar').style.width = pct + '%';
+          });
+          audio.addEventListener('ended', () => {
+            document.getElementById('playBtn').classList.remove('playing');
+            document.getElementById('playBtn').innerHTML = '&#9654;';
+          });
+        })
+        .catch(err => { statusEl.className = 'err'; statusEl.textContent = 'Error: ' + err.message; });
+    }
+
+    function togglePlay() {
+      if (!audio) return;
+      const btn = document.getElementById('playBtn');
+      if (audio.paused) { audio.play(); btn.classList.add('playing'); btn.innerHTML = '&#10074;&#10074;'; }
+      else { audio.pause(); btn.classList.remove('playing'); btn.innerHTML = '&#9654;'; }
+    }
+
+    function seek(e) {
+      if (!audio || !audio.duration) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = pct * audio.duration;
+    }
+
+    function fmtTime(s) {
+      if (!s || isNaN(s)) return '0:00';
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+  </script>
+</body>
+</html>
