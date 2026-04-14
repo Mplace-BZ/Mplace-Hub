@@ -75,7 +75,7 @@
           document.getElementById('pDate').textContent = d.date || '';
           if (d.script) document.getElementById('pScript').textContent = d.script + '...';
           document.title = (d.title || 'MPlace Briefing') + ' — ' + (d.date || '');
-          audio = new Audio(d.audioB64);
+          audio = new Audio(d.audioUrl || d.audioB64);
           audio.addEventListener('loadedmetadata', () => {
             document.getElementById('timeDur').textContent = fmtTime(audio.duration);
           });
