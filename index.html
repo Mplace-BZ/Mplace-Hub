@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v6.86</title>
+<title>MPlace Hub v6.87</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1044,7 +1044,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.86</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v6.87</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -8472,7 +8472,14 @@ function setVoiceState(state) {
 // ── TTS — ElevenLabs (naturalny głos) ─────────────────────
 
 const _11L_KEY = 'sk_4aeac720bcf58c10a447532b1d35af57feda3fdcf12a4bb3';
-const _11L_VOICE = 'EXAVITQu4vr4xnSDxMaL'; // Sarah — kobieta, free tier, multilingual PL
+const _11L_VOICES = {
+  sarah: 'EXAVITQu4vr4xnSDxMaL',  // Sarah — kobieta
+  chris: 'JHwLP4JhPVCpNz5vE668'    // Chris — voice clone
+};
+let _11L_VOICE = localStorage.getItem('mplace_voice') || 'sarah';
+function getVoiceId() { return _11L_VOICES[_11L_VOICE] || _11L_VOICES.sarah; }
+function switchVoice(v) { _11L_VOICE = v; localStorage.setItem('mplace_voice', v); updateVoiceSelect(); }
+function updateVoiceSelect() { const el = document.getElementById('vcVoiceSelect'); if (el) el.value = _11L_VOICE; }
 const _11L_MODEL = 'eleven_multilingual_v2';
 let _ttsAudio = null;
 let _ttsSpeaking = false;
@@ -8528,7 +8535,7 @@ ZASADY:
 
   setVoiceState('speaking');
   try {
-    const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${_11L_VOICE}`, {
+    const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${getVoiceId()}`, {
       method: 'POST',
       headers: {
         'xi-api-key': _11L_KEY,
@@ -8611,6 +8618,9 @@ if (window.speechSynthesis) {
   speechSynthesis.getVoices();
   speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 }
+
+// Init voice select
+document.addEventListener('DOMContentLoaded', () => updateVoiceSelect());
 
 // Hide FAB if not supported
 if (!_voiceSupported) {
@@ -15323,7 +15333,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.86</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v6.87</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -18381,6 +18391,13 @@ self.addEventListener('fetch', e => e.respondWith(
 <div class="voice-hub" id="voiceHub">
   <div class="voice-panel">
     <div class="voice-panel-header"><span class="vp-dot"></span> Centrum Glosowe</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+      <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Glos:</span>
+      <select id="vcVoiceSelect" onchange="switchVoice(this.value)" style="font-family:var(--mono);font-size:10px;background:var(--bg3);color:var(--text1);border:1px solid var(--border);border-radius:4px;padding:2px 6px;cursor:pointer">
+        <option value="sarah">Sarah (kobieta)</option>
+        <option value="chris">Chris (Ty)</option>
+      </select>
+    </div>
     <div class="voice-panel-status" id="voiceStatus">Gotowy — kliknij mikrofon</div>
     <div class="voice-controls">
       <button class="vc-btn vc-rec" onclick="toggleVoice()" id="vcRec" title="Nagrywaj">&#9679; Mów</button>
