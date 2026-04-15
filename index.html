@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.25</title>
+<title>MPlace Hub v7.26</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1113,9 +1113,13 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .topbar-accounts button[style*="border-radius:50%"]{width:18px !important;height:18px !important;flex-shrink:0;}
 }
 
-/* ── ZESPÓŁ — nuclear hide: !important overrides everything ── */
-#viewZespol{display:none!important}
-#viewZespol.zm-active{display:block!important}
+/* ── ZESPÓŁ — overlay panel (nie .view system) ── */
+.zm-panel{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;animation:fi .2s ease}
+.zm-panel.open{display:block}
+.zm-panel-close{position:sticky;top:0;z-index:201;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px}
+.zm-panel-close button{font-family:var(--mono);font-size:11px;padding:5px 14px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s}
+.zm-panel-close button:hover{background:var(--bg3);color:var(--text)}
+.zm-panel-close span{font-family:var(--mono);font-size:12px;color:var(--text3)}
 /* ── ZESPÓŁ (Team / Worker Panel) ── */
 .zm-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem}
 .zm-tabs{display:flex;gap:6px;margin-bottom:1.5rem}
@@ -1203,7 +1207,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.25</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.26</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -3172,8 +3176,12 @@ IDs: 123456 789012 ..."></textarea>
 </div>
 </div>
 
-<!-- ═══ VIEW: ZESPÓŁ (Team / Worker Panel) ═══ -->
-<div class="view" id="viewZespol" style="display:none">
+<!-- ═══ PANEL: ZESPÓŁ (overlay, nie .view system) ═══ -->
+<div class="zm-panel" id="zmPanel">
+<div class="zm-panel-close">
+  <button onclick="zmClosePanel()">← Wróć</button>
+  <span>Zespół</span>
+</div>
 <div class="container" style="max-width:960px">
   <div class="zm-header">
     <div>
@@ -3479,10 +3487,12 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewPodcasts','viewImportAds','viewKalendar','viewAnaliza','viewCrossBorder','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewTitleAnalyzer','viewKalkulator','viewArkusz','viewWyniki','viewZespol'].forEach(id=>{
+  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewPodcasts','viewImportAds','viewKalendar','viewAnaliza','viewCrossBorder','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewTitleAnalyzer','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el){ el.classList.remove('active'); if(id==='viewZespol') el.classList.remove('zm-active'); }
+    if(el) el.classList.remove('active');
   });
+  // Close zespol overlay if open
+  document.getElementById('zmPanel')?.classList.remove('open');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('navDzis').style.boxShadow='0 0 6px rgba(239,68,68,.4)';
   document.getElementById('navCrossBorder').style.boxShadow='0 0 6px rgba(59,130,246,.4)';
@@ -3621,10 +3631,8 @@ function showView(v){
     document.getElementById('navWyniki').classList.add('active');
     renderWyniki();
   } else if(v==='zespol'){
-    const zEl=document.getElementById('viewZespol');
-    zEl.classList.add('zm-active');
-    document.getElementById('navZespol').classList.add('active');
-    zmInit();
+    zmOpenPanel();
+    return; // Don't save to lastActiveTab — it's an overlay
   } else {
     document.getElementById('viewAccount').classList.add('active');
     document.getElementById('nav'+v)?.classList.add('active');
@@ -5638,6 +5646,19 @@ let zmWorkers = [];     // [{id, email, name, access:[]}]
 let zmTasks = [];       // [{id, title, desc, assignee, status, priority, konto, dueDate, checklist:[{text,done}], createdAt, updatedAt}]
 let zmEditTaskId = null;
 
+// ── Panel open/close (overlay, nie view system) ──
+function zmOpenPanel() {
+  const panel = document.getElementById('zmPanel');
+  if (panel) panel.classList.add('open');
+  document.getElementById('navZespol')?.classList.add('active');
+  zmInit();
+}
+function zmClosePanel() {
+  const panel = document.getElementById('zmPanel');
+  if (panel) panel.classList.remove('open');
+  document.getElementById('navZespol')?.classList.remove('active');
+}
+
 // ── Role detection (called from onAuthStateChanged) ──
 async function zmDetectRole() {
   if (!currentUser) return;
@@ -5686,13 +5707,12 @@ function zmRemoveWorkerView() {
 }
 
 function zmWorkerShowView(v) {
-  ['viewZespol','viewWiedza'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.classList.remove('active'); if(id==='viewZespol') el.classList.remove('zm-active'); }
-  });
+  // Hide all worker views
+  document.getElementById('zmPanel')?.classList.remove('open');
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.zm-worker-nav .nav-btn').forEach(b => b.classList.remove('active'));
   if (v === 'tasks') {
-    const zEl=document.getElementById('viewZespol'); zEl.classList.add('zm-active');
+    document.getElementById('zmPanel')?.classList.add('open');
     document.getElementById('zmwNavTasks')?.classList.add('active');
     // Worker sees only their tasks, hide workers panel and add-task
     document.getElementById('zmWorkersPanel').style.display = 'none';
@@ -16911,7 +16931,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.25</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.26</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
