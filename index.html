@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.22</title>
+<title>MPlace Hub v7.23</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1200,7 +1200,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.22</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.23</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -3170,7 +3170,7 @@ IDs: 123456 789012 ..."></textarea>
 </div>
 
 <!-- ═══ VIEW: ZESPÓŁ (Team / Worker Panel) ═══ -->
-<div class="view" id="viewZespol">
+<div class="view" id="viewZespol" style="display:none">
 <div class="container" style="max-width:960px">
   <div class="zm-header">
     <div>
@@ -3478,7 +3478,7 @@ let acCharts={};
 function showView(v){
   ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewPodcasts','viewImportAds','viewKalendar','viewAnaliza','viewCrossBorder','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewTitleAnalyzer','viewKalkulator','viewArkusz','viewWyniki','viewZespol'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el) el.classList.remove('active');
+    if(el){ el.classList.remove('active'); if(id==='viewZespol') el.style.display='none'; }
   });
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('navDzis').style.boxShadow='0 0 6px rgba(239,68,68,.4)';
@@ -3618,7 +3618,9 @@ function showView(v){
     document.getElementById('navWyniki').classList.add('active');
     renderWyniki();
   } else if(v==='zespol'){
-    document.getElementById('viewZespol').classList.add('active');
+    const zEl=document.getElementById('viewZespol');
+    zEl.style.display='';
+    zEl.classList.add('active');
     document.getElementById('navZespol').classList.add('active');
     zmInit();
   } else {
@@ -5681,11 +5683,11 @@ function zmRemoveWorkerView() {
 function zmWorkerShowView(v) {
   ['viewZespol','viewWiedza'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.classList.remove('active');
+    if (el) { el.classList.remove('active'); if(id==='viewZespol') el.style.display='none'; }
   });
   document.querySelectorAll('.zm-worker-nav .nav-btn').forEach(b => b.classList.remove('active'));
   if (v === 'tasks') {
-    document.getElementById('viewZespol').classList.add('active');
+    const zEl=document.getElementById('viewZespol'); zEl.style.display=''; zEl.classList.add('active');
     document.getElementById('zmwNavTasks')?.classList.add('active');
     // Worker sees only their tasks, hide workers panel and add-task
     document.getElementById('zmWorkersPanel').style.display = 'none';
@@ -16904,7 +16906,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.22</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.23</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
