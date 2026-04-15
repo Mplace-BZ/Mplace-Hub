@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.15</title>
+<title>MPlace Hub v7.16</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1144,7 +1144,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.15</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.16</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -4999,6 +4999,9 @@ async function loadFromFS(){
     await loadWiedzaFromFS();
     await loadNotelogFromFS();
     await loadPodcastsMetaFromFS();
+    // Load all other synced localStorage keys
+    await _syncPullAll();
+    await _syncCatalogs();
 
     setSyncMsg('✓ Dane załadowane', 'ok');
   } catch(e){
@@ -5175,6 +5178,119 @@ async function deletePodcastAudioFromFS(id) {
     await docRef.delete();
     console.log('[sync] Podcast audio usunięty z Firebase:', id);
   } catch(e) { console.error('deletePodcastAudioFromFS', id, e); }
+}
+
+// ── Generic localStorage ↔ Firebase sync ────────────────────
+const _SYNC_KEYS = {
+  presentations: 'mplace_presentations_history',
+  reports: 'mplace_reports_history',
+  aaHistory: 'aaHistory',
+  aaTemplates: 'aaTemplates',
+  kbHistory: 'kbHistory',
+  kbWyroznienia: 'kbWyroznienia',
+  mhSavedReports: 'mhSavedReports',
+  scrSessions: 'scrSessions',
+  cbHistory: 'cbHistory',
+  cbData: 'cbData',
+  taHistory: 'ta_history',
+  taUwagi: 'ta_uwagi',
+  caArchPlans: 'caArchPlans',
+  adsTrackerPlans: 'adsTrackerPlans',
+  adsCampaigns: 'ads_campaigns_meble',
+  voice: 'mplace_voice',
+  d2d: 'adshub3_d2d_snapshots',
+  adsHistory: 'mplace_ads_history_v1',
+};
+
+async function _syncPush(docName) {
+  if (!currentUser) return;
+  const key = _SYNC_KEYS[docName];
+  if (!key) return;
+  try {
+    const raw = localStorage.getItem(key) || '';
+    await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc(docName)
+      .set({ raw, updatedAt: Date.now() });
+  } catch(e) { console.error('[sync] push', docName, e); }
+}
+
+async function _syncPull(docName) {
+  if (!currentUser) return;
+  const key = _SYNC_KEYS[docName];
+  if (!key) return;
+  try {
+    const snap = await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc(docName).get();
+    const local = localStorage.getItem(key);
+    if (!snap.exists) {
+      if (local && local !== '[]' && local !== '{}' && local !== 'null' && local !== '') {
+        await _syncPush(docName);
+        console.log('[sync]', docName, '→ initial push to Firebase');
+      }
+      return;
+    }
+    const fsRaw = snap.data().raw;
+    if (!local || local === '[]' || local === '{}' || local === 'null' || local === '') {
+      if (fsRaw && fsRaw !== '[]' && fsRaw !== '{}') {
+        localStorage.setItem(key, fsRaw);
+        console.log('[sync]', docName, '← loaded from Firebase');
+      }
+    } else {
+      const fsTime = snap.data().updatedAt || 0;
+      // Both have data — take Firebase (last synced = latest save from any device)
+      if (fsRaw && fsRaw !== '[]' && fsRaw !== '{}') {
+        localStorage.setItem(key, fsRaw);
+        console.log('[sync]', docName, '← synced from Firebase');
+      }
+    }
+  } catch(e) { console.error('[sync] pull', docName, e); }
+}
+
+async function _syncPullAll() {
+  const keys = Object.keys(_SYNC_KEYS);
+  // Pull in parallel batches of 5 to avoid overwhelming Firestore
+  for (let i = 0; i < keys.length; i += 5) {
+    await Promise.all(keys.slice(i, i + 5).map(k => _syncPull(k)));
+  }
+}
+
+// Also sync catalog per account (dynamic keys)
+async function _syncCatalogs() {
+  if (!currentUser) return;
+  const accounts = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
+  for (const k of accounts) {
+    const lsKey = 'catalog_' + k;
+    const docName = 'catalog_' + k;
+    try {
+      const snap = await db.collection('users').doc(currentUser.uid)
+        .collection('sync').doc(docName).get();
+      const local = localStorage.getItem(lsKey);
+      if (!snap.exists) {
+        if (local) {
+          await db.collection('users').doc(currentUser.uid)
+            .collection('sync').doc(docName)
+            .set({ raw: local, updatedAt: Date.now() });
+          console.log('[sync]', docName, '→ initial push');
+        }
+      } else if (!local) {
+        localStorage.setItem(lsKey, snap.data().raw);
+        console.log('[sync]', docName, '← from Firebase');
+      } else {
+        localStorage.setItem(lsKey, snap.data().raw);
+      }
+    } catch(e) { console.error('[sync] catalog', k, e); }
+  }
+}
+
+function _syncPushCatalog(konto) {
+  if (!currentUser) return;
+  const lsKey = 'catalog_' + konto;
+  const docName = 'catalog_' + konto;
+  const raw = localStorage.getItem(lsKey) || '';
+  db.collection('users').doc(currentUser.uid)
+    .collection('sync').doc(docName)
+    .set({ raw, updatedAt: Date.now() })
+    .catch(e => console.error('[sync] catalog push', konto, e));
 }
 
 // setData saves to localStorage only — Firebase sync handled explicitly in saveAllWithSync
@@ -8281,6 +8397,7 @@ function savePresentationToHistory(aiText, curM, selectedKeys) {
   });
   if (history.length > 20) history.splice(20);
   localStorage.setItem(SK_PRESENTATIONS, JSON.stringify(history));
+  _syncPush('presentations').catch(e=>console.error(e));
 }
 
 function openPDFsPRModal() {
@@ -8310,12 +8427,14 @@ function closePDFsPRModal() {
 function deletePresentation(id) {
   const history = getPresentationsHistory().filter(p => p.id !== id);
   localStorage.setItem(SK_PRESENTATIONS, JSON.stringify(history));
+  _syncPush('presentations').catch(e=>console.error(e));
   openPDFsPRModal();
 }
 
 function clearAllPresentations() {
   if (!confirm('Usunąć wszystkie zapisane prezentacje?')) return;
   localStorage.removeItem(SK_PRESENTATIONS);
+  _syncPush('presentations').catch(e=>console.error(e));
   openPDFsPRModal();
 }
 
@@ -8408,6 +8527,7 @@ function saveReportToHistory(aiText, curM, dayNum, snap, groups, selectedKeys) {
   // Keep max 20 reports
   if (history.length > 20) history.splice(20);
   localStorage.setItem(SK_REPORTS, JSON.stringify(history));
+  _syncPush('reports').catch(e=>console.error(e));
 }
 
 function openPDFsModal() {
@@ -8436,12 +8556,14 @@ function closePDFsModal() {
 function deleteReport(id) {
   const history = getReportsHistory().filter(r => r.id !== id);
   localStorage.setItem(SK_REPORTS, JSON.stringify(history));
+  _syncPush('reports').catch(e=>console.error(e));
   openPDFsModal(); // refresh list
 }
 
 function clearAllReports() {
   if (!confirm('Usunąć wszystkie zapisane raporty?')) return;
   localStorage.removeItem(SK_REPORTS);
+  _syncPush('reports').catch(e=>console.error(e));
   openPDFsModal();
 }
 
@@ -9139,7 +9261,7 @@ const _11L_VOICES = {
 };
 let _11L_VOICE = localStorage.getItem('mplace_voice') || 'sarah';
 function getVoiceId() { return _11L_VOICES[_11L_VOICE] || _11L_VOICES.sarah; }
-function switchVoice(v) { _11L_VOICE = v; localStorage.setItem('mplace_voice', v); updateVoiceSelect(); }
+function switchVoice(v) { _11L_VOICE = v; localStorage.setItem('mplace_voice', v); _syncPush('voice').catch(e=>console.error(e)); updateVoiceSelect(); }
 function updateVoiceSelect() { const el = document.getElementById('vcVoiceSelect'); if (el) el.value = _11L_VOICE; }
 const _11L_MODEL = 'eleven_multilingual_v2';
 let _ttsAudio = null;
@@ -9699,6 +9821,7 @@ async function adsRunAnalysis() {
     hist.unshift(entry);
     if(hist.length>15) hist.length=15;
     localStorage.setItem(SK_ADS_HISTORY, JSON.stringify(hist));
+    _syncPush('adsHistory').catch(e=>console.error(e));
 
     thinking.style.display='none';
     adsClearAll();
@@ -9745,6 +9868,7 @@ function adsDeleteHistory(i) {
   const hist = JSON.parse(localStorage.getItem(SK_ADS_HISTORY)||'[]');
   hist.splice(i,1);
   localStorage.setItem(SK_ADS_HISTORY, JSON.stringify(hist));
+  _syncPush('adsHistory').catch(e=>console.error(e));
   renderImportAdsList();
 }
 
@@ -10539,7 +10663,7 @@ function closePlaybook() {
 const SK_D2D = 'adshub3_d2d_snapshots';
 
 function getD2DData(){ try{ return JSON.parse(localStorage.getItem(SK_D2D)||'[]'); }catch(e){ return []; } }
-function setD2DData(arr){ localStorage.setItem(SK_D2D, JSON.stringify(arr)); }
+function setD2DData(arr){ localStorage.setItem(SK_D2D, JSON.stringify(arr)); _syncPush('d2d').catch(e=>console.error(e)); }
 
 // Pobierz wartość metryki z wpisu + producent
 function d2dMetricVal(entry, metric, prod){
@@ -12583,6 +12707,7 @@ async function aaRunAnalysis() {
     window._aaHistory.push(entry);
     if (window._aaHistory.length > 20) window._aaHistory = window._aaHistory.slice(-20);
     localStorage.setItem('aaHistory', JSON.stringify(window._aaHistory));
+    _syncPush('aaHistory').catch(e=>console.error(e));
     aaRenderHistory();
     aaShowChat();
 
@@ -12735,6 +12860,7 @@ function mhSave(source, btn) {
 
   try {
     localStorage.setItem('mhSavedReports', JSON.stringify(sessions));
+    _syncPush('mhSavedReports').catch(e=>console.error(e));
     const orig = btn.textContent; btn.textContent = '✓ Zapisano: ' + (userTitle || defaultTitle).substring(0, 30);
     setTimeout(() => { btn.textContent = orig; }, 3000);
   } catch(e) {
@@ -12743,6 +12869,7 @@ function mhSave(source, btn) {
     sessions[0].html = '';
     try {
       localStorage.setItem('mhSavedReports', JSON.stringify(sessions));
+      _syncPush('mhSavedReports').catch(e=>console.error(e));
       const orig = btn.textContent; btn.textContent = '✓ Zapisano (skrócono)';
       setTimeout(() => { btn.textContent = orig; }, 3000);
     } catch(e2) {
@@ -12838,6 +12965,7 @@ function mhDeleteSavedReport(id, source) {
   let all = JSON.parse(localStorage.getItem('mhSavedReports') || '[]');
   all = all.filter(x => x.id !== id);
   localStorage.setItem('mhSavedReports', JSON.stringify(all));
+  _syncPush('mhSavedReports').catch(e=>console.error(e));
   mhRenderSavedList(source, _mhSavedListContainers[source]);
 }
 
@@ -12952,7 +13080,7 @@ function aaDownloadMd() {
 // ── Szablony uwag ──
 const AA_TEMPLATES_KEY = 'aaTemplates';
 function aaGetTemplates() { try { return JSON.parse(localStorage.getItem(AA_TEMPLATES_KEY) || '[]'); } catch(e) { return []; } }
-function aaSaveTemplates(t) { localStorage.setItem(AA_TEMPLATES_KEY, JSON.stringify(t)); }
+function aaSaveTemplates(t) { localStorage.setItem(AA_TEMPLATES_KEY, JSON.stringify(t)); _syncPush('aaTemplates').catch(e=>console.error(e)); }
 
 function aaSaveTemplate() {
   const text = document.getElementById('aaUwagi').value.trim();
@@ -13143,6 +13271,7 @@ function aaRenderHistory() {
 function aaDeleteHistoryEntry(id) {
   window._aaHistory = window._aaHistory.filter(h => String(h.id) !== String(id));
   localStorage.setItem('aaHistory', JSON.stringify(window._aaHistory));
+  _syncPush('aaHistory').catch(e=>console.error(e));
   aaRenderHistory();
 }
 
@@ -13279,6 +13408,7 @@ function getCatalog(konto) {
 
 function saveCatalog(konto, data) {
   localStorage.setItem(CAT_KEY + konto, JSON.stringify(data));
+  _syncPushCatalog(konto);
 }
 
 async function catUpload(konto, input) {
@@ -13974,6 +14104,7 @@ function cbSaveData() {
     });
   });
   localStorage.setItem('cbData', JSON.stringify(data));
+  _syncPush('cbData').catch(e=>console.error(e));
 }
 
 function cbLoadData() {
@@ -14064,6 +14195,7 @@ function cbSaveSnapshot() {
   history.push(snapshot);
   if (history.length > 20) history = history.slice(-20);
   localStorage.setItem('cbHistory', JSON.stringify(history));
+  _syncPush('cbHistory').catch(e=>console.error(e));
   cbRenderHistory();
 
   const el = document.getElementById('cbLastSave');
@@ -14136,6 +14268,7 @@ function cbDeleteSnapshot(id) {
   let history = JSON.parse(localStorage.getItem('cbHistory') || '[]');
   history = history.filter(h => h.id !== id);
   localStorage.setItem('cbHistory', JSON.stringify(history));
+  _syncPush('cbHistory').catch(e=>console.error(e));
   cbRenderHistory();
 }
 
@@ -14310,6 +14443,7 @@ function kbSaveWyroznienia() {
   const rem = document.getElementById('kbWyrRemoved');
   if (rem) data._removed = rem.value;
   localStorage.setItem(KB_WYR_KEY, JSON.stringify(data));
+  _syncPush('kbWyroznienia').catch(e=>console.error(e));
 }
 
 // Auto-save wyróżnienia on input
@@ -14432,6 +14566,7 @@ function wyrSaveAll() {
   const data = JSON.parse(localStorage.getItem(KB_WYR_KEY) || '{}');
   if (rem) data._removed = rem.value;
   localStorage.setItem(KB_WYR_KEY, JSON.stringify(data));
+  _syncPush('kbWyroznienia').catch(e=>console.error(e));
   const status = document.getElementById('wyrSaveStatus');
   if (status) {
     status.textContent = '✓ Zapisano ' + new Date().toLocaleTimeString('pl-PL');
@@ -14679,6 +14814,7 @@ function adsTrackerSavePlanData(konto, plan) {
   const all = adsTrackerGetPlans();
   all[konto] = plan;
   localStorage.setItem(ADS_TRACKER_KEY, JSON.stringify(all));
+  _syncPush('adsTrackerPlans').catch(e=>console.error(e));
 }
 
 // ── Parser planu z tekstu (Format A v2) ──────────────────
@@ -15230,7 +15366,7 @@ function adsTrackerRender() {
 
   // Button usunięcia planu
   html += `<div style="margin-top:10px;display:flex;justify-content:flex-end">
-    <button onclick="if(confirm('Usunąć plan ${plan.kontoName}?')){const a=adsTrackerGetPlans();delete a['${konto}'];localStorage.setItem(ADS_TRACKER_KEY,JSON.stringify(a));adsTrackerRender()}" style="font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">🗑 Usuń plan</button>
+    <button onclick="if(confirm('Usunąć plan ${plan.kontoName}?')){const a=adsTrackerGetPlans();delete a['${konto}'];localStorage.setItem(ADS_TRACKER_KEY,JSON.stringify(a));_syncPush('adsTrackerPlans');adsTrackerRender()}" style="font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">🗑 Usuń plan</button>
   </div>`;
 
   dashboard.innerHTML = html;
@@ -15248,6 +15384,7 @@ function caSaveCampaignsForKonto(konto, list) {
     const all = JSON.parse(localStorage.getItem(CA_KEY) || '{}');
     all[konto] = list;
     localStorage.setItem(CA_KEY, JSON.stringify(all));
+    _syncPush('adsCampaigns').catch(e=>console.error(e));
   } catch(e) {}
 }
 
@@ -15629,6 +15766,7 @@ async function caRunArchitect() {
       plans.unshift(planEntry);
       if (plans.length > 5) plans.pop();
       localStorage.setItem('caArchPlans', JSON.stringify(plans));
+      _syncPush('caArchPlans').catch(e=>console.error(e));
     } catch(e) {}
     const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
     const meta = { title: 'AI Architect — Plan reorganizacji MEBLE', okres: '3 konta', date: new Date().toLocaleString('pl-PL') };
@@ -16131,7 +16269,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.15</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.16</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -16440,6 +16578,7 @@ async function kbRun() {
     window._kbHistory.push(entry);
     if (window._kbHistory.length > 10) window._kbHistory = window._kbHistory.slice(-10);
     localStorage.setItem(KB_HIST_KEY, JSON.stringify(window._kbHistory));
+    _syncPush('kbHistory').catch(e=>console.error(e));
     kbRenderHistory();
 
   } catch(err) {
@@ -16483,6 +16622,7 @@ function kbShowHistoryEntry(id) {
 function kbDeleteHistoryEntry(id) {
   window._kbHistory = window._kbHistory.filter(h => String(h.id) !== String(id));
   localStorage.setItem(KB_HIST_KEY, JSON.stringify(window._kbHistory));
+  _syncPush('kbHistory').catch(e=>console.error(e));
   kbRenderHistory();
 }
 
@@ -17328,6 +17468,7 @@ function scrSaveSession() {
   if (sessions.length > 20) sessions.splice(0, sessions.length - 20);
   try {
     localStorage.setItem('scrSessions', JSON.stringify(sessions));
+    _syncPush('scrSessions').catch(e=>console.error(e));
     scrRenderHistoryList();
     // Wizualne potwierdzenie
     const btn = document.getElementById('scrSaveBtn');
@@ -17376,6 +17517,7 @@ function scrDeleteSession(id) {
   if (!confirm('Usunąć rozmowę z historii?')) return;
   const sessions = scrLoadHistoryList().filter(s => String(s.id) !== String(id));
   localStorage.setItem('scrSessions', JSON.stringify(sessions));
+  _syncPush('scrSessions').catch(e=>console.error(e));
   scrRenderHistoryList();
 }
 
@@ -18359,7 +18501,7 @@ function taLoadUwagi(){
 
 function taSaveUwagi(){
   const el = document.getElementById('taUwagi');
-  if(el) localStorage.setItem(TA_UWAGI_KEY, el.value);
+  if(el) { localStorage.setItem(TA_UWAGI_KEY, el.value); _syncPush('taUwagi').catch(e=>console.error(e)); }
 }
 
 function taClear(){
@@ -18663,6 +18805,7 @@ function taSaveHistory(konto, lines, data){
     });
     if(hist.length > TA_MAX_HISTORY) hist.length = TA_MAX_HISTORY;
     localStorage.setItem(TA_HISTORY_KEY, JSON.stringify(hist));
+    _syncPush('taHistory').catch(e=>console.error(e));
     taRenderHistory();
   } catch(e){}
 }
