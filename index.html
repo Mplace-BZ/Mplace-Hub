@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.13</title>
+<title>MPlace Hub v7.14</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1091,8 +1091,26 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .notelog-entry{font-size:10px;}
   .notelog-date{font-size:8px;min-width:70px;}
   /* Brand */
-  .brand{font-size:13px !important;}
-  .brand span{font-size:13px !important;}
+  .brand{font-size:11px !important;}
+  .brand span{font-size:11px !important;}
+  /* Auth bar — ultra compact on mobile */
+  .auth-bar{padding:3px 8px !important;gap:4px !important;min-height:0 !important;font-size:9px !important;}
+  .auth-bar .nav-sep{display:none;}
+  #topDate{display:none !important;}
+  #syncMsg{display:none !important;}
+  #authStatusText{display:none !important;}
+  .auth-dot{width:6px !important;height:6px !important;}
+  .auth-user{font-size:8px !important;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .auth-btn{font-size:8px !important;padding:2px 6px !important;}
+  /* Topbar — scrollable rows */
+  .topbar-inner{overflow-x:auto;flex-wrap:nowrap;gap:4px;padding:4px 6px;scrollbar-width:none;}
+  .topbar-inner::-webkit-scrollbar{display:none;}
+  .topbar-accounts{overflow-x:auto;flex-wrap:nowrap;gap:4px;padding:4px 6px;scrollbar-width:none;}
+  .topbar-accounts::-webkit-scrollbar{display:none;}
+  .topbar-inner .nav-btn{font-size:9px;padding:4px 7px;flex-shrink:0;}
+  .topbar-accounts .nav-btn{font-size:9px;padding:4px 7px;flex-shrink:0;}
+  .topbar-accounts .nav-glbl{font-size:8px;flex-shrink:0;}
+  .topbar-accounts button[style*="border-radius:50%"]{width:18px !important;height:18px !important;flex-shrink:0;}
 }
 </style>
 
@@ -1126,7 +1144,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.13</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.14</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -4977,11 +4995,165 @@ async function loadFromFS(){
         localStorage.setItem(SK_PROD + k, v);
       });
     }
+    // Load synced modules: wiedza, notelog, podcasts
+    await loadWiedzaFromFS();
+    await loadNotelogFromFS();
+    await loadPodcastsMetaFromFS();
+
     setSyncMsg('✓ Dane załadowane', 'ok');
   } catch(e){
     console.error('loadFromFS', e);
     setSyncMsg('✗ Błąd ładowania', 'err');
   }
+}
+
+// ── Wiedza → Firebase sync ──────────────────────────────────
+async function saveWiedzaToFS() {
+  if (!currentUser) return;
+  try {
+    const entries = JSON.parse(localStorage.getItem('mplace_wiedza_v1') || '[]');
+    await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc('wiedza')
+      .set({ entries, updatedAt: Date.now() });
+  } catch(e) { console.error('saveWiedzaToFS', e); }
+}
+
+async function loadWiedzaFromFS() {
+  if (!currentUser) return;
+  try {
+    const snap = await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc('wiedza').get();
+    if (!snap.exists || !snap.data().entries) return;
+    const fsEntries = snap.data().entries;
+    const localEntries = JSON.parse(localStorage.getItem('mplace_wiedza_v1') || '[]');
+    const fsTime = snap.data().updatedAt || 0;
+    const localTime = localEntries.reduce((m, e) => Math.max(m, e.updated || e.created || 0), 0);
+    if (fsTime >= localTime || !localEntries.length) {
+      localStorage.setItem('mplace_wiedza_v1', JSON.stringify(fsEntries));
+      console.log('[sync] Wiedza załadowana z Firebase:', fsEntries.length, 'wpisów');
+    } else {
+      console.log('[sync] Lokalna wiedza nowsza — pomijam Firebase');
+    }
+  } catch(e) { console.error('loadWiedzaFromFS', e); }
+}
+
+// ── Notatki (Dziennik) → Firebase sync ──────────────────────
+async function saveNotelogToFS() {
+  if (!currentUser) return;
+  try {
+    const entries = JSON.parse(localStorage.getItem('mplace_notelog_v1') || '[]');
+    await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc('notelog')
+      .set({ entries, updatedAt: Date.now() });
+  } catch(e) { console.error('saveNotelogToFS', e); }
+}
+
+async function loadNotelogFromFS() {
+  if (!currentUser) return;
+  try {
+    const snap = await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc('notelog').get();
+    if (!snap.exists || !snap.data().entries) return;
+    const fsEntries = snap.data().entries;
+    const localEntries = JSON.parse(localStorage.getItem('mplace_notelog_v1') || '[]');
+    const fsTime = snap.data().updatedAt || 0;
+    const localTime = localEntries.reduce((m, e) => Math.max(m, e.id || 0), 0);
+    if (fsTime >= localTime || !localEntries.length) {
+      localStorage.setItem('mplace_notelog_v1', JSON.stringify(fsEntries));
+      console.log('[sync] Notatki załadowane z Firebase:', fsEntries.length, 'wpisów');
+    } else {
+      console.log('[sync] Lokalne notatki nowsze — pomijam Firebase');
+    }
+  } catch(e) { console.error('loadNotelogFromFS', e); }
+}
+
+// ── Podcasts metadata → Firebase sync ───────────────────────
+async function savePodcastsMetaToFS() {
+  if (!currentUser) return;
+  try {
+    const entries = JSON.parse(localStorage.getItem('mplace_podcasts_meta_v2') || '[]');
+    await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc('podcasts_meta')
+      .set({ entries, updatedAt: Date.now() });
+  } catch(e) { console.error('savePodcastsMetaToFS', e); }
+}
+
+async function loadPodcastsMetaFromFS() {
+  if (!currentUser) return;
+  try {
+    const snap = await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc('podcasts_meta').get();
+    if (!snap.exists || !snap.data().entries) return;
+    const fsEntries = snap.data().entries;
+    const localEntries = JSON.parse(localStorage.getItem('mplace_podcasts_meta_v2') || '[]');
+    const fsTime = snap.data().updatedAt || 0;
+    const localTime = localEntries.reduce((m, e) => Math.max(m, e.id || 0), 0);
+    if (fsTime >= localTime || !localEntries.length) {
+      localStorage.setItem('mplace_podcasts_meta_v2', JSON.stringify(fsEntries));
+      console.log('[sync] Podcasts meta załadowane z Firebase:', fsEntries.length, 'wpisów');
+    } else {
+      console.log('[sync] Lokalne podcasts meta nowsze — pomijam Firebase');
+    }
+  } catch(e) { console.error('loadPodcastsMetaFromFS', e); }
+}
+
+// ── Podcast audio → Firebase (chunked, private) ─────────────
+async function savePodcastAudioToFS(id, blob) {
+  if (!currentUser) return;
+  try {
+    const b64 = await new Promise((res) => {
+      const r = new FileReader(); r.onloadend = () => res(r.result); r.readAsDataURL(blob);
+    });
+    const CHUNK = 800000;
+    const chunks = Math.ceil(b64.length / CHUNK);
+    const docRef = db.collection('users').doc(currentUser.uid)
+      .collection('podcasts_audio').doc(id.toString());
+    await docRef.set({ chunks, updatedAt: Date.now() });
+    for (let i = 0; i < chunks; i++) {
+      await docRef.collection('audio').doc('chunk_' + i)
+        .set({ data: b64.substring(i * CHUNK, (i + 1) * CHUNK) });
+    }
+    console.log('[sync] Podcast audio uploaded:', id, chunks, 'chunks');
+  } catch(e) { console.error('savePodcastAudioToFS', id, e); }
+}
+
+async function loadPodcastAudioFromFS(id) {
+  if (!currentUser) return null;
+  try {
+    const docRef = db.collection('users').doc(currentUser.uid)
+      .collection('podcasts_audio').doc(id.toString());
+    const doc = await docRef.get();
+    if (!doc.exists) return null;
+    const numChunks = doc.data().chunks || 0;
+    let b64 = '';
+    for (let i = 0; i < numChunks; i++) {
+      const chunkDoc = await docRef.collection('audio').doc('chunk_' + i).get();
+      if (chunkDoc.exists) b64 += chunkDoc.data().data;
+    }
+    if (!b64) return null;
+    const resp = await fetch(b64);
+    const blob = await resp.blob();
+    // Cache in IndexedDB for next time
+    await savePodcastAudio(id, blob);
+    console.log('[sync] Podcast audio pobrany z Firebase:', id);
+    return blob;
+  } catch(e) { console.error('loadPodcastAudioFromFS', id, e); return null; }
+}
+
+async function deletePodcastAudioFromFS(id) {
+  if (!currentUser) return;
+  try {
+    const docRef = db.collection('users').doc(currentUser.uid)
+      .collection('podcasts_audio').doc(id.toString());
+    const doc = await docRef.get();
+    if (!doc.exists) return;
+    const numChunks = doc.data().chunks || 0;
+    for (let i = 0; i < numChunks; i++) {
+      await docRef.collection('audio').doc('chunk_' + i).delete();
+    }
+    await docRef.delete();
+    console.log('[sync] Podcast audio usunięty z Firebase:', id);
+  } catch(e) { console.error('deletePodcastAudioFromFS', id, e); }
 }
 
 // setData saves to localStorage only — Firebase sync handled explicitly in saveAllWithSync
@@ -5124,6 +5296,11 @@ auth.onAuthStateChanged(async user => {
     if(!_fsLoaded){
       _fsLoaded = true;
       await loadFromFS();
+      // Re-render synced modules after Firebase load
+      if(typeof renderWkList==='function') renderWkList();
+      if(typeof updateWkAgentStatus==='function') updateWkAgentStatus();
+      if(typeof initNoteLogs==='function') initNoteLogs();
+      if(typeof renderPodcastList==='function') renderPodcastList();
     }
     await cleanupDzien1();
     renderEntry();
@@ -7406,6 +7583,11 @@ async function savePodcast(blob, script, metrics, title) {
   pods.unshift(entry);
   while (pods.length > 50) { deletePodcastAudio(pods.pop().id); }
   savePodcastsMeta(pods);
+  // Sync to Firebase
+  if (currentUser) {
+    savePodcastsMetaToFS().catch(e => console.error(e));
+    savePodcastAudioToFS(id, blob).catch(e => console.error(e));
+  }
   console.log('Podcast saved, id:', id, 'size:', blob.size, 'bytes');
   return entry;
 }
@@ -7415,6 +7597,11 @@ async function deletePodcast(id) {
   stopPodcastPlayer();
   await deletePodcastAudio(id);
   savePodcastsMeta(getPodcasts().filter(p => p.id !== id));
+  // Sync deletion to Firebase
+  if (currentUser) {
+    savePodcastsMetaToFS().catch(e => console.error(e));
+    deletePodcastAudioFromFS(id).catch(e => console.error(e));
+  }
   renderPodcastList();
 }
 
@@ -7425,7 +7612,8 @@ async function playPodcast(id) {
     return;
   }
   stopPodcastPlayer();
-  const blob = await getPodcastAudio(id);
+  let blob = await getPodcastAudio(id);
+  if (!blob && currentUser) blob = await loadPodcastAudioFromFS(id);
   if (!blob) { alert('Audio not found'); return; }
   const url = URL.createObjectURL(blob);
   const audio = new Audio(url);
@@ -7455,7 +7643,8 @@ function updatePodcastBtn(id, playing) {
 
 async function downloadPodcast(id) {
   const pod = getPodcasts().find(p => p.id === id);
-  const blob = await getPodcastAudio(id);
+  let blob = await getPodcastAudio(id);
+  if (!blob && currentUser) blob = await loadPodcastAudioFromFS(id);
   if (!blob) { alert('Audio not found'); return; }
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -8388,6 +8577,7 @@ function getWiedza() {
 function saveWiedza(entries) {
   localStorage.setItem(SK_WIEDZA, JSON.stringify(entries));
   updateWkAgentStatus();
+  if (currentUser) saveWiedzaToFS().catch(e => console.error(e));
 }
 
 function updateWkAgentStatus() {
@@ -9075,7 +9265,10 @@ const SK_NOTELOG = 'mplace_notelog_v1';
 function getNoteLog() {
   try { return JSON.parse(localStorage.getItem(SK_NOTELOG) || '[]'); } catch(e) { return []; }
 }
-function saveNoteLog(entries) { localStorage.setItem(SK_NOTELOG, JSON.stringify(entries)); }
+function saveNoteLog(entries) {
+  localStorage.setItem(SK_NOTELOG, JSON.stringify(entries));
+  if (currentUser) saveNotelogToFS().catch(e => console.error(e));
+}
 
 function addNoteLog(konto, text, source) {
   if (!text || !text.trim()) return;
@@ -15917,7 +16110,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.13</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.14</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
