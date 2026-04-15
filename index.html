@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.21</title>
+<title>MPlace Hub v7.22</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1112,6 +1112,62 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .topbar-accounts .nav-glbl{font-size:8px;flex-shrink:0;}
   .topbar-accounts button[style*="border-radius:50%"]{width:18px !important;height:18px !important;flex-shrink:0;}
 }
+
+/* ── ZESPÓŁ (Team / Worker Panel) ── */
+.zm-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem}
+.zm-tabs{display:flex;gap:6px;margin-bottom:1.5rem}
+.zm-tab{font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s}
+.zm-tab:hover{background:var(--bg3);color:var(--text)}
+.zm-tab.active{background:rgba(59,130,246,.12);color:#60a5fa;border-color:rgba(59,130,246,.3)}
+.zm-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.75rem;transition:border-color .15s}
+.zm-card:hover{border-color:var(--border2)}
+.zm-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.zm-card-name{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text)}
+.zm-card-email{font-size:11px;color:var(--text2);font-family:var(--mono)}
+.zm-card-access{display:flex;gap:4px;flex-wrap:wrap;margin-top:.5rem}
+.zm-badge{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,.05);color:var(--text2);border:1px solid var(--border)}
+.zm-badge.active{background:rgba(59,130,246,.1);color:#60a5fa;border-color:rgba(59,130,246,.25)}
+.zm-add-form{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:1.25rem}
+.zm-add-form input,.zm-add-form select{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%}
+.zm-add-form label{font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
+.zm-btn{font-family:var(--mono);font-size:11px;padding:7px 16px;border-radius:6px;border:none;cursor:pointer;transition:all .15s;font-weight:500}
+.zm-btn-primary{background:#3b82f6;color:#fff}.zm-btn-primary:hover{background:#2563eb}
+.zm-btn-danger{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.2)}.zm-btn-danger:hover{background:rgba(239,68,68,.2)}
+.zm-btn-success{background:rgba(45,212,160,.12);color:#2dd4a0;border:1px solid rgba(45,212,160,.2)}.zm-btn-success:hover{background:rgba(45,212,160,.2)}
+.zm-btn-sm{font-size:10px;padding:4px 10px}
+.zm-empty{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:13px}
+/* tasks */
+.zm-task{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.6rem;transition:border-color .15s}
+.zm-task:hover{border-color:var(--border2)}
+.zm-task-top{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.5rem}
+.zm-task-title{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text);flex:1}
+.zm-task-pri{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;font-weight:600;letter-spacing:.06em}
+.zm-task-pri.pilne{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
+.zm-task-pri.wazne{background:rgba(245,166,35,.12);color:#f5a623;border:1px solid rgba(245,166,35,.2)}
+.zm-task-pri.info{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2)}
+.zm-task-meta{display:flex;gap:10px;font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:.5rem;flex-wrap:wrap}
+.zm-task-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:.75rem}
+.zm-task-checklist{margin:0;padding:0;list-style:none}
+.zm-task-checklist li{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:var(--text2);cursor:pointer;transition:color .15s}
+.zm-task-checklist li:hover{color:var(--text)}
+.zm-task-checklist li.done{color:var(--text3);text-decoration:line-through}
+.zm-task-checklist li::before{content:'';width:14px;height:14px;border-radius:3px;border:1px solid var(--border2);background:var(--bg);flex-shrink:0;transition:all .15s}
+.zm-task-checklist li.done::before{background:#2dd4a0;border-color:#2dd4a0}
+.zm-task-status{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .15s}
+.zm-task-status.todo{background:rgba(148,163,184,.1);color:#94a3b8;border:1px solid rgba(148,163,184,.2)}
+.zm-task-status.in_progress{background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.2)}
+.zm-task-status.done{background:rgba(45,212,160,.1);color:#2dd4a0;border:1px solid rgba(45,212,160,.2)}
+.zm-task-status.verified{background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
+.zm-task-actions{display:flex;gap:6px;margin-top:.75rem;flex-wrap:wrap}
+.zm-filter-bar{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.zm-filter-bar select,.zm-filter-bar input{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;color:var(--text);font-size:11px;font-family:var(--mono)}
+.zm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin-bottom:1.25rem}
+.zm-stat{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.75rem;text-align:center}
+.zm-stat-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--text)}
+.zm-stat-label{font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.zm-worker-view .topbar-inner,.zm-worker-view .topbar-accounts{display:none!important}
+.zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto}
+.zm-worker-view .zm-worker-nav{display:flex!important}
 </style>
 
   <!-- PWA Manifest -->
@@ -1144,7 +1200,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.21</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.22</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1183,6 +1239,8 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <div class="nav-sep"></div>
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biz</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Settle</button>
+    <div class="nav-sep"></div>
+    <button class="nav-btn" onclick="showView('zespol')" id="navZespol" style="color:#3b82f6;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2)">Team</button>
   </div>
   <div class="topbar-accounts">
     <button onclick="showView('crossborder')" id="navCrossBorder" title="Cross-Border CZ/SK" style="width:22px;height:22px;border-radius:50%;background:#3b82f6;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 6px rgba(59,130,246,.4);transition:transform .15s" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></button>
@@ -3110,6 +3168,104 @@ IDs: 123456 789012 ..."></textarea>
   </div>
 </div>
 </div>
+
+<!-- ═══ VIEW: ZESPÓŁ (Team / Worker Panel) ═══ -->
+<div class="view" id="viewZespol">
+<div class="container" style="max-width:960px">
+  <div class="zm-header">
+    <div>
+      <div class="ph-eyebrow" style="color:#3b82f6">► ZARZĄDZANIE ZESPOŁEM</div>
+      <div class="ph-title">Zespół <span style="color:#3b82f6">✦</span></div>
+      <div class="ph-sub">Pracownicy, zadania, kontrola</div>
+    </div>
+  </div>
+
+  <div class="zm-tabs">
+    <button class="zm-tab active" onclick="zmShowTab('tasks')" id="zmTabTasks">Zadania</button>
+    <button class="zm-tab" onclick="zmShowTab('workers')" id="zmTabWorkers">Pracownicy</button>
+  </div>
+
+  <!-- ── ZADANIA TAB ── -->
+  <div id="zmTasksPanel">
+    <div class="zm-stats" id="zmTaskStats"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap">
+      <div class="zm-filter-bar" id="zmTaskFilters">
+        <select id="zmFilterStatus" onchange="zmRenderTasks()">
+          <option value="">Wszystkie statusy</option>
+          <option value="todo">Do zrobienia</option>
+          <option value="in_progress">W trakcie</option>
+          <option value="done">Gotowe</option>
+          <option value="verified">Zweryfikowane</option>
+        </select>
+        <select id="zmFilterWorker" onchange="zmRenderTasks()">
+          <option value="">Wszyscy</option>
+        </select>
+        <select id="zmFilterPriority" onchange="zmRenderTasks()">
+          <option value="">Wszystkie priorytety</option>
+          <option value="PILNE">PILNE</option>
+          <option value="WAŻNE">WAŻNE</option>
+          <option value="INFO">INFO</option>
+        </select>
+      </div>
+      <button class="zm-btn zm-btn-primary" onclick="zmShowAddTask()">+ Nowe zadanie</button>
+    </div>
+    <div id="zmAddTaskForm" style="display:none">
+      <div class="zm-add-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+          <div><label>Tytuł zadania</label><input id="zmTaskTitle" placeholder="Co trzeba zrobić?"></div>
+          <div><label>Przypisz do</label><select id="zmTaskAssignee"><option value="">— wybierz —</option></select></div>
+        </div>
+        <div style="margin-bottom:.75rem"><label>Opis (opcjonalnie)</label><textarea id="zmTaskDesc" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%;min-height:60px;resize:vertical" placeholder="Szczegóły zadania..."></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+          <div><label>Priorytet</label><select id="zmTaskPriority"><option value="WAŻNE">WAŻNE</option><option value="PILNE">PILNE</option><option value="INFO">INFO</option></select></div>
+          <div><label>Konto (opcjonalnie)</label><select id="zmTaskKonto"><option value="">— brak —</option></select></div>
+          <div><label>Termin</label><input id="zmTaskDue" type="date"></div>
+        </div>
+        <div style="margin-bottom:.75rem">
+          <label>Checklist (po jednym na linię)</label>
+          <textarea id="zmTaskChecklist" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%;min-height:50px;resize:vertical" placeholder="Krok 1&#10;Krok 2&#10;Krok 3"></textarea>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="zm-btn zm-btn-primary" onclick="zmSaveTask()">Zapisz zadanie</button>
+          <button class="zm-btn" style="color:var(--text2)" onclick="zmHideAddTask()">Anuluj</button>
+        </div>
+      </div>
+    </div>
+    <div id="zmTaskList"></div>
+  </div>
+
+  <!-- ── PRACOWNICY TAB ── -->
+  <div id="zmWorkersPanel" style="display:none">
+    <div id="zmAddWorkerForm">
+      <div class="zm-add-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+          <div><label>Imię pracownika</label><input id="zmWorkerName" placeholder="Jan Kowalski"></div>
+          <div><label>Email Google</label><input id="zmWorkerEmail" type="email" placeholder="jan@gmail.com"></div>
+        </div>
+        <div style="margin-bottom:.75rem">
+          <label>Dostęp</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--text);text-transform:none;letter-spacing:0"><input type="checkbox" id="zmAccTasks" checked> Zadania</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--text);text-transform:none;letter-spacing:0"><input type="checkbox" id="zmAccWiedza"> Wiedza (read)</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--text);text-transform:none;letter-spacing:0"><input type="checkbox" id="zmAccMessages"> Wiadomości</label>
+          </div>
+        </div>
+        <button class="zm-btn zm-btn-primary" onclick="zmAddWorker()">+ Dodaj pracownika</button>
+      </div>
+    </div>
+    <div id="zmWorkerList"></div>
+  </div>
+</div>
+</div>
+
+<!-- Worker-restricted nav (shown only for workers) -->
+<div class="zm-worker-nav" id="zmWorkerNav">
+  <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">worker</span></div>
+  <div class="nav-sep"></div>
+  <button class="nav-btn active" onclick="zmWorkerShowView('tasks')" id="zmwNavTasks" style="color:#3b82f6;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2)">Zadania</button>
+  <button class="nav-btn" onclick="zmWorkerShowView('wiedza')" id="zmwNavWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza</button>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════════════
 // CONFIG
@@ -3320,7 +3476,7 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewPodcasts','viewImportAds','viewKalendar','viewAnaliza','viewCrossBorder','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewTitleAnalyzer','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
+  ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewPodcasts','viewImportAds','viewKalendar','viewAnaliza','viewCrossBorder','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewTitleAnalyzer','viewKalkulator','viewArkusz','viewWyniki','viewZespol'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
   });
@@ -3461,6 +3617,10 @@ function showView(v){
     document.getElementById('viewWyniki').classList.add('active');
     document.getElementById('navWyniki').classList.add('active');
     renderWyniki();
+  } else if(v==='zespol'){
+    document.getElementById('viewZespol').classList.add('active');
+    document.getElementById('navZespol').classList.add('active');
+    zmInit();
   } else {
     document.getElementById('viewAccount').classList.add('active');
     document.getElementById('nav'+v)?.classList.add('active');
@@ -5429,6 +5589,9 @@ auth.onAuthStateChanged(async user => {
     document.getElementById('authStatusText').textContent = '☁ Połączono';
     document.getElementById('authUserEmail').textContent = user.email;
     document.getElementById('authLogoutBtn').style.display = 'inline-block';
+    // Detect role first (worker vs owner)
+    await zmDetectRole();
+    if(userRole === 'worker') return; // Worker view handled by zmDetectRole
     // Load from Firebase only on first login this session
     if(!_fsLoaded){
       _fsLoaded = true;
@@ -5445,6 +5608,9 @@ auth.onAuthStateChanged(async user => {
   } else {
     currentUser = null;
     _fsLoaded = false;
+    userRole = 'owner';
+    zmOwnerUid = null;
+    zmRemoveWorkerView();
     document.getElementById('loginWall').style.display = 'flex';
     document.getElementById('authBar').style.display = 'none';
   }
@@ -5458,6 +5624,412 @@ function signOutUser(){
   if(confirm('Wylogować się?')) auth.signOut();
 }
 
+
+// ═══════════════════════════════════════════════════════════
+// ZESPÓŁ — Team / Worker Panel (Faza 1+2)
+// ═══════════════════════════════════════════════════════════
+let userRole = 'owner'; // 'owner' | 'worker'
+let zmOwnerUid = null;  // for workers: the owner's uid
+let zmWorkers = [];     // [{id, email, name, access:[]}]
+let zmTasks = [];       // [{id, title, desc, assignee, status, priority, konto, dueDate, checklist:[{text,done}], createdAt, updatedAt}]
+let zmEditTaskId = null;
+
+// ── Role detection (called from onAuthStateChanged) ──
+async function zmDetectRole() {
+  if (!currentUser) return;
+  const email = currentUser.email.toLowerCase();
+  try {
+    const snap = await db.collection('workerIndex').doc(email.replace(/[.#$/\[\]]/g,'_')).get();
+    if (snap.exists && snap.data().ownerUid) {
+      userRole = 'worker';
+      zmOwnerUid = snap.data().ownerUid;
+      const workerAccess = snap.data().access || ['tasks'];
+      zmApplyWorkerView(workerAccess);
+      await zmLoadTasks();
+      zmRenderTasks();
+    } else {
+      userRole = 'owner';
+      zmOwnerUid = null;
+    }
+  } catch(e) {
+    console.error('[zespol] role detection error', e);
+    userRole = 'owner';
+  }
+}
+
+function zmApplyWorkerView(access) {
+  document.body.classList.add('zm-worker-view');
+  // Show worker nav
+  const wNav = document.getElementById('zmWorkerNav');
+  if (wNav) wNav.style.display = 'flex';
+  // Hide owner topbar
+  document.querySelector('.topbar')?.style.setProperty('display','none','important');
+  // Update worker nav buttons based on access
+  const wNavWiedza = document.getElementById('zmwNavWiedza');
+  if (wNavWiedza) wNavWiedza.style.display = access.includes('wiedza') ? '' : 'none';
+  // Show tasks view by default
+  zmWorkerShowView('tasks');
+}
+
+function zmRemoveWorkerView() {
+  document.body.classList.remove('zm-worker-view');
+  const wNav = document.getElementById('zmWorkerNav');
+  if (wNav) wNav.style.display = 'none';
+  document.querySelector('.topbar')?.style.removeProperty('display');
+}
+
+function zmWorkerShowView(v) {
+  ['viewZespol','viewWiedza'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  document.querySelectorAll('.zm-worker-nav .nav-btn').forEach(b => b.classList.remove('active'));
+  if (v === 'tasks') {
+    document.getElementById('viewZespol').classList.add('active');
+    document.getElementById('zmwNavTasks')?.classList.add('active');
+    // Worker sees only their tasks, hide workers panel and add-task
+    document.getElementById('zmWorkersPanel').style.display = 'none';
+    document.getElementById('zmTasksPanel').style.display = '';
+    document.querySelectorAll('.zm-tabs').forEach(el => el.style.display = 'none');
+    const addBtn = document.querySelector('[onclick="zmShowAddTask()"]');
+    if (addBtn) addBtn.style.display = 'none';
+    zmRenderTasks();
+  } else if (v === 'wiedza') {
+    document.getElementById('viewWiedza').classList.add('active');
+    document.getElementById('zmwNavWiedza')?.classList.add('active');
+    if (typeof renderWkList === 'function') renderWkList();
+  }
+  window.scrollTo(0,0);
+}
+
+// ── Firebase paths helper ──
+function zmTeamRef() {
+  const uid = userRole === 'worker' ? zmOwnerUid : currentUser.uid;
+  return db.collection('teams').doc(uid);
+}
+
+// ── Init (called when showing Zespół tab) ──
+async function zmInit() {
+  if (userRole === 'worker') return;
+  await Promise.all([zmLoadWorkers(), zmLoadTasks()]);
+  zmPopulateSelects();
+  zmRenderWorkers();
+  zmRenderTasks();
+  zmRenderStats();
+}
+
+// ── Tab switching ──
+function zmShowTab(tab) {
+  document.getElementById('zmTabTasks').classList.toggle('active', tab === 'tasks');
+  document.getElementById('zmTabWorkers').classList.toggle('active', tab === 'workers');
+  document.getElementById('zmTasksPanel').style.display = tab === 'tasks' ? '' : 'none';
+  document.getElementById('zmWorkersPanel').style.display = tab === 'workers' ? '' : 'none';
+}
+
+// ════════════════════════════════════════
+// WORKERS CRUD
+// ════════════════════════════════════════
+async function zmLoadWorkers() {
+  if (!currentUser) return;
+  try {
+    const snap = await zmTeamRef().collection('workers').get();
+    zmWorkers = [];
+    snap.forEach(doc => zmWorkers.push({ id: doc.id, ...doc.data() }));
+  } catch(e) { console.error('[zespol] loadWorkers', e); }
+}
+
+async function zmAddWorker() {
+  const name = document.getElementById('zmWorkerName').value.trim();
+  const email = document.getElementById('zmWorkerEmail').value.trim().toLowerCase();
+  if (!name || !email) { alert('Podaj imię i email pracownika'); return; }
+  if (!email.includes('@')) { alert('Nieprawidłowy email'); return; }
+  if (zmWorkers.find(w => w.email === email)) { alert('Ten pracownik już istnieje'); return; }
+  const access = [];
+  if (document.getElementById('zmAccTasks').checked) access.push('tasks');
+  if (document.getElementById('zmAccWiedza').checked) access.push('wiedza');
+  if (document.getElementById('zmAccMessages').checked) access.push('messages');
+  const worker = { email, name, access, addedAt: Date.now() };
+  try {
+    // Save to team subcollection
+    const ref = await zmTeamRef().collection('workers').add(worker);
+    worker.id = ref.id;
+    zmWorkers.push(worker);
+    // Create index for fast lookup on login
+    await db.collection('workerIndex').doc(email.replace(/[.#$/\[\]]/g,'_')).set({
+      ownerUid: currentUser.uid,
+      name,
+      access,
+      updatedAt: Date.now()
+    });
+    // Clear form
+    document.getElementById('zmWorkerName').value = '';
+    document.getElementById('zmWorkerEmail').value = '';
+    document.getElementById('zmAccTasks').checked = true;
+    document.getElementById('zmAccWiedza').checked = false;
+    document.getElementById('zmAccMessages').checked = false;
+    zmRenderWorkers();
+    zmPopulateSelects();
+  } catch(e) { console.error('[zespol] addWorker', e); alert('Błąd zapisu: ' + e.message); }
+}
+
+async function zmRemoveWorker(id) {
+  const w = zmWorkers.find(x => x.id === id);
+  if (!w) return;
+  if (!confirm(`Usunąć pracownika ${w.name} (${w.email})?`)) return;
+  try {
+    await zmTeamRef().collection('workers').doc(id).delete();
+    await db.collection('workerIndex').doc(w.email.replace(/[.#$/\[\]]/g,'_')).delete();
+    zmWorkers = zmWorkers.filter(x => x.id !== id);
+    zmRenderWorkers();
+    zmPopulateSelects();
+  } catch(e) { console.error('[zespol] removeWorker', e); alert('Błąd usuwania: ' + e.message); }
+}
+
+async function zmToggleWorkerAccess(id, accessKey) {
+  const w = zmWorkers.find(x => x.id === id);
+  if (!w) return;
+  const idx = w.access.indexOf(accessKey);
+  if (idx >= 0) w.access.splice(idx, 1);
+  else w.access.push(accessKey);
+  try {
+    await zmTeamRef().collection('workers').doc(id).update({ access: w.access });
+    await db.collection('workerIndex').doc(w.email.replace(/[.#$/\[\]]/g,'_')).update({ access: w.access });
+    zmRenderWorkers();
+  } catch(e) { console.error('[zespol] toggleAccess', e); }
+}
+
+function zmRenderWorkers() {
+  const list = document.getElementById('zmWorkerList');
+  if (!list) return;
+  if (!zmWorkers.length) {
+    list.innerHTML = '<div class="zm-empty">Brak pracowników. Dodaj pierwszego powyżej.</div>';
+    return;
+  }
+  list.innerHTML = zmWorkers.map(w => `
+    <div class="zm-card">
+      <div class="zm-card-header">
+        <div>
+          <div class="zm-card-name">${esc(w.name)}</div>
+          <div class="zm-card-email">${esc(w.email)}</div>
+        </div>
+        <button class="zm-btn zm-btn-danger zm-btn-sm" onclick="zmRemoveWorker('${w.id}')">Usuń</button>
+      </div>
+      <div class="zm-card-access">
+        ${['tasks','wiedza','messages'].map(a =>
+          `<span class="zm-badge${w.access.includes(a) ? ' active' : ''}" onclick="zmToggleWorkerAccess('${w.id}','${a}')" style="cursor:pointer" title="Kliknij aby zmienić">${a === 'tasks' ? 'Zadania' : a === 'wiedza' ? 'Wiedza' : 'Wiadomości'}</span>`
+        ).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// ════════════════════════════════════════
+// TASKS CRUD
+// ════════════════════════════════════════
+async function zmLoadTasks() {
+  if (!currentUser) return;
+  try {
+    const snap = await zmTeamRef().collection('tasks').orderBy('createdAt','desc').get();
+    zmTasks = [];
+    snap.forEach(doc => zmTasks.push({ id: doc.id, ...doc.data() }));
+  } catch(e) { console.error('[zespol] loadTasks', e); }
+}
+
+function zmShowAddTask() {
+  zmEditTaskId = null;
+  document.getElementById('zmAddTaskForm').style.display = '';
+  document.getElementById('zmTaskTitle').value = '';
+  document.getElementById('zmTaskDesc').value = '';
+  document.getElementById('zmTaskAssignee').value = '';
+  document.getElementById('zmTaskPriority').value = 'WAŻNE';
+  document.getElementById('zmTaskKonto').value = '';
+  document.getElementById('zmTaskDue').value = '';
+  document.getElementById('zmTaskChecklist').value = '';
+  document.getElementById('zmTaskTitle').focus();
+}
+
+function zmHideAddTask() {
+  document.getElementById('zmAddTaskForm').style.display = 'none';
+  zmEditTaskId = null;
+}
+
+function zmPopulateSelects() {
+  // Populate assignee selects
+  const workerOpts = '<option value="">— wybierz —</option>' +
+    zmWorkers.map(w => `<option value="${esc(w.email)}">${esc(w.name)}</option>`).join('');
+  const assignee = document.getElementById('zmTaskAssignee');
+  if (assignee) assignee.innerHTML = workerOpts;
+  const filterW = document.getElementById('zmFilterWorker');
+  if (filterW) filterW.innerHTML = '<option value="">Wszyscy</option>' +
+    zmWorkers.map(w => `<option value="${esc(w.email)}">${esc(w.name)}</option>`).join('');
+  // Populate konto select
+  const kontoSel = document.getElementById('zmTaskKonto');
+  if (kontoSel) kontoSel.innerHTML = '<option value="">— brak —</option>' +
+    Object.keys(AC_META).map(k => `<option value="${k}">${k}</option>`).join('');
+}
+
+async function zmSaveTask() {
+  const title = document.getElementById('zmTaskTitle').value.trim();
+  if (!title) { alert('Podaj tytuł zadania'); return; }
+  const checklistRaw = document.getElementById('zmTaskChecklist').value.trim();
+  const checklist = checklistRaw ? checklistRaw.split('\n').filter(l => l.trim()).map(l => ({ text: l.trim(), done: false })) : [];
+  const task = {
+    title,
+    desc: document.getElementById('zmTaskDesc').value.trim(),
+    assignee: document.getElementById('zmTaskAssignee').value,
+    status: 'todo',
+    priority: document.getElementById('zmTaskPriority').value,
+    konto: document.getElementById('zmTaskKonto').value,
+    dueDate: document.getElementById('zmTaskDue').value,
+    checklist,
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  };
+  try {
+    if (zmEditTaskId) {
+      task.createdAt = zmTasks.find(t => t.id === zmEditTaskId)?.createdAt || Date.now();
+      await zmTeamRef().collection('tasks').doc(zmEditTaskId).update(task);
+      const idx = zmTasks.findIndex(t => t.id === zmEditTaskId);
+      if (idx >= 0) zmTasks[idx] = { ...zmTasks[idx], ...task };
+    } else {
+      const ref = await zmTeamRef().collection('tasks').add(task);
+      task.id = ref.id;
+      zmTasks.unshift(task);
+    }
+    zmHideAddTask();
+    zmRenderTasks();
+    zmRenderStats();
+  } catch(e) { console.error('[zespol] saveTask', e); alert('Błąd zapisu: ' + e.message); }
+}
+
+function zmEditTask(id) {
+  const t = zmTasks.find(x => x.id === id);
+  if (!t) return;
+  zmEditTaskId = id;
+  document.getElementById('zmAddTaskForm').style.display = '';
+  document.getElementById('zmTaskTitle').value = t.title;
+  document.getElementById('zmTaskDesc').value = t.desc || '';
+  document.getElementById('zmTaskAssignee').value = t.assignee || '';
+  document.getElementById('zmTaskPriority').value = t.priority || 'WAŻNE';
+  document.getElementById('zmTaskKonto').value = t.konto || '';
+  document.getElementById('zmTaskDue').value = t.dueDate || '';
+  document.getElementById('zmTaskChecklist').value = (t.checklist || []).map(c => c.text).join('\n');
+  document.getElementById('zmTaskTitle').focus();
+}
+
+async function zmDeleteTask(id) {
+  if (!confirm('Usunąć to zadanie?')) return;
+  try {
+    await zmTeamRef().collection('tasks').doc(id).delete();
+    zmTasks = zmTasks.filter(t => t.id !== id);
+    zmRenderTasks();
+    zmRenderStats();
+  } catch(e) { console.error('[zespol] deleteTask', e); }
+}
+
+async function zmSetTaskStatus(id, status) {
+  const t = zmTasks.find(x => x.id === id);
+  if (!t) return;
+  t.status = status;
+  t.updatedAt = Date.now();
+  try {
+    await zmTeamRef().collection('tasks').doc(id).update({ status, updatedAt: t.updatedAt });
+    zmRenderTasks();
+    zmRenderStats();
+  } catch(e) { console.error('[zespol] setStatus', e); }
+}
+
+async function zmToggleCheckItem(taskId, itemIdx) {
+  const t = zmTasks.find(x => x.id === taskId);
+  if (!t || !t.checklist[itemIdx]) return;
+  t.checklist[itemIdx].done = !t.checklist[itemIdx].done;
+  t.updatedAt = Date.now();
+  try {
+    await zmTeamRef().collection('tasks').doc(taskId).update({
+      checklist: t.checklist,
+      updatedAt: t.updatedAt
+    });
+    zmRenderTasks();
+    zmRenderStats();
+  } catch(e) { console.error('[zespol] toggleCheck', e); }
+}
+
+function zmNextStatus(current) {
+  const flow = ['todo','in_progress','done','verified'];
+  const idx = flow.indexOf(current);
+  return flow[Math.min(idx + 1, flow.length - 1)];
+}
+
+const ZM_STATUS_LABELS = { todo: 'Do zrobienia', in_progress: 'W trakcie', done: 'Gotowe', verified: 'Zweryfikowane' };
+
+function zmRenderTasks() {
+  const list = document.getElementById('zmTaskList');
+  if (!list) return;
+  // Filters
+  const fStatus = document.getElementById('zmFilterStatus')?.value || '';
+  const fWorker = document.getElementById('zmFilterWorker')?.value || '';
+  const fPriority = document.getElementById('zmFilterPriority')?.value || '';
+  let filtered = zmTasks;
+  if (userRole === 'worker') filtered = filtered.filter(t => t.assignee === currentUser.email.toLowerCase());
+  if (fStatus) filtered = filtered.filter(t => t.status === fStatus);
+  if (fWorker) filtered = filtered.filter(t => t.assignee === fWorker);
+  if (fPriority) filtered = filtered.filter(t => t.priority === fPriority);
+  if (!filtered.length) {
+    list.innerHTML = '<div class="zm-empty">Brak zadań' + (fStatus || fWorker || fPriority ? ' (zmień filtry)' : '. Utwórz pierwsze powyżej.') + '</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(t => {
+    const workerName = zmWorkers.find(w => w.email === t.assignee)?.name || t.assignee || 'Nieprzypisane';
+    const checkDone = (t.checklist || []).filter(c => c.done).length;
+    const checkTotal = (t.checklist || []).length;
+    const priClass = (t.priority || 'INFO').toLowerCase().replace('ż','z').replace('ą','a');
+    const isOwner = userRole === 'owner';
+    const nextSt = zmNextStatus(t.status);
+    return `
+      <div class="zm-task">
+        <div class="zm-task-top">
+          <div class="zm-task-title">${esc(t.title)}</div>
+          <span class="zm-task-pri ${priClass}">${esc(t.priority || 'INFO')}</span>
+        </div>
+        <div class="zm-task-meta">
+          <span>→ ${esc(workerName)}</span>
+          ${t.konto ? `<span>▸ ${esc(t.konto)}</span>` : ''}
+          ${t.dueDate ? `<span>◷ ${t.dueDate}</span>` : ''}
+          ${checkTotal ? `<span>☑ ${checkDone}/${checkTotal}</span>` : ''}
+        </div>
+        ${t.desc ? `<div class="zm-task-desc">${esc(t.desc)}</div>` : ''}
+        ${checkTotal ? `<ul class="zm-task-checklist">${t.checklist.map((c,i) =>
+          `<li class="${c.done ? 'done' : ''}" onclick="zmToggleCheckItem('${t.id}',${i})">${esc(c.text)}</li>`
+        ).join('')}</ul>` : ''}
+        <div class="zm-task-actions">
+          <span class="zm-task-status ${t.status}" onclick="zmSetTaskStatus('${t.id}','${nextSt}')" title="Kliknij → ${ZM_STATUS_LABELS[nextSt] || nextSt}">${ZM_STATUS_LABELS[t.status] || t.status}</span>
+          ${isOwner ? `<button class="zm-btn zm-btn-sm" style="color:var(--text2)" onclick="zmEditTask('${t.id}')">Edytuj</button>` : ''}
+          ${isOwner ? `<button class="zm-btn zm-btn-danger zm-btn-sm" onclick="zmDeleteTask('${t.id}')">Usuń</button>` : ''}
+          ${isOwner && t.status === 'done' ? `<button class="zm-btn zm-btn-success zm-btn-sm" onclick="zmSetTaskStatus('${t.id}','verified')">✓ Weryfikuj</button>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function zmRenderStats() {
+  const el = document.getElementById('zmTaskStats');
+  if (!el) return;
+  const total = zmTasks.length;
+  const todo = zmTasks.filter(t => t.status === 'todo').length;
+  const prog = zmTasks.filter(t => t.status === 'in_progress').length;
+  const done = zmTasks.filter(t => t.status === 'done').length;
+  const verified = zmTasks.filter(t => t.status === 'verified').length;
+  el.innerHTML = `
+    <div class="zm-stat"><div class="zm-stat-val">${total}</div><div class="zm-stat-label">Wszystkie</div></div>
+    <div class="zm-stat"><div class="zm-stat-val" style="color:#94a3b8">${todo}</div><div class="zm-stat-label">Do zrobienia</div></div>
+    <div class="zm-stat"><div class="zm-stat-val" style="color:#60a5fa">${prog}</div><div class="zm-stat-label">W trakcie</div></div>
+    <div class="zm-stat"><div class="zm-stat-val" style="color:#2dd4a0">${done}</div><div class="zm-stat-label">Gotowe</div></div>
+    <div class="zm-stat"><div class="zm-stat-val" style="color:#a78bfa">${verified}</div><div class="zm-stat-label">Zweryfikowane</div></div>
+  `;
+}
 
 
 // ═══════════════════════════════════════════════════════════
@@ -16332,7 +16904,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.21</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.22</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
