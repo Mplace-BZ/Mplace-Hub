@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.18</title>
+<title>MPlace Hub v7.19</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1144,7 +1144,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.18</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.19</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -12734,10 +12734,17 @@ function aaCopyResult(btn) {
 // 1. Kopiuj  2. Pobierz HTML  3. Drukuj/PDF  4. Email  5. Zapisz (history)  6. → Screener
 
 window._mhReports = window._mhReports || {}; // pamięć ostatnich raportów per source
+// Odtwórz ostatni raport z sessionStorage (backup po odświeżeniu)
+try {
+  const _lastBackup = sessionStorage.getItem('mhLastReport');
+  if (_lastBackup) { const _lb = JSON.parse(_lastBackup); if (_lb.source) window._mhReports[_lb.source] = _lb; }
+} catch(e) {}
 
 function mhSetReport(source, text, html, meta) {
   // source: 'analiza' | 'architect' | 'screener' | 'cockpit' itp.
   window._mhReports[source] = { text, html, meta: meta || {}, savedAt: Date.now() };
+  // Auto-backup ostatniego raportu do sessionStorage (przetrwa odświeżenie)
+  try { sessionStorage.setItem('mhLastReport', JSON.stringify({ source, text, html, meta: meta || {}, savedAt: Date.now() })); } catch(e) {}
 }
 
 function mhGetReport(source) {
@@ -16320,7 +16327,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.18</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.19</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
