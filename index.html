@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.54</title>
+<title>MPlace Hub v7.55</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1337,7 +1337,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.54</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.55</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6388,9 +6388,13 @@ async function zmSaveBriefing(konto) {
     const el = document.getElementById('zmBrief_' + konto + '_' + f.key);
     if (el) data[f.key] = el.value.trim();
   });
+  // Collect assigned workers from checkboxes
+  const assigned = [];
+  document.querySelectorAll('.zm-brief-worker-' + konto + ':checked').forEach(cb => assigned.push(cb.value));
+  data.assignedWorkers = assigned;
   try {
     await zmTeamRef().collection('briefings').doc(konto).set(data, { merge: true });
-    zmBriefings[konto] = data;
+    zmBriefings[konto] = { ...(zmBriefings[konto]||{}), ...data };
     zmRenderBriefings();
   } catch(e) { console.error('[briefings] save', e); alert('Błąd: ' + e.message); }
 }
@@ -6404,18 +6408,33 @@ function zmRenderBriefings() {
   const list = document.getElementById('zmBriefingsList');
   if (!list) return;
   const isOwner = userRole === 'owner';
-  const accounts = Object.keys(AC_META);
+  const myEmail = currentUser.email.toLowerCase();
+  let accounts = Object.keys(AC_META);
+  // Worker filter: show only briefings assigned to them
+  if (!isOwner) {
+    accounts = accounts.filter(konto => {
+      const b = zmBriefings[konto];
+      return b && Array.isArray(b.assignedWorkers) && b.assignedWorkers.includes(myEmail);
+    });
+    if (!accounts.length) {
+      list.innerHTML = '<div class="zm-empty">Brak briefingów przypisanych do Ciebie. Owner musi je udostępnić.</div>';
+      return;
+    }
+  }
   list.innerHTML = accounts.map(konto => {
     const b = zmBriefings[konto] || {};
     const meta = AC_META[konto];
     const grpColor = meta.group === 'MEBLE' ? '#ff6b35' : meta.group === 'LUXSEN' ? '#2dd4a0' : '#b47fff';
-    const hasContent = Object.values(b).some(v => v && typeof v === 'string');
+    const hasContent = ZM_BRIEFING_FIELDS.some(f => b[f.key]);
+    const assigned = Array.isArray(b.assignedWorkers) ? b.assignedWorkers : [];
+    const assignedNames = assigned.map(email => zmWorkers.find(w => w.email === email)?.name || email).join(', ');
     return `
       <div class="zm-briefing-card" style="border-left:3px solid ${grpColor}">
         <div class="zm-briefing-head">
           <div>
             <div class="zm-briefing-konto">${esc(konto)}</div>
             <div style="font-size:10px;color:var(--text3);margin-top:2px">${esc(meta.name)} · ${meta.group}${meta.role?' · '+meta.role.toUpperCase():''}</div>
+            ${isOwner ? `<div style="font-size:10px;margin-top:4px;color:${assigned.length?'#2dd4a0':'#f5a623'}">${assigned.length?'👥 '+esc(assignedNames):'⚠ Nieprzypisany do nikogo'}</div>` : ''}
           </div>
           ${isOwner ? `<button type="button" class="zm-btn zm-btn-sm zm-btn-edit" onclick="zmToggleBriefingEdit('${konto}')">✎ ${hasContent?'Edytuj':'Uzupełnij'}</button>` : ''}
         </div>
@@ -6438,8 +6457,22 @@ function zmRenderBriefings() {
               : `<input id="zmBrief_${konto}_${f.key}" placeholder="${f.placeholder}" value="${esc(b[f.key]||'')}">`
             }
           `).join('')}
-          <button type="button" class="zm-btn zm-btn-primary zm-btn-sm" onclick="zmSaveBriefing('${konto}')">💾 Zapisz briefing</button>
-          <button type="button" class="zm-btn zm-btn-sm" style="color:var(--text2);border:1px solid var(--border)" onclick="zmToggleBriefingEdit('${konto}')">Anuluj</button>
+          <label style="margin-top:.5rem">👥 Udostępnij pracownikom</label>
+          ${zmWorkers.length === 0
+            ? '<div style="color:var(--text3);font-size:10px;padding:6px 0">Brak pracowników — dodaj ich w tabie Pracownicy</div>'
+            : `<div style="display:flex;flex-wrap:wrap;gap:8px;padding:6px 0">
+                ${zmWorkers.map(w => `
+                  <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;font-family:var(--mono);color:var(--text);padding:4px 8px;background:var(--bg);border:1px solid var(--border);border-radius:4px">
+                    <input type="checkbox" class="zm-brief-worker-${konto}" value="${esc(w.email)}" ${assigned.includes(w.email)?'checked':''}>
+                    ${esc(w.name)}
+                  </label>
+                `).join('')}
+              </div>`
+          }
+          <div style="display:flex;gap:6px;margin-top:.5rem">
+            <button type="button" class="zm-btn zm-btn-primary zm-btn-sm" onclick="zmSaveBriefing('${konto}')">💾 Zapisz briefing</button>
+            <button type="button" class="zm-btn zm-btn-sm" style="color:var(--text2);border:1px solid var(--border)" onclick="zmToggleBriefingEdit('${konto}')">Anuluj</button>
+          </div>
         </div>
         ` : ''}
       </div>
@@ -7041,7 +7074,7 @@ function zmShowTab(tab) {
   });
   if (tab === 'templates') zmLoadTemplates().then(zmRenderTemplates);
   else if (tab === 'wknow') zmLoadWKnow().then(zmRenderWKnow);
-  else if (tab === 'briefings') zmLoadBriefings().then(zmRenderBriefings);
+  else if (tab === 'briefings') Promise.all([zmLoadBriefings(), zmLoadWorkers()]).then(zmRenderBriefings);
   else if (tab === 'secrets') { zmLoadSecretsMeta().then(() => {
     // Auto-unlock if password cached in session
     const cached = sessionStorage.getItem('zmMasterPass');
@@ -18554,7 +18587,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.54</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.55</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
