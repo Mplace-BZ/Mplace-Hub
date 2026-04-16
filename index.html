@@ -6214,6 +6214,8 @@ async function zmDetectRole() {
     if (wSnap.exists && wSnap.data().ownerUid && wSnap.data().ownerUid !== currentUser.uid) {
       userRole = 'worker';
       zmOwnerUid = wSnap.data().ownerUid;
+      // Register worker UID for Firestore security rules
+      try { await db.collection('workerUids').doc(currentUser.uid).set({ ownerUid: zmOwnerUid }, { merge: true }); } catch(e) { console.warn('[workerUids] register:', e); }
       const workerAccess = wSnap.data().access || ['tasks'];
       zmApplyWorkerView(workerAccess);
       await zmLoadTasks();
