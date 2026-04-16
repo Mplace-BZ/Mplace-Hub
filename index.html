@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.60</title>
+<title>MPlace Hub v7.61</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1190,10 +1190,10 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 @keyframes zmMicPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.6)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
 .zm-btn *{pointer-events:none}
 /* Date picker indicator visible in dark mode */
-.zm-panel input[type="date"]::-webkit-calendar-picker-indicator,
-.zm-panel input[type="date"]::-webkit-inner-spin-button{filter:invert(.85);cursor:pointer;opacity:.7;transition:opacity .15s}
-.zm-panel input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
-.zm-panel input[type="date"]{color-scheme:dark}
+input[type="date"]{color-scheme:dark}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-inner-spin-button{filter:invert(.85);cursor:pointer;opacity:.7;transition:opacity .15s}
+input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 /* Template flash highlight */
 .zm-card.zm-flash{animation:zmFlashIn 1.5s ease-out}
 @keyframes zmFlashIn{0%{border-color:#2dd4a0;box-shadow:0 0 0 2px rgba(45,212,160,.4),0 0 20px rgba(45,212,160,.3);background:rgba(45,212,160,.08)}100%{border-color:var(--border);box-shadow:none;background:var(--bg2)}}
@@ -1377,7 +1377,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.60</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.61</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -19457,7 +19457,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.60</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.61</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
