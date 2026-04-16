@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.62</title>
+<title>MPlace Hub v7.63</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1197,6 +1197,34 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 /* Template flash highlight */
 .zm-card.zm-flash{animation:zmFlashIn 1.5s ease-out}
 @keyframes zmFlashIn{0%{border-color:#2dd4a0;box-shadow:0 0 0 2px rgba(45,212,160,.4),0 0 20px rgba(45,212,160,.3);background:rgba(45,212,160,.08)}100%{border-color:var(--border);box-shadow:none;background:var(--bg2)}}
+/* Calendar */
+.zm-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.zm-cal-nav{display:flex;align-items:center;gap:8px}
+.zm-cal-nav button{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text2);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s}
+.zm-cal-nav button:hover{background:var(--bg3);color:var(--text)}
+.zm-cal-month{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--text);min-width:180px;text-align:center}
+.zm-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.zm-cal-dayname{font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;padding:6px 0;text-transform:uppercase;letter-spacing:.08em}
+.zm-cal-cell{min-height:90px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px 6px;transition:border-color .15s;position:relative;overflow:hidden}
+.zm-cal-cell:hover{border-color:var(--border2)}
+.zm-cal-cell.today{border-color:rgba(96,165,250,.5);box-shadow:0 0 8px rgba(96,165,250,.15)}
+.zm-cal-cell.outside{opacity:.35;background:transparent}
+.zm-cal-date{font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:4px}
+.zm-cal-cell.today .zm-cal-date{color:#60a5fa;font-weight:700}
+.zm-cal-tasks{display:flex;flex-direction:column;gap:2px}
+.zm-cal-task{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:all .12s;border-left:2px solid}
+.zm-cal-task:hover{filter:brightness(1.3);transform:translateX(2px)}
+.zm-cal-task.pri-pilne{background:rgba(239,68,68,.15);color:#f87171;border-color:#ef4444}
+.zm-cal-task.pri-wazne{background:rgba(245,166,35,.12);color:#fbbf24;border-color:#f5a623}
+.zm-cal-task.pri-info{background:rgba(96,165,250,.12);color:#93c5fd;border-color:#60a5fa}
+.zm-cal-task.st-done,.zm-cal-task.st-verified{opacity:.45;text-decoration:line-through}
+.zm-cal-more{font-family:var(--mono);font-size:8px;color:var(--text3);text-align:center;margin-top:2px;cursor:pointer}
+.zm-cal-more:hover{color:var(--text2)}
+@media(max-width:768px){
+  .zm-cal-cell{min-height:50px;padding:3px 4px}
+  .zm-cal-task{font-size:8px;padding:1px 4px}
+  .zm-cal-date{font-size:9px}
+}
 /* Task Factory modal */
 .tf-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1rem;animation:zmFadeIn .15s ease}
 @keyframes zmFadeIn{from{opacity:0}to{opacity:1}}
@@ -1377,7 +1405,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.62</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.63</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1453,6 +1481,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <button class="nav-btn" onclick="zmWorkerShowView('briefings')" id="zmwNavBriefings" style="color:#2dd4a0;background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2)">Briefingi</button>
   <button class="nav-btn" onclick="zmWorkerShowView('secrets')" id="zmwNavSecrets" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Loginy 🔐</button>
   <button class="nav-btn" onclick="zmWorkerShowView('sessions')" id="zmwNavSessions" style="color:#06b6d4;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2)">Rozliczenie</button>
+  <button class="nav-btn" onclick="zmWorkerShowView('calendar')" id="zmwNavCalendar" style="color:#f97316;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2)">Kalendarz</button>
   <div style="flex:1"></div>
   <button class="nav-btn zm-sos-btn" onclick="zmSOS()" title="Poproś Chrisa o pomoc (tworzy task PILNY)">🆘 SOS</button>
 </div>
@@ -3388,6 +3417,7 @@ IDs: 123456 789012 ..."></textarea>
     <button class="zm-tab" onclick="zmShowTab('sessions')" id="zmTabSessions">Rozliczenie</button>
     <button class="zm-tab" onclick="zmShowTab('announce')" id="zmTabAnnounce">Ogłoszenia</button>
     <button class="zm-tab" onclick="zmShowTab('actions')" id="zmTabActions">⚡ Biblioteka akcji</button>
+    <button class="zm-tab" onclick="zmShowTab('calendar')" id="zmTabCalendar">📅 Kalendarz</button>
   </div>
 
   <!-- ── ZADANIA TAB ── -->
@@ -3564,6 +3594,19 @@ IDs: 123456 789012 ..."></textarea>
     <div id="tfBuiltinList" style="margin-top:.5rem"></div>
     <div style="margin-top:1rem;font-family:var(--mono);font-size:11px;color:#60a5fa">Twoje niestandardowe akcje:</div>
     <div id="tfCustomList" style="margin-top:.5rem"></div>
+  </div>
+
+  <!-- ── KALENDARZ ── -->
+  <div id="zmCalendarPanel" style="display:none">
+    <div class="zm-cal-header">
+      <div class="zm-cal-nav">
+        <button onclick="zmCalNav(-1)">← Poprzedni</button>
+        <div class="zm-cal-month" id="zmCalMonthLabel"></div>
+        <button onclick="zmCalNav(1)">Następny →</button>
+      </div>
+      <button onclick="zmCalToday()" class="zm-btn zm-btn-primary zm-btn-sm">Dzisiaj</button>
+    </div>
+    <div id="zmCalGrid" class="zm-cal-grid"></div>
   </div>
 </div>
 </div>
@@ -6182,9 +6225,9 @@ async function zmLoadOwnerWiedza() {
 function zmWorkerShowView(v) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.zm-worker-nav .nav-btn').forEach(b => b.classList.remove('active'));
-  const navIds = { tasks:'zmwNavTasks', wiedza:'zmwNavWiedza', briefings:'zmwNavBriefings', secrets:'zmwNavSecrets', sessions:'zmwNavSessions' };
+  const navIds = { tasks:'zmwNavTasks', wiedza:'zmwNavWiedza', briefings:'zmwNavBriefings', secrets:'zmwNavSecrets', sessions:'zmwNavSessions', calendar:'zmwNavCalendar' };
   document.getElementById(navIds[v])?.classList.add('active');
-  const allPanels = ['zmTasksPanel','zmWorkersPanel','zmTemplatesPanel','zmWKnowPanel','zmBriefingsPanel','zmSecretsPanel','zmSessionsPanel','zmAnnouncePanel'];
+  const allPanels = ['zmTasksPanel','zmWorkersPanel','zmTemplatesPanel','zmWKnowPanel','zmBriefingsPanel','zmSecretsPanel','zmSessionsPanel','zmAnnouncePanel','zmCalendarPanel'];
   allPanels.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   document.querySelectorAll('.zm-tabs').forEach(el => el.style.display = 'none');
   const zEl = document.getElementById('zmPanel');
@@ -6217,6 +6260,9 @@ function zmWorkerShowView(v) {
   } else if (v === 'sessions') {
     document.getElementById('zmSessionsPanel').style.display = '';
     zmLoadSessions().then(zmRenderSessions);
+  } else if (v === 'calendar') {
+    document.getElementById('zmCalendarPanel').style.display = '';
+    zmRenderCalendar();
   }
   window.scrollTo(0,0);
 }
@@ -7590,6 +7636,142 @@ async function tfSendTasks() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// KALENDARZ TASKÓW
+// ═══════════════════════════════════════════════════════════════════
+let zmCalYear = new Date().getFullYear();
+let zmCalMonth = new Date().getMonth(); // 0-indexed
+
+const ZM_DAY_NAMES = ['Pon','Wt','Śr','Czw','Pt','Sob','Ndz'];
+const ZM_MONTH_NAMES = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+
+function zmCalNav(delta) {
+  zmCalMonth += delta;
+  if (zmCalMonth > 11) { zmCalMonth = 0; zmCalYear++; }
+  if (zmCalMonth < 0) { zmCalMonth = 11; zmCalYear--; }
+  zmRenderCalendar();
+}
+
+function zmCalToday() {
+  zmCalYear = new Date().getFullYear();
+  zmCalMonth = new Date().getMonth();
+  zmRenderCalendar();
+}
+
+function zmRenderCalendar() {
+  const label = document.getElementById('zmCalMonthLabel');
+  const grid = document.getElementById('zmCalGrid');
+  if (!label || !grid) return;
+
+  label.textContent = `${ZM_MONTH_NAMES[zmCalMonth]} ${zmCalYear}`;
+
+  const now = new Date();
+  const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+
+  // First day of month (Monday = 0)
+  const firstDay = new Date(zmCalYear, zmCalMonth, 1);
+  let startDow = firstDay.getDay() - 1; // Mon=0 ... Sun=6
+  if (startDow < 0) startDow = 6;
+
+  const daysInMonth = new Date(zmCalYear, zmCalMonth + 1, 0).getDate();
+  const prevMonthDays = new Date(zmCalYear, zmCalMonth, 0).getDate();
+
+  // Gather tasks by dueDate
+  const email = currentUser?.email?.toLowerCase();
+  const isOwner = userRole === 'owner';
+  const tasksByDate = {};
+  (zmTasks || []).forEach(t => {
+    if (!t.dueDate) return;
+    if (!isOwner && t.assignee !== email) return;
+    if (!tasksByDate[t.dueDate]) tasksByDate[t.dueDate] = [];
+    tasksByDate[t.dueDate].push(t);
+  });
+  // Also place tasks without dueDate on createdAt date (faded)
+  (zmTasks || []).forEach(t => {
+    if (t.dueDate) return;
+    if (!isOwner && t.assignee !== email) return;
+    if (!t.createdAt) return;
+    const d = new Date(t.createdAt);
+    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    if (!tasksByDate[key]) tasksByDate[key] = [];
+    tasksByDate[key].push({ ...t, _noDue: true });
+  });
+
+  // Build grid
+  let html = ZM_DAY_NAMES.map(d => `<div class="zm-cal-dayname">${d}</div>`).join('');
+
+  const totalCells = Math.ceil((startDow + daysInMonth) / 7) * 7;
+
+  for (let i = 0; i < totalCells; i++) {
+    const dayNum = i - startDow + 1;
+    let dateStr = '';
+    let displayDay = '';
+    let isOutside = false;
+
+    if (dayNum < 1) {
+      // Previous month
+      const d = prevMonthDays + dayNum;
+      const m = zmCalMonth === 0 ? 12 : zmCalMonth;
+      const y = zmCalMonth === 0 ? zmCalYear - 1 : zmCalYear;
+      dateStr = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      displayDay = d;
+      isOutside = true;
+    } else if (dayNum > daysInMonth) {
+      // Next month
+      const d = dayNum - daysInMonth;
+      const m = zmCalMonth + 2 > 12 ? 1 : zmCalMonth + 2;
+      const y = zmCalMonth + 2 > 12 ? zmCalYear + 1 : zmCalYear;
+      dateStr = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      displayDay = d;
+      isOutside = true;
+    } else {
+      dateStr = zmCalYear + '-' + String(zmCalMonth + 1).padStart(2,'0') + '-' + String(dayNum).padStart(2,'0');
+      displayDay = dayNum;
+    }
+
+    const isToday = dateStr === todayStr;
+    const dayTasks = tasksByDate[dateStr] || [];
+
+    // Render max 3 tasks, "+N more" for rest
+    const maxShow = 3;
+    const tasksHtml = dayTasks.slice(0, maxShow).map(t => {
+      const priClass = 'pri-' + (t.priority || 'INFO').toLowerCase().replace('ż','z').replace('ą','a');
+      const stClass = ['done','verified'].includes(t.status) ? ' st-' + t.status : '';
+      const opacity = t._noDue ? 'opacity:.5;' : '';
+      const workerInitial = isOwner ? (zmWorkers.find(w => w.email === t.assignee)?.name?.[0] || '') + ' ' : '';
+      return `<div class="zm-cal-task ${priClass}${stClass}" style="${opacity}" title="${esc(t.title)}" onclick="zmCalClickTask('${t.id}')">${workerInitial}${esc(t.title)}</div>`;
+    }).join('');
+    const moreHtml = dayTasks.length > maxShow ? `<div class="zm-cal-more">+${dayTasks.length - maxShow} więcej</div>` : '';
+
+    html += `<div class="zm-cal-cell${isToday?' today':''}${isOutside?' outside':''}">
+      <div class="zm-cal-date">${displayDay}</div>
+      <div class="zm-cal-tasks">${tasksHtml}${moreHtml}</div>
+    </div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+function zmCalClickTask(taskId) {
+  // Switch to tasks tab and scroll to the task
+  if (userRole === 'owner') {
+    zmShowTab('tasks');
+  } else {
+    zmWorkerShowView('tasks');
+  }
+  setTimeout(() => {
+    const el = document.querySelector(`[onclick*="zmToggleComments('${taskId}')"]`);
+    if (el) {
+      const card = el.closest('.zm-task');
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.style.boxShadow = '0 0 0 2px #60a5fa, 0 0 20px rgba(96,165,250,.3)';
+        setTimeout(() => { card.style.boxShadow = ''; }, 2000);
+      }
+    }
+  }, 100);
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // BATCH OPERATIONS — wklej listę IDs/pozycji → seria tasków
 // ═══════════════════════════════════════════════════════════════════
 async function tfOpenBatch() {
@@ -7930,9 +8112,9 @@ function zmStartPolling() {
 
 // ── Tab switching ──
 function zmShowTab(tab) {
-  const tabs = ['tasks','workers','templates','wknow','briefings','secrets','sessions','announce','actions'];
-  const panels = { tasks:'zmTasksPanel', workers:'zmWorkersPanel', templates:'zmTemplatesPanel', wknow:'zmWKnowPanel', briefings:'zmBriefingsPanel', secrets:'zmSecretsPanel', sessions:'zmSessionsPanel', announce:'zmAnnouncePanel', actions:'zmActionsPanel' };
-  const tabIds = { tasks:'zmTabTasks', workers:'zmTabWorkers', templates:'zmTabTemplates', wknow:'zmTabWKnow', briefings:'zmTabBriefings', secrets:'zmTabSecrets', sessions:'zmTabSessions', announce:'zmTabAnnounce', actions:'zmTabActions' };
+  const tabs = ['tasks','workers','templates','wknow','briefings','secrets','sessions','announce','actions','calendar'];
+  const panels = { tasks:'zmTasksPanel', workers:'zmWorkersPanel', templates:'zmTemplatesPanel', wknow:'zmWKnowPanel', briefings:'zmBriefingsPanel', secrets:'zmSecretsPanel', sessions:'zmSessionsPanel', announce:'zmAnnouncePanel', actions:'zmActionsPanel', calendar:'zmCalendarPanel' };
+  const tabIds = { tasks:'zmTabTasks', workers:'zmTabWorkers', templates:'zmTabTemplates', wknow:'zmTabWKnow', briefings:'zmTabBriefings', secrets:'zmTabSecrets', sessions:'zmTabSessions', announce:'zmTabAnnounce', actions:'zmTabActions', calendar:'zmTabCalendar' };
   tabs.forEach(t => {
     const btn = document.getElementById(tabIds[t]);
     if (btn) btn.classList.toggle('active', t === tab);
@@ -7956,6 +8138,7 @@ function zmShowTab(tab) {
   else if (tab === 'sessions') zmLoadSessions().then(zmRenderSessions);
   else if (tab === 'announce') zmLoadAnnouncements().then(() => { zmRenderAnnouncements(); zmRenderAnnounceBar(); });
   else if (tab === 'actions') tfLoadCustomActions().then(tfRenderActionsLibrary);
+  else if (tab === 'calendar') zmRenderCalendar();
 }
 
 // ════════════════════════════════════════
@@ -19492,7 +19675,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.62</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.63</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
