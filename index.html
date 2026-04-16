@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.50</title>
+<title>MPlace Hub v7.51</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1151,6 +1151,8 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 @keyframes zmPreviewFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 /* Badges */
 .zm-nav-badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ef4444;color:#fff;font-family:var(--mono);font-size:9px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.zm-badge-flash{animation:zmBadgeFlash 1.5s ease-out}
+@keyframes zmBadgeFlash{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(239,68,68,0)}25%{transform:scale(1.5);box-shadow:0 0 0 8px rgba(239,68,68,.4)}50%{transform:scale(1.2);box-shadow:0 0 0 4px rgba(239,68,68,.2)}75%{transform:scale(1.3);box-shadow:0 0 0 6px rgba(239,68,68,.3)}}
 .zm-badge-unread{display:inline-flex;margin-left:4px;min-width:14px;height:14px;padding:0 4px;border-radius:7px;background:#ef4444;color:#fff;font-family:var(--mono);font-size:9px;font-weight:600;align-items:center;justify-content:center}
 .zm-panel-close{position:sticky;top:0;z-index:201;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px}
 .zm-panel-close button{font-family:var(--mono);font-size:11px;padding:5px 14px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s}
@@ -1335,7 +1337,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.50</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.51</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -5983,6 +5985,7 @@ auth.onAuthStateChanged(async user => {
     zmOwnerUid = null;
     zmRemoveWorkerView();
     if(zmPollInterval){ clearInterval(zmPollInterval); zmPollInterval = null; }
+    zmStopRealtimeTasks();
     document.getElementById('loginWall').style.display = 'flex';
     document.getElementById('authBar').style.display = 'none';
   }
@@ -6948,18 +6951,60 @@ async function zmPollOnce() {
     zmRenderStats();
   }
 }
+
+// Firestore real-time listener for tasks (instant updates)
+let zmTasksUnsub = null;
+function zmStartRealtimeTasks() {
+  if (zmTasksUnsub) return;
+  try {
+    zmTasksUnsub = zmTeamRef().collection('tasks').orderBy('createdAt','desc')
+      .onSnapshot((snap) => {
+        const prevUnread = (zmTasks || []).reduce((s,t) => s + zmUnreadCommentCount(t), 0);
+        zmTasks = [];
+        snap.forEach(doc => zmTasks.push({ id: doc.id, ...doc.data() }));
+        const newUnread = zmTasks.reduce((s,t) => s + zmUnreadCommentCount(t), 0);
+        zmUpdateNavBadge();
+        // Flash badge if new unread appeared
+        if (newUnread > prevUnread) {
+          const badge = document.getElementById('zmNavBadge') || document.getElementById('zmwNavBadge');
+          if (badge) {
+            badge.classList.add('zm-badge-flash');
+            setTimeout(() => badge.classList.remove('zm-badge-flash'), 1500);
+          }
+          // Try to play short beep
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.value = 660; gain.gain.value = 0.05;
+            osc.start(); osc.stop(ctx.currentTime + 0.1);
+          } catch(e) {}
+        }
+        const panel = document.getElementById('zmPanel');
+        if (panel && panel.classList.contains('open')) {
+          zmRenderTasks();
+          zmRenderStats();
+        }
+      }, (err) => console.error('[realtime] tasks', err));
+  } catch(e) { console.error('[realtime] start', e); }
+}
+function zmStopRealtimeTasks() {
+  if (zmTasksUnsub) { try { zmTasksUnsub(); } catch(e) {} zmTasksUnsub = null; }
+}
+
 function zmStartPolling() {
   if (zmPollInterval) return;
-  // Poll every 15s for real-time-ish feel
+  // Primary: realtime listener (instant updates)
+  zmStartRealtimeTasks();
+  // Backup: poll every 30s in case listener fails
   zmPollInterval = setInterval(() => {
     if (document.hidden) return;
     zmPollOnce();
-  }, 15000);
-  // Also refresh when tab becomes visible again
+  }, 30000);
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && currentUser) zmPollOnce();
   });
-  // Refresh on window focus
   window.addEventListener('focus', () => {
     if (currentUser) zmPollOnce();
   });
@@ -18471,7 +18516,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.50</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.51</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
