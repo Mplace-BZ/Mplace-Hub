@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.41</title>
+<title>MPlace Hub v7.42</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1118,6 +1118,37 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .zm-panel.open{display:block}
 .zm-worker-view .zm-panel{position:static;z-index:auto;inset:auto;overflow:visible}
 .zm-worker-view .zm-panel .zm-panel-close{display:none}
+/* Worker: hide Wszyscy filter */
+.zm-worker-view #zmFilterWorker{display:none}
+/* Task card enhancements */
+.zm-task.verified{opacity:.55}
+.zm-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;font-family:var(--mono);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:.02em}
+.zm-progress-wrap{display:flex;align-items:center;gap:8px;margin:.5rem 0}
+.zm-progress-bar{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.zm-progress-fill{height:100%;background:linear-gradient(90deg,#2dd4a0,#60a5fa);border-radius:2px;transition:width .3s}
+.zm-progress-text{font-family:var(--mono);font-size:10px;color:var(--text2);white-space:nowrap}
+.zm-due{padding:2px 8px;border-radius:4px;font-weight:500}
+.zm-due.overdue{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+.zm-due.today{background:rgba(245,166,35,.15);color:#f5a623;border:1px solid rgba(245,166,35,.3)}
+.zm-due.soon{background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.25)}
+.zm-due.later{color:var(--text2)}
+/* Comments */
+.zm-comments{border-top:1px solid var(--border);margin-top:.75rem;padding-top:.75rem}
+.zm-comments-list{max-height:300px;overflow-y:auto;margin-bottom:.75rem}
+.zm-comment{padding:.6rem .75rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-bottom:.4rem}
+.zm-comment-head{display:flex;justify-content:space-between;margin-bottom:4px}
+.zm-comment-author{font-family:var(--mono);font-size:11px;font-weight:500;color:#60a5fa}
+.zm-comment-date{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.zm-comment-text{font-size:12px;color:var(--text);line-height:1.5;white-space:pre-wrap}
+.zm-comment-form{display:flex;gap:8px;align-items:flex-end}
+.zm-comment-form textarea{flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);resize:vertical;min-height:40px}
+/* History */
+.zm-history{border-top:1px solid var(--border);margin-top:.75rem;padding-top:.75rem}
+.zm-history-item{display:flex;gap:10px;padding:4px 0;font-family:var(--mono);font-size:10px;color:var(--text2)}
+.zm-history-date{color:var(--text3);white-space:nowrap}
+/* Badges */
+.zm-nav-badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ef4444;color:#fff;font-family:var(--mono);font-size:9px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.zm-badge-unread{display:inline-flex;margin-left:4px;min-width:14px;height:14px;padding:0 4px;border-radius:7px;background:#ef4444;color:#fff;font-family:var(--mono);font-size:9px;font-weight:600;align-items:center;justify-content:center}
 .zm-panel-close{position:sticky;top:0;z-index:201;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px}
 .zm-panel-close button{font-family:var(--mono);font-size:11px;padding:5px 14px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s}
 .zm-panel-close button:hover{background:var(--bg3);color:var(--text)}
@@ -1214,7 +1245,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.41</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.42</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1254,7 +1285,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <button class="nav-btn" onclick="showView('biznes')" id="navBiznes" style="color:var(--accent);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Biz</button>
     <button class="nav-btn" onclick="showView('rozliczenie')" id="navRozliczenie" style="color:var(--yellow);background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Settle</button>
     <div class="nav-sep"></div>
-    <button class="nav-btn" onclick="showView('zespol')" id="navZespol" style="color:#3b82f6;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2)">Team</button>
+    <button class="nav-btn" onclick="showView('zespol')" id="navZespol" style="color:#3b82f6;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);position:relative">Team<span id="zmNavBadge" class="zm-nav-badge" style="display:none"></span></button>
   </div>
   <div class="topbar-accounts">
     <button onclick="showView('crossborder')" id="navCrossBorder" title="Cross-Border CZ/SK" style="width:22px;height:22px;border-radius:50%;background:#3b82f6;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 6px rgba(59,130,246,.4);transition:transform .15s" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></button>
@@ -1285,7 +1316,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 <div class="zm-worker-nav" id="zmWorkerNav">
   <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">worker</span></div>
   <div class="nav-sep"></div>
-  <button class="nav-btn active" onclick="zmWorkerShowView('tasks')" id="zmwNavTasks" style="color:#3b82f6;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2)">Zadania</button>
+  <button class="nav-btn active" onclick="zmWorkerShowView('tasks')" id="zmwNavTasks" style="color:#3b82f6;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);position:relative">Zadania<span id="zmwNavBadge" class="zm-nav-badge" style="display:none"></span></button>
   <button class="nav-btn" onclick="zmWorkerShowView('wiedza')" id="zmwNavWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza</button>
 </div>
 
@@ -3210,6 +3241,7 @@ IDs: 123456 789012 ..."></textarea>
   <div class="zm-tabs">
     <button class="zm-tab active" onclick="zmShowTab('tasks')" id="zmTabTasks">Zadania</button>
     <button class="zm-tab" onclick="zmShowTab('workers')" id="zmTabWorkers">Pracownicy</button>
+    <button class="zm-tab" onclick="zmShowTab('templates')" id="zmTabTemplates">Szablony</button>
   </div>
 
   <!-- ── ZADANIA TAB ── -->
@@ -3281,6 +3313,21 @@ IDs: 123456 789012 ..."></textarea>
       </div>
     </div>
     <div id="zmWorkerList"></div>
+  </div>
+
+  <!-- ── SZABLONY TAB ── -->
+  <div id="zmTemplatesPanel" style="display:none">
+    <div class="zm-add-form">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+        <div><label>Nazwa szablonu</label><input id="zmTplName" placeholder="np. Analiza tygodniowa MEBLE"></div>
+        <div><label>Priorytet</label><select id="zmTplPriority"><option value="WAŻNE">WAŻNE</option><option value="PILNE">PILNE</option><option value="INFO">INFO</option></select></div>
+      </div>
+      <div style="margin-bottom:.75rem"><label>Tytuł zadania</label><input id="zmTplTitle" placeholder="Tytuł który zostanie użyty"></div>
+      <div style="margin-bottom:.75rem"><label>Opis</label><textarea id="zmTplDesc" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%;min-height:50px;resize:vertical"></textarea></div>
+      <div style="margin-bottom:.75rem"><label>Checklist (po jednym na linię)</label><textarea id="zmTplChecklist" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%;min-height:50px;resize:vertical"></textarea></div>
+      <button class="zm-btn zm-btn-primary" onclick="zmSaveTemplate()">+ Zapisz szablon</button>
+    </div>
+    <div id="zmTemplateList"></div>
   </div>
 </div>
 </div>
@@ -5754,6 +5801,11 @@ auth.onAuthStateChanged(async user => {
     await cleanupDzien1();
     renderEntry();
     updateAlertBadge();
+    // Load tasks for nav badge
+    zmLoadWorkers().then(() => zmLoadTasks()).then(() => {
+      zmUpdateNavBadge();
+      zmStartPolling();
+    }).catch(e => console.error('[zespol] init load', e));
     // Owner confirmed + data loaded → show the last active view
     const lastTab = localStorage.getItem('lastActiveTab') || 'dashboard';
     showView(lastTab);
@@ -5763,6 +5815,7 @@ auth.onAuthStateChanged(async user => {
     userRole = 'pending';
     zmOwnerUid = null;
     zmRemoveWorkerView();
+    if(zmPollInterval){ clearInterval(zmPollInterval); zmPollInterval = null; }
     document.getElementById('loginWall').style.display = 'flex';
     document.getElementById('authBar').style.display = 'none';
   }
@@ -5823,7 +5876,11 @@ async function zmDetectRole() {
       const workerAccess = wSnap.data().access || ['tasks'];
       zmApplyWorkerView(workerAccess);
       await zmLoadTasks();
+      await zmLoadWorkers(); // so comments show author names
       zmRenderTasks();
+      zmRenderStats();
+      zmUpdateNavBadge();
+      zmStartPolling();
       return;
     }
     // 3. Neither → no access
@@ -5921,14 +5978,121 @@ async function zmInit() {
   zmRenderWorkers();
   zmRenderTasks();
   zmRenderStats();
+  zmUpdateNavBadge();
+}
+
+// ════════════════════════════════════════
+// TEMPLATES
+// ════════════════════════════════════════
+let zmTemplates = [];
+
+async function zmLoadTemplates() {
+  if (!currentUser) return;
+  try {
+    const snap = await zmTeamRef().collection('templates').get();
+    zmTemplates = [];
+    snap.forEach(doc => zmTemplates.push({ id: doc.id, ...doc.data() }));
+  } catch(e) { console.error('[zespol] loadTemplates', e); }
+}
+
+async function zmSaveTemplate() {
+  const name = document.getElementById('zmTplName').value.trim();
+  const title = document.getElementById('zmTplTitle').value.trim();
+  if (!name || !title) { alert('Podaj nazwę i tytuł'); return; }
+  const checklistRaw = document.getElementById('zmTplChecklist').value.trim();
+  const checklist = checklistRaw ? checklistRaw.split('\n').filter(l => l.trim()).map(l => ({ text: l.trim(), done: false })) : [];
+  const tpl = {
+    name,
+    title,
+    desc: document.getElementById('zmTplDesc').value.trim(),
+    priority: document.getElementById('zmTplPriority').value,
+    checklist,
+    createdAt: Date.now()
+  };
+  try {
+    const ref = await zmTeamRef().collection('templates').add(tpl);
+    tpl.id = ref.id;
+    zmTemplates.push(tpl);
+    document.getElementById('zmTplName').value = '';
+    document.getElementById('zmTplTitle').value = '';
+    document.getElementById('zmTplDesc').value = '';
+    document.getElementById('zmTplChecklist').value = '';
+    zmRenderTemplates();
+  } catch(e) { console.error('[zespol] saveTemplate', e); alert('Błąd: ' + e.message); }
+}
+
+async function zmDeleteTemplate(id) {
+  if (!confirm('Usunąć szablon?')) return;
+  try {
+    await zmTeamRef().collection('templates').doc(id).delete();
+    zmTemplates = zmTemplates.filter(t => t.id !== id);
+    zmRenderTemplates();
+  } catch(e) { console.error('[zespol] deleteTemplate', e); }
+}
+
+function zmUseTemplate(id) {
+  const tpl = zmTemplates.find(t => t.id === id);
+  if (!tpl) return;
+  zmShowTab('tasks');
+  zmShowAddTask();
+  document.getElementById('zmTaskTitle').value = tpl.title;
+  document.getElementById('zmTaskDesc').value = tpl.desc || '';
+  document.getElementById('zmTaskPriority').value = tpl.priority || 'WAŻNE';
+  document.getElementById('zmTaskChecklist').value = (tpl.checklist || []).map(c => c.text).join('\n');
+  document.getElementById('zmTaskTitle').focus();
+}
+
+function zmRenderTemplates() {
+  const list = document.getElementById('zmTemplateList');
+  if (!list) return;
+  if (!zmTemplates.length) {
+    list.innerHTML = '<div class="zm-empty">Brak szablonów. Zapisz pierwszy powyżej.</div>';
+    return;
+  }
+  list.innerHTML = zmTemplates.map(tpl => `
+    <div class="zm-card">
+      <div class="zm-card-header">
+        <div>
+          <div class="zm-card-name">${esc(tpl.name)}</div>
+          <div class="zm-card-email">${esc(tpl.title)}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="zm-btn zm-btn-primary zm-btn-sm" onclick="zmUseTemplate('${tpl.id}')">Użyj</button>
+          <button class="zm-btn zm-btn-danger zm-btn-sm" onclick="zmDeleteTemplate('${tpl.id}')">Usuń</button>
+        </div>
+      </div>
+      ${tpl.desc ? `<div style="font-size:11px;color:var(--text2);margin-top:6px">${esc(tpl.desc)}</div>` : ''}
+      ${(tpl.checklist || []).length ? `<div style="font-size:10px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${tpl.checklist.length} kroków</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// Poll for new tasks/comments every 60s when user is active
+let zmPollInterval = null;
+function zmStartPolling() {
+  if (zmPollInterval) return;
+  zmPollInterval = setInterval(async () => {
+    if (!currentUser || document.hidden) return;
+    await zmLoadTasks();
+    zmUpdateNavBadge();
+    // Re-render if panel is open
+    const panel = document.getElementById('zmPanel');
+    if (panel && panel.classList.contains('open')) {
+      zmRenderTasks();
+      zmRenderStats();
+    }
+  }, 60000);
 }
 
 // ── Tab switching ──
 function zmShowTab(tab) {
   document.getElementById('zmTabTasks').classList.toggle('active', tab === 'tasks');
   document.getElementById('zmTabWorkers').classList.toggle('active', tab === 'workers');
+  document.getElementById('zmTabTemplates').classList.toggle('active', tab === 'templates');
   document.getElementById('zmTasksPanel').style.display = tab === 'tasks' ? '' : 'none';
   document.getElementById('zmWorkersPanel').style.display = tab === 'workers' ? '' : 'none';
+  document.getElementById('zmTemplatesPanel').style.display = tab === 'templates' ? '' : 'none';
+  if (tab === 'templates') { zmLoadTemplates().then(zmRenderTemplates); }
 }
 
 // ════════════════════════════════════════
@@ -6080,21 +6244,30 @@ async function zmSaveTask() {
   if (!title) { alert('Podaj tytuł zadania'); return; }
   const checklistRaw = document.getElementById('zmTaskChecklist').value.trim();
   const checklist = checklistRaw ? checklistRaw.split('\n').filter(l => l.trim()).map(l => ({ text: l.trim(), done: false })) : [];
+  const authorName = currentUser.displayName || currentUser.email.split('@')[0];
+  const isEdit = !!zmEditTaskId;
+  const existingTask = isEdit ? zmTasks.find(t => t.id === zmEditTaskId) : null;
   const task = {
     title,
     desc: document.getElementById('zmTaskDesc').value.trim(),
     assignee: document.getElementById('zmTaskAssignee').value,
-    status: 'todo',
+    status: existingTask?.status || 'todo',
     priority: document.getElementById('zmTaskPriority').value,
     konto: document.getElementById('zmTaskKonto').value,
     dueDate: document.getElementById('zmTaskDue').value,
     checklist,
-    createdAt: Date.now(),
+    comments: existingTask?.comments || [],
+    readBy: existingTask?.readBy || {},
+    history: (existingTask?.history || []).concat([{
+      at: Date.now(),
+      author: authorName,
+      action: isEdit ? 'edytował zadanie' : 'utworzył zadanie'
+    }]),
+    createdAt: existingTask?.createdAt || Date.now(),
     updatedAt: Date.now()
   };
   try {
     if (zmEditTaskId) {
-      task.createdAt = zmTasks.find(t => t.id === zmEditTaskId)?.createdAt || Date.now();
       await zmTeamRef().collection('tasks').doc(zmEditTaskId).update(task);
       const idx = zmTasks.findIndex(t => t.id === zmEditTaskId);
       if (idx >= 0) zmTasks[idx] = { ...zmTasks[idx], ...task };
@@ -6137,10 +6310,20 @@ async function zmDeleteTask(id) {
 async function zmSetTaskStatus(id, status) {
   const t = zmTasks.find(x => x.id === id);
   if (!t) return;
+  const authorName = userRole === 'owner'
+    ? (currentUser.displayName || currentUser.email.split('@')[0])
+    : (zmWorkers.find(w => w.email === currentUser.email.toLowerCase())?.name || currentUser.email.split('@')[0]);
   t.status = status;
   t.updatedAt = Date.now();
+  t.history = (t.history || []).concat([{
+    at: Date.now(),
+    author: authorName,
+    action: 'zmienił status → ' + (ZM_STATUS_LABELS[status] || status)
+  }]);
   try {
-    await zmTeamRef().collection('tasks').doc(id).update({ status, updatedAt: t.updatedAt });
+    await zmTeamRef().collection('tasks').doc(id).update({
+      status, updatedAt: t.updatedAt, history: t.history
+    });
     zmRenderTasks();
     zmRenderStats();
   } catch(e) { console.error('[zespol] setStatus', e); }
@@ -6168,6 +6351,36 @@ function zmNextStatus(current) {
 }
 
 const ZM_STATUS_LABELS = { todo: 'Do zrobienia', in_progress: 'W trakcie', done: 'Gotowe', verified: 'Zweryfikowane' };
+const ZM_PRIORITY_ORDER = { 'PILNE': 0, 'WAŻNE': 1, 'INFO': 2 };
+
+// Due date helper — returns {label, cls} or null
+function zmDueDateInfo(dueDate) {
+  if (!dueDate) return null;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const due = new Date(dueDate); due.setHours(0,0,0,0);
+  const diff = Math.round((due - now) / 86400000);
+  if (diff < 0) return { label: Math.abs(diff) + ' dni po terminie', cls: 'overdue' };
+  if (diff === 0) return { label: 'Dzisiaj', cls: 'today' };
+  if (diff === 1) return { label: 'Jutro', cls: 'soon' };
+  if (diff <= 3) return { label: 'Za ' + diff + ' dni', cls: 'soon' };
+  return { label: dueDate, cls: 'later' };
+}
+
+// Account group color
+function zmKontoColor(konto) {
+  if (!konto || !AC_META[konto]) return null;
+  const g = AC_META[konto].group;
+  if (g === 'MEBLE') return '#ff6b35';
+  if (g === 'LUXSEN') return '#2dd4a0';
+  if (g === 'ONE') return '#b47fff';
+  return null;
+}
+
+// Worker initials (for avatar)
+function zmInitials(name) {
+  if (!name) return '?';
+  return name.split(/\s+/).map(s => s[0]).join('').toUpperCase().slice(0,2);
+}
 
 function zmRenderTasks() {
   const list = document.getElementById('zmTaskList');
@@ -6176,11 +6389,24 @@ function zmRenderTasks() {
   const fStatus = document.getElementById('zmFilterStatus')?.value || '';
   const fWorker = document.getElementById('zmFilterWorker')?.value || '';
   const fPriority = document.getElementById('zmFilterPriority')?.value || '';
-  let filtered = zmTasks;
+  let filtered = zmTasks.slice();
   if (userRole === 'worker') filtered = filtered.filter(t => t.assignee === currentUser.email.toLowerCase());
   if (fStatus) filtered = filtered.filter(t => t.status === fStatus);
   if (fWorker) filtered = filtered.filter(t => t.assignee === fWorker);
   if (fPriority) filtered = filtered.filter(t => t.priority === fPriority);
+
+  // Sort: verified last, then priority, then dueDate (empty dueDate = bottom), then createdAt desc
+  filtered.sort((a,b) => {
+    if ((a.status === 'verified') !== (b.status === 'verified')) return a.status === 'verified' ? 1 : -1;
+    const pa = ZM_PRIORITY_ORDER[a.priority] ?? 99;
+    const pb = ZM_PRIORITY_ORDER[b.priority] ?? 99;
+    if (pa !== pb) return pa - pb;
+    const da = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+    const db = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+    if (da !== db) return da - db;
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
+
   if (!filtered.length) {
     const msg = userRole === 'worker'
       ? 'Brak zadań dla Ciebie. Poczekaj na przydział od administratora.'
@@ -6188,34 +6414,73 @@ function zmRenderTasks() {
     list.innerHTML = '<div class="zm-empty">' + msg + '</div>';
     return;
   }
+
   list.innerHTML = filtered.map(t => {
     const workerName = zmWorkers.find(w => w.email === t.assignee)?.name || t.assignee || 'Nieprzypisane';
     const checkDone = (t.checklist || []).filter(c => c.done).length;
     const checkTotal = (t.checklist || []).length;
+    const checkPct = checkTotal ? Math.round(checkDone / checkTotal * 100) : 0;
     const priClass = (t.priority || 'INFO').toLowerCase().replace('ż','z').replace('ą','a');
     const isOwner = userRole === 'owner';
     const nextSt = zmNextStatus(t.status);
+    const due = zmDueDateInfo(t.dueDate);
+    const kontoColor = zmKontoColor(t.konto);
+    const comments = t.comments || [];
+    const unreadBadge = zmUnreadCommentCount(t) > 0 ? `<span class="zm-badge-unread">${zmUnreadCommentCount(t)}</span>` : '';
     return `
-      <div class="zm-task">
+      <div class="zm-task${t.status === 'verified' ? ' verified' : ''}">
         <div class="zm-task-top">
+          <div class="zm-avatar" title="${esc(workerName)}">${esc(zmInitials(workerName))}</div>
           <div class="zm-task-title">${esc(t.title)}</div>
           <span class="zm-task-pri ${priClass}">${esc(t.priority || 'INFO')}</span>
         </div>
         <div class="zm-task-meta">
           <span>→ ${esc(workerName)}</span>
-          ${t.konto ? `<span>▸ ${esc(t.konto)}</span>` : ''}
-          ${t.dueDate ? `<span>◷ ${t.dueDate}</span>` : ''}
-          ${checkTotal ? `<span>☑ ${checkDone}/${checkTotal}</span>` : ''}
+          ${t.konto ? `<span style="${kontoColor?`color:${kontoColor}`:''}">▸ ${esc(t.konto)}</span>` : ''}
+          ${due ? `<span class="zm-due ${due.cls}">◷ ${due.label}</span>` : ''}
         </div>
         ${t.desc ? `<div class="zm-task-desc">${esc(t.desc)}</div>` : ''}
-        ${checkTotal ? `<ul class="zm-task-checklist">${t.checklist.map((c,i) =>
-          `<li class="${c.done ? 'done' : ''}" onclick="zmToggleCheckItem('${t.id}',${i})">${esc(c.text)}</li>`
-        ).join('')}</ul>` : ''}
+        ${checkTotal ? `
+          <div class="zm-progress-wrap">
+            <div class="zm-progress-bar"><div class="zm-progress-fill" style="width:${checkPct}%"></div></div>
+            <div class="zm-progress-text">${checkDone}/${checkTotal}</div>
+          </div>
+          <ul class="zm-task-checklist">${t.checklist.map((c,i) =>
+            `<li class="${c.done ? 'done' : ''}" onclick="zmToggleCheckItem('${t.id}',${i})">${esc(c.text)}</li>`
+          ).join('')}</ul>
+        ` : ''}
         <div class="zm-task-actions">
           <span class="zm-task-status ${t.status}" onclick="zmSetTaskStatus('${t.id}','${nextSt}')" title="Kliknij → ${ZM_STATUS_LABELS[nextSt] || nextSt}">${ZM_STATUS_LABELS[t.status] || t.status}</span>
+          <button class="zm-btn zm-btn-sm" style="color:var(--text2)" onclick="zmToggleComments('${t.id}')">💬 ${comments.length}${unreadBadge}</button>
+          ${isOwner ? `<button class="zm-btn zm-btn-sm" style="color:var(--text2)" onclick="zmToggleHistory('${t.id}')">⧗ Historia</button>` : ''}
           ${isOwner ? `<button class="zm-btn zm-btn-sm" style="color:var(--text2)" onclick="zmEditTask('${t.id}')">Edytuj</button>` : ''}
           ${isOwner ? `<button class="zm-btn zm-btn-danger zm-btn-sm" onclick="zmDeleteTask('${t.id}')">Usuń</button>` : ''}
           ${isOwner && t.status === 'done' ? `<button class="zm-btn zm-btn-success zm-btn-sm" onclick="zmSetTaskStatus('${t.id}','verified')">✓ Weryfikuj</button>` : ''}
+        </div>
+        <div class="zm-comments" id="zmComments_${t.id}" style="display:none">
+          <div class="zm-comments-list">
+            ${comments.map(c => `
+              <div class="zm-comment">
+                <div class="zm-comment-head">
+                  <span class="zm-comment-author">${esc(c.authorName || c.author)}</span>
+                  <span class="zm-comment-date">${new Date(c.createdAt).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+                </div>
+                <div class="zm-comment-text">${esc(c.text)}</div>
+              </div>
+            `).join('') || '<div class="zm-empty" style="padding:.5rem">Brak komentarzy</div>'}
+          </div>
+          <div class="zm-comment-form">
+            <textarea id="zmCommentInput_${t.id}" placeholder="Napisz komentarz..." rows="2"></textarea>
+            <button class="zm-btn zm-btn-primary zm-btn-sm" onclick="zmAddComment('${t.id}')">Wyślij</button>
+          </div>
+        </div>
+        <div class="zm-history" id="zmHistory_${t.id}" style="display:none">
+          ${(t.history || []).map(h => `
+            <div class="zm-history-item">
+              <span class="zm-history-date">${new Date(h.at).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+              <span class="zm-history-action">${esc(h.author || '')} — ${esc(h.action)}</span>
+            </div>
+          `).join('') || '<div class="zm-empty" style="padding:.5rem">Brak historii</div>'}
         </div>
       </div>
     `;
@@ -6225,18 +6490,123 @@ function zmRenderTasks() {
 function zmRenderStats() {
   const el = document.getElementById('zmTaskStats');
   if (!el) return;
-  const total = zmTasks.length;
-  const todo = zmTasks.filter(t => t.status === 'todo').length;
-  const prog = zmTasks.filter(t => t.status === 'in_progress').length;
-  const done = zmTasks.filter(t => t.status === 'done').length;
-  const verified = zmTasks.filter(t => t.status === 'verified').length;
+  // For worker: show only their tasks in stats
+  const src = userRole === 'worker'
+    ? zmTasks.filter(t => t.assignee === currentUser.email.toLowerCase())
+    : zmTasks;
+  const total = src.length;
+  const todo = src.filter(t => t.status === 'todo').length;
+  const prog = src.filter(t => t.status === 'in_progress').length;
+  const done = src.filter(t => t.status === 'done').length;
+  const verified = src.filter(t => t.status === 'verified').length;
+  const overdue = src.filter(t => {
+    if (!t.dueDate || t.status === 'verified' || t.status === 'done') return false;
+    return new Date(t.dueDate) < new Date().setHours(0,0,0,0);
+  }).length;
+  const todayCount = src.filter(t => {
+    if (!t.dueDate || t.status === 'verified') return false;
+    const d = new Date(t.dueDate); d.setHours(0,0,0,0);
+    const now = new Date(); now.setHours(0,0,0,0);
+    return d.getTime() === now.getTime();
+  }).length;
   el.innerHTML = `
     <div class="zm-stat"><div class="zm-stat-val">${total}</div><div class="zm-stat-label">Wszystkie</div></div>
     <div class="zm-stat"><div class="zm-stat-val" style="color:#94a3b8">${todo}</div><div class="zm-stat-label">Do zrobienia</div></div>
     <div class="zm-stat"><div class="zm-stat-val" style="color:#60a5fa">${prog}</div><div class="zm-stat-label">W trakcie</div></div>
     <div class="zm-stat"><div class="zm-stat-val" style="color:#2dd4a0">${done}</div><div class="zm-stat-label">Gotowe</div></div>
     <div class="zm-stat"><div class="zm-stat-val" style="color:#a78bfa">${verified}</div><div class="zm-stat-label">Zweryfikowane</div></div>
+    ${todayCount ? `<div class="zm-stat"><div class="zm-stat-val" style="color:#f5a623">${todayCount}</div><div class="zm-stat-label">Dzisiaj</div></div>` : ''}
+    ${overdue ? `<div class="zm-stat"><div class="zm-stat-val" style="color:#ef4444">${overdue}</div><div class="zm-stat-label">Po terminie</div></div>` : ''}
   `;
+}
+
+// ── Comments ──
+function zmToggleComments(taskId) {
+  const el = document.getElementById('zmComments_' + taskId);
+  if (!el) return;
+  const isHidden = el.style.display === 'none';
+  el.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    // Mark comments as read for current user
+    zmMarkCommentsRead(taskId);
+  }
+}
+
+function zmToggleHistory(taskId) {
+  const el = document.getElementById('zmHistory_' + taskId);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function zmUnreadCommentCount(t) {
+  if (!t.comments || !currentUser) return 0;
+  const email = currentUser.email.toLowerCase();
+  const readAt = (t.readBy && t.readBy[email.replace(/[.#$/\[\]]/g,'_')]) || 0;
+  return t.comments.filter(c => c.author !== email && (c.createdAt || 0) > readAt).length;
+}
+
+async function zmMarkCommentsRead(taskId) {
+  const t = zmTasks.find(x => x.id === taskId);
+  if (!t || !currentUser) return;
+  const email = currentUser.email.toLowerCase();
+  const key = email.replace(/[.#$/\[\]]/g,'_');
+  t.readBy = t.readBy || {};
+  t.readBy[key] = Date.now();
+  try {
+    await zmTeamRef().collection('tasks').doc(taskId).update({ readBy: t.readBy });
+    zmUpdateNavBadge();
+    zmRenderTasks();
+  } catch(e) { console.error('[zespol] markRead', e); }
+}
+
+async function zmAddComment(taskId) {
+  const input = document.getElementById('zmCommentInput_' + taskId);
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  const t = zmTasks.find(x => x.id === taskId);
+  if (!t) return;
+  const authorName = userRole === 'owner'
+    ? (currentUser.displayName || currentUser.email.split('@')[0])
+    : (zmWorkers.find(w => w.email === currentUser.email.toLowerCase())?.name || currentUser.email.split('@')[0]);
+  const comment = {
+    author: currentUser.email.toLowerCase(),
+    authorName,
+    text,
+    createdAt: Date.now()
+  };
+  t.comments = (t.comments || []).concat([comment]);
+  // Add history entry
+  t.history = (t.history || []).concat([{
+    at: Date.now(),
+    author: authorName,
+    action: 'dodał komentarz'
+  }]);
+  try {
+    await zmTeamRef().collection('tasks').doc(taskId).update({
+      comments: t.comments,
+      history: t.history
+    });
+    input.value = '';
+    zmRenderTasks();
+    zmUpdateNavBadge();
+    // Keep panel open
+    const el = document.getElementById('zmComments_' + taskId);
+    if (el) el.style.display = 'block';
+  } catch(e) { console.error('[zespol] addComment', e); alert('Błąd: ' + e.message); }
+}
+
+// ── Nav badge (unread comments + new tasks) ──
+function zmUpdateNavBadge() {
+  const badge = document.getElementById('zmNavBadge');
+  const wBadge = document.getElementById('zmwNavBadge');
+  if (!currentUser) return;
+  const src = userRole === 'worker'
+    ? zmTasks.filter(t => t.assignee === currentUser.email.toLowerCase())
+    : zmTasks;
+  const unread = src.reduce((sum, t) => sum + zmUnreadCommentCount(t), 0);
+  if (badge) { badge.textContent = unread || ''; badge.style.display = unread ? 'inline-flex' : 'none'; }
+  if (wBadge) { wBadge.textContent = unread || ''; wBadge.style.display = unread ? 'inline-flex' : 'none'; }
 }
 
 
@@ -17112,7 +17482,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.41</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.42</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
