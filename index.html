@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.48</title>
+<title>MPlace Hub v7.49</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1142,6 +1142,13 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .zm-history{border-top:1px solid var(--border);margin-top:.75rem;padding-top:.75rem}
 .zm-history-item{display:flex;gap:10px;padding:4px 0;font-family:var(--mono);font-size:10px;color:var(--text2)}
 .zm-history-date{color:var(--text3);white-space:nowrap}
+/* Unread comment preview on task card */
+.zm-unread-preview{margin:.6rem 0 0;padding:10px 14px;background:linear-gradient(135deg,rgba(96,165,250,.12),rgba(96,165,250,.04));border:1px solid rgba(96,165,250,.35);border-left:3px solid #60a5fa;border-radius:6px;display:flex;align-items:flex-start;gap:8px;cursor:pointer;transition:all .15s;font-size:12px;animation:zmPreviewFadeIn .3s ease}
+.zm-unread-preview:hover{background:linear-gradient(135deg,rgba(96,165,250,.2),rgba(96,165,250,.08));border-color:#60a5fa;box-shadow:0 0 10px rgba(96,165,250,.2)}
+.zm-unread-icon{font-size:14px;flex-shrink:0}
+.zm-unread-author{font-family:var(--mono);font-size:11px;font-weight:600;color:#60a5fa;flex-shrink:0}
+.zm-unread-text{color:var(--text);line-height:1.4;overflow:hidden}
+@keyframes zmPreviewFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 /* Badges */
 .zm-nav-badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ef4444;color:#fff;font-family:var(--mono);font-size:9px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
 .zm-badge-unread{display:inline-flex;margin-left:4px;min-width:14px;height:14px;padding:0 4px;border-radius:7px;background:#ef4444;color:#fff;font-family:var(--mono);font-size:9px;font-weight:600;align-items:center;justify-content:center}
@@ -1328,7 +1335,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.48</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.49</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6901,11 +6908,12 @@ function zmRenderAnnounceBar() {
 async function zmSOS() {
   const msg = prompt('Co się dzieje? Krótki opis problemu (Chris dostanie task PILNY):');
   if (!msg || !msg.trim()) return;
-  const workerName = zmWorkers.find(w => w.email === currentUser.email.toLowerCase())?.name || currentUser.email;
+  const email = currentUser.email.toLowerCase();
+  const workerName = zmWorkers.find(w => w.email === email)?.name || currentUser.email;
   const task = {
     title: '🆘 SOS od ' + workerName,
     desc: msg.trim(),
-    assignee: '', // owner sees all tasks, will notice
+    assignee: email, // worker sees it too to track Chris's response
     status: 'todo',
     priority: 'PILNE',
     konto: '',
@@ -6919,8 +6927,12 @@ async function zmSOS() {
     fromSOS: true
   };
   try {
-    await zmTeamRef().collection('tasks').add(task);
-    alert('✓ SOS wysłany. Chris zobaczy task PILNY.');
+    const ref = await zmTeamRef().collection('tasks').add(task);
+    task.id = ref.id;
+    zmTasks.unshift(task);
+    zmRenderTasks();
+    zmRenderStats();
+    alert('✓ SOS wysłany. Chris zobaczy task PILNY — odpowiedź pojawi się jako komentarz w Twoich Zadaniach.');
   } catch(e) { console.error('[sos]', e); alert('Błąd: ' + e.message); }
 }
 
@@ -7319,7 +7331,10 @@ function zmRenderTasks() {
     const due = zmDueDateInfo(t.dueDate);
     const kontoColor = zmKontoColor(t.konto);
     const comments = t.comments || [];
-    const unreadBadge = zmUnreadCommentCount(t) > 0 ? `<span class="zm-badge-unread">${zmUnreadCommentCount(t)}</span>` : '';
+    const unreadCount = zmUnreadCommentCount(t);
+    const unreadBadge = unreadCount > 0 ? `<span class="zm-badge-unread">${unreadCount}</span>` : '';
+    // Preview last comment if unread
+    const lastComment = unreadCount > 0 && comments.length ? comments[comments.length - 1] : null;
     return `
       <div class="zm-task${t.status === 'verified' ? ' verified' : ''}">
         <div class="zm-task-top">
@@ -7343,6 +7358,13 @@ function zmRenderTasks() {
           <ul class="zm-task-checklist">${t.checklist.map((c,i) =>
             `<li class="${c.done ? 'done' : ''}" onclick="zmToggleCheckItem('${t.id}',${i})">${esc(c.text)}</li>`
           ).join('')}</ul>
+        ` : ''}
+        ${lastComment ? `
+          <div class="zm-unread-preview" onclick="zmToggleComments('${t.id}')" title="Kliknij żeby zobaczyć wszystkie komentarze">
+            <span class="zm-unread-icon">💬</span>
+            <span class="zm-unread-author">${esc(lastComment.authorName || lastComment.author)}:</span>
+            <span class="zm-unread-text">${esc(lastComment.text.slice(0, 120))}${lastComment.text.length > 120 ? '...' : ''}</span>
+          </div>
         ` : ''}
         <div class="zm-task-actions">
           <span class="zm-task-status ${t.status}" onclick="zmSetTaskStatus('${t.id}','${nextSt}')" title="Kliknij → ${ZM_STATUS_LABELS[nextSt] || nextSt}">${ZM_STATUS_LABELS[t.status] || t.status}</span>
@@ -18431,7 +18453,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.48</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.49</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
