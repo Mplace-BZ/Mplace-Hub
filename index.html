@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.44</title>
+<title>MPlace Hub v7.45</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1171,15 +1171,27 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .zm-add-form input,.zm-add-form select{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%}
 .zm-add-form label{font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
 .zm-btn{font-family:var(--mono);font-size:11px;padding:7px 16px;border-radius:6px;border:none;cursor:pointer;transition:all .15s;font-weight:500}
-/* Neon pastel buttons — dashed border + soft glow */
-.zm-btn-primary{background:transparent;color:#60a5fa;border:1px dashed rgba(96,165,250,.5);font-weight:500;letter-spacing:.02em}.zm-btn-primary:hover{background:rgba(96,165,250,.08);border-color:#60a5fa;box-shadow:0 0 12px rgba(96,165,250,.25);color:#93c5fd}
-.zm-btn-danger{background:transparent;color:#f87171;border:1px dashed rgba(248,113,113,.5);font-weight:500}.zm-btn-danger:hover{background:rgba(248,113,113,.08);border-color:#f87171;box-shadow:0 0 12px rgba(248,113,113,.25)}
-.zm-btn-success{background:transparent;color:#4ade80;border:1px dashed rgba(74,222,128,.5);font-weight:500}.zm-btn-success:hover{background:rgba(74,222,128,.08);border-color:#4ade80;box-shadow:0 0 12px rgba(74,222,128,.25)}
+/* Live solid buttons — matches Wiedza/Analiza/Centrum Ads style */
+.zm-btn-primary{background:rgba(96,165,250,.14);color:#60a5fa;border:1px solid rgba(96,165,250,.45);font-weight:500;letter-spacing:.02em}.zm-btn-primary:hover{background:rgba(96,165,250,.22);border-color:rgba(96,165,250,.7);box-shadow:0 0 10px rgba(96,165,250,.3);filter:brightness(1.1)}
+.zm-btn-danger{background:rgba(239,68,68,.14);color:#ef4444;border:1px solid rgba(239,68,68,.45);font-weight:500}.zm-btn-danger:hover{background:rgba(239,68,68,.22);border-color:rgba(239,68,68,.7);box-shadow:0 0 10px rgba(239,68,68,.3)}
+.zm-btn-success{background:rgba(45,212,160,.14);color:#2dd4a0;border:1px solid rgba(45,212,160,.45);font-weight:500}.zm-btn-success:hover{background:rgba(45,212,160,.22);border-color:rgba(45,212,160,.7);box-shadow:0 0 10px rgba(45,212,160,.3)}
 .zm-btn-sm{font-size:10px;padding:5px 12px}
-.zm-btn-comment{background:transparent;color:#60a5fa;border:1px dashed rgba(96,165,250,.5);font-weight:500}.zm-btn-comment:hover{background:rgba(96,165,250,.08);border-color:#60a5fa;box-shadow:0 0 12px rgba(96,165,250,.25)}
-.zm-btn-history{background:transparent;color:#c4b5fd;border:1px dashed rgba(196,181,253,.5);font-weight:500}.zm-btn-history:hover{background:rgba(196,181,253,.08);border-color:#c4b5fd;box-shadow:0 0 12px rgba(196,181,253,.25)}
-.zm-btn-edit{background:transparent;color:#fbbf24;border:1px dashed rgba(251,191,36,.5);font-weight:500}.zm-btn-edit:hover{background:rgba(251,191,36,.08);border-color:#fbbf24;box-shadow:0 0 12px rgba(251,191,36,.25)}
+.zm-btn-comment{background:rgba(96,165,250,.14);color:#60a5fa;border:1px solid rgba(96,165,250,.45);font-weight:500}.zm-btn-comment:hover{background:rgba(96,165,250,.22);border-color:rgba(96,165,250,.7);box-shadow:0 0 10px rgba(96,165,250,.3)}
+.zm-btn-history{background:rgba(167,139,250,.14);color:#a78bfa;border:1px solid rgba(167,139,250,.45);font-weight:500}.zm-btn-history:hover{background:rgba(167,139,250,.22);border-color:rgba(167,139,250,.7);box-shadow:0 0 10px rgba(167,139,250,.3)}
+.zm-btn-edit{background:rgba(245,166,35,.14);color:#f5a623;border:1px solid rgba(245,166,35,.45);font-weight:500}.zm-btn-edit:hover{background:rgba(245,166,35,.22);border-color:rgba(245,166,35,.7);box-shadow:0 0 10px rgba(245,166,35,.3)}
+.zm-btn-voice{background:rgba(255,107,53,.14);color:#ff6b35;border:1px solid rgba(255,107,53,.45);font-weight:500}
+.zm-btn-voice:hover{background:rgba(255,107,53,.22);border-color:rgba(255,107,53,.7);box-shadow:0 0 10px rgba(255,107,53,.3)}
+.zm-btn-voice.recording{background:rgba(239,68,68,.25);color:#ef4444;border-color:#ef4444;animation:zmMicPulse 1.2s ease-in-out infinite}
+@keyframes zmMicPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.6)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
 .zm-btn *{pointer-events:none}
+/* Date picker indicator visible in dark mode */
+.zm-panel input[type="date"]::-webkit-calendar-picker-indicator,
+.zm-panel input[type="date"]::-webkit-inner-spin-button{filter:invert(.85);cursor:pointer;opacity:.7;transition:opacity .15s}
+.zm-panel input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
+.zm-panel input[type="date"]{color-scheme:dark}
+/* Template flash highlight */
+.zm-card.zm-flash{animation:zmFlashIn 1.5s ease-out}
+@keyframes zmFlashIn{0%{border-color:#2dd4a0;box-shadow:0 0 0 2px rgba(45,212,160,.4),0 0 20px rgba(45,212,160,.3);background:rgba(45,212,160,.08)}100%{border-color:var(--border);box-shadow:none;background:var(--bg2)}}
 .zm-empty{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:13px}
 /* tasks */
 .zm-task{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.6rem;transition:border-color .15s}
@@ -1253,7 +1265,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.44</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.45</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6020,12 +6032,22 @@ async function zmSaveTemplate() {
   try {
     const ref = await zmTeamRef().collection('templates').add(tpl);
     tpl.id = ref.id;
-    zmTemplates.push(tpl);
+    zmTemplates.unshift(tpl);
     document.getElementById('zmTplName').value = '';
     document.getElementById('zmTplTitle').value = '';
     document.getElementById('zmTplDesc').value = '';
     document.getElementById('zmTplChecklist').value = '';
     zmRenderTemplates();
+    // Flash highlight new template + scroll
+    setTimeout(() => {
+      const list = document.getElementById('zmTemplateList');
+      const newCard = list?.querySelector('.zm-card');
+      if (newCard) {
+        newCard.classList.add('zm-flash');
+        newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => newCard.classList.remove('zm-flash'), 1600);
+      }
+    }, 50);
   } catch(e) { console.error('[zespol] saveTemplate', e); alert('Błąd: ' + e.message); }
 }
 
@@ -6478,8 +6500,11 @@ function zmRenderTasks() {
             `).join('') || '<div class="zm-empty" style="padding:.5rem">Brak komentarzy</div>'}
           </div>
           <div class="zm-comment-form">
-            <textarea id="zmCommentInput_${t.id}" placeholder="Napisz komentarz..." rows="2"></textarea>
-            <button type="button" class="zm-btn zm-btn-primary zm-btn-sm" onclick="zmAddComment('${t.id}')">Wyślij</button>
+            <textarea id="zmCommentInput_${t.id}" placeholder="Napisz lub podyktuj komentarz..." rows="2"></textarea>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <button type="button" class="zm-btn zm-btn-voice zm-btn-sm" id="zmMicBtn_${t.id}" onclick="zmVoiceComment('${t.id}')" title="Dyktuj (powiedz 'koniec' żeby wysłać)">🎤</button>
+              <button type="button" class="zm-btn zm-btn-primary zm-btn-sm" onclick="zmAddComment('${t.id}')">Wyślij</button>
+            </div>
           </div>
         </div>
         <div class="zm-history" id="zmHistory_${t.id}" style="display:${zmOpenHistory.has(t.id)?'block':'none'}">
@@ -6616,6 +6641,56 @@ function zmUpdateNavBadge() {
   const unread = src.reduce((sum, t) => sum + zmUnreadCommentCount(t), 0);
   if (badge) { badge.textContent = unread || ''; badge.style.display = unread ? 'inline-flex' : 'none'; }
   if (wBadge) { wBadge.textContent = unread || ''; wBadge.style.display = unread ? 'inline-flex' : 'none'; }
+}
+
+// ── Voice input for comments (SpeechRecognition pl-PL) ──
+let zmActiveVoiceTask = null;
+let zmVoiceRec = null;
+
+function zmVoiceComment(taskId) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Twoja przeglądarka nie wspiera rozpoznawania mowy (użyj Chrome)'); return; }
+  // Stop if already recording same task
+  if (zmActiveVoiceTask === taskId && zmVoiceRec) {
+    try { zmVoiceRec.stop(); } catch(e) {}
+    return;
+  }
+  // Stop any existing recording
+  if (zmVoiceRec) { try { zmVoiceRec.stop(); } catch(e) {} }
+  const ta = document.getElementById('zmCommentInput_' + taskId);
+  const btn = document.getElementById('zmMicBtn_' + taskId);
+  if (!ta) return;
+  zmActiveVoiceTask = taskId;
+  if (btn) btn.classList.add('recording');
+  const rec = new SR();
+  rec.lang = 'pl-PL';
+  rec.continuous = true;
+  rec.interimResults = true;
+  let autoSend = false;
+  rec.onresult = (e) => {
+    let transcript = '';
+    for (let i = 0; i < e.results.length; i++) transcript += e.results[i][0].transcript;
+    const lower = transcript.toLowerCase().trim();
+    // Trigger words: auto-send on "koniec" / "wyślij"
+    const isFinal = e.results[e.results.length - 1].isFinal;
+    if (isFinal && /\b(koniec|wyślij|wyslij)\b\.?\s*$/i.test(lower)) {
+      transcript = transcript.replace(/\s*(koniec|wyślij|wyslij)[.,!?]?\s*$/i, '').trim();
+      ta.value = transcript;
+      autoSend = true;
+      try { rec.stop(); } catch(e) {}
+      return;
+    }
+    ta.value = transcript;
+  };
+  rec.onerror = (e) => { console.error('[voice]', e); };
+  rec.onend = () => {
+    if (btn) btn.classList.remove('recording');
+    zmActiveVoiceTask = null;
+    zmVoiceRec = null;
+    if (autoSend && ta.value.trim()) zmAddComment(taskId);
+  };
+  zmVoiceRec = rec;
+  try { rec.start(); } catch(e) { console.error('[voice] start', e); if (btn) btn.classList.remove('recording'); }
 }
 
 
@@ -17491,7 +17566,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.44</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.45</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
