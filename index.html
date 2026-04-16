@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.63</title>
+<title>MPlace Hub v7.64</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1198,7 +1198,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-card.zm-flash{animation:zmFlashIn 1.5s ease-out}
 @keyframes zmFlashIn{0%{border-color:#2dd4a0;box-shadow:0 0 0 2px rgba(45,212,160,.4),0 0 20px rgba(45,212,160,.3);background:rgba(45,212,160,.08)}100%{border-color:var(--border);box-shadow:none;background:var(--bg2)}}
 /* Calendar */
-.zm-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.zm-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem}
 .zm-cal-nav{display:flex;align-items:center;gap:8px}
 .zm-cal-nav button{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text2);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s}
 .zm-cal-nav button:hover{background:var(--bg3);color:var(--text)}
@@ -1405,7 +1405,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.63</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.64</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -3600,13 +3600,36 @@ IDs: 123456 789012 ..."></textarea>
   <div id="zmCalendarPanel" style="display:none">
     <div class="zm-cal-header">
       <div class="zm-cal-nav">
-        <button onclick="zmCalNav(-1)">← Poprzedni</button>
+        <button onclick="zmCalNav(-1)">←</button>
         <div class="zm-cal-month" id="zmCalMonthLabel"></div>
-        <button onclick="zmCalNav(1)">Następny →</button>
+        <button onclick="zmCalNav(1)">→</button>
+      </div>
+      <div class="zm-filter-bar">
+        <select id="zmCalFilterWorker" onchange="zmRenderCalendar()">
+          <option value="">Wszyscy</option>
+        </select>
+        <select id="zmCalFilterKonto" onchange="zmRenderCalendar()">
+          <option value="">Wszystkie konta</option>
+        </select>
+        <select id="zmCalFilterPri" onchange="zmRenderCalendar()">
+          <option value="">Wszystkie priorytety</option>
+          <option value="PILNE">PILNE</option>
+          <option value="WAŻNE">WAŻNE</option>
+          <option value="INFO">INFO</option>
+        </select>
+        <select id="zmCalFilterStatus" onchange="zmRenderCalendar()">
+          <option value="">Wszystkie statusy</option>
+          <option value="active" selected>Aktywne (bez verified)</option>
+          <option value="todo">Do zrobienia</option>
+          <option value="in_progress">W trakcie</option>
+          <option value="done">Gotowe</option>
+          <option value="verified">Zweryfikowane</option>
+        </select>
       </div>
       <button onclick="zmCalToday()" class="zm-btn zm-btn-primary zm-btn-sm">Dzisiaj</button>
     </div>
     <div id="zmCalGrid" class="zm-cal-grid"></div>
+    <div id="zmCalStats" style="margin-top:1rem;display:flex;gap:1rem;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--text3)"></div>
   </div>
 </div>
 </div>
@@ -7664,31 +7687,60 @@ function zmRenderCalendar() {
 
   label.textContent = `${ZM_MONTH_NAMES[zmCalMonth]} ${zmCalYear}`;
 
+  // Populate filter selects (only once or when workers change)
+  const fWorker = document.getElementById('zmCalFilterWorker');
+  if (fWorker && fWorker.options.length <= 1 && zmWorkers.length) {
+    zmWorkers.forEach(w => {
+      if (!fWorker.querySelector(`option[value="${w.email}"]`))
+        fWorker.innerHTML += `<option value="${esc(w.email)}">${esc(w.name)}</option>`;
+    });
+  }
+  const fKonto = document.getElementById('zmCalFilterKonto');
+  if (fKonto && fKonto.options.length <= 1) {
+    Object.keys(AC_META).forEach(k => {
+      fKonto.innerHTML += `<option value="${k}">${k}</option>`;
+    });
+  }
+
+  // Read filters
+  const filterWorker = document.getElementById('zmCalFilterWorker')?.value || '';
+  const filterKonto = document.getElementById('zmCalFilterKonto')?.value || '';
+  const filterPri = document.getElementById('zmCalFilterPri')?.value || '';
+  const filterStatus = document.getElementById('zmCalFilterStatus')?.value || '';
+
   const now = new Date();
   const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
 
-  // First day of month (Monday = 0)
   const firstDay = new Date(zmCalYear, zmCalMonth, 1);
-  let startDow = firstDay.getDay() - 1; // Mon=0 ... Sun=6
+  let startDow = firstDay.getDay() - 1;
   if (startDow < 0) startDow = 6;
 
   const daysInMonth = new Date(zmCalYear, zmCalMonth + 1, 0).getDate();
   const prevMonthDays = new Date(zmCalYear, zmCalMonth, 0).getDate();
 
-  // Gather tasks by dueDate
+  // Filter tasks
   const email = currentUser?.email?.toLowerCase();
   const isOwner = userRole === 'owner';
+  const filtered = (zmTasks || []).filter(t => {
+    if (!isOwner && t.assignee !== email) return false;
+    if (filterWorker && t.assignee !== filterWorker) return false;
+    if (filterKonto && t.konto !== filterKonto) return false;
+    if (filterPri && t.priority !== filterPri) return false;
+    if (filterStatus === 'active' && ['verified'].includes(t.status)) return false;
+    if (filterStatus && filterStatus !== 'active' && t.status !== filterStatus) return false;
+    return true;
+  });
+
+  // Group by dueDate
   const tasksByDate = {};
-  (zmTasks || []).forEach(t => {
+  filtered.forEach(t => {
     if (!t.dueDate) return;
-    if (!isOwner && t.assignee !== email) return;
     if (!tasksByDate[t.dueDate]) tasksByDate[t.dueDate] = [];
     tasksByDate[t.dueDate].push(t);
   });
-  // Also place tasks without dueDate on createdAt date (faded)
-  (zmTasks || []).forEach(t => {
+  // Tasks without dueDate → on createdAt date
+  filtered.forEach(t => {
     if (t.dueDate) return;
-    if (!isOwner && t.assignee !== email) return;
     if (!t.createdAt) return;
     const d = new Date(t.createdAt);
     const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
@@ -7749,6 +7801,26 @@ function zmRenderCalendar() {
   }
 
   grid.innerHTML = html;
+
+  // Stats
+  const statsEl = document.getElementById('zmCalStats');
+  if (statsEl) {
+    const totalThisMonth = filtered.filter(t => {
+      const d = t.dueDate || '';
+      return d.startsWith(zmCalYear + '-' + String(zmCalMonth+1).padStart(2,'0'));
+    }).length;
+    const pilne = filtered.filter(t => t.priority === 'PILNE' && !['done','verified'].includes(t.status)).length;
+    const overdue = filtered.filter(t => {
+      if (!t.dueDate || ['done','verified'].includes(t.status)) return false;
+      return t.dueDate < todayStr;
+    }).length;
+    statsEl.innerHTML = `
+      <span>${totalThisMonth} tasków w miesiącu</span>
+      ${pilne ? `<span style="color:#ef4444">${pilne} pilnych</span>` : ''}
+      ${overdue ? `<span style="color:#ef4444">${overdue} po terminie</span>` : ''}
+      <span>${filtered.length} widocznych (po filtrze)</span>
+    `;
+  }
 }
 
 function zmCalClickTask(taskId) {
@@ -19675,7 +19747,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.63</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.64</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
