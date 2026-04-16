@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://www.gstatic.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://firestore.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://red-haze-5f37mplace-agent.contactmplace.workers.dev https://www.googleapis.com; media-src 'self' blob:; frame-ancestors 'none';">
-<title>MPlace Hub v7.65</title>
+<title>MPlace Hub v7.66</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1431,7 +1431,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.65</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.66</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6284,9 +6284,9 @@ async function zmLoadOwnerWiedza() {
 function zmWorkerShowView(v) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.zm-worker-nav .nav-btn').forEach(b => b.classList.remove('active'));
-  const navIds = { tasks:'zmwNavTasks', wiedza:'zmwNavWiedza', briefings:'zmwNavBriefings', secrets:'zmwNavSecrets', sessions:'zmwNavSessions', calendar:'zmwNavCalendar' };
+  const navIds = { tasks:'zmwNavTasks', wiedza:'zmwNavWiedza', briefings:'zmwNavBriefings', secrets:'zmwNavSecrets', sessions:'zmwNavSessions', calendar:'zmwNavCalendar', dashboard:'zmwNavDashboard' };
   document.getElementById(navIds[v])?.classList.add('active');
-  const allPanels = ['zmTasksPanel','zmWorkersPanel','zmTemplatesPanel','zmWKnowPanel','zmBriefingsPanel','zmSecretsPanel','zmSessionsPanel','zmAnnouncePanel','zmCalendarPanel'];
+  const allPanels = ['zmTasksPanel','zmWorkersPanel','zmTemplatesPanel','zmWKnowPanel','zmBriefingsPanel','zmSecretsPanel','zmSessionsPanel','zmAnnouncePanel','zmCalendarPanel','zmDashboardPanel'];
   allPanels.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   document.querySelectorAll('.zm-tabs').forEach(el => el.style.display = 'none');
   const zEl = document.getElementById('zmPanel');
@@ -6322,6 +6322,9 @@ function zmWorkerShowView(v) {
   } else if (v === 'calendar') {
     document.getElementById('zmCalendarPanel').style.display = '';
     zmRenderCalendar();
+  } else if (v === 'dashboard') {
+    document.getElementById('zmDashboardPanel').style.display = '';
+    zmRenderDashboard();
   }
   window.scrollTo(0,0);
 }
@@ -7692,6 +7695,161 @@ async function tfSendTasks() {
     btn.textContent = `⚠ ${sent}/${selectedIndexes.length} wysłano`;
     alert(`Wysłano ${sent}, błędów: ${errors}`);
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DASHBOARD WORKERA — "Mój tydzień"
+// ═══════════════════════════════════════════════════════════════════
+const ZM_LEVELS = [
+  { name: 'Junior', min: 0, color: '#94a3b8' },
+  { name: 'Regular', min: 10, color: '#60a5fa' },
+  { name: 'Senior', min: 30, color: '#2dd4a0' },
+  { name: 'Expert', min: 75, color: '#f5a623' },
+  { name: 'Master', min: 150, color: '#e879f9' }
+];
+
+function zmGetLevel(xp) {
+  for (let i = ZM_LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= ZM_LEVELS[i].min) {
+      const next = ZM_LEVELS[i + 1];
+      const pct = next ? Math.min(100, Math.round((xp - ZM_LEVELS[i].min) / (next.min - ZM_LEVELS[i].min) * 100)) : 100;
+      return { ...ZM_LEVELS[i], idx: i, xp, pct, nextName: next?.name || '—', nextMin: next?.min || xp };
+    }
+  }
+  return { ...ZM_LEVELS[0], idx: 0, xp, pct: 0, nextName: 'Regular', nextMin: 10 };
+}
+
+function zmRenderDashboard() {
+  const el = document.getElementById('zmDashContent');
+  if (!el) return;
+  const email = currentUser?.email?.toLowerCase();
+  const isOwner = userRole === 'owner';
+  const targetEmail = isOwner ? '' : email; // Owner sees all, worker sees own
+  const myTasks = targetEmail
+    ? zmTasks.filter(t => t.assignee === targetEmail)
+    : zmTasks;
+
+  // XP = tasks verified
+  const xp = myTasks.filter(t => t.status === 'verified').length;
+  const level = zmGetLevel(xp);
+
+  // Stats
+  const total = myTasks.length;
+  const done = myTasks.filter(t => t.status === 'done').length;
+  const verified = myTasks.filter(t => t.status === 'verified').length;
+  const inProgress = myTasks.filter(t => t.status === 'in_progress').length;
+  const todo = myTasks.filter(t => t.status === 'todo').length;
+  const overdue = myTasks.filter(t => {
+    if (!t.dueDate || ['done','verified'].includes(t.status)) return false;
+    const now = new Date(); now.setHours(0,0,0,0);
+    return new Date(t.dueDate) < now;
+  }).length;
+
+  // Average time to complete (createdAt → updatedAt for verified)
+  const verifiedTimes = myTasks.filter(t => t.status === 'verified' && t.createdAt && t.updatedAt)
+    .map(t => t.updatedAt - t.createdAt);
+  const avgTime = verifiedTimes.length
+    ? Math.round(verifiedTimes.reduce((a,b) => a+b, 0) / verifiedTimes.length / 3600000 * 10) / 10
+    : 0;
+
+  // Streak — consecutive days with at least 1 verified/done
+  let streak = 0;
+  const dayMs = 86400000;
+  const today = new Date(); today.setHours(0,0,0,0);
+  for (let d = 0; d < 365; d++) {
+    const checkDate = new Date(today.getTime() - d * dayMs);
+    const dateStr = checkDate.toISOString().slice(0, 10);
+    const hadActivity = myTasks.some(t =>
+      ['done','verified'].includes(t.status) &&
+      t.updatedAt &&
+      new Date(t.updatedAt).toISOString().slice(0, 10) === dateStr
+    );
+    if (hadActivity) streak++;
+    else if (d > 0) break; // first gap = end streak (skip today if no activity yet)
+  }
+
+  // Weekly breakdown (Mon-Sun of current week)
+  const now = new Date();
+  const dayOfWeek = (now.getDay() + 6) % 7; // Mon=0
+  const weekStart = new Date(now); weekStart.setDate(now.getDate() - dayOfWeek); weekStart.setHours(0,0,0,0);
+  const weekDays = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStart.getTime() + i * dayMs);
+    const dateStr = d.toISOString().slice(0, 10);
+    const dayTasks = myTasks.filter(t =>
+      ['done','verified'].includes(t.status) &&
+      t.updatedAt &&
+      new Date(t.updatedAt).toISOString().slice(0, 10) === dateStr
+    ).length;
+    weekDays.push({ name: ZM_DAY_NAMES[i], date: d.getDate(), dateStr, count: dayTasks, isToday: i === dayOfWeek });
+  }
+  const weekMax = Math.max(1, ...weekDays.map(d => d.count));
+  const weekTotal = weekDays.reduce((s, d) => s + d.count, 0);
+
+  // Top konta
+  const kontoCount = {};
+  myTasks.filter(t => t.konto && ['done','verified'].includes(t.status))
+    .forEach(t => { kontoCount[t.konto] = (kontoCount[t.konto] || 0) + 1; });
+  const topKonta = Object.entries(kontoCount).sort((a,b) => b[1] - a[1]).slice(0, 5);
+
+  const workerName = isOwner
+    ? 'Zespół'
+    : (zmWorkers.find(w => w.email === email)?.name || email?.split('@')[0] || 'Worker');
+
+  el.innerHTML = `
+    <!-- Hero: level + XP -->
+    <div class="zm-dash-hero">
+      <div class="zm-dash-level ${level.name.toLowerCase()}">${level.name}</div>
+      <div class="zm-dash-xp">${xp} XP</div>
+      <div class="zm-dash-xp-sub">${xp < level.nextMin ? `${level.nextMin - xp} XP do ${level.nextName}` : 'Maksymalny poziom!'}</div>
+      <div class="zm-dash-bar"><div class="zm-dash-bar-fill" style="width:${level.pct}%;background:${level.color}"></div></div>
+    </div>
+
+    <!-- Streak -->
+    ${streak > 0 ? `
+    <div class="zm-dash-streak">
+      <div class="zm-dash-streak-fire">${streak >= 7 ? '🔥' : streak >= 3 ? '⚡' : '✨'}</div>
+      <div>
+        <div class="zm-dash-streak-num">${streak} ${streak === 1 ? 'dzień' : streak < 5 ? 'dni' : 'dni'}</div>
+        <div class="zm-dash-streak-text">z rzędu z ukończonym zadaniem${streak >= 7 ? ' — niesamowite!' : streak >= 3 ? ' — świetna passa!' : ''}</div>
+      </div>
+    </div>
+    ` : ''}
+
+    <!-- Metrics -->
+    <div class="zm-dash-metrics">
+      <div class="zm-dash-metric"><div class="zm-dash-metric-val">${total}</div><div class="zm-dash-metric-lbl">Wszystkie</div></div>
+      <div class="zm-dash-metric"><div class="zm-dash-metric-val" style="color:#94a3b8">${todo}</div><div class="zm-dash-metric-lbl">Do zrobienia</div></div>
+      <div class="zm-dash-metric"><div class="zm-dash-metric-val" style="color:#60a5fa">${inProgress}</div><div class="zm-dash-metric-lbl">W trakcie</div></div>
+      <div class="zm-dash-metric"><div class="zm-dash-metric-val" style="color:#2dd4a0">${done + verified}</div><div class="zm-dash-metric-lbl">Ukończone</div><div class="zm-dash-metric-sub">${verified} zweryfikowanych</div></div>
+      ${overdue ? `<div class="zm-dash-metric"><div class="zm-dash-metric-val" style="color:#ef4444">${overdue}</div><div class="zm-dash-metric-lbl">Po terminie</div></div>` : ''}
+      ${avgTime ? `<div class="zm-dash-metric"><div class="zm-dash-metric-val">${avgTime}h</div><div class="zm-dash-metric-lbl">Śr. czas</div><div class="zm-dash-metric-sub">od utworzenia do verified</div></div>` : ''}
+    </div>
+
+    <!-- Weekly heatmap -->
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:.5rem">Ten tydzień: ${weekTotal} ukończonych</div>
+    <div class="zm-dash-week">
+      ${weekDays.map(d => `
+        <div class="zm-dash-week-day${d.isToday ? ' today' : ''}">
+          <div class="zm-dash-week-name">${d.name}</div>
+          <div class="zm-dash-week-num" style="color:${d.count ? '#2dd4a0' : 'var(--text3)'}">${d.count || '—'}</div>
+          <div class="zm-dash-week-bar"><div class="zm-dash-week-fill" style="width:${Math.round(d.count / weekMax * 100)}%"></div></div>
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- Top konta -->
+    ${topKonta.length ? `
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:.5rem">Top konta (ukończone taski):</div>
+    <div class="zm-dash-top">
+      ${topKonta.map(([k, cnt]) => {
+        const meta = AC_META[k];
+        const clr = meta?.group === 'MEBLE' ? '#ff6b35' : meta?.group === 'LUXSEN' ? '#2dd4a0' : '#b47fff';
+        return `<div class="zm-dash-konto-chip" style="border-color:${clr};color:${clr}">${k} <strong>${cnt}</strong></div>`;
+      }).join('')}
+    </div>
+    ` : ''}
+  `;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -19788,7 +19946,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.65</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.66</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
