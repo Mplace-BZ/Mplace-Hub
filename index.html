@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.56</title>
+<title>MPlace Hub v7.57</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1377,7 +1377,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.56</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.57</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -7130,14 +7130,15 @@ ${actionList}
 DOSTĘPNE KONTA: ${accountList}
 
 ZASADY:
-1. Zwracaj TYLKO valid JSON (bez markdown, bez \`\`\`json).
-2. Każde zadanie = JEDNA konkretna, wykonalna czynność. Bez "przeanalizuj i pomyśl".
-3. Priorytet: PILNE (coś pilnego, alarm, ROAS<3), WAŻNE (optymalizacja), INFO (miłe-ale-nie-pilne).
-4. Max 15 zadań. Jakość > ilość. Lepiej 5 konkretnych niż 15 ogólników.
-5. Jeśli raport zawiera IDs ofert / nazwy kampanii — UŻYJ ich dokładnie w desc.
-6. Jeśli brak konta w raporcie → zostaw "".
-7. desc: 2-4 zdania co trzeba zrobić i DLACZEGO (np. "ROAS 1.2 = poniżej BE 2.5, tnie marżę").
-8. Jeśli task wymaga kroków innych niż standardowy checklist typu → dodaj customChecklist jako array.
+1. Zwracaj TYLKO valid JSON (bez markdown, bez \`\`\`json, bez komentarzy).
+2. Każde zadanie = JEDNA konkretna czynność. Bez "przeanalizuj".
+3. Priorytet: PILNE (alarm, ROAS<3), WAŻNE (optymalizacja), INFO.
+4. **Max 10 zadań.** Jakość > ilość. Lepiej 5 konkretnych niż 10 ogólników.
+5. Jeśli raport ma IDs/nazwy — użyj w desc dokładnie.
+6. Brak konta w raporcie → "".
+7. desc: **max 2 zdania** (krótko, konkretnie, z uzasadnieniem).
+8. customChecklist TYLKO jeśli standardowy typu nie pasuje (zostaw null lub pomiń).
+9. Tytuł: max 60 znaków.
 
 FORMAT ODPOWIEDZI:
 {
@@ -7152,22 +7153,74 @@ FORMAT ODPOWIEDZI:
     }
   ]
 }`;
-  const userPrompt = `Raport źródłowy (typ: ${sourceType}):\n\n${sourceText}\n\nWygeneruj taski wg zasad systemu. Zwróć tylko JSON.`;
+  // Trim source if too long (Claude context limit + avoid truncation in response)
+  const maxSourceLen = 15000;
+  const trimmedSource = sourceText.length > maxSourceLen
+    ? sourceText.slice(0, maxSourceLen) + '\n\n[... raport przycięty, skoncentruj się na powyższym ...]'
+    : sourceText;
+  const userPrompt = `Raport źródłowy (typ: ${sourceType}):\n\n${trimmedSource}\n\nWygeneruj taski wg zasad systemu. Zwróć tylko JSON, maksymalnie 10 zadań.`;
   const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 4096,
+      max_tokens: 8192,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }]
     })
   });
   const raw = await readSSE(resp);
-  // Parse JSON — strip eventual markdown fences
-  let jsonStr = raw.trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'');
-  const parsed = JSON.parse(jsonStr);
-  return (parsed.tasks || []).filter(t => t.type && t.title);
+  return tfParseTasks(raw);
+}
+
+function tfParseTasks(raw) {
+  // Strip markdown fences
+  let s = raw.trim()
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/, '')
+    .replace(/```\s*$/, '')
+    .trim();
+  // Try direct parse first
+  try {
+    const parsed = JSON.parse(s);
+    return (parsed.tasks || parsed || []).filter(t => t && t.type && t.title);
+  } catch(e1) {
+    // Fallback: extract tasks array manually — response might be truncated
+    const tasks = [];
+    // Find start of tasks array
+    const startIdx = s.indexOf('"tasks"');
+    if (startIdx < 0) throw new Error('Brak pola "tasks" w odpowiedzi AI');
+    // Find first [ after "tasks"
+    const arrStart = s.indexOf('[', startIdx);
+    if (arrStart < 0) throw new Error('Brak otwarcia tablicy tasks');
+    // Walk from arrStart, collect balanced { ... } objects
+    let depth = 0, objStart = -1, inStr = false, esc = false;
+    for (let i = arrStart + 1; i < s.length; i++) {
+      const ch = s[i];
+      if (esc) { esc = false; continue; }
+      if (ch === '\\') { esc = true; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (inStr) continue;
+      if (ch === '{') {
+        if (depth === 0) objStart = i;
+        depth++;
+      } else if (ch === '}') {
+        depth--;
+        if (depth === 0 && objStart >= 0) {
+          const chunk = s.slice(objStart, i + 1);
+          try {
+            const obj = JSON.parse(chunk);
+            if (obj.type && obj.title) tasks.push(obj);
+          } catch(_) {}
+          objStart = -1;
+        }
+      } else if (ch === ']' && depth === 0) {
+        break;
+      }
+    }
+    if (!tasks.length) throw new Error('Nie udało się odzyskać tasków z odpowiedzi AI. Spróbuj jeszcze raz lub skróć raport.');
+    return tasks;
+  }
 }
 
 // ── Modal ──
@@ -18970,7 +19023,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.56</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.57</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
