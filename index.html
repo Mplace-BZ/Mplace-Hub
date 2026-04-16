@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.55</title>
+<title>MPlace Hub v7.56</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1197,6 +1197,46 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 /* Template flash highlight */
 .zm-card.zm-flash{animation:zmFlashIn 1.5s ease-out}
 @keyframes zmFlashIn{0%{border-color:#2dd4a0;box-shadow:0 0 0 2px rgba(45,212,160,.4),0 0 20px rgba(45,212,160,.3);background:rgba(45,212,160,.08)}100%{border-color:var(--border);box-shadow:none;background:var(--bg2)}}
+/* Task Factory modal */
+.tf-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1rem;animation:zmFadeIn .15s ease}
+@keyframes zmFadeIn{from{opacity:0}to{opacity:1}}
+.tf-box{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;width:100%;max-width:560px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.tf-box-wide{max-width:900px}
+.tf-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:14px;color:#60a5fa;font-weight:500;background:linear-gradient(135deg,rgba(59,130,246,.08),transparent)}
+.tf-x{background:transparent;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:4px 10px;border-radius:4px;transition:all .15s}
+.tf-x:hover{color:var(--text);background:var(--bg3)}
+.tf-source{padding:8px 18px;border-bottom:1px solid var(--border);background:var(--bg);font-family:var(--mono);font-size:11px}
+.tf-rows{overflow-y:auto;padding:12px 18px;flex:1}
+.tf-row{display:flex;gap:10px;padding:12px;margin-bottom:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;transition:all .15s}
+.tf-row.tf-disabled{opacity:.4;background:transparent}
+.tf-check{flex-shrink:0;padding-top:4px}
+.tf-check input{width:18px;height:18px;cursor:pointer;accent-color:#60a5fa}
+.tf-row-body{flex:1;display:flex;flex-direction:column;gap:8px}
+.tf-row-head{display:flex;gap:8px;align-items:center}
+.tf-icon{font-size:16px;flex-shrink:0}
+.tf-title{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 10px;font-family:var(--mono);font-size:12px;color:var(--text);font-weight:500}
+.tf-pri{font-family:var(--mono);font-size:10px;padding:5px 10px;border-radius:5px;border:1px solid var(--border2);cursor:pointer;font-weight:600;letter-spacing:.04em}
+.tf-pri-pilne{background:rgba(239,68,68,.15);color:#ef4444;border-color:rgba(239,68,68,.4)}
+.tf-pri-wazne{background:rgba(245,166,35,.15);color:#f5a623;border-color:rgba(245,166,35,.4)}
+.tf-pri-info{background:rgba(96,165,250,.12);color:#60a5fa;border-color:rgba(96,165,250,.35)}
+.tf-row-meta{display:flex;gap:8px}
+.tf-row-meta select{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:5px 8px;font-family:var(--mono);font-size:10px;color:var(--text2)}
+.tf-desc{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:6px 10px;font-family:var(--mono);font-size:11px;color:var(--text);line-height:1.5;resize:vertical;min-height:40px}
+.tf-checklist-det{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.tf-checklist-det summary{cursor:pointer;padding:2px 0}
+.tf-checklist-det summary:hover{color:var(--text2)}
+.tf-checklist-det ol{margin:6px 0 0 18px;padding:0;color:var(--text2);line-height:1.55}
+.tf-footer{padding:14px 18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg)}
+.tf-assign{display:flex;gap:6px;align-items:center;font-family:var(--mono);font-size:11px;color:var(--text2);flex-wrap:wrap}
+.tf-assign select,.tf-assign input{background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:5px 8px;font-family:var(--mono);font-size:11px;color:var(--text)}
+.tf-actions{display:flex;gap:8px}
+.tf-btn-cancel{font-family:var(--mono);font-size:11px;padding:7px 16px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer}
+.tf-btn-send{font-family:var(--mono);font-size:11px;padding:7px 20px;border-radius:6px;border:1px solid rgba(59,130,246,.5);background:rgba(59,130,246,.2);color:#60a5fa;cursor:pointer;font-weight:600}
+.tf-btn-send:hover:not(:disabled){background:rgba(59,130,246,.35);box-shadow:0 0 12px rgba(59,130,246,.3)}
+.tf-btn-send:disabled{opacity:.5;cursor:not-allowed}
+/* Task Source chip on worker task card */
+.zm-task-source{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:10px;background:rgba(59,130,246,.08);color:#60a5fa;border:1px dashed rgba(59,130,246,.3);margin-top:4px;cursor:pointer}
+.zm-task-source:hover{background:rgba(59,130,246,.15)}
 /* SOS button */
 .zm-sos-btn{color:#ef4444!important;background:rgba(239,68,68,.12)!important;border:1px solid rgba(239,68,68,.4)!important;font-weight:600!important;animation:zmSosPulse 3s ease-in-out infinite}
 .zm-sos-btn:hover{background:rgba(239,68,68,.25)!important;border-color:#ef4444!important;box-shadow:0 0 12px rgba(239,68,68,.4)}
@@ -1337,7 +1377,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.55</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.56</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6990,6 +7030,347 @@ async function zmSOS() {
   } catch(e) { console.error('[sos]', e); alert('Błąd: ' + e.message); }
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// TASK FACTORY — AI Extractor + Review Modal + Batch Create
+// ═══════════════════════════════════════════════════════════════════
+
+// Action Library — 10 base types with ready-made checklists
+const TF_ACTIONS = {
+  zmien_tytul: {
+    label: 'Zmień tytuł oferty',
+    icon: '📝',
+    checklist: ['Otwórz ofertę w panelu Allegro', 'Zmień tytuł na nowy (podany w opisie)', 'Zapisz zmianę', 'Screenshot nowego tytułu do komentarza']
+  },
+  wylacz_kampanie: {
+    label: 'Wyłącz kampanię Ads',
+    icon: '⏸',
+    checklist: ['Panel Allegro Ads → Kampanie', 'Znajdź kampanię wskazaną w opisie', 'Zmień status na PAUZA', 'Screenshot statusu do komentarza']
+  },
+  skaluj_kampanie: {
+    label: 'Skaluj kampanię Ads',
+    icon: '🚀',
+    checklist: ['Panel Allegro Ads → Kampanie', 'Zwiększ budżet zgodnie z opisem', 'Sprawdź CPC limity (max 1.50 zł)', 'Raportuj nowy budżet w komentarzu']
+  },
+  dodaj_wyroznienie: {
+    label: 'Dodaj wyróżnienie',
+    icon: '⭐',
+    checklist: ['Otwórz ofertę', 'Promocje → Dodaj wyróżnienie flat 7 dni', 'Potwierdź koszt', 'Screenshot aktywnej promocji']
+  },
+  wylacz_wyroznienie: {
+    label: 'Wyłącz wyróżnienie',
+    icon: '✖',
+    checklist: ['Otwórz ofertę', 'Promocje → Wyłącz aktywne wyróżnienie', 'Zapisz', 'Screenshot stanu po']
+  },
+  zmien_cene: {
+    label: 'Zmień cenę oferty',
+    icon: '💰',
+    checklist: ['Otwórz ofertę', 'Edytuj cenę (podana w opisie)', 'Zapisz', 'Sprawdź BE ROAS po zmianie', 'Raportuj nową cenę']
+  },
+  wystaw_aukcje: {
+    label: 'Wystaw nową ofertę',
+    icon: '➕',
+    checklist: ['Kopiuj istniejącą ofertę jako wzór', 'Uzupełnij tytuł wg konwencji Format A v2', 'Dodaj zdjęcia i opis', 'Wybierz kategorię i parametry', 'Opublikuj', 'Podaj nowy ID oferty w komentarzu']
+  },
+  analiza_ads: {
+    label: 'Zrób analizę Ads',
+    icon: '📊',
+    checklist: ['Pobierz raport XLSX z panelu Allegro (okres w opisie)', 'Upload do zakładki Analiza Ofert', 'Wybierz konto i uruchom analizę', 'Przeklej kluczowe wnioski do komentarza']
+  },
+  copy_paste_ads: {
+    label: 'Przepisz kampanie Ads',
+    icon: '📋',
+    checklist: ['Otwórz plik CSV/tabelę z planem', 'Panel Allegro Ads → Nowa kampania', 'Wklej nazwę + budżet + stawki', 'Zapisz kampanię', 'Potwierdź w komentarzu liczbę przepisanych kampanii']
+  },
+  weryfikuj_roas: {
+    label: 'Zweryfikuj ROAS po zmianie',
+    icon: '🔍',
+    checklist: ['Poczekaj 24h od zmiany', 'Otwórz Dashboard konta', 'Zapisz ROAS przed i po', 'Jeśli ROAS < 3 → SOS', 'Raportuj wyniki w komentarzu']
+  }
+};
+
+// Currently extracted tasks (before Chris approves)
+let tfExtractedTasks = [];
+let tfSourceMeta = null;
+
+async function tfExtract(source) {
+  // Get source text
+  const r = (typeof mhGetReport === 'function') ? mhGetReport(source) : null;
+  let sourceText = r?.text || '';
+  let sourceTitle = r?.title || source;
+  // Fallback: try window._aaLastText etc
+  if (!sourceText && source === 'analiza' && window._aaLastText) sourceText = window._aaLastText;
+  if (!sourceText) { alert('Brak raportu do ekstrakcji. Wygeneruj najpierw raport.'); return; }
+  // Check that we're owner
+  if (userRole !== 'owner') { alert('Tylko owner może generować taski'); return; }
+  tfSourceMeta = { source, title: sourceTitle, textSnippet: sourceText.slice(0, 400), extractedAt: Date.now() };
+  // Show loading modal
+  tfShowModal('loading');
+  try {
+    const tasks = await tfCallExtractor(sourceText, source);
+    tfExtractedTasks = tasks;
+    if (!tasks.length) {
+      tfShowModal('empty');
+      return;
+    }
+    tfShowModal('review');
+  } catch(e) {
+    console.error('[tf] extract', e);
+    tfShowModal('error', e.message);
+  }
+}
+
+async function tfCallExtractor(sourceText, sourceType) {
+  const actionList = Object.entries(TF_ACTIONS).map(([k,v]) => `  - ${k}: ${v.label}`).join('\n');
+  const accountList = Object.keys(AC_META).join(', ');
+  const systemPrompt = `Jesteś AI Task Extractor dla agencji MPlace. Twoim jedynym zadaniem jest wyciągnięcie z raportu konkretnych akcji do wykonania przez pracownika.
+
+DOSTĘPNE TYPY AKCJI:
+${actionList}
+
+DOSTĘPNE KONTA: ${accountList}
+
+ZASADY:
+1. Zwracaj TYLKO valid JSON (bez markdown, bez \`\`\`json).
+2. Każde zadanie = JEDNA konkretna, wykonalna czynność. Bez "przeanalizuj i pomyśl".
+3. Priorytet: PILNE (coś pilnego, alarm, ROAS<3), WAŻNE (optymalizacja), INFO (miłe-ale-nie-pilne).
+4. Max 15 zadań. Jakość > ilość. Lepiej 5 konkretnych niż 15 ogólników.
+5. Jeśli raport zawiera IDs ofert / nazwy kampanii — UŻYJ ich dokładnie w desc.
+6. Jeśli brak konta w raporcie → zostaw "".
+7. desc: 2-4 zdania co trzeba zrobić i DLACZEGO (np. "ROAS 1.2 = poniżej BE 2.5, tnie marżę").
+8. Jeśli task wymaga kroków innych niż standardowy checklist typu → dodaj customChecklist jako array.
+
+FORMAT ODPOWIEDZI:
+{
+  "tasks": [
+    {
+      "type": "zmien_tytul",
+      "title": "Krótki tytuł (max 80 znaków)",
+      "priority": "PILNE|WAŻNE|INFO",
+      "konto": "MobelKap",
+      "desc": "Konkret z IDs/nazwami + uzasadnienie",
+      "customChecklist": null
+    }
+  ]
+}`;
+  const userPrompt = `Raport źródłowy (typ: ${sourceType}):\n\n${sourceText}\n\nWygeneruj taski wg zasad systemu. Zwróć tylko JSON.`;
+  const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4096,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  });
+  const raw = await readSSE(resp);
+  // Parse JSON — strip eventual markdown fences
+  let jsonStr = raw.trim().replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'');
+  const parsed = JSON.parse(jsonStr);
+  return (parsed.tasks || []).filter(t => t.type && t.title);
+}
+
+// ── Modal ──
+function tfShowModal(mode, errMsg) {
+  let overlay = document.getElementById('tfModal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'tfModal';
+    overlay.className = 'tf-overlay';
+    overlay.onclick = (e) => { if (e.target === overlay) tfCloseModal(); };
+    document.body.appendChild(overlay);
+  }
+  if (mode === 'loading') {
+    overlay.innerHTML = `<div class="tf-box"><div class="tf-head"><div>⚡ AI Task Extractor</div><button onclick="tfCloseModal()" class="tf-x">✕</button></div><div style="padding:2rem;text-align:center;color:var(--text2);font-family:var(--mono);font-size:12px"><div style="font-size:24px;margin-bottom:.5rem">⚙</div>Analizuję raport i wyciągam taski...</div></div>`;
+  } else if (mode === 'empty') {
+    overlay.innerHTML = `<div class="tf-box"><div class="tf-head"><div>⚡ AI Task Extractor</div><button onclick="tfCloseModal()" class="tf-x">✕</button></div><div style="padding:2rem;text-align:center;color:var(--text2)">AI nie znalazł konkretnych tasków w tym raporcie.<br>Spróbuj z bardziej szczegółowym raportem albo dodaj taski ręcznie w Team → Zadania.</div></div>`;
+  } else if (mode === 'error') {
+    overlay.innerHTML = `<div class="tf-box"><div class="tf-head"><div>⚡ AI Task Extractor</div><button onclick="tfCloseModal()" class="tf-x">✕</button></div><div style="padding:2rem;text-align:center;color:#ef4444">Błąd: ${esc(errMsg||'unknown')}</div></div>`;
+  } else if (mode === 'review') {
+    tfRenderReview(overlay);
+  }
+  overlay.style.display = 'flex';
+}
+
+function tfCloseModal() {
+  const o = document.getElementById('tfModal');
+  if (o) o.style.display = 'none';
+  tfExtractedTasks = [];
+  tfSourceMeta = null;
+}
+
+function tfRenderReview(overlay) {
+  const workerOpts = zmWorkers.map(w => `<option value="${esc(w.email)}">${esc(w.name)}</option>`).join('');
+  const rowsHtml = tfExtractedTasks.map((t, i) => {
+    const actionDef = TF_ACTIONS[t.type] || { label: t.type, icon: '•', checklist: [] };
+    const checklist = t.customChecklist || actionDef.checklist;
+    return `
+      <div class="tf-row" data-idx="${i}">
+        <label class="tf-check">
+          <input type="checkbox" checked onchange="tfToggleRow(${i})">
+        </label>
+        <div class="tf-row-body">
+          <div class="tf-row-head">
+            <span class="tf-icon">${actionDef.icon}</span>
+            <input class="tf-title" value="${esc(t.title)}" onchange="tfUpdateField(${i},'title',this.value)">
+            <select class="tf-pri tf-pri-${(t.priority||'INFO').toLowerCase().replace('ż','z').replace('ą','a')}" onchange="tfUpdateField(${i},'priority',this.value)">
+              ${['PILNE','WAŻNE','INFO'].map(p => `<option value="${p}"${p===t.priority?' selected':''}>${p}</option>`).join('')}
+            </select>
+          </div>
+          <div class="tf-row-meta">
+            <select onchange="tfUpdateField(${i},'type',this.value); tfRerenderRow(${i})">
+              ${Object.entries(TF_ACTIONS).map(([k,v]) => `<option value="${k}"${k===t.type?' selected':''}>${v.icon} ${v.label}</option>`).join('')}
+            </select>
+            <select onchange="tfUpdateField(${i},'konto',this.value)">
+              <option value="">— konto —</option>
+              ${Object.keys(AC_META).map(k => `<option value="${k}"${k===t.konto?' selected':''}>${k}</option>`).join('')}
+            </select>
+          </div>
+          <textarea class="tf-desc" onchange="tfUpdateField(${i},'desc',this.value)" rows="2">${esc(t.desc||'')}</textarea>
+          <details class="tf-checklist-det">
+            <summary>Checklist (${checklist.length} kroków)</summary>
+            <ol>${checklist.map(c => `<li>${esc(c)}</li>`).join('')}</ol>
+          </details>
+        </div>
+      </div>
+    `;
+  }).join('');
+  overlay.innerHTML = `
+    <div class="tf-box tf-box-wide">
+      <div class="tf-head">
+        <div>⚡ AI Task Extractor — ${tfExtractedTasks.length} wygenerowanych</div>
+        <button onclick="tfCloseModal()" class="tf-x">✕</button>
+      </div>
+      <div class="tf-source">
+        <span style="color:var(--text3);font-size:10px">Źródło:</span>
+        <span style="color:#60a5fa">${esc(tfSourceMeta?.title || tfSourceMeta?.source || '')}</span>
+      </div>
+      <div class="tf-rows">${rowsHtml}</div>
+      <div class="tf-footer">
+        <div class="tf-assign">
+          <label>Przypisz do:</label>
+          <select id="tfAssignee">
+            <option value="">— wybierz pracownika —</option>
+            ${workerOpts}
+          </select>
+          <label style="margin-left:1rem">Termin:</label>
+          <select id="tfDueOpt" onchange="tfUpdateDueDate()">
+            <option value="today">Dzisiaj</option>
+            <option value="tomorrow" selected>Jutro</option>
+            <option value="week">Za tydzień</option>
+            <option value="custom">Własna data</option>
+          </select>
+          <input type="date" id="tfDue" value="${tfDateString(1)}">
+        </div>
+        <div class="tf-actions">
+          <button onclick="tfCloseModal()" class="tf-btn-cancel">Anuluj</button>
+          <button onclick="tfSendTasks()" class="tf-btn-send" id="tfSendBtn">Wyślij zaznaczone →</button>
+        </div>
+      </div>
+    </div>
+  `;
+  tfUpdateSendCount();
+}
+
+function tfDateString(daysOffset) {
+  const d = new Date(); d.setDate(d.getDate() + (daysOffset||0));
+  return d.toISOString().slice(0,10);
+}
+
+function tfUpdateDueDate() {
+  const opt = document.getElementById('tfDueOpt').value;
+  const input = document.getElementById('tfDue');
+  if (opt === 'today') input.value = tfDateString(0);
+  else if (opt === 'tomorrow') input.value = tfDateString(1);
+  else if (opt === 'week') input.value = tfDateString(7);
+  input.readOnly = opt !== 'custom';
+}
+
+function tfToggleRow(idx) {
+  const row = document.querySelector(`.tf-row[data-idx="${idx}"]`);
+  if (row) row.classList.toggle('tf-disabled');
+  tfUpdateSendCount();
+}
+
+function tfUpdateField(idx, field, value) {
+  if (tfExtractedTasks[idx]) tfExtractedTasks[idx][field] = value;
+}
+
+function tfRerenderRow(idx) {
+  // Rerender just to refresh checklist preview — simple full review rerender
+  const overlay = document.getElementById('tfModal');
+  if (overlay) tfRenderReview(overlay);
+}
+
+function tfUpdateSendCount() {
+  const rows = document.querySelectorAll('.tf-row:not(.tf-disabled)');
+  const btn = document.getElementById('tfSendBtn');
+  if (btn) btn.textContent = `Wyślij ${rows.length} tasków →`;
+}
+
+async function tfSendTasks() {
+  const assignee = document.getElementById('tfAssignee').value;
+  if (!assignee) { alert('Wybierz pracownika'); return; }
+  const dueDate = document.getElementById('tfDue').value;
+  const selectedIndexes = [];
+  document.querySelectorAll('.tf-row').forEach(row => {
+    if (!row.classList.contains('tf-disabled')) selectedIndexes.push(parseInt(row.dataset.idx));
+  });
+  if (!selectedIndexes.length) { alert('Zaznacz przynajmniej jeden task'); return; }
+  const btn = document.getElementById('tfSendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Wysyłanie...';
+  const authorName = currentUser.displayName || currentUser.email.split('@')[0];
+  const authorEmail = currentUser.email.toLowerCase();
+  const authorKey = authorEmail.replace(/[.#$/\[\]]/g,'_');
+  let sent = 0, errors = 0;
+  for (const i of selectedIndexes) {
+    const t = tfExtractedTasks[i];
+    const actionDef = TF_ACTIONS[t.type] || { checklist: [] };
+    const checklistItems = (t.customChecklist || actionDef.checklist).map(text => ({ text, done: false }));
+    const task = {
+      title: t.title,
+      desc: t.desc || '',
+      assignee,
+      status: 'todo',
+      priority: t.priority || 'WAŻNE',
+      konto: t.konto || '',
+      dueDate,
+      checklist: checklistItems,
+      comments: [],
+      readBy: { [authorKey]: Date.now() },
+      history: [{ at: Date.now(), author: authorName, action: 'wygenerowany z raportu ' + (tfSourceMeta?.source||'') }],
+      createdAt: Date.now(),
+      createdBy: authorEmail,
+      updatedAt: Date.now(),
+      tfType: t.type,
+      tfSource: tfSourceMeta?.source || '',
+      tfSourceTitle: tfSourceMeta?.title || '',
+      tfSourceSnippet: tfSourceMeta?.textSnippet || ''
+    };
+    try {
+      const ref = await zmTeamRef().collection('tasks').add(task);
+      task.id = ref.id;
+      zmTasks.unshift(task);
+      sent++;
+    } catch(e) { console.error('[tf] send', e); errors++; }
+  }
+  btn.disabled = false;
+  if (errors === 0) {
+    btn.textContent = `✓ Wysłano ${sent}`;
+    setTimeout(() => {
+      tfCloseModal();
+      alert(`✓ ${sent} ${sent===1?'task wysłany':'tasków wysłanych'} do ${zmWorkers.find(w=>w.email===assignee)?.name||assignee}`);
+      zmRenderTasks();
+      zmRenderStats();
+      zmUpdateNavBadge();
+    }, 500);
+  } else {
+    btn.textContent = `⚠ ${sent}/${selectedIndexes.length} wysłano`;
+    alert(`Wysłano ${sent}, błędów: ${errors}`);
+  }
+}
+
 // Poll for new tasks/comments every 60s when user is active
 let zmPollInterval = null;
 async function zmPollOnce() {
@@ -7470,6 +7851,7 @@ function zmRenderTasks() {
           <span class="zm-chip"><span class="zm-chip-ico">📅</span> Utworzone: ${fmtDate(t.createdAt) || '—'}</span>
           ${due ? `<span class="zm-chip zm-due ${due.cls}"><span class="zm-chip-ico">⏰</span> Termin: ${due.label}</span>` : `<span class="zm-chip"><span class="zm-chip-ico">⏰</span> Bez terminu</span>`}
           ${t.updatedAt && t.updatedAt !== t.createdAt ? `<span class="zm-chip zm-chip-muted"><span class="zm-chip-ico">↻</span> Aktualizacja: ${fmtRelative(t.updatedAt)}</span>` : ''}
+          ${t.tfSource ? `<span class="zm-task-source" title="${esc(t.tfSourceTitle||t.tfSource)}">⚡ z raportu: ${esc(t.tfSource)}</span>` : ''}
         </div>
         ${t.desc ? `<div class="zm-task-desc">${esc(t.desc)}</div>` : ''}
         ${checkTotal ? `
@@ -15015,6 +15397,7 @@ function mhReportButtonsHTML(source) {
     <button onclick="mhSave('${source}',this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.06);color:#34d399;cursor:pointer">💾 Zapisz</button>
     <button onclick="mhSendToScreener('${source}')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(232,121,249,.3);background:rgba(232,121,249,.08);color:#e879f9;cursor:pointer">→ Screener</button>
     <button onclick="mhSlidePresentation('${source}')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(180,127,255,.3);background:rgba(180,127,255,.08);color:#b47fff;cursor:pointer">◆ Prezentacja</button>
+    <button onclick="tfExtract('${source}')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(59,130,246,.4);background:rgba(59,130,246,.12);color:#60a5fa;cursor:pointer;font-weight:500">⚡ Wygeneruj taski</button>
   </div>`;
 }
 
@@ -18587,7 +18970,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.55</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.56</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
