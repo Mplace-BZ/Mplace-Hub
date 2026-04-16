@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://www.gstatic.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://firestore.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://red-haze-5f37mplace-agent.contactmplace.workers.dev https://www.googleapis.com; media-src 'self' blob:; frame-ancestors 'none';">
-<title>MPlace Hub v7.68</title>
+<title>MPlace Hub v7.69</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1431,7 +1431,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.68</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.69</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -7737,10 +7737,9 @@ function zmRenderDashboard() {
   if (!el) return;
   const email = currentUser?.email?.toLowerCase();
   const isOwner = userRole === 'owner';
-  const targetEmail = isOwner ? '' : email; // Owner sees all, worker sees own
-  const myTasks = targetEmail
-    ? zmTasks.filter(t => t.assignee === targetEmail)
-    : zmTasks;
+  // Owner = dashboard per worker. Worker = own dashboard.
+  if (isOwner) { zmRenderOwnerDashboard(el); return; }
+  const myTasks = zmTasks.filter(t => t.assignee === email);
 
   // XP = tasks verified
   const xp = myTasks.filter(t => t.status === 'verified').length;
@@ -7880,6 +7879,134 @@ function zmRenderDashboard() {
       </div>
     </div>
   `;
+}
+
+// ── Owner Dashboard — breakdown per worker ──
+function zmRenderOwnerDashboard(el) {
+  // Group tasks by worker
+  const byWorker = {};
+  zmTasks.forEach(t => {
+    const email = t.assignee || '_unassigned';
+    if (!byWorker[email]) byWorker[email] = { email, tasks: [] };
+    byWorker[email].tasks.push(t);
+  });
+
+  // Overall stats
+  const total = zmTasks.length;
+  const done = zmTasks.filter(t => ['done','verified'].includes(t.status)).length;
+  const verified = zmTasks.filter(t => t.status === 'verified').length;
+  const overdue = zmTasks.filter(t => {
+    if (!t.dueDate || ['done','verified'].includes(t.status)) return false;
+    return t.dueDate < new Date().toISOString().slice(0,10);
+  }).length;
+  const pctDone = total ? Math.round(done / total * 100) : 0;
+
+  let html = `
+    <div style="font-family:var(--mono);font-size:13px;color:var(--text);margin-bottom:1rem;font-weight:600">Zespół — przegląd</div>
+
+    <div class="zm-dash-metrics">
+      <div class="zm-dash-metric"><div class="zm-dash-metric-val">${total}</div><div class="zm-dash-metric-lbl">Wszystkie</div></div>
+      <div class="zm-dash-metric"><div class="zm-dash-metric-val" style="color:#2dd4a0">${done}</div><div class="zm-dash-metric-lbl">Ukończone</div><div class="zm-dash-metric-sub">${pctDone}% completion</div></div>
+      <div class="zm-dash-metric"><div class="zm-dash-metric-val" style="color:#a78bfa">${verified}</div><div class="zm-dash-metric-lbl">Zweryfikowane</div></div>
+      <div class="zm-dash-metric"><div class="zm-dash-metric-val" style="color:#60a5fa">${zmWorkers.length}</div><div class="zm-dash-metric-lbl">Pracowników</div></div>
+      ${overdue ? `<div class="zm-dash-metric"><div class="zm-dash-metric-val" style="color:#ef4444">${overdue}</div><div class="zm-dash-metric-lbl">Po terminie</div></div>` : ''}
+    </div>
+  `;
+
+  // Per-worker cards
+  const workerList = zmWorkers.length ? zmWorkers : [{ email: '_unassigned', name: 'Nieprzypisane' }];
+  html += `<div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin:1.25rem 0 .75rem">Per pracownik:</div>`;
+
+  workerList.forEach(w => {
+    const wTasks = byWorker[w.email]?.tasks || [];
+    const wTotal = wTasks.length;
+    const wTodo = wTasks.filter(t => t.status === 'todo').length;
+    const wProg = wTasks.filter(t => t.status === 'in_progress').length;
+    const wDone = wTasks.filter(t => t.status === 'done').length;
+    const wVerified = wTasks.filter(t => t.status === 'verified').length;
+    const wXP = wVerified;
+    const wLevel = zmGetLevel(wXP);
+    const wOverdue = wTasks.filter(t => {
+      if (!t.dueDate || ['done','verified'].includes(t.status)) return false;
+      return t.dueDate < new Date().toISOString().slice(0,10);
+    }).length;
+
+    // Top konta for this worker
+    const kontoCount = {};
+    wTasks.filter(t => t.konto && ['done','verified'].includes(t.status))
+      .forEach(t => { kontoCount[t.konto] = (kontoCount[t.konto] || 0) + 1; });
+    const topKonta = Object.entries(kontoCount).sort((a,b) => b[1] - a[1]).slice(0, 3);
+
+    // Weekly for this worker
+    const now = new Date();
+    const dayOfWeek = (now.getDay() + 6) % 7;
+    const weekStart = new Date(now); weekStart.setDate(now.getDate() - dayOfWeek); weekStart.setHours(0,0,0,0);
+    let weekDone = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(weekStart.getTime() + i * 86400000);
+      const dateStr = d.toISOString().slice(0,10);
+      weekDone += wTasks.filter(t =>
+        ['done','verified'].includes(t.status) && t.updatedAt &&
+        new Date(t.updatedAt).toISOString().slice(0,10) === dateStr
+      ).length;
+    }
+
+    html += `
+      <div class="zm-card" style="margin-bottom:.75rem;padding:1rem 1.25rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="zm-avatar" style="width:36px;height:36px;font-size:13px">${esc(zmInitials(w.name))}</div>
+            <div>
+              <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text)">${esc(w.name)}</div>
+              <div style="font-size:10px;color:var(--text3)">${esc(w.email)}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:16px">${wLevel.icon}</span>
+            <span style="font-family:var(--mono);font-size:11px;color:${wLevel.color};font-weight:600">${wLevel.name}</span>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--text2)">${wXP} XP</span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;margin-top:.75rem;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
+          <span style="color:var(--text2)">${wTotal} tasków</span>
+          <span style="color:#94a3b8">${wTodo} todo</span>
+          <span style="color:#60a5fa">${wProg} w trakcie</span>
+          <span style="color:#2dd4a0">${wDone} done</span>
+          <span style="color:#a78bfa">${wVerified} verified</span>
+          ${wOverdue ? `<span style="color:#ef4444">${wOverdue} po terminie</span>` : ''}
+          <span style="color:#06b6d4">${weekDone} ten tydzień</span>
+        </div>
+
+        ${topKonta.length ? `
+          <div style="display:flex;gap:4px;margin-top:.5rem;flex-wrap:wrap">
+            ${topKonta.map(([k, cnt]) => {
+              const meta = AC_META[k];
+              const clr = meta?.group === 'MEBLE' ? '#ff6b35' : meta?.group === 'LUXSEN' ? '#2dd4a0' : '#b47fff';
+              return `<span class="zm-dash-konto-chip" style="border-color:${clr};color:${clr};font-size:9px;padding:3px 8px">${k} ${cnt}</span>`;
+            }).join('')}
+          </div>
+        ` : ''}
+
+        <div style="margin-top:.6rem">
+          <div class="zm-dash-bar" style="height:4px"><div class="zm-dash-bar-fill" style="width:${wTotal?Math.round((wDone+wVerified)/wTotal*100):0}%;background:${wLevel.color}"></div></div>
+          <div style="font-size:9px;color:var(--text3);margin-top:3px;text-align:right">${wTotal?Math.round((wDone+wVerified)/wTotal*100):0}% ukończone</div>
+        </div>
+      </div>
+    `;
+  });
+
+  // Unassigned tasks
+  const unassigned = byWorker['_unassigned']?.tasks || zmTasks.filter(t => !t.assignee);
+  if (unassigned.length) {
+    html += `
+      <div class="zm-card" style="margin-bottom:.75rem;padding:.75rem 1rem;opacity:.7">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3)">⚠ ${unassigned.length} tasków nieprzypisanych</div>
+      </div>
+    `;
+  }
+
+  el.innerHTML = html;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -19976,7 +20103,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.68</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.69</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
