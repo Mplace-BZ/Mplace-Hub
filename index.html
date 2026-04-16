@@ -7,7 +7,8 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.64</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://www.gstatic.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://firestore.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://red-haze-5f37mplace-agent.contactmplace.workers.dev https://www.googleapis.com; media-src 'self' blob:; frame-ancestors 'none';">
+<title>MPlace Hub v7.65</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1197,6 +1198,31 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 /* Template flash highlight */
 .zm-card.zm-flash{animation:zmFlashIn 1.5s ease-out}
 @keyframes zmFlashIn{0%{border-color:#2dd4a0;box-shadow:0 0 0 2px rgba(45,212,160,.4),0 0 20px rgba(45,212,160,.3);background:rgba(45,212,160,.08)}100%{border-color:var(--border);box-shadow:none;background:var(--bg2)}}
+/* Worker Dashboard */
+.zm-dash-hero{background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(167,139,250,.08));border:1px solid rgba(59,130,246,.25);border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1.25rem}
+.zm-dash-level{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.25rem}
+.zm-dash-level.junior{color:#94a3b8}.zm-dash-level.regular{color:#60a5fa}.zm-dash-level.senior{color:#2dd4a0}.zm-dash-level.expert{color:#f5a623}.zm-dash-level.master{color:#e879f9}
+.zm-dash-xp{font-family:var(--mono);font-size:32px;font-weight:700;color:var(--text);line-height:1}
+.zm-dash-xp-sub{font-size:11px;color:var(--text2);font-family:var(--mono);margin-top:6px}
+.zm-dash-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:10px}
+.zm-dash-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.zm-dash-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.75rem;margin-bottom:1.25rem}
+.zm-dash-metric{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center}
+.zm-dash-metric-val{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text)}
+.zm-dash-metric-lbl{font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.zm-dash-metric-sub{font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px}
+.zm-dash-week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:1.25rem}
+.zm-dash-week-day{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.75rem .5rem;text-align:center}
+.zm-dash-week-day.today{border-color:rgba(96,165,250,.5);box-shadow:0 0 8px rgba(96,165,250,.15)}
+.zm-dash-week-name{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.zm-dash-week-num{font-family:var(--mono);font-size:18px;font-weight:600}
+.zm-dash-week-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:6px}
+.zm-dash-week-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#2dd4a0,#60a5fa)}
+.zm-dash-streak{display:flex;align-items:center;gap:10px;padding:.85rem 1.25rem;background:linear-gradient(135deg,rgba(245,166,35,.1),rgba(239,68,68,.05));border:1px solid rgba(245,166,35,.3);border-radius:10px;margin-bottom:1.25rem}
+.zm-dash-streak-fire{font-size:28px}.zm-dash-streak-num{font-family:var(--mono);font-size:22px;font-weight:700;color:#f5a623}
+.zm-dash-streak-text{font-size:11px;color:var(--text2)}
+.zm-dash-top{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.zm-dash-konto-chip{font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:12px;border:1px solid var(--border);background:var(--bg2)}
 /* Calendar */
 .zm-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem}
 .zm-cal-nav{display:flex;align-items:center;gap:8px}
@@ -1405,7 +1431,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.64</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.65</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1482,6 +1508,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <button class="nav-btn" onclick="zmWorkerShowView('secrets')" id="zmwNavSecrets" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Loginy 🔐</button>
   <button class="nav-btn" onclick="zmWorkerShowView('sessions')" id="zmwNavSessions" style="color:#06b6d4;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2)">Rozliczenie</button>
   <button class="nav-btn" onclick="zmWorkerShowView('calendar')" id="zmwNavCalendar" style="color:#f97316;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2)">Kalendarz</button>
+  <button class="nav-btn" onclick="zmWorkerShowView('dashboard')" id="zmwNavDashboard" style="color:#e879f9;background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.2)">Mój tydzień</button>
   <div style="flex:1"></div>
   <button class="nav-btn zm-sos-btn" onclick="zmSOS()" title="Poproś Chrisa o pomoc (tworzy task PILNY)">🆘 SOS</button>
 </div>
@@ -3631,6 +3658,11 @@ IDs: 123456 789012 ..."></textarea>
     <div id="zmCalGrid" class="zm-cal-grid"></div>
     <div id="zmCalStats" style="margin-top:1rem;display:flex;gap:1rem;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--text3)"></div>
   </div>
+
+  <!-- ── DASHBOARD WORKERA ── -->
+  <div id="zmDashboardPanel" style="display:none">
+    <div id="zmDashContent"></div>
+  </div>
 </div>
 </div>
 
@@ -4451,6 +4483,10 @@ function toggleCmpAcc(k, btn){
 }
 
 
+
+// ── WORKER CONFIG ────────────────────────────────────────
+const WORKER_URL = 'https://red-haze-5f37mplace-agent.contactmplace.workers.dev';
+const WORKER_AUTH = 'Bearer Czucio123$';
 
 // ── DASHBOARD EXTRAS ─────────────────────────────────────
 function initDashboardExtras(){
@@ -7375,9 +7411,9 @@ FORMAT ODPOWIEDZI:
     ? sourceText.slice(0, maxSourceLen) + '\n\n[... raport przycięty, skoncentruj się na powyższym ...]'
     : sourceText;
   const userPrompt = `Raport źródłowy (typ: ${sourceType}):\n\n${trimmedSource}\n\nWygeneruj taski wg zasad systemu. Zwróć tylko JSON, maksymalnie 10 zadań.`;
-  const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+  const resp = await fetch(WORKER_URL + '/', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 8192,
@@ -8080,9 +8116,9 @@ Instrukcja usera: ${instruction}
 
 Lista pozycji:
 ${items.map((it,i) => `${i+1}. ${it}`).join('\n')}`;
-  const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+  const resp = await fetch(WORKER_URL + '/', {
     method: 'POST',
-    headers: { 'Content-Type':'application/json' },
+    headers: { 'Content-Type':'application/json', 'Authorization': WORKER_AUTH },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 8192,
@@ -8184,8 +8220,8 @@ function zmStartPolling() {
 
 // ── Tab switching ──
 function zmShowTab(tab) {
-  const tabs = ['tasks','workers','templates','wknow','briefings','secrets','sessions','announce','actions','calendar'];
-  const panels = { tasks:'zmTasksPanel', workers:'zmWorkersPanel', templates:'zmTemplatesPanel', wknow:'zmWKnowPanel', briefings:'zmBriefingsPanel', secrets:'zmSecretsPanel', sessions:'zmSessionsPanel', announce:'zmAnnouncePanel', actions:'zmActionsPanel', calendar:'zmCalendarPanel' };
+  const tabs = ['tasks','workers','templates','wknow','briefings','secrets','sessions','announce','actions','calendar','dashboard'];
+  const panels = { tasks:'zmTasksPanel', workers:'zmWorkersPanel', templates:'zmTemplatesPanel', wknow:'zmWKnowPanel', briefings:'zmBriefingsPanel', secrets:'zmSecretsPanel', sessions:'zmSessionsPanel', announce:'zmAnnouncePanel', actions:'zmActionsPanel', calendar:'zmCalendarPanel', dashboard:'zmDashboardPanel' };
   const tabIds = { tasks:'zmTabTasks', workers:'zmTabWorkers', templates:'zmTabTemplates', wknow:'zmTabWKnow', briefings:'zmTabBriefings', secrets:'zmTabSecrets', sessions:'zmTabSessions', announce:'zmTabAnnounce', actions:'zmTabActions', calendar:'zmTabCalendar' };
   tabs.forEach(t => {
     const btn = document.getElementById(tabIds[t]);
@@ -8211,6 +8247,7 @@ function zmShowTab(tab) {
   else if (tab === 'announce') zmLoadAnnouncements().then(() => { zmRenderAnnouncements(); zmRenderAnnounceBar(); });
   else if (tab === 'actions') tfLoadCustomActions().then(tfRenderActionsLibrary);
   else if (tab === 'calendar') zmRenderCalendar();
+  else if (tab === 'dashboard') zmRenderDashboard();
 }
 
 // ════════════════════════════════════════
@@ -10165,10 +10202,11 @@ async function agentSend(){
   const systemPrompt = buildAgentContext();
 
   try {
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': WORKER_AUTH,
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
@@ -10755,9 +10793,9 @@ ${Object.keys(filteredGroups).length > 1 ? `2. WYNIKI PER GRUPA\n   Dla każdej 
 Bądź konkretny jak analityk finansowy. Podawaj liczby. Odpowiedz po polsku.`;
 
   try {
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -10985,9 +11023,9 @@ async function generatePodcast() {
 
   try {
     // Step 1: Claude rephrase to podcast script
-    const rResp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const rResp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 2048,
@@ -11012,12 +11050,13 @@ ZASADY:
 
     if (btn) btn.textContent = '⟳ Generuję audio...';
 
-    // Step 2: ElevenLabs TTS
-    const ttsResp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${getVoiceId()}`, {
+    // Step 2: ElevenLabs TTS (via Worker proxy)
+    const ttsResp = await fetch(WORKER_URL + '/tts', {
       method: 'POST',
-      headers: { 'xi-api-key': _11L_KEY, 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         text: podcastScript.substring(0, 2500),
+        voice_id: getVoiceId(),
         model_id: _11L_MODEL,
         voice_settings: { stability: 0.5, similarity_boost: 0.75 }
       })
@@ -11247,7 +11286,8 @@ async function sharePodcast(id, btn) {
     });
     const CHUNK = 800000;
     const chunks = Math.ceil(b64.length / CHUNK);
-    await firebase.firestore().collection('publicPodcasts').doc(id.toString()).set({
+    const shareId = crypto.randomUUID();
+    await firebase.firestore().collection('publicPodcasts').doc(shareId).set({
       title: pod.title || 'MPlace Briefing', date: pod.date || '',
       script: (pod.script || '').substring(0, 200), chunks: chunks,
       metrics: pod.metrics || [],
@@ -11255,10 +11295,10 @@ async function sharePodcast(id, btn) {
     });
     for (let i = 0; i < chunks; i++) {
       if (btn) btn.textContent = 'Upload ' + (i+1) + '/' + chunks + '...';
-      await firebase.firestore().collection('publicPodcasts').doc(id.toString())
+      await firebase.firestore().collection('publicPodcasts').doc(shareId)
         .collection('audio').doc('chunk_' + i).set({ data: b64.substring(i * CHUNK, (i+1) * CHUNK) });
     }
-    const url = 'https://mplace-bz.github.io/Mplace-Hub/listen.html?id=' + id;
+    const url = 'https://mplace-bz.github.io/Mplace-Hub/listen.html?id=' + shareId;
     await navigator.clipboard.writeText(url);
     if (btn) { btn.innerHTML = '&#10003; Copied!'; setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 4000); }
     alert('Link skopiowany!\n\n' + url);
@@ -11458,9 +11498,9 @@ ${dataCtx}
 ${SLIDE_REPORT_PROMPT}`;
 
   try {
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -11770,7 +11810,7 @@ async function sharePresentation(btn) {
   btn.textContent = 'Zapisuję...';
   btn.disabled = true;
   try {
-    const id = Date.now().toString();
+    const id = crypto.randomUUID();
     await firebase.firestore().collection('publicPresentations').doc(id).set({
       html: slidesInner,
       scope: _shareMeta.curM,
@@ -12295,9 +12335,9 @@ Jeśli nie masz dobrych propozycji: {"proposals": []}
 Raport:
 ${reportText}`;
 
-  const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+  const resp = await fetch(WORKER_URL + '/', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
@@ -12668,7 +12708,7 @@ function setVoiceState(state) {
 
 // ── TTS — ElevenLabs (naturalny głos) ─────────────────────
 
-const _11L_KEY = 'sk_4aeac720bcf58c10a447532b1d35af57feda3fdcf12a4bb3';
+// Klucz ElevenLabs przeniesiony do Cloudflare Worker (env.ELEVENLABS_KEY)
 const _11L_VOICES = {
   sarah: 'EXAVITQu4vr4xnSDxMaL',  // Sarah — kobieta
   chris: 'JHwLP4JhPVCpNz5vE668'    // Chris — voice clone
@@ -12702,9 +12742,9 @@ async function speakText(text) {
   // Rephrase via Claude — natural speech instead of reading raw report
   let spoken = clean;
   try {
-    const rResp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const rResp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1024,
@@ -12732,14 +12772,15 @@ ZASADY:
 
   setVoiceState('speaking');
   try {
-    const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${getVoiceId()}`, {
+    const resp = await fetch(WORKER_URL + '/tts', {
       method: 'POST',
       headers: {
-        'xi-api-key': _11L_KEY,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': WORKER_AUTH
       },
       body: JSON.stringify({
         text: trimmed,
+        voice_id: getVoiceId(),
         model_id: _11L_MODEL,
         voice_settings: { stability: 0.5, similarity_boost: 0.75 }
       })
@@ -13208,9 +13249,9 @@ async function adsRunAnalysis() {
   prompt += `Styl: konkretny, liczby w zł i %, po polsku.`;
 
   try {
-    const res = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev', {
+    const res = await fetch(WORKER_URL + '/', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json', 'Authorization': WORKER_AUTH},
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:8192,
@@ -16064,9 +16105,9 @@ async function aaRunAnalysis() {
     const beRoas = C && C.beRoasGlob ? C.beRoasGlob : (C && C.mBefore > 0 ? 1 / (C.mBefore / 100) : 6);
     const prompt = aaBuildPrompt(kontoName, okres || 'bieżący', uwagi, adsData || {totKoszt:0,totSprzedaz:0,totRoas:0,kampanie:[],zgnile:[],kosztZgnile:0,gwiazdy:[]}, sprzedazData, konwersjaData, beRoas, ads30dData);
 
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 16384,
@@ -16444,9 +16485,9 @@ KRYTYCZNE ZASADY PREZENTACJI (OBOWIĄZKOWE):
 - Na KAŻDYM slajdzie pod treścią dodaj stopkę: "Przygotował: MPlace | Sprzedaż online bez przepaleń 🔥"`;
 
   try {
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -16690,9 +16731,9 @@ async function aaChatSend() {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
   try {
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 4096,
@@ -17270,9 +17311,9 @@ async function generateDzis() {
     prompt += `- Uwzględnij alerty, kanibalizację, optymalizację Ads, wyróżnienia, sezonowość\n`;
     prompt += `- summary: 1 motywacyjne zdanie o dniu\n`;
 
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 4096,
@@ -17853,9 +17894,9 @@ async function cbRunAnalysis() {
     thinkingText.textContent = 'Agent AI analizuje rynki CZ/SK...';
     const prompt = cbBuildPrompt();
 
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -19224,9 +19265,9 @@ async function caRunArchitect() {
     const prompt = caBuildArchitectPrompt(data);
     if (status) status.textContent = 'AI Architect analizuje 3 konta (max 60 sek)...';
 
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 16384,
@@ -19747,7 +19788,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.64</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.65</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -20020,9 +20061,9 @@ async function kbRun() {
     prompt += `5. BUDŻET — jak przesunąć oszczędzony budżet: z którego konta na które, na jakie produkty\n`;
     prompt += `6. PLAN DZIAŁAŃ — 5 kroków: [PILNE/WAŻNE] Co → Które konto/aukcja → Efekt w zł\n`;
 
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -21073,9 +21114,9 @@ async function scrSend() {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
   try {
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 16384,
@@ -22155,9 +22196,9 @@ ${lines.map((l,i)=>`${i+1}. ${l.trim()}`).join('\n')}`;
   document.getElementById('taResult').innerHTML = '<div style="color:var(--text3);font-family:var(--mono);font-size:11px;padding:1rem">Czekam na odpowiedź Agenta...</div>';
 
   try {
-    const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,

@@ -86,7 +86,10 @@
             const m = document.getElementById('pMetrics');
             m.style.display = 'flex';
             d.metrics.forEach(mt => {
-              m.innerHTML += '<div class="metric"><div class="metric-val">' + mt.value + '</div><div class="metric-label">' + mt.label + '</div></div>';
+              const card = document.createElement('div'); card.className = 'metric';
+              const val = document.createElement('div'); val.className = 'metric-val'; val.textContent = mt.value;
+              const lbl = document.createElement('div'); lbl.className = 'metric-label'; lbl.textContent = mt.label;
+              card.appendChild(val); card.appendChild(lbl); m.appendChild(card);
             });
           }
           document.title = (d.title || 'MPlace Briefing') + ' — ' + (d.date || '');
