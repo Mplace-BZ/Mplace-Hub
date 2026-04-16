@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.58</title>
+<title>MPlace Hub v7.59</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1377,7 +1377,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.58</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.59</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -3387,6 +3387,7 @@ IDs: 123456 789012 ..."></textarea>
     <button class="zm-tab" onclick="zmShowTab('secrets')" id="zmTabSecrets">Loginy 🔐</button>
     <button class="zm-tab" onclick="zmShowTab('sessions')" id="zmTabSessions">Rozliczenie</button>
     <button class="zm-tab" onclick="zmShowTab('announce')" id="zmTabAnnounce">Ogłoszenia</button>
+    <button class="zm-tab" onclick="zmShowTab('actions')" id="zmTabActions">⚡ Biblioteka akcji</button>
   </div>
 
   <!-- ── ZADANIA TAB ── -->
@@ -3536,6 +3537,30 @@ IDs: 123456 789012 ..."></textarea>
       <button type="button" class="zm-btn zm-btn-primary" onclick="zmSaveAnnounce()">+ Publikuj ogłoszenie</button>
     </div>
     <div id="zmAnnounceList"></div>
+  </div>
+
+  <!-- ── BIBLIOTEKA AKCJI (custom types for Task Factory) ── -->
+  <div id="zmActionsPanel" style="display:none">
+    <div style="color:var(--text2);font-size:11px;margin-bottom:1rem">Twoje własne typy akcji dla AI Task Extractor. AI będzie mógł wygenerować taski z Twoimi checklistami dopasowanymi do tego co robicie codziennie.</div>
+    <div class="zm-add-form">
+      <div style="display:grid;grid-template-columns:1fr 1fr 120px;gap:.75rem;margin-bottom:.75rem">
+        <div><label>Klucz (ID, bez spacji)</label><input id="tfActionKey" placeholder="np. przedluz_oferte"></div>
+        <div><label>Nazwa (widoczna)</label><input id="tfActionLabel" placeholder="np. Przedłuż ofertę o 30 dni"></div>
+        <div><label>Ikona</label><input id="tfActionIcon" placeholder="np. ⏱" maxlength="2"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr;gap:.75rem;margin-bottom:.75rem">
+        <div><label>Kategoria</label><select id="tfActionCat">${['Oferta','Ads','Promocje','Klient','Kontrola','Inne'].map(c => `<option value="${c}">${c}</option>`).join('')}</select></div>
+      </div>
+      <div style="margin-bottom:.75rem">
+        <label>Checklist (po jednym kroku na linię)</label>
+        <textarea id="tfActionChecklist" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%;min-height:100px;resize:vertical" placeholder="Krok 1&#10;Krok 2&#10;Krok 3"></textarea>
+      </div>
+      <button type="button" class="zm-btn zm-btn-primary" onclick="tfSaveCustomAction()">+ Zapisz akcję</button>
+    </div>
+    <div style="margin-top:1rem;font-family:var(--mono);font-size:11px;color:var(--text2)">Wbudowane akcje (${Object.keys(TF_ACTIONS).length}):</div>
+    <div id="tfBuiltinList" style="margin-top:.5rem"></div>
+    <div style="margin-top:1rem;font-family:var(--mono);font-size:11px;color:#60a5fa">Twoje niestandardowe akcje:</div>
+    <div id="tfCustomList" style="margin-top:.5rem"></div>
   </div>
 </div>
 </div>
@@ -7035,59 +7060,165 @@ async function zmSOS() {
 // TASK FACTORY — AI Extractor + Review Modal + Batch Create
 // ═══════════════════════════════════════════════════════════════════
 
-// Action Library — 10 base types with ready-made checklists
+// Action Library — 23 types with ready-made checklists, grouped by category
 const TF_ACTIONS = {
-  zmien_tytul: {
-    label: 'Zmień tytuł oferty',
-    icon: '📝',
-    checklist: ['Otwórz ofertę w panelu Allegro', 'Zmień tytuł na nowy (podany w opisie)', 'Zapisz zmianę', 'Screenshot nowego tytułu do komentarza']
-  },
-  wylacz_kampanie: {
-    label: 'Wyłącz kampanię Ads',
-    icon: '⏸',
-    checklist: ['Panel Allegro Ads → Kampanie', 'Znajdź kampanię wskazaną w opisie', 'Zmień status na PAUZA', 'Screenshot statusu do komentarza']
-  },
-  skaluj_kampanie: {
-    label: 'Skaluj kampanię Ads',
-    icon: '🚀',
-    checklist: ['Panel Allegro Ads → Kampanie', 'Zwiększ budżet zgodnie z opisem', 'Sprawdź CPC limity (max 1.50 zł)', 'Raportuj nowy budżet w komentarzu']
-  },
-  dodaj_wyroznienie: {
-    label: 'Dodaj wyróżnienie',
-    icon: '⭐',
-    checklist: ['Otwórz ofertę', 'Promocje → Dodaj wyróżnienie flat 7 dni', 'Potwierdź koszt', 'Screenshot aktywnej promocji']
-  },
-  wylacz_wyroznienie: {
-    label: 'Wyłącz wyróżnienie',
-    icon: '✖',
-    checklist: ['Otwórz ofertę', 'Promocje → Wyłącz aktywne wyróżnienie', 'Zapisz', 'Screenshot stanu po']
-  },
-  zmien_cene: {
-    label: 'Zmień cenę oferty',
-    icon: '💰',
-    checklist: ['Otwórz ofertę', 'Edytuj cenę (podana w opisie)', 'Zapisz', 'Sprawdź BE ROAS po zmianie', 'Raportuj nową cenę']
-  },
-  wystaw_aukcje: {
-    label: 'Wystaw nową ofertę',
-    icon: '➕',
-    checklist: ['Kopiuj istniejącą ofertę jako wzór', 'Uzupełnij tytuł wg konwencji Format A v2', 'Dodaj zdjęcia i opis', 'Wybierz kategorię i parametry', 'Opublikuj', 'Podaj nowy ID oferty w komentarzu']
-  },
-  analiza_ads: {
-    label: 'Zrób analizę Ads',
-    icon: '📊',
-    checklist: ['Pobierz raport XLSX z panelu Allegro (okres w opisie)', 'Upload do zakładki Analiza Ofert', 'Wybierz konto i uruchom analizę', 'Przeklej kluczowe wnioski do komentarza']
-  },
-  copy_paste_ads: {
-    label: 'Przepisz kampanie Ads',
-    icon: '📋',
-    checklist: ['Otwórz plik CSV/tabelę z planem', 'Panel Allegro Ads → Nowa kampania', 'Wklej nazwę + budżet + stawki', 'Zapisz kampanię', 'Potwierdź w komentarzu liczbę przepisanych kampanii']
-  },
-  weryfikuj_roas: {
-    label: 'Zweryfikuj ROAS po zmianie',
-    icon: '🔍',
-    checklist: ['Poczekaj 24h od zmiany', 'Otwórz Dashboard konta', 'Zapisz ROAS przed i po', 'Jeśli ROAS < 3 → SOS', 'Raportuj wyniki w komentarzu']
-  }
+  // ── OFERTA — tytuł / cena / opis ──
+  zmien_tytul: { cat:'Oferta', label:'Zmień tytuł oferty', icon:'📝', checklist:['Otwórz ofertę w panelu Allegro','Zmień tytuł na nowy (podany w opisie)','Zapisz zmianę','Screenshot nowego tytułu do komentarza'] },
+  zmien_cene: { cat:'Oferta', label:'Zmień cenę oferty', icon:'💰', checklist:['Otwórz ofertę','Edytuj cenę (podana w opisie)','Zapisz','Sprawdź BE ROAS po zmianie','Raportuj nową cenę'] },
+  zmien_opis: { cat:'Oferta', label:'Zmień opis oferty', icon:'📄', checklist:['Otwórz ofertę → Edytuj opis','Wklej/zmień treść wg opisu zadania','Zapisz','Preview oferty — sprawdź formatowanie','Screenshot do komentarza'] },
+  dopisz_sekcje: { cat:'Oferta', label:'Dopisz sekcję do opisu', icon:'➕', checklist:['Otwórz opis oferty','Dodaj sekcję w odpowiednim miejscu (zgodnie z opisem)','Zachowaj styl istniejącego opisu','Zapisz','Screenshot nowej sekcji'] },
+  zmien_zdjecie: { cat:'Oferta', label:'Zmień/dodaj zdjęcie', icon:'🖼', checklist:['Otwórz ofertę → Galeria','Wymień/dodaj zdjęcie wg opisu','Sprawdź kolejność (zdjęcie główne = 1)','Zapisz','Preview oferty'] },
+  uzupelnij_parametry: { cat:'Oferta', label:'Uzupełnij parametry', icon:'📋', checklist:['Otwórz ofertę → Parametry','Uzupełnij brakujące wg opisu','Zapisz','Sprawdź czy wszystkie wymagane są ✓'] },
+  zmien_kategorie: { cat:'Oferta', label:'Zmień kategorię', icon:'🏷', checklist:['Otwórz ofertę','Edytuj kategorię na wskazaną w opisie','Zapisz — mogą zniknąć parametry','Uzupełnij brakujące parametry','Screenshot'] },
+  zmien_dostawe: { cat:'Oferta', label:'Zmień dostawę / Smart', icon:'🚚', checklist:['Otwórz ofertę → Dostawa','Zmień/dodaj Smart zgodnie z opisem','Zapisz','Sprawdź czas wysyłki','Screenshot'] },
+  wystaw_aukcje: { cat:'Oferta', label:'Wystaw nową ofertę', icon:'✨', checklist:['Kopiuj istniejącą ofertę jako wzór','Uzupełnij tytuł wg konwencji Format A v2','Dodaj zdjęcia i opis','Wybierz kategorię i parametry','Opublikuj','Podaj nowy ID oferty w komentarzu'] },
+  cross_border: { cat:'Oferta', label:'Wystaw na CZ/SK', icon:'🌍', checklist:['Otwórz ofertę → Allegro.cz/Allegro.sk','Przelicz cenę CZK/EUR (podaj przelicznik)','Uzupełnij tytuł i opis w j. czeskim/słowackim','Dostawa zagraniczna','Opublikuj','Podaj ID nowej oferty'] },
+
+  // ── ADS — kampanie ──
+  wylacz_kampanie: { cat:'Ads', label:'Wyłącz kampanię Ads', icon:'⏸', checklist:['Panel Allegro Ads → Kampanie','Znajdź kampanię wskazaną w opisie','Zmień status na PAUZA','Screenshot statusu do komentarza'] },
+  skaluj_kampanie: { cat:'Ads', label:'Skaluj kampanię Ads', icon:'🚀', checklist:['Panel Allegro Ads → Kampanie','Zwiększ budżet zgodnie z opisem','Sprawdź CPC limity (max 1.50 zł)','Raportuj nowy budżet'] },
+  copy_paste_ads: { cat:'Ads', label:'Przepisz kampanie Ads', icon:'📋', checklist:['Otwórz plik CSV/tabelę z planem','Panel Allegro Ads → Nowa kampania','Wklej nazwę + budżet + stawki','Zapisz kampanię','Potwierdź liczbę przepisanych'] },
+  kampania_graficzna: { cat:'Ads', label:'Utwórz kampanię graficzną', icon:'🎨', checklist:['Panel Ads → Nowa kampania graficzna','Wybierz oferty/kategorię','Wybierz banner (istniejący lub zamów)','Ustaw budżet i CPM','Uruchom'] },
+  restart_ads: { cat:'Ads', label:'Restart kampanii Ads', icon:'🔄', checklist:['Wyłącz kampanię','Poczekaj 10 min','Włącz ponownie','Poczekaj 24h na nowy cykl nauki','Raportuj ROAS po 48h'] },
+  analiza_ads: { cat:'Ads', label:'Zrób analizę Ads', icon:'📊', checklist:['Pobierz raport XLSX z panelu Allegro (okres w opisie)','Upload do zakładki Analiza Ofert','Wybierz konto i uruchom analizę','Przeklej kluczowe wnioski do komentarza'] },
+
+  // ── PROMOCJE ──
+  dodaj_wyroznienie: { cat:'Promocje', label:'Dodaj wyróżnienie flat', icon:'⭐', checklist:['Otwórz ofertę','Promocje → Dodaj wyróżnienie flat 7 dni','Potwierdź koszt','Screenshot aktywnej promocji'] },
+  wylacz_wyroznienie: { cat:'Promocje', label:'Wyłącz wyróżnienie', icon:'✖', checklist:['Otwórz ofertę','Promocje → Wyłącz aktywne wyróżnienie','Zapisz','Screenshot stanu po'] },
+  zmien_wyroznienie: { cat:'Promocje', label:'Zmień wyróżnienie (flat↔elastic)', icon:'🔀', checklist:['Otwórz ofertę → Promocje','Wyłącz aktualne wyróżnienie','Dodaj nowy typ (flat lub elastic)','Porównaj koszty','Screenshot'] },
+
+  // ── KLIENT / OPERACJE ──
+  odpowiedz_klient: { cat:'Klient', label:'Odpowiedz klientowi', icon:'💬', checklist:['Allegro Wiadomości → znajdź wątek (ID w opisie)','Wklej/napisz odpowiedź','Wyślij','Zaznacz wątek jako rozwiązany','Screenshot odpowiedzi'] },
+  obsluga_zwrotu: { cat:'Klient', label:'Obsłuż zwrot/reklamację', icon:'↩', checklist:['Otwórz zwrot w panelu Allegro','Sprawdź powód zgodnie z opisem','Zaakceptuj lub odrzuć (uzasadnij)','Wygeneruj etykietę zwrotną jeśli potrzeba','Raportuj decyzję'] },
+  monitoring_konkurencji: { cat:'Klient', label:'Sprawdź konkurencję', icon:'👀', checklist:['Otwórz Allegro → wyszukaj kategorię/produkt wg opisu','Sprawdź top 10 ofert konkurencji','Zapisz: ceny, tytuły, wyróżnienia, Smart','Screenshot tabeli','Raportuj wnioski'] },
+
+  // ── KONTROLA ──
+  weryfikuj_roas: { cat:'Kontrola', label:'Zweryfikuj ROAS po zmianie', icon:'🔍', checklist:['Poczekaj 24h od zmiany','Otwórz Dashboard konta','Zapisz ROAS przed i po','Jeśli ROAS < 3 → SOS','Raportuj wyniki'] },
+  inne: { cat:'Inne', label:'Inne (bez checklisty)', icon:'•', checklist:['Wykonaj zadanie wg opisu','Raportuj wynik w komentarzu'] }
 };
+
+// Category order for grouping in selects
+const TF_CATEGORIES = ['Oferta','Ads','Promocje','Klient','Kontrola','Inne'];
+
+// Custom actions stored in Firestore (/teams/{uid}/customActions/)
+let zmCustomActions = {};
+async function tfLoadCustomActions() {
+  if (!currentUser) return;
+  try {
+    const snap = await zmTeamRef().collection('customActions').get();
+    zmCustomActions = {};
+    snap.forEach(doc => { zmCustomActions[doc.id] = doc.data(); });
+  } catch(e) { console.error('[tf] loadCustom', e); }
+}
+
+function tfAllActions() {
+  // Merge built-in + custom
+  const merged = { ...TF_ACTIONS };
+  Object.entries(zmCustomActions).forEach(([k, v]) => {
+    merged[k] = { ...v, isCustom: true };
+  });
+  return merged;
+}
+
+async function tfSaveCustomAction() {
+  if (userRole !== 'owner') { alert('Tylko owner może dodawać akcje'); return; }
+  const key = document.getElementById('tfActionKey').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'_');
+  const label = document.getElementById('tfActionLabel').value.trim();
+  const icon = document.getElementById('tfActionIcon').value.trim() || '•';
+  const cat = document.getElementById('tfActionCat').value;
+  const checklistRaw = document.getElementById('tfActionChecklist').value.trim();
+  if (!key || !label) { alert('Podaj klucz i nazwę'); return; }
+  if (TF_ACTIONS[key]) { alert('Ten klucz jest już używany przez wbudowaną akcję — wybierz inny'); return; }
+  const checklist = checklistRaw ? checklistRaw.split('\n').map(l => l.trim()).filter(Boolean) : [];
+  if (!checklist.length) { alert('Podaj przynajmniej 1 krok checklisty'); return; }
+  const data = { label, icon, cat, checklist, createdAt: Date.now() };
+  try {
+    await zmTeamRef().collection('customActions').doc(key).set(data);
+    zmCustomActions[key] = data;
+    // Clear form
+    document.getElementById('tfActionKey').value = '';
+    document.getElementById('tfActionLabel').value = '';
+    document.getElementById('tfActionIcon').value = '';
+    document.getElementById('tfActionChecklist').value = '';
+    tfRenderActionsLibrary();
+    // Flash new action
+    setTimeout(() => {
+      const el = document.querySelector(`[data-action-key="${key}"]`);
+      if (el) {
+        el.classList.add('zm-flash');
+        el.scrollIntoView({behavior:'smooth',block:'center'});
+        setTimeout(() => el.classList.remove('zm-flash'), 1600);
+      }
+    }, 50);
+  } catch(e) { console.error('[tf] save action', e); alert('Błąd: ' + e.message); }
+}
+
+async function tfDeleteCustomAction(key) {
+  if (!confirm('Usunąć akcję "' + key + '"? Istniejące taski użyjące jej zachowają checklistę w Firebase.')) return;
+  try {
+    await zmTeamRef().collection('customActions').doc(key).delete();
+    delete zmCustomActions[key];
+    tfRenderActionsLibrary();
+  } catch(e) { console.error('[tf] delete action', e); }
+}
+
+function tfRenderActionsLibrary() {
+  // Built-in
+  const builtinEl = document.getElementById('tfBuiltinList');
+  if (builtinEl) {
+    const byCategory = {};
+    Object.entries(TF_ACTIONS).forEach(([k, v]) => {
+      const cat = v.cat || 'Inne';
+      if (!byCategory[cat]) byCategory[cat] = [];
+      byCategory[cat].push([k, v]);
+    });
+    builtinEl.innerHTML = TF_CATEGORIES.filter(c => byCategory[c]).map(cat => `
+      <div style="margin-bottom:.75rem">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${cat}</div>
+        ${byCategory[cat].map(([k, v]) => `
+          <div class="zm-card" style="padding:.6rem .8rem;margin-bottom:4px;display:flex;align-items:center;gap:.6rem">
+            <span style="font-size:14px">${v.icon}</span>
+            <div style="flex:1">
+              <div style="font-family:var(--mono);font-size:11px;color:var(--text)">${esc(v.label)}</div>
+              <div style="font-size:9px;color:var(--text3);margin-top:1px">${k} · ${v.checklist.length} kroków</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+  }
+  // Custom
+  const customEl = document.getElementById('tfCustomList');
+  if (customEl) {
+    const custom = Object.entries(zmCustomActions);
+    if (!custom.length) {
+      customEl.innerHTML = '<div class="zm-empty" style="padding:1rem">Brak własnych akcji. Dodaj pierwszą powyżej.</div>';
+      return;
+    }
+    customEl.innerHTML = custom.map(([k, v]) => `
+      <div class="zm-card" data-action-key="${k}" style="padding:.75rem 1rem;margin-bottom:6px">
+        <div style="display:flex;align-items:flex-start;gap:.75rem">
+          <span style="font-size:18px;flex-shrink:0">${esc(v.icon||'•')}</span>
+          <div style="flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem">
+              <div>
+                <div style="font-family:var(--mono);font-size:12px;color:var(--text);font-weight:500">${esc(v.label)}</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:2px">${k} · ${v.cat||'Inne'} · ${(v.checklist||[]).length} kroków</div>
+              </div>
+              <button type="button" class="zm-btn zm-btn-sm zm-btn-danger" onclick="tfDeleteCustomAction('${k}')">🗑</button>
+            </div>
+            <details style="margin-top:6px;font-family:var(--mono);font-size:10px;color:var(--text3)">
+              <summary style="cursor:pointer">Pokaż checklistę</summary>
+              <ol style="margin:6px 0 0 18px;color:var(--text2);line-height:1.55">
+                ${(v.checklist||[]).map(c => `<li>${esc(c)}</li>`).join('')}
+              </ol>
+            </details>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
 
 // Currently extracted tasks (before Chris approves)
 let tfExtractedTasks = [];
@@ -7107,6 +7238,7 @@ async function tfExtract(source) {
   // Show loading modal
   tfShowModal('loading');
   try {
+    await tfLoadCustomActions();
     const tasks = await tfCallExtractor(sourceText, source);
     tfExtractedTasks = tasks;
     if (!tasks.length) {
@@ -7121,7 +7253,18 @@ async function tfExtract(source) {
 }
 
 async function tfCallExtractor(sourceText, sourceType) {
-  const actionList = Object.entries(TF_ACTIONS).map(([k,v]) => `  - ${k}: ${v.label}`).join('\n');
+  // Group actions by category for AI readability
+  const allActions = tfAllActions();
+  const byCategory = {};
+  Object.entries(allActions).forEach(([k, v]) => {
+    const cat = v.cat || 'Inne';
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push(`${k}: ${v.label}`);
+  });
+  const actionList = TF_CATEGORIES.concat(Object.keys(byCategory).filter(c => !TF_CATEGORIES.includes(c)))
+    .filter(cat => byCategory[cat])
+    .map(cat => `[${cat}]\n` + byCategory[cat].map(a => '  - ' + a).join('\n'))
+    .join('\n');
   const accountList = Object.keys(AC_META).join(', ');
   const systemPrompt = `Jesteś AI Task Extractor dla agencji MPlace. Twoim jedynym zadaniem jest wyciągnięcie z raportu konkretnych akcji do wykonania przez pracownika.
 
@@ -7253,10 +7396,27 @@ function tfCloseModal() {
   tfSourceMeta = null;
 }
 
+function tfActionSelectHtml(selectedType) {
+  const allActions = tfAllActions();
+  const byCategory = {};
+  Object.entries(allActions).forEach(([k, v]) => {
+    const cat = v.cat || 'Inne';
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push([k, v]);
+  });
+  return TF_CATEGORIES.concat(Object.keys(byCategory).filter(c => !TF_CATEGORIES.includes(c)))
+    .filter(cat => byCategory[cat])
+    .map(cat => `<optgroup label="${cat}">` +
+      byCategory[cat].map(([k, v]) => `<option value="${k}"${k===selectedType?' selected':''}>${v.icon} ${v.label}${v.isCustom?' ✎':''}</option>`).join('') +
+      '</optgroup>'
+    ).join('');
+}
+
 function tfRenderReview(overlay) {
   const workerOpts = zmWorkers.map(w => `<option value="${esc(w.email)}">${esc(w.name)}</option>`).join('');
+  const allActions = tfAllActions();
   const rowsHtml = tfExtractedTasks.map((t, i) => {
-    const actionDef = TF_ACTIONS[t.type] || { label: t.type, icon: '•', checklist: [] };
+    const actionDef = allActions[t.type] || { label: t.type, icon: '•', checklist: [] };
     const checklist = t.customChecklist || actionDef.checklist;
     return `
       <div class="tf-row" data-idx="${i}">
@@ -7273,7 +7433,7 @@ function tfRenderReview(overlay) {
           </div>
           <div class="tf-row-meta">
             <select onchange="tfUpdateField(${i},'type',this.value); tfRerenderRow(${i})">
-              ${Object.entries(TF_ACTIONS).map(([k,v]) => `<option value="${k}"${k===t.type?' selected':''}>${v.icon} ${v.label}</option>`).join('')}
+              ${tfActionSelectHtml(t.type)}
             </select>
             <select onchange="tfUpdateField(${i},'konto',this.value)">
               <option value="">— konto —</option>
@@ -7378,9 +7538,10 @@ async function tfSendTasks() {
   const authorEmail = currentUser.email.toLowerCase();
   const authorKey = authorEmail.replace(/[.#$/\[\]]/g,'_');
   let sent = 0, errors = 0;
+  const allActions = tfAllActions();
   for (const i of selectedIndexes) {
     const t = tfExtractedTasks[i];
-    const actionDef = TF_ACTIONS[t.type] || { checklist: [] };
+    const actionDef = allActions[t.type] || { checklist: [] };
     const checklistItems = (t.customChecklist || actionDef.checklist).map(text => ({ text, done: false }));
     const task = {
       title: t.title,
@@ -7498,9 +7659,9 @@ function zmStartPolling() {
 
 // ── Tab switching ──
 function zmShowTab(tab) {
-  const tabs = ['tasks','workers','templates','wknow','briefings','secrets','sessions','announce'];
-  const panels = { tasks:'zmTasksPanel', workers:'zmWorkersPanel', templates:'zmTemplatesPanel', wknow:'zmWKnowPanel', briefings:'zmBriefingsPanel', secrets:'zmSecretsPanel', sessions:'zmSessionsPanel', announce:'zmAnnouncePanel' };
-  const tabIds = { tasks:'zmTabTasks', workers:'zmTabWorkers', templates:'zmTabTemplates', wknow:'zmTabWKnow', briefings:'zmTabBriefings', secrets:'zmTabSecrets', sessions:'zmTabSessions', announce:'zmTabAnnounce' };
+  const tabs = ['tasks','workers','templates','wknow','briefings','secrets','sessions','announce','actions'];
+  const panels = { tasks:'zmTasksPanel', workers:'zmWorkersPanel', templates:'zmTemplatesPanel', wknow:'zmWKnowPanel', briefings:'zmBriefingsPanel', secrets:'zmSecretsPanel', sessions:'zmSessionsPanel', announce:'zmAnnouncePanel', actions:'zmActionsPanel' };
+  const tabIds = { tasks:'zmTabTasks', workers:'zmTabWorkers', templates:'zmTabTemplates', wknow:'zmTabWKnow', briefings:'zmTabBriefings', secrets:'zmTabSecrets', sessions:'zmTabSessions', announce:'zmTabAnnounce', actions:'zmTabActions' };
   tabs.forEach(t => {
     const btn = document.getElementById(tabIds[t]);
     if (btn) btn.classList.toggle('active', t === tab);
@@ -7523,6 +7684,7 @@ function zmShowTab(tab) {
   }); }
   else if (tab === 'sessions') zmLoadSessions().then(zmRenderSessions);
   else if (tab === 'announce') zmLoadAnnouncements().then(() => { zmRenderAnnouncements(); zmRenderAnnounceBar(); });
+  else if (tab === 'actions') tfLoadCustomActions().then(tfRenderActionsLibrary);
 }
 
 // ════════════════════════════════════════
@@ -19024,7 +19186,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.58</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.59</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
