@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.52</title>
+<title>MPlace Hub v7.53</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1337,7 +1337,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.52</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.53</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6916,17 +6916,18 @@ async function zmSOS() {
   const task = {
     title: '🆘 SOS od ' + workerName,
     desc: msg.trim(),
-    assignee: email, // worker sees it too to track Chris's response
+    assignee: email,
     status: 'todo',
     priority: 'PILNE',
     konto: '',
     dueDate: new Date().toISOString().slice(0,10),
     checklist: [],
     comments: [],
-    readBy: {},
+    readBy: { [email.replace(/[.#$/\[\]]/g,'_')]: Date.now() }, // author has "seen" their own SOS
     history: [{ at: Date.now(), author: workerName, action: 'zgłosił SOS' }],
     createdAt: Date.now(),
     updatedAt: Date.now(),
+    createdBy: email,
     fromSOS: true
   };
   try {
@@ -7189,8 +7190,12 @@ async function zmSaveTask() {
   const checklistRaw = document.getElementById('zmTaskChecklist').value.trim();
   const checklist = checklistRaw ? checklistRaw.split('\n').filter(l => l.trim()).map(l => ({ text: l.trim(), done: false })) : [];
   const authorName = currentUser.displayName || currentUser.email.split('@')[0];
+  const authorEmail = currentUser.email.toLowerCase();
+  const authorKey = authorEmail.replace(/[.#$/\[\]]/g,'_');
   const isEdit = !!zmEditTaskId;
   const existingTask = isEdit ? zmTasks.find(t => t.id === zmEditTaskId) : null;
+  const baseReadBy = existingTask?.readBy || {};
+  baseReadBy[authorKey] = Date.now(); // creator/editor has seen it
   const task = {
     title,
     desc: document.getElementById('zmTaskDesc').value.trim(),
@@ -7201,13 +7206,14 @@ async function zmSaveTask() {
     dueDate: document.getElementById('zmTaskDue').value,
     checklist,
     comments: existingTask?.comments || [],
-    readBy: existingTask?.readBy || {},
+    readBy: baseReadBy,
     history: (existingTask?.history || []).concat([{
       at: Date.now(),
       author: authorName,
       action: isEdit ? 'edytował zadanie' : 'utworzył zadanie'
     }]),
     createdAt: existingTask?.createdAt || Date.now(),
+    createdBy: existingTask?.createdBy || authorEmail,
     updatedAt: Date.now()
   };
   try {
@@ -7520,10 +7526,16 @@ function zmToggleHistory(taskId) {
 }
 
 function zmUnreadCommentCount(t) {
-  if (!t.comments || !currentUser) return 0;
+  if (!currentUser) return 0;
   const email = currentUser.email.toLowerCase();
-  const readAt = (t.readBy && t.readBy[email.replace(/[.#$/\[\]]/g,'_')]) || 0;
-  return t.comments.filter(c => c.author !== email && (c.createdAt || 0) > readAt).length;
+  const key = email.replace(/[.#$/\[\]]/g,'_');
+  const readAt = (t.readBy && t.readBy[key]) || 0;
+  // Unread comments from others (not me, and after my last read)
+  const commentsUnread = (t.comments || []).filter(c => c.author !== email && (c.createdAt || 0) > readAt).length;
+  // New task from someone else, never opened (readAt == 0)
+  const createdBySomeoneElse = t.createdBy && t.createdBy !== email;
+  const taskIsNew = createdBySomeoneElse && !readAt;
+  return commentsUnread + (taskIsNew ? 1 : 0);
 }
 
 async function zmMarkCommentsRead(taskId) {
@@ -18516,7 +18528,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.52</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.53</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
