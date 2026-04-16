@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.45</title>
+<title>MPlace Hub v7.46</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1127,11 +1127,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .zm-progress-bar{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
 .zm-progress-fill{height:100%;background:linear-gradient(90deg,#2dd4a0,#60a5fa);border-radius:2px;transition:width .3s}
 .zm-progress-text{font-family:var(--mono);font-size:10px;color:var(--text2);white-space:nowrap}
-.zm-due{padding:2px 8px;border-radius:4px;font-weight:500}
-.zm-due.overdue{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
-.zm-due.today{background:rgba(245,166,35,.15);color:#f5a623;border:1px solid rgba(245,166,35,.3)}
-.zm-due.soon{background:rgba(59,130,246,.1);color:#60a5fa;border:1px solid rgba(59,130,246,.25)}
-.zm-due.later{color:var(--text2)}
+/* .zm-due styles moved to .zm-chip.zm-due above */
 /* Comments */
 .zm-comments{border-top:1px solid var(--border);margin-top:.75rem;padding-top:.75rem}
 .zm-comments-list{max-height:300px;overflow-y:auto;margin-bottom:.75rem}
@@ -1204,8 +1200,16 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .zm-task-pri.wazne{background:linear-gradient(135deg,rgba(245,166,35,.3),rgba(245,166,35,.15));color:#f5a623;border:1px solid rgba(245,166,35,.5)}
 .zm-task-pri.info{background:linear-gradient(135deg,rgba(96,165,250,.25),rgba(96,165,250,.1));color:#60a5fa;border:1px solid rgba(96,165,250,.4)}
 @keyframes zmPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
-.zm-task-meta{display:flex;gap:10px;font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:.5rem;flex-wrap:wrap}
-.zm-task-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:.75rem}
+.zm-task-meta{display:flex;gap:6px;font-size:10px;color:var(--text2);font-family:var(--mono);margin-bottom:.6rem;flex-wrap:wrap}
+.zm-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:var(--bg);border:1px solid var(--border);font-size:10px;letter-spacing:.02em;color:var(--text2)}
+.zm-chip-ico{font-size:11px;line-height:1;opacity:.85}
+.zm-chip-muted{color:var(--text3);border-style:dashed}
+.zm-chip.zm-due{color:var(--text2)}
+.zm-chip.zm-due.overdue{background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.45);font-weight:600}
+.zm-chip.zm-due.today{background:rgba(245,166,35,.1);color:#f5a623;border-color:rgba(245,166,35,.45);font-weight:600}
+.zm-chip.zm-due.soon{background:rgba(96,165,250,.1);color:#60a5fa;border-color:rgba(96,165,250,.35)}
+.zm-chip.zm-due.later{color:var(--text2)}
+.zm-task-desc{font-size:12px;color:var(--text);line-height:1.55;margin-bottom:.75rem;padding:10px 14px;background:var(--bg);border-left:3px solid rgba(96,165,250,.4);border-radius:4px}
 .zm-task-checklist{margin:0;padding:0;list-style:none}
 .zm-task-checklist li{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:var(--text2);cursor:pointer;transition:color .15s}
 .zm-task-checklist li:hover{color:var(--text)}
@@ -1218,7 +1222,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .zm-task-status.in_progress{background:linear-gradient(135deg,rgba(59,130,246,.25),rgba(59,130,246,.15));color:#60a5fa;border:1px solid rgba(59,130,246,.45);box-shadow:0 0 8px rgba(59,130,246,.15)}
 .zm-task-status.done{background:linear-gradient(135deg,rgba(45,212,160,.25),rgba(45,212,160,.15));color:#2dd4a0;border:1px solid rgba(45,212,160,.45);box-shadow:0 0 8px rgba(45,212,160,.15)}
 .zm-task-status.verified{background:linear-gradient(135deg,rgba(167,139,250,.25),rgba(167,139,250,.15));color:#a78bfa;border:1px solid rgba(167,139,250,.45);box-shadow:0 0 8px rgba(167,139,250,.15)}
-.zm-task-actions{display:flex;gap:6px;margin-top:.75rem;flex-wrap:wrap}
+.zm-task-actions{display:flex;gap:6px;margin-top:.85rem;padding-top:.75rem;border-top:1px dashed var(--border);flex-wrap:wrap;align-items:center}
 .zm-filter-bar{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
 .zm-filter-bar select,.zm-filter-bar input{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;color:var(--text);font-size:11px;font-family:var(--mono)}
 .zm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin-bottom:1.25rem}
@@ -1265,7 +1269,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.45</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.46</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6445,6 +6449,24 @@ function zmRenderTasks() {
     return;
   }
 
+  const fmtDate = (ts) => {
+    if (!ts) return null;
+    const d = new Date(ts);
+    return d.toLocaleDateString('pl-PL', {day:'2-digit', month:'2-digit', year:'numeric'});
+  };
+  const fmtRelative = (ts) => {
+    if (!ts) return null;
+    const diff = Date.now() - ts;
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'przed chwilą';
+    if (mins < 60) return mins + ' min temu';
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + ' godz temu';
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return days + ' dni temu';
+    return fmtDate(ts);
+  };
+
   list.innerHTML = filtered.map(t => {
     const workerName = zmWorkers.find(w => w.email === t.assignee)?.name || t.assignee || 'Nieprzypisane';
     const checkDone = (t.checklist || []).filter(c => c.done).length;
@@ -6465,15 +6487,17 @@ function zmRenderTasks() {
           <span class="zm-task-pri ${priClass}">${esc(t.priority || 'INFO')}</span>
         </div>
         <div class="zm-task-meta">
-          <span>→ ${esc(workerName)}</span>
-          ${t.konto ? `<span style="${kontoColor?`color:${kontoColor}`:''}">▸ ${esc(t.konto)}</span>` : ''}
-          ${due ? `<span class="zm-due ${due.cls}">◷ ${due.label}</span>` : ''}
+          <span class="zm-chip"><span class="zm-chip-ico">👤</span> ${esc(workerName)}</span>
+          ${t.konto ? `<span class="zm-chip" style="${kontoColor?`color:${kontoColor};border-color:${kontoColor}44`:''}"><span class="zm-chip-ico">▸</span> ${esc(t.konto)}</span>` : ''}
+          <span class="zm-chip"><span class="zm-chip-ico">📅</span> Utworzone: ${fmtDate(t.createdAt) || '—'}</span>
+          ${due ? `<span class="zm-chip zm-due ${due.cls}"><span class="zm-chip-ico">⏰</span> Termin: ${due.label}</span>` : `<span class="zm-chip"><span class="zm-chip-ico">⏰</span> Bez terminu</span>`}
+          ${t.updatedAt && t.updatedAt !== t.createdAt ? `<span class="zm-chip zm-chip-muted"><span class="zm-chip-ico">↻</span> Aktualizacja: ${fmtRelative(t.updatedAt)}</span>` : ''}
         </div>
         ${t.desc ? `<div class="zm-task-desc">${esc(t.desc)}</div>` : ''}
         ${checkTotal ? `
           <div class="zm-progress-wrap">
             <div class="zm-progress-bar"><div class="zm-progress-fill" style="width:${checkPct}%"></div></div>
-            <div class="zm-progress-text">${checkDone}/${checkTotal}</div>
+            <div class="zm-progress-text">${checkDone}/${checkTotal} (${checkPct}%)</div>
           </div>
           <ul class="zm-task-checklist">${t.checklist.map((c,i) =>
             `<li class="${c.done ? 'done' : ''}" onclick="zmToggleCheckItem('${t.id}',${i})">${esc(c.text)}</li>`
@@ -17566,7 +17590,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.45</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.46</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
