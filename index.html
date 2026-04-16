@@ -1296,7 +1296,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-sos-btn:hover{background:rgba(239,68,68,.25)!important;border-color:#ef4444!important;box-shadow:0 0 12px rgba(239,68,68,.4)}
 @keyframes zmSosPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
 /* Announcement banner */
-#zmAnnounceBar{position:sticky;top:44px;z-index:99;background:linear-gradient(90deg,rgba(245,166,35,.15),rgba(239,68,68,.1));border-bottom:1px solid rgba(245,166,35,.3);padding:10px 16px;font-family:var(--mono);font-size:12px;color:#f5a623;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#zmAnnounceBar{position:sticky;top:0;z-index:99;background:linear-gradient(90deg,rgba(245,166,35,.15),rgba(239,68,68,.1));border-bottom:1px solid rgba(245,166,35,.3);padding:10px 16px;font-family:var(--mono);font-size:12px;color:#f5a623;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.zm-worker-view #zmAnnounceBar{top:0}
+body:not(.zm-worker-view) #zmAnnounceBar{top:44px}
 #zmAnnounceBar .zm-announce-title{font-weight:600;color:#fbbf24}
 #zmAnnounceBar .zm-announce-text{color:var(--text2);font-size:11px}
 /* Briefing card */
