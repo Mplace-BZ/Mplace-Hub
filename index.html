@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.35</title>
+<title>MPlace Hub v7.36</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1208,7 +1208,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.35</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.36</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1353,6 +1353,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
     <button class="btn primary" onclick="saveAllWithSync()">▸ Zapisz wszystkie wpisy</button>
     <button id="closingToggle" class="btn" onclick="toggleClosingMode()" style="color:var(--text3);border-color:var(--border)" title="Zamknięcie poprzedniego miesiąca">↩ Zamknięcie</button>
     <button class="btn" onclick="showBackupModal()" style="color:var(--green);border-color:rgba(45,212,160,.3)">🛡 Backup</button>
+    <button class="btn" onclick="showHistEditModal()" style="color:#b47fff;border-color:rgba(180,127,255,.3)" title="Edytuj dane historycznego miesiąca">✎ Korekta historii</button>
     <button class="btn" onclick="exportCSV()">↗ Eksport CSV</button>
     <button class="btn" onclick="saveSnapshotD2D()" style="color:#b47fff;border-color:rgba(180,127,255,.3)">📊 Zapisz do D2D</button>
     <input type="file" id="importFileInput" accept=".json" onchange="importJSON(event)">
@@ -5022,6 +5023,123 @@ function showNotePopup(note){
 // ═══════════════════════════════════════════════════════════
 function showBackupModal(){ document.getElementById('backupModal').style.display='flex'; }
 function hideBackupModal(){ document.getElementById('backupModal').style.display='none'; }
+
+// ═══════════════════════════════════════════════════════════
+// KOREKTA HISTORYCZNEGO MIESIĄCA (izolowane — nie dotyka saveAll)
+// ═══════════════════════════════════════════════════════════
+function showHistEditModal(){
+  const sel = document.getElementById('he_konto');
+  sel.innerHTML = '<option value="">— wybierz konto —</option>' +
+    Object.keys(AC_META).map(k=>`<option value="${k}">${AC_META[k].name}</option>`).join('');
+  document.getElementById('he_month').innerHTML = '<option value="">— wybierz miesiąc —</option>';
+  document.getElementById('he_fields').style.display='none';
+  document.getElementById('he_saveBtn').style.display='none';
+  document.getElementById('heStatus').className='backup-status';
+  document.getElementById('heStatus').textContent='';
+  document.getElementById('histEditModal').style.display='flex';
+}
+function hideHistEditModal(){ document.getElementById('histEditModal').style.display='none'; }
+
+function heOnKontoChange(){
+  const k = document.getElementById('he_konto').value;
+  const monthSel = document.getElementById('he_month');
+  document.getElementById('he_fields').style.display='none';
+  document.getElementById('he_saveBtn').style.display='none';
+  if(!k){ monthSel.innerHTML='<option value="">— wybierz miesiąc —</option>'; return; }
+  const D = getData(k);
+  if(!D.length){ monthSel.innerHTML='<option value="">(brak danych)</option>'; return; }
+  // Sort: same order as timeline — newest first
+  const curM = MONTHS[new Date().getMonth()];
+  const curIdx = MONTHS.indexOf(curM);
+  const mAgo = m => (curIdx - MONTHS.indexOf(m) + 12) % 12;
+  const sorted = [...D].sort((a,b)=>mAgo(a.m)-mAgo(b.m));
+  monthSel.innerHTML = '<option value="">— wybierz miesiąc —</option>' +
+    sorted.map(r=>{
+      const tag = r.m===curM ? ' (bieżący)' : '';
+      const sp = r.sprzedaz ? ` · ${Math.round(r.sprzedaz).toLocaleString('pl-PL')} zł` : '';
+      return `<option value="${r.m}">${r.m}${tag}${sp}</option>`;
+    }).join('');
+}
+
+function heOnMonthChange(){
+  const k = document.getElementById('he_konto').value;
+  const m = document.getElementById('he_month').value;
+  if(!k || !m){ document.getElementById('he_fields').style.display='none'; document.getElementById('he_saveBtn').style.display='none'; return; }
+  const D = getData(k);
+  const row = D.find(x=>x.m===m);
+  if(!row){ document.getElementById('he_fields').style.display='none'; return; }
+  const setV = (id,v)=>{ const el=document.getElementById(id); if(el) el.value = (v==null?'':v); };
+  setV('he_adsC', row.adsCost);
+  setV('he_roas', row.roas);
+  setV('he_wa',   row.wartoscAds);
+  setV('he_sp',   row.sprzedaz);
+  setV('he_comm', row.commission);
+  setV('he_del',  row.delivery);
+  setV('he_promoC', row.promoC);
+  setV('he_coinsC', row.coinsC);
+  setV('he_ss',   row.ss||'');
+  setV('he_qlt',  row.qlt);
+  setV('he_note', row.note||'');
+  document.getElementById('he_fields').style.display='block';
+  document.getElementById('he_saveBtn').style.display='flex';
+}
+
+async function heSave(){
+  const k = document.getElementById('he_konto').value;
+  const m = document.getElementById('he_month').value;
+  const status = document.getElementById('heStatus');
+  status.className='backup-status';
+  if(!k || !m){ status.className='backup-status err'; status.textContent='Wybierz konto i miesiąc.'; return; }
+  const D = getData(k);
+  const idx = D.findIndex(x=>x.m===m);
+  if(idx<0){ status.className='backup-status err'; status.textContent='Nie znaleziono wpisu.'; return; }
+  const num = id => { const v = document.getElementById(id).value; return v===''?null:parseFloat(v); };
+  const orig = D[idx];
+  const updated = {
+    ...orig,
+    ss: document.getElementById('he_ss').value || '',
+    qlt: num('he_qlt'),
+    sprzedaz: num('he_sp') || 0,
+    delivery: num('he_del') || 0,
+    commission: num('he_comm') || 0,
+    adsCost: num('he_adsC') || 0,
+    roas: num('he_roas') || 0,
+    wartoscAds: num('he_wa') || 0,
+    promoC: num('he_promoC') || 0,
+    coinsC: num('he_coinsC') || 0,
+    note: (document.getElementById('he_note').value||'').trim(),
+    _correctedAt: Date.now(),
+    _correctedDay: new Date().toLocaleDateString('pl-PL'),
+  };
+  // Walidacja soft
+  const warn = [];
+  if(updated.sprzedaz>0 && updated.adsCost>updated.sprzedaz) warn.push('Koszt Ads > sprzedaż');
+  if(updated.commission>30) warn.push('Prowizja > 30%');
+  if(updated.roas>50) warn.push('ROAS > 50');
+  if(warn.length && !confirm('Podejrzane wartości:\n'+warn.join('\n')+'\n\nZapisać mimo to?')) return;
+
+  D[idx] = updated;
+  setData(k, D);
+  status.className='backup-status ok';
+  status.textContent='✓ Zapisano lokalnie. Sync Firebase...';
+  if(typeof currentUser !== 'undefined' && currentUser && typeof saveAccToFS === 'function'){
+    try{
+      await saveAccToFS(k);
+      status.textContent='✓ Zapisano + zsynchronizowano ('+AC_META[k].name+' · '+m+')';
+    }catch(e){
+      status.className='backup-status err';
+      status.textContent='✗ Sync Firebase nie powiódł się (dane w localStorage).';
+      console.error('heSave sync',e);
+    }
+  }
+  // Re-render widoków, jeśli są aktywne
+  try{ if(typeof renderEntry === 'function') renderEntry(); }catch(e){}
+  try{
+    const active = document.getElementById('nav'+k)?.classList.contains('active');
+    if(active && typeof renderAccount === 'function') renderAccount(k);
+  }catch(e){}
+  setTimeout(()=>{ hideHistEditModal(); }, 1500);
+}
 
 function exportJSON(){
   const backup = { version:3, exportedAt: new Date().toISOString(), accounts:{}, producers:{} };
@@ -16966,7 +17084,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.35</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.36</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -20158,6 +20276,51 @@ self.addEventListener('fetch', e => e.respondWith(
       <button class="backup-btn close-btn" onclick="hideBackupModal()">Zamknij</button>
     </div>
     <div class="backup-status" id="backupStatus"></div>
+  </div>
+</div>
+
+<!-- Historical Edit Modal (izolowany od głównego flow zapisu) -->
+<div class="backup-modal-overlay" id="histEditModal" style="display:none" onclick="if(event.target===this)hideHistEditModal()">
+  <div class="backup-modal" style="max-width:640px">
+    <h3>✎ Korekta <span style="color:#b47fff">historycznego miesiąca</span></h3>
+    <p>Edytuj dowolny zamknięty miesiąc dla wybranego konta. Zmiany zapisują się do localStorage + Firebase. Nie modyfikuje bieżącego miesiąca.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.8rem">
+      <div>
+        <label style="font-family:var(--mono);font-size:10px;color:var(--text3);display:block;margin-bottom:3px">Konto</label>
+        <select id="he_konto" onchange="heOnKontoChange()" style="width:100%;padding:.5rem .6rem;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:12px"></select>
+      </div>
+      <div>
+        <label style="font-family:var(--mono);font-size:10px;color:var(--text3);display:block;margin-bottom:3px">Miesiąc</label>
+        <select id="he_month" onchange="heOnMonthChange()" style="width:100%;padding:.5rem .6rem;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:12px"></select>
+      </div>
+    </div>
+    <div id="he_fields" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+        <div><label style="font-family:var(--mono);font-size:9px;color:var(--text3);display:block">Koszt Ads (zł)</label><input type="number" id="he_adsC" style="width:100%;padding:.4rem .5rem;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:12px"></div>
+        <div><label style="font-family:var(--mono);font-size:9px;color:var(--text3);display:block">ROAS</label><input type="number" step="0.01" id="he_roas" style="width:100%;padding:.4rem .5rem;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:12px"></div>
+        <div><label style="font-family:var(--mono);font-size:9px;color:var(--text3);display:block">Wartość Ads (zł)</label><input type="number" id="he_wa" style="width:100%;padding:.4rem .5rem;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:12px"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+        <div><label style="font-family:var(--mono);font-size:9px;color:var(--text3);display:block">Sprzedaż brutto (zł)</label><input type="number" id="he_sp" style="width:100%;padding:.4rem .5rem;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:12px"></div>
+        <div><label style="font-family:var(--mono);font-size:9px;color:var(--text3);display:block">Prowizja %</label><input type="number" step="0.1" id="he_comm" style="width:100%;padding:.4rem .5rem;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:12px"></div>
+        <div><label style="font-family:var(--mono);font-size:9px;color:var(--text3);display:block">Dostawa (zł)</label><input type="number" id="he_del" style="width:100%;padding:.4rem .5rem;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:12px"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+        <div><label style="font-family:var(--mono);font-size:9px;color:var(--text3);display:block">Wyróżnienia (zł)</label><input type="number" id="he_promoC" style="width:100%;padding:.4rem .5rem;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:12px"></div>
+        <div><label style="font-family:var(--mono);font-size:9px;color:var(--text3);display:block">Monety (zł)</label><input type="number" id="he_coinsC" style="width:100%;padding:.4rem .5rem;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:12px"></div>
+        <div><label style="font-family:var(--mono);font-size:9px;color:var(--text3);display:block">SS</label><select id="he_ss" style="width:100%;padding:.4rem .5rem;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:12px"><option value="">—</option><option value="T">T</option><option value="N">N</option></select></div>
+        <div><label style="font-family:var(--mono);font-size:9px;color:var(--text3);display:block">Qlt</label><input type="number" id="he_qlt" style="width:100%;padding:.4rem .5rem;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:12px"></div>
+      </div>
+      <div style="margin-bottom:.5rem">
+        <label style="font-family:var(--mono);font-size:9px;color:var(--text3);display:block">Notatka (opcjonalnie)</label>
+        <textarea id="he_note" rows="2" style="width:100%;padding:.4rem .5rem;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--sans);font-size:12px;resize:vertical"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:.5rem;margin-top:.8rem">
+      <button id="he_saveBtn" class="backup-btn" onclick="heSave()" style="flex:1;color:#b47fff;border-color:rgba(180,127,255,.4);justify-content:center;display:none">▸ Zapisz korektę</button>
+      <button class="backup-btn close-btn" onclick="hideHistEditModal()" style="flex:1">Anuluj</button>
+    </div>
+    <div class="backup-status" id="heStatus"></div>
   </div>
 </div>
 
