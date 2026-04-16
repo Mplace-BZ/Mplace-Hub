@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.46</title>
+<title>MPlace Hub v7.47</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1188,6 +1188,65 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 /* Template flash highlight */
 .zm-card.zm-flash{animation:zmFlashIn 1.5s ease-out}
 @keyframes zmFlashIn{0%{border-color:#2dd4a0;box-shadow:0 0 0 2px rgba(45,212,160,.4),0 0 20px rgba(45,212,160,.3);background:rgba(45,212,160,.08)}100%{border-color:var(--border);box-shadow:none;background:var(--bg2)}}
+/* SOS button */
+.zm-sos-btn{color:#ef4444!important;background:rgba(239,68,68,.12)!important;border:1px solid rgba(239,68,68,.4)!important;font-weight:600!important;animation:zmSosPulse 3s ease-in-out infinite}
+.zm-sos-btn:hover{background:rgba(239,68,68,.25)!important;border-color:#ef4444!important;box-shadow:0 0 12px rgba(239,68,68,.4)}
+@keyframes zmSosPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+/* Announcement banner */
+#zmAnnounceBar{position:sticky;top:44px;z-index:99;background:linear-gradient(90deg,rgba(245,166,35,.15),rgba(239,68,68,.1));border-bottom:1px solid rgba(245,166,35,.3);padding:10px 16px;font-family:var(--mono);font-size:12px;color:#f5a623;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#zmAnnounceBar .zm-announce-title{font-weight:600;color:#fbbf24}
+#zmAnnounceBar .zm-announce-text{color:var(--text2);font-size:11px}
+/* Briefing card */
+.zm-briefing-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.75rem;transition:border-color .15s}
+.zm-briefing-card:hover{border-color:var(--border2)}
+.zm-briefing-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;gap:.5rem}
+.zm-briefing-konto{font-family:var(--mono);font-size:14px;font-weight:600}
+.zm-briefing-badge{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;letter-spacing:.06em}
+.zm-briefing-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:.6rem}
+.zm-briefing-kpi{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;text-align:center}
+.zm-briefing-kpi-val{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text)}
+.zm-briefing-kpi-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.zm-briefing-section{margin-top:.5rem;padding:8px 12px;background:var(--bg);border-radius:6px;font-size:11px;color:var(--text2);line-height:1.5}
+.zm-briefing-section strong{color:var(--text);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px}
+.zm-briefing-section.danger{border-left:3px solid #ef4444}
+.zm-briefing-section.info{border-left:3px solid #60a5fa}
+.zm-briefing-edit-form{display:none;padding-top:.6rem;margin-top:.6rem;border-top:1px dashed var(--border)}
+.zm-briefing-edit-form.open{display:block}
+.zm-briefing-edit-form input,.zm-briefing-edit-form textarea{background:var(--bg);border:1px solid var(--border2);border-radius:4px;padding:5px 8px;color:var(--text);font-size:11px;font-family:var(--mono);width:100%;margin-bottom:6px}
+.zm-briefing-edit-form textarea{min-height:45px;resize:vertical}
+.zm-briefing-edit-form label{font-size:9px;color:var(--text3);display:block;margin-bottom:2px;font-family:var(--mono)}
+/* Secrets */
+.zm-secret-row{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.75rem;margin-bottom:.6rem;display:grid;grid-template-columns:120px 1fr 1fr auto;gap:.5rem;align-items:center}
+.zm-secret-row .zm-secret-konto{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text)}
+.zm-secret-row .zm-secret-val{font-family:var(--mono);font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:4px 8px;background:var(--bg);border-radius:4px;cursor:pointer;transition:color .15s}
+.zm-secret-row .zm-secret-val:hover{color:var(--text)}
+.zm-secret-row .zm-secret-actions{display:flex;gap:4px;flex-wrap:wrap}
+/* Session / Rozliczenie */
+.zm-session-bar{background:linear-gradient(135deg,rgba(6,182,212,.1),rgba(96,165,250,.08));border:1px solid rgba(6,182,212,.3);border-radius:10px;padding:1.25rem;margin-bottom:1rem;text-align:center}
+.zm-session-big{font-family:var(--mono);font-size:24px;font-weight:600;color:#06b6d4;margin-bottom:.3rem}
+.zm-session-sub{font-size:11px;color:var(--text2);font-family:var(--mono);margin-bottom:.75rem}
+.zm-session-table{width:100%;border-collapse:collapse;margin-top:.5rem}
+.zm-session-table th,.zm-session-table td{padding:8px 10px;font-family:var(--mono);font-size:11px;text-align:left;border-bottom:1px solid var(--border)}
+.zm-session-table th{color:var(--text3);font-weight:400;font-size:9px;text-transform:uppercase;letter-spacing:.06em;background:var(--bg)}
+.zm-session-table td{color:var(--text)}
+.zm-session-table .zm-hours{color:#06b6d4;font-weight:600}
+/* Announcements */
+.zm-announce-card{background:linear-gradient(135deg,rgba(245,166,35,.08),rgba(239,68,68,.04));border:1px solid rgba(245,166,35,.3);border-radius:8px;padding:.85rem 1rem;margin-bottom:.6rem}
+.zm-announce-card .zm-announce-head{display:flex;justify-content:space-between;margin-bottom:.4rem;gap:.5rem}
+.zm-announce-card .zm-announce-card-title{font-family:var(--mono);font-size:12px;font-weight:600;color:#fbbf24}
+.zm-announce-card .zm-announce-date{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.zm-announce-card .zm-announce-body{font-size:12px;color:var(--text);line-height:1.5;white-space:pre-wrap}
+/* WKnow */
+.zm-wknow-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem;margin-bottom:.6rem}
+.zm-wknow-head{display:flex;justify-content:space-between;margin-bottom:.4rem;gap:.5rem;align-items:center}
+.zm-wknow-title{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text)}
+.zm-wknow-cat{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;letter-spacing:.06em;text-transform:uppercase}
+.zm-wknow-cat.faq{background:rgba(96,165,250,.15);color:#60a5fa}
+.zm-wknow-cat.playbook{background:rgba(45,212,160,.15);color:#2dd4a0}
+.zm-wknow-cat.zasady{background:rgba(245,166,35,.15);color:#f5a623}
+.zm-wknow-cat.linki{background:rgba(167,139,250,.15);color:#a78bfa}
+.zm-wknow-cat.inne{background:rgba(148,163,184,.15);color:#94a3b8}
+.zm-wknow-body{font-size:12px;color:var(--text2);line-height:1.55;white-space:pre-wrap;margin-top:.4rem}
 .zm-empty{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:13px}
 /* tasks */
 .zm-task{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.6rem;transition:border-color .15s}
@@ -1269,7 +1328,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.46</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.47</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -1342,7 +1401,15 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   <div class="nav-sep"></div>
   <button class="nav-btn active" onclick="zmWorkerShowView('tasks')" id="zmwNavTasks" style="color:#3b82f6;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);position:relative">Zadania<span id="zmwNavBadge" class="zm-nav-badge" style="display:none"></span></button>
   <button class="nav-btn" onclick="zmWorkerShowView('wiedza')" id="zmwNavWiedza" style="color:#a78bfa;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)">Wiedza</button>
+  <button class="nav-btn" onclick="zmWorkerShowView('briefings')" id="zmwNavBriefings" style="color:#2dd4a0;background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.2)">Briefingi</button>
+  <button class="nav-btn" onclick="zmWorkerShowView('secrets')" id="zmwNavSecrets" style="color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)">Loginy 🔐</button>
+  <button class="nav-btn" onclick="zmWorkerShowView('sessions')" id="zmwNavSessions" style="color:#06b6d4;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2)">Rozliczenie</button>
+  <div style="flex:1"></div>
+  <button class="nav-btn zm-sos-btn" onclick="zmSOS()" title="Poproś Chrisa o pomoc (tworzy task PILNY)">🆘 SOS</button>
 </div>
+
+<!-- Announcement banner (shown when there are active announcements) -->
+<div id="zmAnnounceBar" style="display:none"></div>
 
 <!-- ═══ VIEW: WPISZ DANE ═══ -->
 <div class="view" id="viewEntry">
@@ -3266,6 +3333,11 @@ IDs: 123456 789012 ..."></textarea>
     <button class="zm-tab active" onclick="zmShowTab('tasks')" id="zmTabTasks">Zadania</button>
     <button class="zm-tab" onclick="zmShowTab('workers')" id="zmTabWorkers">Pracownicy</button>
     <button class="zm-tab" onclick="zmShowTab('templates')" id="zmTabTemplates">Szablony</button>
+    <button class="zm-tab" onclick="zmShowTab('wknow')" id="zmTabWKnow">Wiedza zespołu</button>
+    <button class="zm-tab" onclick="zmShowTab('briefings')" id="zmTabBriefings">Briefingi</button>
+    <button class="zm-tab" onclick="zmShowTab('secrets')" id="zmTabSecrets">Loginy 🔐</button>
+    <button class="zm-tab" onclick="zmShowTab('sessions')" id="zmTabSessions">Rozliczenie</button>
+    <button class="zm-tab" onclick="zmShowTab('announce')" id="zmTabAnnounce">Ogłoszenia</button>
   </div>
 
   <!-- ── ZADANIA TAB ── -->
@@ -3352,6 +3424,69 @@ IDs: 123456 789012 ..."></textarea>
       <button class="zm-btn zm-btn-primary" onclick="zmSaveTemplate()">+ Zapisz szablon</button>
     </div>
     <div id="zmTemplateList"></div>
+  </div>
+
+  <!-- ── WIEDZA ZESPOŁU (separate from owner's own wiedza) ── -->
+  <div id="zmWKnowPanel" style="display:none">
+    <div class="zm-add-form" id="zmWKnowForm">
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:.75rem;margin-bottom:.75rem">
+        <div><label>Tytuł</label><input id="zmWKnowTitle" placeholder="np. Jak restartować kampanię Ads"></div>
+        <div><label>Kategoria</label><select id="zmWKnowCat"><option value="faq">FAQ</option><option value="playbook">Playbook</option><option value="zasady">Zasady</option><option value="linki">Linki</option><option value="inne">Inne</option></select></div>
+      </div>
+      <div style="margin-bottom:.75rem"><label>Treść (markdown OK)</label><textarea id="zmWKnowContent" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%;min-height:100px;resize:vertical" placeholder="Pełna treść, linki, zasady..."></textarea></div>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="zm-btn zm-btn-primary" onclick="zmSaveWKnow()">+ Zapisz wpis</button>
+        <button type="button" class="zm-btn" style="color:var(--text2);border:1px solid var(--border)" onclick="zmClearWKnow()">Wyczyść</button>
+      </div>
+    </div>
+    <div id="zmWKnowList"></div>
+  </div>
+
+  <!-- ── BRIEFINGI per konto ── -->
+  <div id="zmBriefingsPanel" style="display:none">
+    <div style="color:var(--text2);font-size:11px;margin-bottom:1rem">Jeden briefing per konto. Owner uzupełnia — pracownik czyta (read-only).</div>
+    <div id="zmBriefingsList"></div>
+  </div>
+
+  <!-- ── SEJF HASEŁ ── -->
+  <div id="zmSecretsPanel" style="display:none">
+    <div id="zmMasterPassWrap" class="zm-add-form" style="border:1px solid rgba(245,166,35,.35);background:rgba(245,166,35,.05)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:.6rem">
+        <span style="font-size:14px">🔐</span>
+        <span style="font-family:var(--mono);font-size:12px;color:#f5a623">Master password</span>
+      </div>
+      <div style="color:var(--text2);font-size:11px;margin-bottom:.6rem">Wpisz master password żeby otworzyć sejf. Owner ustawia go raz — nigdy nie jest zapisywany w Firebase, tylko w sesji. Owner przekazuje hasło pracownikom poza aplikacją (np. Signal).</div>
+      <div style="display:flex;gap:8px">
+        <input type="password" id="zmMasterPass" placeholder="Master password..." style="flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;font-family:var(--mono)">
+        <button type="button" class="zm-btn zm-btn-primary" onclick="zmUnlockSecrets()">Odblokuj sejf</button>
+      </div>
+      <div id="zmMasterPassMsg" style="margin-top:.5rem;font-size:11px;color:var(--text2)"></div>
+    </div>
+    <div id="zmSecretsWrap" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
+        <div style="color:var(--green);font-size:11px;font-family:var(--mono)">✓ Sejf odblokowany</div>
+        <div style="display:flex;gap:6px">
+          <button type="button" class="zm-btn zm-btn-sm" style="color:var(--text2);border:1px solid var(--border)" onclick="zmLockSecrets()">🔒 Zamknij</button>
+        </div>
+      </div>
+      <div id="zmSecretsList"></div>
+    </div>
+  </div>
+
+  <!-- ── ROZLICZENIE / SESSIONS ── -->
+  <div id="zmSessionsPanel" style="display:none">
+    <div id="zmSessionCurrent" class="zm-add-form" style="display:none"></div>
+    <div id="zmSessionsList"></div>
+  </div>
+
+  <!-- ── OGŁOSZENIA (owner only) ── -->
+  <div id="zmAnnouncePanel" style="display:none">
+    <div class="zm-add-form">
+      <div style="margin-bottom:.75rem"><label>Tytuł</label><input id="zmAnnounceTitle" placeholder="np. Urlop Chrisa 20-25 kwietnia"></div>
+      <div style="margin-bottom:.75rem"><label>Treść</label><textarea id="zmAnnounceText" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%;min-height:60px;resize:vertical" placeholder="Szczegóły dla zespołu..."></textarea></div>
+      <button type="button" class="zm-btn zm-btn-primary" onclick="zmSaveAnnounce()">+ Publikuj ogłoszenie</button>
+    </div>
+    <div id="zmAnnounceList"></div>
   </div>
 </div>
 </div>
@@ -5825,11 +5960,12 @@ auth.onAuthStateChanged(async user => {
     await cleanupDzien1();
     renderEntry();
     updateAlertBadge();
-    // Load tasks for nav badge
+    // Load tasks for nav badge + announcements
     zmLoadWorkers().then(() => zmLoadTasks()).then(() => {
       zmUpdateNavBadge();
       zmStartPolling();
     }).catch(e => console.error('[zespol] init load', e));
+    zmLoadAnnouncements().then(zmRenderAnnounceBar).catch(e => console.error('[announce]', e));
     // Owner confirmed + data loaded → show the last active view
     const lastTab = localStorage.getItem('lastActiveTab') || 'dashboard';
     showView(lastTab);
@@ -5901,6 +6037,9 @@ async function zmDetectRole() {
       zmApplyWorkerView(workerAccess);
       await zmLoadTasks();
       await zmLoadWorkers(); // so comments show author names
+      await zmLoadAnnouncements();
+      await zmLoadSessions();
+      zmRenderAnnounceBar();
       zmRenderTasks();
       zmRenderStats();
       zmUpdateNavBadge();
@@ -5963,27 +6102,43 @@ async function zmLoadOwnerWiedza() {
 }
 
 function zmWorkerShowView(v) {
-  // Hide all worker views
-  document.getElementById('zmPanel')?.classList.remove('open');
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.zm-worker-nav .nav-btn').forEach(b => b.classList.remove('active'));
+  const navIds = { tasks:'zmwNavTasks', wiedza:'zmwNavWiedza', briefings:'zmwNavBriefings', secrets:'zmwNavSecrets', sessions:'zmwNavSessions' };
+  document.getElementById(navIds[v])?.classList.add('active');
+  const allPanels = ['zmTasksPanel','zmWorkersPanel','zmTemplatesPanel','zmWKnowPanel','zmBriefingsPanel','zmSecretsPanel','zmSessionsPanel','zmAnnouncePanel'];
+  allPanels.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  document.querySelectorAll('.zm-tabs').forEach(el => el.style.display = 'none');
+  const zEl = document.getElementById('zmPanel');
+  zEl?.classList.add('open');
   if (v === 'tasks') {
-    document.getElementById('zmPanel')?.classList.add('open');
-    document.getElementById('zmwNavTasks')?.classList.add('active');
-    // Worker sees only their tasks, hide workers panel and add-task
-    document.getElementById('zmWorkersPanel').style.display = 'none';
     document.getElementById('zmTasksPanel').style.display = '';
-    document.querySelectorAll('.zm-tabs').forEach(el => el.style.display = 'none');
     const addBtn = document.querySelector('[onclick="zmShowAddTask()"]');
     if (addBtn) addBtn.style.display = 'none';
     zmRenderTasks();
   } else if (v === 'wiedza') {
-    document.getElementById('viewWiedza').classList.add('active');
-    document.getElementById('zmwNavWiedza')?.classList.add('active');
-    // Load owner's wiedza from Firebase
-    zmLoadOwnerWiedza().then(() => {
-      if (typeof renderWkList === 'function') renderWkList();
+    document.getElementById('zmWKnowPanel').style.display = '';
+    const form = document.getElementById('zmWKnowForm');
+    if (form) form.style.display = 'none';
+    zmLoadWKnow().then(zmRenderWKnow);
+  } else if (v === 'briefings') {
+    document.getElementById('zmBriefingsPanel').style.display = '';
+    zmLoadBriefings().then(zmRenderBriefings);
+  } else if (v === 'secrets') {
+    document.getElementById('zmSecretsPanel').style.display = '';
+    zmLoadSecretsMeta().then(() => {
+      const cached = sessionStorage.getItem('zmMasterPass');
+      if (cached && zmSecretSalt) {
+        document.getElementById('zmMasterPass').value = cached;
+        zmUnlockSecrets();
+      } else {
+        document.getElementById('zmMasterPassWrap').style.display = '';
+        document.getElementById('zmSecretsWrap').style.display = 'none';
+      }
     });
+  } else if (v === 'sessions') {
+    document.getElementById('zmSessionsPanel').style.display = '';
+    zmLoadSessions().then(zmRenderSessions);
   }
   window.scrollTo(0,0);
 }
@@ -6101,6 +6256,640 @@ function zmRenderTemplates() {
   `).join('');
 }
 
+// ════════════════════════════════════════════════
+// WIEDZA ZESPOŁU (owner pisze, worker czyta — osobna od prywatnej wiedzy)
+// ════════════════════════════════════════════════
+let zmWKnow = [];
+const ZM_WKNOW_CATS = { faq:'FAQ', playbook:'Playbook', zasady:'Zasady', linki:'Linki', inne:'Inne' };
+let zmWKnowEditId = null;
+
+async function zmLoadWKnow() {
+  if (!currentUser) return;
+  try {
+    const snap = await zmTeamRef().collection('workerKnowledge').orderBy('createdAt','desc').get();
+    zmWKnow = [];
+    snap.forEach(doc => zmWKnow.push({ id: doc.id, ...doc.data() }));
+  } catch(e) { console.error('[wknow] load', e); }
+}
+
+async function zmSaveWKnow() {
+  const title = document.getElementById('zmWKnowTitle').value.trim();
+  const content = document.getElementById('zmWKnowContent').value.trim();
+  if (!title || !content) { alert('Podaj tytuł i treść'); return; }
+  const entry = {
+    title,
+    content,
+    cat: document.getElementById('zmWKnowCat').value,
+    createdAt: Date.now(),
+    updatedBy: currentUser.displayName || currentUser.email
+  };
+  try {
+    if (zmWKnowEditId) {
+      entry.createdAt = zmWKnow.find(e => e.id === zmWKnowEditId)?.createdAt || Date.now();
+      entry.updatedAt = Date.now();
+      await zmTeamRef().collection('workerKnowledge').doc(zmWKnowEditId).update(entry);
+      const idx = zmWKnow.findIndex(e => e.id === zmWKnowEditId);
+      if (idx >= 0) zmWKnow[idx] = { ...zmWKnow[idx], ...entry };
+      zmWKnowEditId = null;
+    } else {
+      const ref = await zmTeamRef().collection('workerKnowledge').add(entry);
+      entry.id = ref.id;
+      zmWKnow.unshift(entry);
+    }
+    zmClearWKnow();
+    zmRenderWKnow();
+  } catch(e) { console.error('[wknow] save', e); alert('Błąd: ' + e.message); }
+}
+
+function zmClearWKnow() {
+  document.getElementById('zmWKnowTitle').value = '';
+  document.getElementById('zmWKnowContent').value = '';
+  document.getElementById('zmWKnowCat').value = 'faq';
+  zmWKnowEditId = null;
+}
+
+function zmEditWKnow(id) {
+  const e = zmWKnow.find(x => x.id === id);
+  if (!e) return;
+  zmWKnowEditId = id;
+  document.getElementById('zmWKnowTitle').value = e.title;
+  document.getElementById('zmWKnowContent').value = e.content;
+  document.getElementById('zmWKnowCat').value = e.cat || 'inne';
+  document.getElementById('zmWKnowTitle').scrollIntoView({behavior:'smooth',block:'center'});
+  document.getElementById('zmWKnowTitle').focus();
+}
+
+async function zmDeleteWKnow(id) {
+  if (!confirm('Usunąć wpis?')) return;
+  try {
+    await zmTeamRef().collection('workerKnowledge').doc(id).delete();
+    zmWKnow = zmWKnow.filter(e => e.id !== id);
+    zmRenderWKnow();
+  } catch(e) { console.error('[wknow] delete', e); }
+}
+
+function zmRenderWKnow() {
+  const list = document.getElementById('zmWKnowList');
+  if (!list) return;
+  const isOwner = userRole === 'owner';
+  if (!zmWKnow.length) {
+    list.innerHTML = '<div class="zm-empty">' + (isOwner ? 'Brak wpisów. Dodaj pierwszy.' : 'Brak wpisów w bazie wiedzy zespołu.') + '</div>';
+    return;
+  }
+  list.innerHTML = zmWKnow.map(e => `
+    <div class="zm-wknow-card">
+      <div class="zm-wknow-head">
+        <div class="zm-wknow-title">${esc(e.title)}</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="zm-wknow-cat ${e.cat||'inne'}">${ZM_WKNOW_CATS[e.cat||'inne']}</span>
+          ${isOwner ? `<button type="button" class="zm-btn zm-btn-sm zm-btn-edit" onclick="zmEditWKnow('${e.id}')">✎</button><button type="button" class="zm-btn zm-btn-sm zm-btn-danger" onclick="zmDeleteWKnow('${e.id}')">🗑</button>` : ''}
+        </div>
+      </div>
+      <div class="zm-wknow-body">${esc(e.content)}</div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════
+// BRIEFINGI PER KONTO
+// ════════════════════════════════════════════════
+let zmBriefings = {};
+const ZM_BRIEFING_FIELDS = [
+  { key:'beRoas', label:'BE ROAS', placeholder:'np. 2.5' },
+  { key:'marzaBE', label:'Marża BE', placeholder:'np. 15%' },
+  { key:'strategia', label:'Strategia', placeholder:'Główne założenia...', multi:true },
+  { key:'doNotTouch', label:'Czego NIE ruszać', placeholder:'Wyróżnienia produktowe, wykluczenia...', multi:true, danger:true },
+  { key:'kontakt', label:'Kontakt do ownera', placeholder:'tel / email' },
+  { key:'notes', label:'Notatki dodatkowe', placeholder:'...', multi:true }
+];
+
+async function zmLoadBriefings() {
+  if (!currentUser) return;
+  try {
+    const snap = await zmTeamRef().collection('briefings').get();
+    zmBriefings = {};
+    snap.forEach(doc => { zmBriefings[doc.id] = doc.data(); });
+  } catch(e) { console.error('[briefings] load', e); }
+}
+
+async function zmSaveBriefing(konto) {
+  const data = { konto, updatedAt: Date.now() };
+  ZM_BRIEFING_FIELDS.forEach(f => {
+    const el = document.getElementById('zmBrief_' + konto + '_' + f.key);
+    if (el) data[f.key] = el.value.trim();
+  });
+  try {
+    await zmTeamRef().collection('briefings').doc(konto).set(data, { merge: true });
+    zmBriefings[konto] = data;
+    zmRenderBriefings();
+  } catch(e) { console.error('[briefings] save', e); alert('Błąd: ' + e.message); }
+}
+
+function zmToggleBriefingEdit(konto) {
+  const form = document.getElementById('zmBriefEdit_' + konto);
+  if (form) form.classList.toggle('open');
+}
+
+function zmRenderBriefings() {
+  const list = document.getElementById('zmBriefingsList');
+  if (!list) return;
+  const isOwner = userRole === 'owner';
+  const accounts = Object.keys(AC_META);
+  list.innerHTML = accounts.map(konto => {
+    const b = zmBriefings[konto] || {};
+    const meta = AC_META[konto];
+    const grpColor = meta.group === 'MEBLE' ? '#ff6b35' : meta.group === 'LUXSEN' ? '#2dd4a0' : '#b47fff';
+    const hasContent = Object.values(b).some(v => v && typeof v === 'string');
+    return `
+      <div class="zm-briefing-card" style="border-left:3px solid ${grpColor}">
+        <div class="zm-briefing-head">
+          <div>
+            <div class="zm-briefing-konto">${esc(konto)}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px">${esc(meta.name)} · ${meta.group}${meta.role?' · '+meta.role.toUpperCase():''}</div>
+          </div>
+          ${isOwner ? `<button type="button" class="zm-btn zm-btn-sm zm-btn-edit" onclick="zmToggleBriefingEdit('${konto}')">✎ ${hasContent?'Edytuj':'Uzupełnij'}</button>` : ''}
+        </div>
+        ${hasContent ? `
+          ${(b.beRoas || b.marzaBE) ? `<div class="zm-briefing-kpis">
+            ${b.beRoas ? `<div class="zm-briefing-kpi"><div class="zm-briefing-kpi-val">${esc(b.beRoas)}</div><div class="zm-briefing-kpi-lbl">BE ROAS</div></div>`:''}
+            ${b.marzaBE ? `<div class="zm-briefing-kpi"><div class="zm-briefing-kpi-val">${esc(b.marzaBE)}</div><div class="zm-briefing-kpi-lbl">Marża BE</div></div>`:''}
+          </div>` : ''}
+          ${b.strategia ? `<div class="zm-briefing-section info"><strong>Strategia</strong>${esc(b.strategia)}</div>` : ''}
+          ${b.doNotTouch ? `<div class="zm-briefing-section danger"><strong>⚠ Nie ruszać</strong>${esc(b.doNotTouch)}</div>` : ''}
+          ${b.kontakt ? `<div class="zm-briefing-section"><strong>Kontakt</strong>${esc(b.kontakt)}</div>` : ''}
+          ${b.notes ? `<div class="zm-briefing-section"><strong>Notatki</strong>${esc(b.notes)}</div>` : ''}
+        ` : `<div style="color:var(--text3);font-size:11px;padding:8px 0;font-style:italic">${isOwner?'Brak briefingu — kliknij "Uzupełnij"':'Owner nie uzupełnił jeszcze briefingu'}</div>`}
+        ${isOwner ? `
+        <div class="zm-briefing-edit-form" id="zmBriefEdit_${konto}">
+          ${ZM_BRIEFING_FIELDS.map(f => `
+            <label>${f.label}</label>
+            ${f.multi
+              ? `<textarea id="zmBrief_${konto}_${f.key}" placeholder="${f.placeholder}">${esc(b[f.key]||'')}</textarea>`
+              : `<input id="zmBrief_${konto}_${f.key}" placeholder="${f.placeholder}" value="${esc(b[f.key]||'')}">`
+            }
+          `).join('')}
+          <button type="button" class="zm-btn zm-btn-primary zm-btn-sm" onclick="zmSaveBriefing('${konto}')">💾 Zapisz briefing</button>
+          <button type="button" class="zm-btn zm-btn-sm" style="color:var(--text2);border:1px solid var(--border)" onclick="zmToggleBriefingEdit('${konto}')">Anuluj</button>
+        </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════
+// SEJF HASEŁ (AES-256-GCM + PBKDF2)
+// ════════════════════════════════════════════════
+let zmSecrets = [];
+let zmSecretKey = null; // CryptoKey derived from master password
+let zmSecretSalt = null;
+
+async function zmDeriveKey(password, salt) {
+  const enc = new TextEncoder();
+  const keyMat = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    keyMat,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt','decrypt']
+  );
+}
+
+async function zmEncrypt(plaintext, key) {
+  const enc = new TextEncoder();
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, enc.encode(plaintext));
+  return { iv: Array.from(iv), data: Array.from(new Uint8Array(ct)) };
+}
+
+async function zmDecrypt(payload, key) {
+  const dec = new TextDecoder();
+  const iv = new Uint8Array(payload.iv);
+  const data = new Uint8Array(payload.data);
+  const pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv }, key, data);
+  return dec.decode(pt);
+}
+
+function zmBufToB64(arr) {
+  return btoa(String.fromCharCode(...arr));
+}
+function zmB64ToBuf(b64) {
+  return new Uint8Array(atob(b64).split('').map(c => c.charCodeAt(0)));
+}
+
+async function zmLoadSecretsMeta() {
+  if (!currentUser) return;
+  try {
+    const snap = await zmTeamRef().collection('secrets').get();
+    zmSecrets = [];
+    snap.forEach(doc => zmSecrets.push({ id: doc.id, ...doc.data() }));
+    // Salt stored in dedicated doc
+    const saltDoc = await zmTeamRef().collection('secretsConfig').doc('meta').get();
+    if (saltDoc.exists && saltDoc.data().salt) {
+      zmSecretSalt = zmB64ToBuf(saltDoc.data().salt);
+    }
+  } catch(e) { console.error('[secrets] load', e); }
+}
+
+async function zmUnlockSecrets() {
+  const password = document.getElementById('zmMasterPass').value;
+  if (!password) { alert('Podaj master password'); return; }
+  const msg = document.getElementById('zmMasterPassMsg');
+  try {
+    // First-time setup: generate salt
+    if (!zmSecretSalt) {
+      if (userRole !== 'owner') {
+        msg.innerHTML = '<span style="color:#ef4444">Owner musi najpierw ustawić master password i dodać pierwszy login</span>';
+        return;
+      }
+      if (!confirm('Pierwszy raz ustawiasz master password. Zapamiętaj go — nie da się go odzyskać. Kontynuować?')) return;
+      zmSecretSalt = crypto.getRandomValues(new Uint8Array(16));
+      await zmTeamRef().collection('secretsConfig').doc('meta').set({ salt: zmBufToB64(zmSecretSalt), createdAt: Date.now() });
+    }
+    zmSecretKey = await zmDeriveKey(password, zmSecretSalt);
+    // Test decryption: if any secrets exist, verify master is correct
+    if (zmSecrets.length > 0) {
+      try {
+        await zmDecrypt(zmSecrets[0].loginEnc, zmSecretKey);
+      } catch(err) {
+        zmSecretKey = null;
+        msg.innerHTML = '<span style="color:#ef4444">Błędny master password</span>';
+        return;
+      }
+    }
+    sessionStorage.setItem('zmMasterPass', password); // cache for session
+    document.getElementById('zmMasterPassWrap').style.display = 'none';
+    document.getElementById('zmSecretsWrap').style.display = '';
+    msg.textContent = '';
+    document.getElementById('zmMasterPass').value = '';
+    await zmRenderSecrets();
+  } catch(e) {
+    console.error('[secrets] unlock', e);
+    msg.innerHTML = '<span style="color:#ef4444">Błąd: ' + e.message + '</span>';
+  }
+}
+
+function zmLockSecrets() {
+  zmSecretKey = null;
+  sessionStorage.removeItem('zmMasterPass');
+  document.getElementById('zmMasterPassWrap').style.display = '';
+  document.getElementById('zmSecretsWrap').style.display = 'none';
+}
+
+async function zmAddSecret() {
+  if (!zmSecretKey) { alert('Najpierw odblokuj sejf'); return; }
+  if (userRole !== 'owner') { alert('Tylko owner może dodawać'); return; }
+  const konto = prompt('Nazwa konta (np. MobelKap, Luxsen):');
+  if (!konto) return;
+  const login = prompt('Login:');
+  if (!login) return;
+  const password = prompt('Hasło:');
+  if (!password) return;
+  const notes = prompt('Notatki (opcjonalnie):') || '';
+  try {
+    const loginEnc = await zmEncrypt(login, zmSecretKey);
+    const passwordEnc = await zmEncrypt(password, zmSecretKey);
+    const doc = { konto, loginEnc, passwordEnc, notes, createdAt: Date.now(), createdBy: currentUser.email };
+    const ref = await zmTeamRef().collection('secrets').add(doc);
+    doc.id = ref.id;
+    zmSecrets.push(doc);
+    await zmRenderSecrets();
+  } catch(e) { console.error('[secrets] add', e); alert('Błąd: ' + e.message); }
+}
+
+async function zmDeleteSecret(id) {
+  if (userRole !== 'owner') { alert('Tylko owner może usuwać'); return; }
+  if (!confirm('Usunąć ten login?')) return;
+  try {
+    await zmTeamRef().collection('secrets').doc(id).delete();
+    zmSecrets = zmSecrets.filter(s => s.id !== id);
+    zmRenderSecrets();
+  } catch(e) { console.error('[secrets] delete', e); }
+}
+
+async function zmCopySecret(id, field) {
+  if (!zmSecretKey) return;
+  const s = zmSecrets.find(x => x.id === id);
+  if (!s) return;
+  try {
+    const plaintext = await zmDecrypt(s[field], zmSecretKey);
+    await navigator.clipboard.writeText(plaintext);
+    // Log access
+    try {
+      await zmTeamRef().collection('secretsLog').add({
+        konto: s.konto, field, user: currentUser.email, at: Date.now()
+      });
+    } catch(e) {}
+    // Toast
+    const btn = event && event.target;
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = '✓ skopiowano';
+      setTimeout(() => { btn.textContent = orig; }, 1200);
+    }
+  } catch(e) { console.error('[secrets] copy', e); alert('Błąd dekrypcji'); }
+}
+
+async function zmRenderSecrets() {
+  const list = document.getElementById('zmSecretsList');
+  if (!list) return;
+  const isOwner = userRole === 'owner';
+  if (!zmSecrets.length) {
+    list.innerHTML = (isOwner
+      ? '<div class="zm-empty">Brak zapisanych loginów. <br><br><button type="button" class="zm-btn zm-btn-primary" onclick="zmAddSecret()">+ Dodaj pierwszy login</button></div>'
+      : '<div class="zm-empty">Brak zapisanych loginów</div>');
+    return;
+  }
+  list.innerHTML = (isOwner ? '<div style="margin-bottom:.75rem"><button type="button" class="zm-btn zm-btn-primary zm-btn-sm" onclick="zmAddSecret()">+ Dodaj login</button></div>' : '') +
+    zmSecrets.map(s => `
+    <div class="zm-secret-row">
+      <div class="zm-secret-konto">${esc(s.konto)}</div>
+      <div class="zm-secret-val" title="${esc(s.notes||'')}">${esc(s.notes||'—')}</div>
+      <div style="display:flex;gap:4px;justify-content:flex-end">
+        <button type="button" class="zm-btn zm-btn-sm zm-btn-primary" onclick="zmCopySecret('${s.id}','loginEnc')">📋 Login</button>
+        <button type="button" class="zm-btn zm-btn-sm zm-btn-primary" onclick="zmCopySecret('${s.id}','passwordEnc')">🔑 Hasło</button>
+      </div>
+      <div>${isOwner?`<button type="button" class="zm-btn zm-btn-sm zm-btn-danger" onclick="zmDeleteSecret('${s.id}')">🗑</button>`:''}</div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════════════
+// ROZLICZENIE (work sessions — check-in/out)
+// ════════════════════════════════════════════════
+let zmSessions = [];
+let zmCurrentSession = null;
+
+function zmSessionKey(email, date) {
+  const d = new Date(date || Date.now());
+  const key = d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+  return email.replace(/[.#$/\[\]@]/g,'_') + '_' + key;
+}
+
+async function zmLoadSessions() {
+  if (!currentUser) return;
+  try {
+    // Load last 14 days for owner, or just own for worker
+    const cutoff = Date.now() - 14 * 86400000;
+    const snap = await zmTeamRef().collection('workSessions').where('start','>=', cutoff).get();
+    zmSessions = [];
+    snap.forEach(doc => zmSessions.push({ id: doc.id, ...doc.data() }));
+    // Find current active session for this user
+    const email = currentUser.email.toLowerCase();
+    const today = zmSessionKey(email);
+    zmCurrentSession = zmSessions.find(s => s.id === today && !s.end) || null;
+  } catch(e) { console.error('[sessions] load', e); }
+}
+
+async function zmStartSession() {
+  const email = currentUser.email.toLowerCase();
+  const id = zmSessionKey(email);
+  const data = { workerEmail: email, workerName: zmWorkers.find(w => w.email === email)?.name || email, date: new Date().toISOString().slice(0,10), start: Date.now() };
+  try {
+    await zmTeamRef().collection('workSessions').doc(id).set(data);
+    data.id = id;
+    zmCurrentSession = data;
+    // Replace or add
+    const idx = zmSessions.findIndex(s => s.id === id);
+    if (idx >= 0) zmSessions[idx] = data; else zmSessions.push(data);
+    zmRenderSessions();
+  } catch(e) { console.error('[sessions] start', e); alert('Błąd: ' + e.message); }
+}
+
+async function zmEndSession() {
+  if (!zmCurrentSession) return;
+  const end = Date.now();
+  const hours = Math.round((end - zmCurrentSession.start) / 360000) / 10; // 0.1h precision
+  const tasksCompleted = zmTasks.filter(t => t.assignee === currentUser.email.toLowerCase() && t.status === 'done' && (t.updatedAt || 0) >= zmCurrentSession.start).length;
+  try {
+    await zmTeamRef().collection('workSessions').doc(zmCurrentSession.id).update({ end, hours, tasksCompleted });
+    zmCurrentSession.end = end;
+    zmCurrentSession.hours = hours;
+    zmCurrentSession.tasksCompleted = tasksCompleted;
+    zmCurrentSession = null;
+    zmRenderSessions();
+  } catch(e) { console.error('[sessions] end', e); alert('Błąd: ' + e.message); }
+}
+
+function zmFormatDuration(start, end) {
+  if (!start) return '—';
+  const diff = (end || Date.now()) - start;
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  return h + 'h ' + m + 'm';
+}
+
+function zmRenderSessions() {
+  const cur = document.getElementById('zmSessionCurrent');
+  const list = document.getElementById('zmSessionsList');
+  if (!cur || !list) return;
+  // Current session bar — only for worker
+  if (userRole === 'worker') {
+    if (zmCurrentSession) {
+      const dur = zmFormatDuration(zmCurrentSession.start);
+      cur.style.display = '';
+      cur.innerHTML = `
+        <div class="zm-session-bar">
+          <div class="zm-session-big">${dur}</div>
+          <div class="zm-session-sub">pracujesz od ${new Date(zmCurrentSession.start).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}</div>
+          <button type="button" class="zm-btn zm-btn-danger" onclick="zmEndSession()">⏹ Zakończ dzień</button>
+        </div>
+      `;
+    } else {
+      cur.style.display = '';
+      cur.innerHTML = `
+        <div class="zm-session-bar">
+          <div class="zm-session-big" style="color:var(--text2)">Gotowy do pracy?</div>
+          <div class="zm-session-sub">kliknij poniżej żeby rozpocząć dzień</div>
+          <button type="button" class="zm-btn zm-btn-success" onclick="zmStartSession()">▶ Rozpocznij dzień</button>
+        </div>
+      `;
+    }
+  } else {
+    cur.style.display = 'none';
+  }
+  // Sessions table
+  const sorted = [...zmSessions].sort((a,b) => (b.start||0) - (a.start||0));
+  if (!sorted.length) {
+    list.innerHTML = '<div class="zm-empty">Brak sesji pracy w ostatnich 14 dniach</div>';
+    return;
+  }
+  // Group by worker for owner
+  if (userRole === 'owner') {
+    const byWorker = {};
+    sorted.forEach(s => {
+      const k = s.workerEmail;
+      if (!byWorker[k]) byWorker[k] = { name: s.workerName || k, total: 0, count: 0, sessions: [] };
+      byWorker[k].sessions.push(s);
+      byWorker[k].total += (s.hours || 0);
+      byWorker[k].count += 1;
+    });
+    list.innerHTML = Object.entries(byWorker).map(([email, d]) => `
+      <div class="zm-card" style="margin-bottom:1rem">
+        <div class="zm-card-header">
+          <div>
+            <div class="zm-card-name">${esc(d.name)}</div>
+            <div class="zm-card-email">${esc(email)}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="zm-session-big" style="font-size:16px">${d.total.toFixed(1)}h</div>
+            <div class="zm-session-sub">w ${d.count} sesj${d.count===1?'i':'ach'}</div>
+          </div>
+        </div>
+        <table class="zm-session-table">
+          <thead><tr><th>Data</th><th>Start</th><th>Koniec</th><th>Godziny</th><th>Zadania</th></tr></thead>
+          <tbody>
+            ${d.sessions.map(s => `
+              <tr>
+                <td>${s.date || '—'}</td>
+                <td>${s.start ? new Date(s.start).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+                <td>${s.end ? new Date(s.end).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'}) : '<span style="color:#2dd4a0">w toku</span>'}</td>
+                <td class="zm-hours">${s.hours ? s.hours.toFixed(1) + 'h' : zmFormatDuration(s.start, s.end)}</td>
+                <td>${s.tasksCompleted || 0}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `).join('');
+  } else {
+    const mine = sorted.filter(s => s.workerEmail === currentUser.email.toLowerCase());
+    list.innerHTML = `
+      <table class="zm-session-table">
+        <thead><tr><th>Data</th><th>Start</th><th>Koniec</th><th>Godziny</th><th>Zadania</th></tr></thead>
+        <tbody>
+          ${mine.map(s => `
+            <tr>
+              <td>${s.date || '—'}</td>
+              <td>${s.start ? new Date(s.start).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+              <td>${s.end ? new Date(s.end).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'}) : '<span style="color:#2dd4a0">w toku</span>'}</td>
+              <td class="zm-hours">${s.hours ? s.hours.toFixed(1) + 'h' : zmFormatDuration(s.start, s.end)}</td>
+              <td>${s.tasksCompleted || 0}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+}
+
+// ════════════════════════════════════════════════
+// OGŁOSZENIA
+// ════════════════════════════════════════════════
+let zmAnnouncements = [];
+
+async function zmLoadAnnouncements() {
+  if (!currentUser) return;
+  try {
+    const snap = await zmTeamRef().collection('announcements').orderBy('createdAt','desc').limit(20).get();
+    zmAnnouncements = [];
+    snap.forEach(doc => zmAnnouncements.push({ id: doc.id, ...doc.data() }));
+  } catch(e) { console.error('[announce] load', e); }
+}
+
+async function zmSaveAnnounce() {
+  const title = document.getElementById('zmAnnounceTitle').value.trim();
+  const text = document.getElementById('zmAnnounceText').value.trim();
+  if (!title || !text) { alert('Podaj tytuł i treść'); return; }
+  const data = { title, text, createdAt: Date.now(), createdBy: currentUser.displayName || currentUser.email, active: true };
+  try {
+    const ref = await zmTeamRef().collection('announcements').add(data);
+    data.id = ref.id;
+    zmAnnouncements.unshift(data);
+    document.getElementById('zmAnnounceTitle').value = '';
+    document.getElementById('zmAnnounceText').value = '';
+    zmRenderAnnouncements();
+    zmRenderAnnounceBar();
+  } catch(e) { console.error('[announce] save', e); alert('Błąd: ' + e.message); }
+}
+
+async function zmToggleAnnounceActive(id) {
+  const a = zmAnnouncements.find(x => x.id === id);
+  if (!a) return;
+  a.active = !a.active;
+  try {
+    await zmTeamRef().collection('announcements').doc(id).update({ active: a.active });
+    zmRenderAnnouncements();
+    zmRenderAnnounceBar();
+  } catch(e) { console.error('[announce] toggle', e); }
+}
+
+async function zmDeleteAnnounce(id) {
+  if (!confirm('Usunąć ogłoszenie?')) return;
+  try {
+    await zmTeamRef().collection('announcements').doc(id).delete();
+    zmAnnouncements = zmAnnouncements.filter(a => a.id !== id);
+    zmRenderAnnouncements();
+    zmRenderAnnounceBar();
+  } catch(e) { console.error('[announce] delete', e); }
+}
+
+function zmRenderAnnouncements() {
+  const list = document.getElementById('zmAnnounceList');
+  if (!list) return;
+  if (!zmAnnouncements.length) {
+    list.innerHTML = '<div class="zm-empty">Brak ogłoszeń</div>';
+    return;
+  }
+  list.innerHTML = zmAnnouncements.map(a => `
+    <div class="zm-announce-card" style="${a.active?'':'opacity:.5'}">
+      <div class="zm-announce-head">
+        <div class="zm-announce-card-title">${esc(a.title)}</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="zm-announce-date">${new Date(a.createdAt).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+          <button type="button" class="zm-btn zm-btn-sm" style="color:var(--text2);border:1px solid var(--border)" onclick="zmToggleAnnounceActive('${a.id}')">${a.active?'Ukryj':'Pokaż'}</button>
+          <button type="button" class="zm-btn zm-btn-sm zm-btn-danger" onclick="zmDeleteAnnounce('${a.id}')">🗑</button>
+        </div>
+      </div>
+      <div class="zm-announce-body">${esc(a.text)}</div>
+    </div>
+  `).join('');
+}
+
+function zmRenderAnnounceBar() {
+  const bar = document.getElementById('zmAnnounceBar');
+  if (!bar) return;
+  const active = zmAnnouncements.filter(a => a.active);
+  if (!active.length) { bar.style.display = 'none'; return; }
+  const latest = active[0];
+  bar.style.display = 'flex';
+  bar.innerHTML = `
+    <span>📢</span>
+    <span class="zm-announce-title">${esc(latest.title)}</span>
+    <span class="zm-announce-text">${esc(latest.text.slice(0, 200))}${latest.text.length > 200 ? '...' : ''}</span>
+  `;
+}
+
+// ════════════════════════════════════════════════
+// SOS (worker quick urgent task)
+// ════════════════════════════════════════════════
+async function zmSOS() {
+  const msg = prompt('Co się dzieje? Krótki opis problemu (Chris dostanie task PILNY):');
+  if (!msg || !msg.trim()) return;
+  const workerName = zmWorkers.find(w => w.email === currentUser.email.toLowerCase())?.name || currentUser.email;
+  const task = {
+    title: '🆘 SOS od ' + workerName,
+    desc: msg.trim(),
+    assignee: '', // owner sees all tasks, will notice
+    status: 'todo',
+    priority: 'PILNE',
+    konto: '',
+    dueDate: new Date().toISOString().slice(0,10),
+    checklist: [],
+    comments: [],
+    readBy: {},
+    history: [{ at: Date.now(), author: workerName, action: 'zgłosił SOS' }],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    fromSOS: true
+  };
+  try {
+    await zmTeamRef().collection('tasks').add(task);
+    alert('✓ SOS wysłany. Chris zobaczy task PILNY.');
+  } catch(e) { console.error('[sos]', e); alert('Błąd: ' + e.message); }
+}
+
 // Poll for new tasks/comments every 60s when user is active
 let zmPollInterval = null;
 function zmStartPolling() {
@@ -6120,13 +6909,31 @@ function zmStartPolling() {
 
 // ── Tab switching ──
 function zmShowTab(tab) {
-  document.getElementById('zmTabTasks').classList.toggle('active', tab === 'tasks');
-  document.getElementById('zmTabWorkers').classList.toggle('active', tab === 'workers');
-  document.getElementById('zmTabTemplates').classList.toggle('active', tab === 'templates');
-  document.getElementById('zmTasksPanel').style.display = tab === 'tasks' ? '' : 'none';
-  document.getElementById('zmWorkersPanel').style.display = tab === 'workers' ? '' : 'none';
-  document.getElementById('zmTemplatesPanel').style.display = tab === 'templates' ? '' : 'none';
-  if (tab === 'templates') { zmLoadTemplates().then(zmRenderTemplates); }
+  const tabs = ['tasks','workers','templates','wknow','briefings','secrets','sessions','announce'];
+  const panels = { tasks:'zmTasksPanel', workers:'zmWorkersPanel', templates:'zmTemplatesPanel', wknow:'zmWKnowPanel', briefings:'zmBriefingsPanel', secrets:'zmSecretsPanel', sessions:'zmSessionsPanel', announce:'zmAnnouncePanel' };
+  const tabIds = { tasks:'zmTabTasks', workers:'zmTabWorkers', templates:'zmTabTemplates', wknow:'zmTabWKnow', briefings:'zmTabBriefings', secrets:'zmTabSecrets', sessions:'zmTabSessions', announce:'zmTabAnnounce' };
+  tabs.forEach(t => {
+    const btn = document.getElementById(tabIds[t]);
+    if (btn) btn.classList.toggle('active', t === tab);
+    const panel = document.getElementById(panels[t]);
+    if (panel) panel.style.display = t === tab ? '' : 'none';
+  });
+  if (tab === 'templates') zmLoadTemplates().then(zmRenderTemplates);
+  else if (tab === 'wknow') zmLoadWKnow().then(zmRenderWKnow);
+  else if (tab === 'briefings') zmLoadBriefings().then(zmRenderBriefings);
+  else if (tab === 'secrets') { zmLoadSecretsMeta().then(() => {
+    // Auto-unlock if password cached in session
+    const cached = sessionStorage.getItem('zmMasterPass');
+    if (cached && zmSecretSalt) {
+      document.getElementById('zmMasterPass').value = cached;
+      zmUnlockSecrets();
+    } else {
+      document.getElementById('zmMasterPassWrap').style.display = '';
+      document.getElementById('zmSecretsWrap').style.display = 'none';
+    }
+  }); }
+  else if (tab === 'sessions') zmLoadSessions().then(zmRenderSessions);
+  else if (tab === 'announce') zmLoadAnnouncements().then(() => { zmRenderAnnouncements(); zmRenderAnnounceBar(); });
 }
 
 // ════════════════════════════════════════
@@ -17590,7 +18397,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.46</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.47</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
