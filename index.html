@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.36</title>
+<title>MPlace Hub v7.37</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1175,6 +1175,8 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .zm-stat-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--text)}
 .zm-stat-label{font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
 .zm-worker-view .topbar-inner,.zm-worker-view .topbar-accounts{display:none!important}
+.zm-worker-view .view{display:none!important}
+.zm-worker-view .zm-panel{display:block!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 </style>
 
@@ -1208,7 +1210,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.36</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.37</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -3489,9 +3491,13 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
-  // Gate: block all views until role is confirmed
-  if(userRole === 'none'){ if(typeof zmShowNoAccess==='function') zmShowNoAccess(); return; }
-  if(userRole === 'pending') return;
+  // Gate: only owner can access views. Worker uses zmWorkerShowView, others see nothing.
+  if(userRole !== 'owner'){
+    // Hide ALL views defensively
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+    if(userRole === 'none' && typeof zmShowNoAccess==='function') zmShowNoAccess();
+    return;
+  }
   ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewPodcasts','viewImportAds','viewKalendar','viewAnaliza','viewCrossBorder','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewTitleAnalyzer','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
@@ -17084,7 +17090,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.36</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.37</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
