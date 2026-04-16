@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.59</title>
+<title>MPlace Hub v7.60</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1377,7 +1377,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.59</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.60</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -3412,7 +3412,10 @@ IDs: 123456 789012 ..."></textarea>
           <option value="INFO">INFO</option>
         </select>
       </div>
-      <button class="zm-btn zm-btn-primary" onclick="zmShowAddTask()">+ Nowe zadanie</button>
+      <div style="display:flex;gap:6px">
+        <button class="zm-btn zm-btn-primary" onclick="zmShowAddTask()">+ Nowe zadanie</button>
+        <button class="zm-btn zm-btn-edit" onclick="tfOpenBatch()" title="Wklej listę IDs → wygeneruj serię tasków">⚡ Batch z listy</button>
+      </div>
     </div>
     <div id="zmAddTaskForm" style="display:none">
       <div class="zm-add-form">
@@ -7584,6 +7587,274 @@ async function tfSendTasks() {
     btn.textContent = `⚠ ${sent}/${selectedIndexes.length} wysłano`;
     alert(`Wysłano ${sent}, błędów: ${errors}`);
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BATCH OPERATIONS — wklej listę IDs/pozycji → seria tasków
+// ═══════════════════════════════════════════════════════════════════
+async function tfOpenBatch() {
+  if (userRole !== 'owner') { alert('Tylko owner'); return; }
+  await Promise.all([tfLoadCustomActions(), zmLoadWorkers()]);
+  let overlay = document.getElementById('tfBatchModal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'tfBatchModal';
+    overlay.className = 'tf-overlay';
+    overlay.onclick = (e) => { if (e.target === overlay) tfCloseBatchModal(); };
+    document.body.appendChild(overlay);
+  }
+  tfRenderBatchModal(overlay);
+  overlay.style.display = 'flex';
+}
+
+function tfCloseBatchModal() {
+  const o = document.getElementById('tfBatchModal');
+  if (o) o.style.display = 'none';
+}
+
+function tfRenderBatchModal(overlay) {
+  const actionSelectHtml = tfActionSelectHtml('zmien_tytul');
+  const workerOpts = zmWorkers.map(w => `<option value="${esc(w.email)}">${esc(w.name)}</option>`).join('');
+  overlay.innerHTML = `
+    <div class="tf-box tf-box-wide">
+      <div class="tf-head">
+        <div>⚡ Batch Operations — seria tasków z listy</div>
+        <button onclick="tfCloseBatchModal()" class="tf-x">✕</button>
+      </div>
+      <div style="padding:16px 18px;overflow-y:auto;flex:1">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:.75rem">Wklej listę IDs ofert / nazw kampanii / klientów (po jednym na linię). Każda linia = jeden task.</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+          <div>
+            <label style="font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Typ akcji</label>
+            <select id="tfBatchAction" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%" onchange="tfBatchUpdatePreview()">${actionSelectHtml}</select>
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Konto (opcjonalnie, dla wszystkich)</label>
+            <select id="tfBatchKonto" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%">
+              <option value="">— brak —</option>
+              ${Object.keys(AC_META).map(k => `<option value="${k}">${k}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom:.75rem">
+          <label style="font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Lista (po jednym na linię)</label>
+          <textarea id="tfBatchItems" rows="8" placeholder="1234567890&#10;9876543210&#10;5555555555&#10;..." style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%;resize:vertical" oninput="tfBatchUpdatePreview()"></textarea>
+        </div>
+
+        <div style="margin-bottom:.75rem">
+          <label style="font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Instrukcja dla każdego taska (np. nowy tytuł, nowa cena, powód)</label>
+          <textarea id="tfBatchInstruction" rows="2" placeholder="np. Zmień tytuł wg konwencji: [Kategoria] [model] [wymiary] biały mat" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%;resize:vertical"></textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+          <div>
+            <label style="font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Przypisz do</label>
+            <select id="tfBatchAssignee" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%">
+              <option value="">— wybierz —</option>
+              ${workerOpts}
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Priorytet</label>
+            <select id="tfBatchPriority" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%">
+              <option value="WAŻNE">WAŻNE</option>
+              <option value="PILNE">PILNE</option>
+              <option value="INFO">INFO</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Termin</label>
+            <input type="date" id="tfBatchDue" value="${tfDateString(1)}" style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:100%">
+          </div>
+        </div>
+
+        <div style="padding:10px 12px;background:rgba(96,165,250,.06);border:1px dashed rgba(96,165,250,.3);border-radius:6px;margin-bottom:.75rem">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--text)">
+            <input type="checkbox" id="tfBatchAI" style="accent-color:#60a5fa">
+            <span><strong>🤖 Wzbogać AI</strong> — Claude przerobi każdy element na konkretny task z uzasadnieniem (wolniej, ale lepsze opisy)</span>
+          </label>
+        </div>
+
+        <div id="tfBatchPreview" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-family:var(--mono);font-size:11px;color:var(--text2);min-height:40px">
+          <em>Wklej listę powyżej żeby zobaczyć podgląd</em>
+        </div>
+      </div>
+      <div class="tf-footer">
+        <div class="tf-assign">
+          <span id="tfBatchCount" style="color:#60a5fa;font-weight:600">0 tasków</span>
+        </div>
+        <div class="tf-actions">
+          <button onclick="tfCloseBatchModal()" class="tf-btn-cancel">Anuluj</button>
+          <button onclick="tfBatchGenerate()" class="tf-btn-send" id="tfBatchSendBtn">Wygeneruj i wyślij →</button>
+        </div>
+      </div>
+    </div>
+  `;
+  tfBatchUpdatePreview();
+}
+
+function tfBatchItems() {
+  const raw = document.getElementById('tfBatchItems')?.value || '';
+  return raw.split('\n').map(l => l.trim()).filter(Boolean);
+}
+
+function tfBatchUpdatePreview() {
+  const items = tfBatchItems();
+  const countEl = document.getElementById('tfBatchCount');
+  const preview = document.getElementById('tfBatchPreview');
+  const btn = document.getElementById('tfBatchSendBtn');
+  if (countEl) countEl.textContent = items.length + ' task' + (items.length===1?'':(items.length<5?'i':'ów'));
+  if (btn) btn.disabled = items.length === 0;
+  if (!preview) return;
+  if (!items.length) {
+    preview.innerHTML = '<em>Wklej listę powyżej żeby zobaczyć podgląd</em>';
+    return;
+  }
+  const actionKey = document.getElementById('tfBatchAction')?.value;
+  const action = tfAllActions()[actionKey] || { label:'?', icon:'•' };
+  const first3 = items.slice(0, 3);
+  preview.innerHTML = `
+    <div style="color:var(--text);margin-bottom:6px"><strong>${action.icon} ${action.label}</strong> × ${items.length}</div>
+    <div style="color:var(--text2)">Przykładowe taski:</div>
+    <ul style="margin:4px 0 0 20px;line-height:1.7">
+      ${first3.map(item => `<li>${esc(action.label)}: <span style="color:#60a5fa">${esc(item)}</span></li>`).join('')}
+      ${items.length > 3 ? `<li style="color:var(--text3)">... i ${items.length - 3} więcej</li>` : ''}
+    </ul>
+  `;
+}
+
+async function tfBatchGenerate() {
+  const items = tfBatchItems();
+  if (!items.length) { alert('Wklej przynajmniej 1 pozycję'); return; }
+  const actionKey = document.getElementById('tfBatchAction').value;
+  const konto = document.getElementById('tfBatchKonto').value;
+  const instruction = document.getElementById('tfBatchInstruction').value.trim();
+  const assignee = document.getElementById('tfBatchAssignee').value;
+  const priority = document.getElementById('tfBatchPriority').value;
+  const dueDate = document.getElementById('tfBatchDue').value;
+  const useAI = document.getElementById('tfBatchAI').checked;
+  if (!assignee) { alert('Wybierz pracownika'); return; }
+  const actionDef = tfAllActions()[actionKey];
+  if (!actionDef) { alert('Wybierz typ akcji'); return; }
+  const btn = document.getElementById('tfBatchSendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generowanie...';
+
+  let tasks = items.map(item => ({
+    type: actionKey,
+    title: actionDef.label + ': ' + item,
+    priority,
+    konto,
+    desc: instruction || actionDef.label + ' — pozycja: ' + item,
+    customChecklist: null,
+    _batchItem: item
+  }));
+
+  // Optional: AI enrichment
+  if (useAI && instruction) {
+    btn.textContent = 'AI wzbogaca opisy...';
+    try {
+      tasks = await tfBatchAIEnrich(tasks, actionDef, instruction);
+    } catch(e) {
+      console.error('[batch] AI enrich', e);
+      alert('AI enrichment nie powiodło się — wysyłam proste taski.');
+    }
+  }
+
+  // Send tasks to Firebase
+  btn.textContent = 'Wysyłanie...';
+  const authorName = currentUser.displayName || currentUser.email.split('@')[0];
+  const authorEmail = currentUser.email.toLowerCase();
+  const authorKey = authorEmail.replace(/[.#$/\[\]]/g,'_');
+  let sent = 0, errors = 0;
+  for (const t of tasks) {
+    const checklistItems = (t.customChecklist || actionDef.checklist).map(text => ({ text, done: false }));
+    const task = {
+      title: t.title.slice(0, 100),
+      desc: t.desc || '',
+      assignee,
+      status: 'todo',
+      priority: t.priority || priority,
+      konto: t.konto || konto || '',
+      dueDate,
+      checklist: checklistItems,
+      comments: [],
+      readBy: { [authorKey]: Date.now() },
+      history: [{ at: Date.now(), author: authorName, action: 'wygenerowany batchem' }],
+      createdAt: Date.now(),
+      createdBy: authorEmail,
+      updatedAt: Date.now(),
+      tfType: t.type,
+      tfSource: 'batch',
+      tfSourceTitle: `Batch ${actionDef.label} × ${items.length}`,
+      tfBatchItem: t._batchItem
+    };
+    try {
+      const ref = await zmTeamRef().collection('tasks').add(task);
+      task.id = ref.id;
+      zmTasks.unshift(task);
+      sent++;
+    } catch(e) { console.error('[batch] send', e); errors++; }
+  }
+  btn.disabled = false;
+  if (errors === 0) {
+    btn.textContent = `✓ Wysłano ${sent}`;
+    setTimeout(() => {
+      tfCloseBatchModal();
+      alert(`✓ ${sent} tasków wysłanych do ${zmWorkers.find(w=>w.email===assignee)?.name||assignee}`);
+      zmRenderTasks();
+      zmRenderStats();
+      zmUpdateNavBadge();
+    }, 500);
+  } else {
+    btn.textContent = `⚠ ${sent}/${tasks.length} wysłano`;
+    alert(`Wysłano ${sent}, błędów: ${errors}`);
+  }
+}
+
+async function tfBatchAIEnrich(tasks, actionDef, instruction) {
+  // Build prompt: ask AI to return JSON with personalized title+desc per item
+  const items = tasks.map(t => t._batchItem);
+  const systemPrompt = `Jesteś AI asystentem agencji MPlace. Dostajesz listę pozycji i typ akcji. Zwróć JSON z personalizowanymi taskami.
+Format odpowiedzi (TYLKO JSON, max ${items.length} obiektów):
+{"tasks":[{"item":"<oryginalna pozycja>","title":"<krótki tytuł max 60zn>","desc":"<konkret 1-2 zdania>"}]}
+Zasady: Zachowaj oryginalny "item" 1:1. Tytuł zwięzły. Desc konkretny z instrukcji usera. Zero markdown.`;
+  const userPrompt = `Typ akcji: ${actionDef.label}
+Instrukcja usera: ${instruction}
+
+Lista pozycji:
+${items.map((it,i) => `${i+1}. ${it}`).join('\n')}`;
+  const resp = await fetch('https://red-haze-5f37mplace-agent.contactmplace.workers.dev/', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 8192,
+      system: systemPrompt,
+      messages: [{ role:'user', content: userPrompt }]
+    })
+  });
+  const raw = await readSSE(resp);
+  const parsed = tfParseTasks(raw.trim().replace(/^```json\s*/i,'').replace(/```\s*$/,''));
+  // tfParseTasks returns objects — but we need items field
+  // Fallback: parse directly
+  let aiTasks = parsed;
+  if (!aiTasks.length || !aiTasks[0].item) {
+    try {
+      const obj = JSON.parse(raw.trim().replace(/^```json\s*/i,'').replace(/```\s*$/,''));
+      aiTasks = obj.tasks || [];
+    } catch(e) {}
+  }
+  // Merge AI results back with original tasks by item match
+  return tasks.map(orig => {
+    const ai = aiTasks.find(a => a.item === orig._batchItem || a.title === orig.title);
+    if (ai) {
+      return { ...orig, title: ai.title || orig.title, desc: ai.desc || orig.desc };
+    }
+    return orig;
+  });
 }
 
 // Poll for new tasks/comments every 60s when user is active
@@ -19186,7 +19457,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.59</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.60</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
