@@ -1,0 +1,91 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isWorkerOf(ownerUid) {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/workerUids/$(request.auth.uid))
+        && get(/databases/$(database)/documents/workerUids/$(request.auth.uid)).data.ownerUid == ownerUid;
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      match /{document=**} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    match /teams/{ownerUid} {
+      allow read, write: if isOwner(ownerUid);
+
+      match /{document=**} {
+        allow read, write: if isOwner(ownerUid);
+      }
+
+      match /tasks/{taskId} {
+        allow read, update: if isWorkerOf(ownerUid);
+      }
+
+      match /workerKnowledge/{docId} {
+        allow read: if isWorkerOf(ownerUid);
+      }
+
+      match /announcements/{docId} {
+        allow read: if isWorkerOf(ownerUid);
+      }
+
+      match /briefings/{docId} {
+        allow read: if isWorkerOf(ownerUid);
+      }
+
+      match /workSessions/{sessionId} {
+        allow read, create, update: if isWorkerOf(ownerUid);
+      }
+
+      match /workers/{workerId} {
+        allow read: if isWorkerOf(ownerUid);
+      }
+    }
+
+    match /workerIndex/{emailDoc} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn()
+        && (resource == null || resource.data.ownerUid == request.auth.uid);
+    }
+
+    match /workerUids/{uid} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    match /publicPresentations/{presentationId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if false;
+    }
+
+    match /publicPodcasts/{podcastId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if false;
+
+      match /audio/{chunkId} {
+        allow read: if true;
+        allow create: if isSignedIn();
+        allow update, delete: if false;
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
