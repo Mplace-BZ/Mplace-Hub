@@ -31,6 +31,7 @@
   <div id="status">Ładowanie prezentacji...</div>
   <div id="content"></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script>
@@ -60,7 +61,7 @@
             statusEl.textContent = 'Prezentacja nie istnieje lub została usunięta.';
             return;
           }
-          contentEl.innerHTML = doc.data().html;
+          contentEl.innerHTML = DOMPurify.sanitize(doc.data().html, { USE_PROFILES: { html: true }, ADD_TAGS: ['style'], ADD_ATTR: ['class', 'style'] });
         })
         .catch(err => {
           statusEl.className = 'err';
