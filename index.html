@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MPlace Hub v7.47</title>
+<title>MPlace Hub v7.48</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1328,7 +1328,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 </div>
 <div class="auth-bar" id="authBar" style="display:none">
   <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.47</span></div>
+    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.48</span></div>
     <div class="nav-sep"></div>
     <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
   </div>
@@ -6568,27 +6568,61 @@ async function zmDeleteSecret(id) {
   } catch(e) { console.error('[secrets] delete', e); }
 }
 
-async function zmCopySecret(id, field) {
-  if (!zmSecretKey) return;
+async function zmCopySecret(id, field, ev) {
+  const btn = ev && ev.currentTarget;
+  if (!zmSecretKey) {
+    alert('Sejf zablokowany — odblokuj master password');
+    return;
+  }
   const s = zmSecrets.find(x => x.id === id);
-  if (!s) return;
+  if (!s) { alert('Nie znaleziono wpisu'); return; }
+  let plaintext;
   try {
-    const plaintext = await zmDecrypt(s[field], zmSecretKey);
-    await navigator.clipboard.writeText(plaintext);
-    // Log access
-    try {
-      await zmTeamRef().collection('secretsLog').add({
-        konto: s.konto, field, user: currentUser.email, at: Date.now()
-      });
-    } catch(e) {}
-    // Toast
-    const btn = event && event.target;
-    if (btn) {
-      const orig = btn.textContent;
-      btn.textContent = '✓ skopiowano';
-      setTimeout(() => { btn.textContent = orig; }, 1200);
+    plaintext = await zmDecrypt(s[field], zmSecretKey);
+  } catch(e) {
+    console.error('[secrets] decrypt', e);
+    alert('Błąd dekrypcji — sprawdź czy master password jest poprawny');
+    return;
+  }
+  // Try modern clipboard API first, fallback to execCommand
+  let copied = false;
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(plaintext);
+      copied = true;
     }
-  } catch(e) { console.error('[secrets] copy', e); alert('Błąd dekrypcji'); }
+  } catch(e) { console.warn('[secrets] clipboard API failed', e); }
+  if (!copied) {
+    // Fallback: textarea + execCommand
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = plaintext;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      copied = document.execCommand('copy');
+      document.body.removeChild(ta);
+    } catch(e) { console.error('[secrets] fallback copy', e); }
+  }
+  if (!copied) {
+    // Last resort — show in prompt for manual copy
+    prompt('Skopiuj ręcznie (Ctrl+C):', plaintext);
+    return;
+  }
+  // Log access
+  try {
+    await zmTeamRef().collection('secretsLog').add({
+      konto: s.konto, field, user: currentUser.email, at: Date.now()
+    });
+  } catch(e) {}
+  // Toast on button
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '✓ skopiowano';
+    btn.style.color = '#2dd4a0';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+  }
 }
 
 async function zmRenderSecrets() {
@@ -6607,8 +6641,8 @@ async function zmRenderSecrets() {
       <div class="zm-secret-konto">${esc(s.konto)}</div>
       <div class="zm-secret-val" title="${esc(s.notes||'')}">${esc(s.notes||'—')}</div>
       <div style="display:flex;gap:4px;justify-content:flex-end">
-        <button type="button" class="zm-btn zm-btn-sm zm-btn-primary" onclick="zmCopySecret('${s.id}','loginEnc')">📋 Login</button>
-        <button type="button" class="zm-btn zm-btn-sm zm-btn-primary" onclick="zmCopySecret('${s.id}','passwordEnc')">🔑 Hasło</button>
+        <button type="button" class="zm-btn zm-btn-sm zm-btn-primary" onclick="zmCopySecret('${s.id}','loginEnc',event)">📋 Login</button>
+        <button type="button" class="zm-btn zm-btn-sm zm-btn-primary" onclick="zmCopySecret('${s.id}','passwordEnc',event)">🔑 Hasło</button>
       </div>
       <div>${isOwner?`<button type="button" class="zm-btn zm-btn-sm zm-btn-danger" onclick="zmDeleteSecret('${s.id}')">🗑</button>`:''}</div>
     </div>
@@ -18397,7 +18431,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.47</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.48</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
