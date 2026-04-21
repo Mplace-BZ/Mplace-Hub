@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v7.75</title>
+<title>MPlace Hub v7.76</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1575,7 +1575,7 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v7.75</span>
+    <span class="brand-ver">v7.76</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -18181,7 +18181,10 @@ function dzisPopulateQuickView() {
   // Sales MTD
   const accs = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
   let totalSales = 0, totalAds = 0, roasArr = [], redNames = [];
-  const cm = MONTHS[new Date().getMonth()];
+  // Try current month, fallback to previous if no data
+  let cm = MONTHS[new Date().getMonth()];
+  let hasCurrentData = accs.some(k => DATA[k] && DATA[k][cm] && (parseFloat(DATA[k][cm].sales)||0) > 0);
+  if (!hasCurrentData) cm = MONTHS[(new Date().getMonth() - 1 + 12) % 12];
   accs.forEach(k => {
     const d = DATA[k] && DATA[k][cm];
     if (!d) return;
@@ -18195,7 +18198,8 @@ function dzisPopulateQuickView() {
     if (a > 0 && (s / a) < beRoas) redNames.push(k);
   });
   const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-  el('dzisQuickSales', totalSales > 0 ? (totalSales >= 1e6 ? (totalSales/1e6).toFixed(2)+'M' : Math.round(totalSales/1000)+'k') + ' zl' : '—');
+  const monthLabel = !hasCurrentData && totalSales > 0 ? ' ('+cm+')' : '';
+  el('dzisQuickSales', totalSales > 0 ? (totalSales >= 1e6 ? (totalSales/1e6).toFixed(2)+'M' : Math.round(totalSales/1000)+'k') + ' zl' + monthLabel : '—');
   const avgRoas = roasArr.length ? roasArr.reduce((a,b)=>a+b,0)/roasArr.length : 0;
   el('dzisQuickRoas', avgRoas > 0 ? avgRoas.toFixed(2) + 'x' : '—');
   const minR = roasArr.length ? Math.min(...roasArr).toFixed(1) : '—';
@@ -20632,7 +20636,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.75</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.76</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
