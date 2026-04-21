@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v7.79</title>
+<title>MPlace Hub v7.80</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1360,9 +1360,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-sos-btn:hover{background:rgba(239,68,68,.25)!important;border-color:#ef4444!important;box-shadow:0 0 12px rgba(239,68,68,.4)}
 @keyframes zmSosPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
 /* Announcement banner */
-#zmAnnounceBar{position:sticky;top:0;z-index:99;background:linear-gradient(90deg,rgba(245,166,35,.15),rgba(239,68,68,.1));border-bottom:1px solid rgba(245,166,35,.3);padding:10px 16px;font-family:var(--mono);font-size:12px;color:#f5a623;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#zmAnnounceBar{position:sticky;top:52px;z-index:99;background:linear-gradient(90deg,rgba(245,166,35,.15),rgba(239,68,68,.1));border-bottom:1px solid rgba(245,166,35,.3);padding:10px 16px;font-family:var(--mono);font-size:12px;color:#f5a623;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .zm-worker-view #zmAnnounceBar{top:0}
-body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
+body:not(.zm-worker-view) #zmAnnounceBar{top:52px}
 #zmAnnounceBar .zm-announce-title{font-weight:600;color:#fbbf24}
 #zmAnnounceBar .zm-announce-text{color:var(--text2);font-size:11px}
 /* Briefing card */
@@ -1575,7 +1575,7 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v7.79</span>
+    <span class="brand-ver">v7.80</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -20639,7 +20639,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.79</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.80</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
