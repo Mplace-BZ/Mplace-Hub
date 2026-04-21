@@ -1536,17 +1536,14 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
     <div class="login-note">Twoje dane są bezpieczne na Twoim koncie Google.<br>Nikt inny nie ma dostępu.</div>
   </div>
 </div>
-<div class="auth-bar" id="authBar" style="display:none">
-  <div style="display:flex;align-items:center;gap:.75rem">
-    <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
-  </div>
-  <div style="display:flex;align-items:center;gap:.75rem">
-    <span class="sync-msg" id="syncMsg"></span>
-    <span id="authStatusText" style="color:var(--text3)">Łączenie...</span>
-    <div class="auth-dot" id="authDot"></div>
-    <span class="auth-user" id="authUserEmail"></span>
-    <button class="auth-btn logout" id="authLogoutBtn" onclick="signOutUser()" style="display:none">Wyloguj</button>
-  </div>
+<!-- auth-bar hidden: sidebar has user/logout, topbar has POŁĄCZONO -->
+<div class="auth-bar" id="authBar" style="display:none!important">
+  <div id="topDate" style="display:none"></div>
+  <span class="sync-msg" id="syncMsg"></span>
+  <span id="authStatusText" style="display:none"></span>
+  <div class="auth-dot" id="authDot" style="display:none"></div>
+  <span class="auth-user" id="authUserEmail" style="display:none"></span>
+  <button class="auth-btn logout" id="authLogoutBtn" style="display:none"></button>
 </div>
 
 <!-- ═══ SIDEBAR (redesign shell) ═══ -->
@@ -6303,9 +6300,8 @@ auth.onAuthStateChanged(async user => {
   if(user){
     currentUser = user;
     document.getElementById('loginWall').style.display = 'none';
-    document.getElementById('authBar').style.display = 'flex';
+    // auth-bar hidden — sidebar/topbar replace it
     document.getElementById('authDot').className = 'auth-dot online';
-    document.getElementById('authStatusText').textContent = '☁ Połączono';
     document.getElementById('authUserEmail').textContent = user.email;
     document.getElementById('authLogoutBtn').style.display = 'inline-block';
     // Hide worker nav immediately (before async calls)
