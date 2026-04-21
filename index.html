@@ -114,10 +114,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .container{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:1.5rem 1.25rem 4rem;}
 
 /* ── PAGE HEADER ── */
-.ph-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.4rem;}
-.ph-title{font-family:'Satoshi',-apple-system,sans-serif;font-size:48px;font-weight:800;line-height:1.0;letter-spacing:-.02em;margin-bottom:.3rem;}
-.ph-title span{color:var(--accent);}
-.ph-sub{font-family:var(--mono);font-size:13px;color:var(--text2);}
+/* ── PAGE HEADER ── */
+.page-header{margin:32px 0 40px}
+.ph-eyebrow{font:11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.ph-title{font:800 72px/1.02 'Satoshi',-apple-system,sans-serif;letter-spacing:-.025em;color:var(--text);margin:0}
+.ph-title span{color:var(--accent)}
+.ph-sub{font:400 14px/1.5 var(--mono);color:var(--text2);margin-top:14px}
+.ph-sub .sep{color:var(--text3)}
+@media(max-width:1200px){.ph-title{font-size:52px}.ph-sub{font-size:13px}}
+@media(max-width:800px){.ph-title{font-size:40px}}
 .group-badge{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;border-radius:4px;border:1px solid;}
 .g-meble-badge{color:var(--g-meble);border-color:rgba(255,107,53,.3);background:rgba(255,107,53,.07);}
 .g-luxsen-badge{color:var(--g-luxsen);border-color:rgba(45,212,160,.3);background:rgba(45,212,160,.07);}
@@ -1779,18 +1784,25 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
 
 <!-- ═══ VIEW: DZIŚ — COCKPIT ═══ -->
 <div class="view" id="viewDzis">
-<div class="container" style="max-width:900px">
+<div class="container" style="max-width:1280px">
   <!-- HEADER -->
-  <div style="margin-bottom:1.5rem">
-    <div class="ph-eyebrow" style="color:var(--accent)">▸ DZIS</div>
-    <div class="ph-title">Cockpit <span id="dzisWeekday"></span></div>
-    <div class="ph-sub" id="dzisDate"></div>
-  </div>
-  <div style="display:flex;justify-content:flex-end;margin-top:-3rem;margin-bottom:1rem">
-    <div style="display:flex;gap:8px;align-items:center">
-      <div id="dzisTimer" style="font-family:var(--mono);font-size:13px;color:var(--text3)"></div>
+  <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+    <div>
+      <div class="ph-eyebrow">▸ DZIS</div>
+      <div class="ph-title">Cockpit <span id="dzisWeekday"></span></div>
+      <div class="ph-sub" id="dzisDate"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:40px">
+      <div style="font-family:var(--mono);font-size:13px;color:var(--text3)">START</div>
+      <div id="dzisTimer" style="font-family:var(--mono);font-size:18px;color:var(--text);font-weight:600"></div>
+      <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;margin-left:8px">→ Kopiuj dzien</button>
+      <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer">Drukuj</button>
     </div>
   </div>
+
+  <!-- 2-COL LAYOUT -->
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start">
+  <div><!-- LEFT COLUMN: kroki dnia -->
 
   <!-- KROK 0: KATALOG OFERT -->
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
@@ -1798,7 +1810,7 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
       <div style="display:flex;align-items:center;gap:10px">
         <div style="width:24px;height:24px;border-radius:50%;background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">0</div>
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--text)">Katalog ofert (upload raz / miesiąc)</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">Katalog ofert <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">MIESIECZNE</span></div>
           <div style="font-size:10px;color:var(--text3)" id="dzisCatalogStatus">Agent wie co masz wystawione — ceny, SKU, stany</div>
         </div>
       </div>
@@ -1824,9 +1836,9 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:24px;height:24px;border-radius:50%;background:rgba(255,107,53,.15);color:var(--accent);font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">1</div>
+        <div style="width:24px;height:24px;border-radius:50%;background:rgba(255,77,106,.15);color:#ff4d6a;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">1</div>
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--text)">Dane sprzedażowe</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">Dane sprzedażowe <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,77,106,.12);color:#ff4d6a;border:1px solid rgba(255,77,106,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">BLOKADA</span></div>
           <div style="font-size:10px;color:var(--text3)" id="dzisStep1Status">Sprawdzam...</div>
         </div>
       </div>
@@ -1839,8 +1851,8 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
       <div style="width:24px;height:24px;border-radius:50%;background:rgba(56,189,248,.15);color:#38bdf8;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">2</div>
       <div>
-        <div style="font-size:12px;font-weight:600;color:var(--text)">Raporty Allegro (opcjonalne)</div>
-        <div style="font-size:10px;color:var(--text3)">Upload Ads + Sprzedaż + Konwersja → głębsza analiza z numerami aukcji</div>
+        <div style="font-size:12px;font-weight:600;color:var(--text)">Raporty Allegro <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(77,159,255,.12);color:#4d9fff;border:1px solid rgba(77,159,255,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">OPCJONALNE</span></div>
+        <div style="font-size:10px;color:var(--text3)">Upload Ads + Sprzedaz + Konwersja → glebsza analiza z numerami aukcji</div>
       </div>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
@@ -1864,9 +1876,9 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:1.25rem">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:24px;height:24px;border-radius:50%;background:rgba(239,68,68,.15);color:#ef4444;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">3</div>
+        <div style="width:24px;height:24px;border-radius:50%;background:rgba(255,107,53,.15);color:var(--accent);font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">3</div>
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--text)">Generuj 23 zadania na dziś</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">Generuj 23 zadania na dzis <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,107,53,.12);color:#ff6b35;border:1px solid rgba(255,107,53,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">AKCJA</span></div>
           <div style="font-size:10px;color:var(--text3)" id="dzisStep3Info">Dane kont + Wiedza + ostatnie analizy</div>
         </div>
       </div>
@@ -1882,6 +1894,55 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
     <span style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px">Did you know?</span>
     <span id="dzisDYKText"></span>
   </div>
+
+  </div><!-- /LEFT COLUMN -->
+
+  <!-- RIGHT COLUMN: szybki podglad -->
+  <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:68px">
+    <!-- DZIŚ · SZYBKI PODGLĄD -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px">DZIS · SZYBKI PODGLAD</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">SPRZEDAZ MTD</div>
+          <div id="dzisQuickSales" style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);line-height:1">—</div>
+          <div id="dzisQuickSalesEom" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px"></div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">SREDNI ROAS</div>
+          <div id="dzisQuickRoas" style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);line-height:1">—</div>
+          <div id="dzisQuickRoasRange" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px"></div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">KONTA W CZERWIENI</div>
+          <div id="dzisQuickRed" style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);line-height:1">—</div>
+          <div id="dzisQuickRedNames" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px"></div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">ZADANIA DZIS</div>
+          <div id="dzisQuickTasks" style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);line-height:1">—</div>
+          <div id="dzisQuickTasksSub" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOCUS (WYBRANE PRZEZ AGENTA) -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">FOCUS (WYBRANE PRZEZ AGENTA)</div>
+      <div id="dzisQuickFocus" style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3)">Wygeneruj plan, zeby zobaczyc focus</div>
+      </div>
+    </div>
+
+    <!-- WCZORAJ · DELTA -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">WCZORAJ · DELTA</div>
+      <div id="dzisQuickDelta" style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3)">Dane pojawia sie po wpisaniu</div>
+      </div>
+    </div>
+  </div><!-- /RIGHT COLUMN -->
+  </div><!-- /2-COL GRID -->
 
   <!-- STATS + PROGRESS -->
   <div id="dzisStats" class="dzis-stats" style="display:none"></div>
@@ -1902,11 +1963,8 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   <!-- TASKS -->
   <div id="dzisContent"></div>
 
-  <!-- FOOTER -->
-  <div id="dzisFooter" style="display:none;margin-top:1.5rem;display:flex;gap:.5rem">
-    <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Kopiuj</button>
-    <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Drukuj</button>
-  </div>
+  <!-- FOOTER (buttons moved to header) -->
+  <div id="dzisFooter" style="display:none"></div>
 </div>
 </div>
 
@@ -4083,6 +4141,7 @@ function showView(v){
     dzisCheckStep1();
     dzisStartTimer();
     catRenderStatus();
+    if (typeof dzisPopulateQuickView === 'function') dzisPopulateQuickView();
     // Show DYK
     const wE = getWiedza();
     if (wE.length) { const r = wE[Math.floor(Math.random()*wE.length)]; document.getElementById('dzisDYKText').textContent = r.title+' — '+r.content.substring(0,120)+'...'; document.getElementById('dzisDYK').style.display='block'; }
@@ -18098,6 +18157,66 @@ function dzisStartTimer() {
     const s = elapsed % 60;
     if (timerEl) timerEl.textContent = (h > 0 ? h + ':' : '') + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
   }, 1000);
+}
+
+function dzisPopulateQuickView() {
+  // Sales MTD
+  const accs = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
+  let totalSales = 0, totalAds = 0, roasArr = [], redNames = [];
+  const cm = MONTHS[new Date().getMonth()];
+  accs.forEach(k => {
+    const d = DATA[k] && DATA[k][cm];
+    if (!d) return;
+    const s = parseFloat(d.sales) || 0;
+    const a = parseFloat(d.ads) || 0;
+    totalSales += s;
+    totalAds += a;
+    if (a > 0) roasArr.push(s / a);
+    const m = AC_META[k]?.margin || 60;
+    const beRoas = 1 / (m / 100);
+    if (a > 0 && (s / a) < beRoas) redNames.push(k);
+  });
+  const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  el('dzisQuickSales', totalSales > 0 ? (totalSales >= 1e6 ? (totalSales/1e6).toFixed(2)+'M' : Math.round(totalSales/1000)+'k') + ' zl' : '—');
+  const avgRoas = roasArr.length ? roasArr.reduce((a,b)=>a+b,0)/roasArr.length : 0;
+  el('dzisQuickRoas', avgRoas > 0 ? avgRoas.toFixed(2) + 'x' : '—');
+  const minR = roasArr.length ? Math.min(...roasArr).toFixed(1) : '—';
+  const maxR = roasArr.length ? Math.max(...roasArr).toFixed(1) : '—';
+  el('dzisQuickRoasRange', avgRoas > 0 ? 'min ' + minR + ' · max ' + maxR : '');
+  el('dzisQuickRed', String(redNames.length));
+  el('dzisQuickRedNames', redNames.length ? redNames.join(' · ') : 'Brak');
+  // Tasks today
+  const todayTasks = zmTasks.filter(t => {
+    if (!t.dueDate || t.status === 'verified') return false;
+    const d = new Date(t.dueDate); d.setHours(0,0,0,0);
+    const n = new Date(); n.setHours(0,0,0,0);
+    return d.getTime() === n.getTime();
+  });
+  const pilne = todayTasks.filter(t => t.priority === 'PILNE').length;
+  el('dzisQuickTasks', String(todayTasks.length));
+  el('dzisQuickTasksSub', pilne ? pilne + ' PILNE' : '');
+  // Delta (yesterday vs day before)
+  const deltaEl = document.getElementById('dzisQuickDelta');
+  if (deltaEl && totalSales > 0) {
+    const prevMonth = MONTHS[(new Date().getMonth() - 1 + 12) % 12];
+    let prevSales = 0;
+    accs.forEach(k => { const d = DATA[k] && DATA[k][prevMonth]; if (d) prevSales += (parseFloat(d.sales)||0); });
+    if (prevSales > 0) {
+      const sDelta = ((totalSales - prevSales) / prevSales * 100).toFixed(1);
+      const up = parseFloat(sDelta) >= 0;
+      deltaEl.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:var(--mono);font-size:12px;color:var(--text2)">Sprzedaz</span>
+          <span style="font-family:var(--mono);font-size:12px;color:${up?'#9ee9cd':'#ffb7c4'}">${up?'▲':'▼'} ${Math.abs(sDelta)}%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:var(--mono);font-size:12px;color:var(--text2)">ROAS</span>
+          <span style="font-family:var(--mono);font-size:12px;color:${avgRoas>0?'#9ee9cd':'var(--text3)'}">
+            ${avgRoas > 0 ? avgRoas.toFixed(2)+'x' : '—'}
+          </span>
+        </div>`;
+    }
+  }
 }
 
 function generateDzisRefresh() {
