@@ -1589,9 +1589,9 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
 <!-- ═══ NEW TOPBAR (breadcrumb + accounts + right) ═══ -->
 <div class="mp-topbar" id="mpTopbar" style="display:none">
   <div class="mp-crumbs">
-    <span id="mpCrumbRole">Owner</span>
+    <span id="mpCrumbDate"></span>
     <span class="sep">/</span>
-    <span class="here" id="mpCrumbView">Dzis / Cockpit</span>
+    <span class="here" id="mpCrumbView">Cockpit</span>
   </div>
   <div class="mp-accounts" id="mpAccounts">
     <div class="mp-acc active" data-acc="all" onclick="mpSelectAccount('all')"><span style="color:var(--text);font-weight:600">ALL</span> <span style="color:var(--text3)">9</span></div>
@@ -4222,7 +4222,7 @@ function showView(v){
     // Highlight account chip in new topbar
     mpSelectAccount(v);
     const ce = document.getElementById('mpCrumbView');
-    if (ce) ce.textContent = 'Konto / ' + v;
+    if (ce) ce.textContent = v;
   }
   window.scrollTo(0,0);
   try{ localStorage.setItem('lastActiveTab', v); }catch(e){}
@@ -9152,11 +9152,17 @@ const MP_NAV = [
   ]},
 ];
 
-// View key → breadcrumb label
-const MP_CRUMB = { entry: 'Dzis / Data', crossborder: 'Operacyjne / Cross-Border' };
-MP_NAV.forEach(g => g.items.forEach(it => { MP_CRUMB[it.k] = g.group + ' / ' + it.label; }));
+// View key → breadcrumb label (just the view name)
+const MP_CRUMB = { entry: 'Data', crossborder: 'Cross-Border' };
+MP_NAV.forEach(g => g.items.forEach(it => { MP_CRUMB[it.k] = it.label; }));
 
 function mpInitSidebar() {
+  // Set date in breadcrumb
+  const now = new Date();
+  const dayN = ['nd','pn','wt','śr','cz','pt','sb'];
+  const moN = ['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','paź','lis','gru'];
+  const dateEl = document.getElementById('mpCrumbDate');
+  if (dateEl) dateEl.textContent = dayN[now.getDay()] + '. ' + now.getDate() + ' ' + moN[now.getMonth()] + ' ' + now.getFullYear();
   const nav = document.getElementById('mpSidebarNav');
   if (!nav) return;
   nav.innerHTML = MP_NAV.map(g => `
