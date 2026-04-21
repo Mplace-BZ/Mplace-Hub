@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v7.73</title>
+<title>MPlace Hub v7.74</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1575,7 +1575,7 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v7.73</span>
+    <span class="brand-ver">v7.74</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -1813,9 +1813,9 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:24px;height:24px;border-radius:50%;background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">0</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(167,139,250,.35);color:#a78bfa;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(167,139,250,.35)">8</div>
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--text)">Katalog ofert <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">MIESIECZNE</span></div>
+          <div style="font-size:15px;font-weight:600;color:var(--text)">Katalog ofert <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">MIESIECZNE</span></div>
           <div style="font-size:10px;color:var(--text3)" id="dzisCatalogStatus">Agent wie co masz wystawione — ceny, SKU, stany</div>
         </div>
       </div>
@@ -1841,9 +1841,9 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:24px;height:24px;border-radius:50%;background:rgba(255,77,106,.15);color:#ff4d6a;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">1</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(255,77,106,.4);color:#ff4d6a;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,77,106,.4)">1</div>
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--text)">Dane sprzedażowe <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,77,106,.12);color:#ff4d6a;border:1px solid rgba(255,77,106,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">BLOKADA</span></div>
+          <div style="font-size:15px;font-weight:600;color:var(--text)">Dane sprzedażowe <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,77,106,.12);color:#ff4d6a;border:1px solid rgba(255,77,106,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">BLOKADA</span></div>
           <div style="font-size:10px;color:var(--text3)" id="dzisStep1Status">Sprawdzam...</div>
         </div>
       </div>
@@ -1854,9 +1854,9 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   <!-- KROK 2: RAPORTY XLSX -->
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div style="width:24px;height:24px;border-radius:50%;background:rgba(56,189,248,.15);color:#38bdf8;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">2</div>
+      <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(77,159,255,.35);color:#4d9fff;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(77,159,255,.35)">2</div>
       <div>
-        <div style="font-size:12px;font-weight:600;color:var(--text)">Raporty Allegro <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(77,159,255,.12);color:#4d9fff;border:1px solid rgba(77,159,255,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">OPCJONALNE</span></div>
+        <div style="font-size:15px;font-weight:600;color:var(--text)">Raporty Allegro <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(77,159,255,.12);color:#4d9fff;border:1px solid rgba(77,159,255,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">OPCJONALNE</span></div>
         <div style="font-size:10px;color:var(--text3)">Upload Ads + Sprzedaz + Konwersja → glebsza analiza z numerami aukcji</div>
       </div>
     </div>
@@ -1881,9 +1881,9 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:1.25rem">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:24px;height:24px;border-radius:50%;background:rgba(255,107,53,.15);color:var(--accent);font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">3</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(255,107,53,.4);color:#ff6b35;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,107,53,.4)">3</div>
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--text)">Generuj 23 zadania na dzis <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,107,53,.12);color:#ff6b35;border:1px solid rgba(255,107,53,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">AKCJA</span></div>
+          <div style="font-size:15px;font-weight:600;color:var(--text)">Generuj 23 zadania na dzis <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,107,53,.12);color:#ff6b35;border:1px solid rgba(255,107,53,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">AKCJA</span></div>
           <div style="font-size:10px;color:var(--text3)" id="dzisStep3Info">Dane kont + Wiedza + ostatnie analizy</div>
         </div>
       </div>
@@ -1895,9 +1895,19 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   </div>
 
   <!-- DID YOU KNOW -->
-  <div id="dzisDYK" style="display:none;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-size:11px;color:#a78bfa">
-    <span style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px">Did you know?</span>
-    <span id="dzisDYKText"></span>
+  <div id="dzisDYK" style="display:none;background:linear-gradient(90deg,rgba(167,139,250,.08),rgba(167,139,250,.01));border:1px solid rgba(167,139,250,.22);border-radius:10px;padding:14px 16px;margin-bottom:1rem">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="color:#a78bfa;margin-top:2px;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 16 16" style="display:block"><path d="M1.5 8C3 5 5.5 3.5 8 3.5 10.5 3.5 13 5 14.5 8 13 11 10.5 12.5 8 12.5 5.5 12.5 3 11 1.5 8Z" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="2" fill="none" stroke="#a78bfa" stroke-width="1.5"/></svg></div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#d4c6ff;margin-bottom:6px;font-weight:600">DID YOU KNOW?</div>
+        <div id="dzisDYKText" style="font-size:13px;line-height:1.5;color:var(--text)"></div>
+        <div style="margin-top:10px;display:flex;gap:6px">
+          <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Kopiuj</button>
+          <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Drukuj</button>
+          <button onclick="if(typeof wkQuickAdd==='function'){const t=document.getElementById('dzisDYKText');wkQuickAdd(t?t.textContent:'')}" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Zapisz w Wiedzy</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   </div><!-- /LEFT COLUMN -->
@@ -18203,26 +18213,64 @@ function dzisPopulateQuickView() {
   const pilne = todayTasks.filter(t => t.priority === 'PILNE').length;
   el('dzisQuickTasks', String(todayTasks.length));
   el('dzisQuickTasksSub', pilne ? pilne + ' PILNE' : '');
-  // Delta (yesterday vs day before)
+  // EOM estimate
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const dayOfMonth = now.getDate();
+  if (totalSales > 0 && dayOfMonth > 1) {
+    const eom = totalSales / (dayOfMonth - 1) * daysInMonth;
+    el('dzisQuickSalesEom', 'est. EOM ' + (eom >= 1e6 ? (eom/1e6).toFixed(2)+'M' : Math.round(eom/1000)+'k') + ' zl');
+  }
+  // Overdue tasks
+  const overdue = zmTasks.filter(t => {
+    if (!t.dueDate || t.status === 'verified' || t.status === 'done') return false;
+    return new Date(t.dueDate) < new Date(new Date().setHours(0,0,0,0));
+  }).length;
+  el('dzisQuickTasksSub', [pilne ? pilne+' PILNE' : '', overdue ? overdue+' po terminie' : ''].filter(Boolean).join(' · ') || '');
+  // Focus — find worst performing accounts (TODO: podpiąć do Firestore AI)
+  const focusEl = document.getElementById('dzisQuickFocus');
+  if (focusEl && totalSales > 0) {
+    const focusItems = [];
+    accs.forEach(k => {
+      const d = DATA[k] && DATA[k][cm]; if (!d) return;
+      const s = parseFloat(d.sales)||0, a = parseFloat(d.ads)||0;
+      const m = AC_META[k]?.margin || 60;
+      const beRoas = 1/(m/100);
+      const roas = a > 0 ? s/a : 0;
+      if (a > 0 && roas < beRoas) focusItems.push({k, roas, type:'red', msg:'ROAS '+roas.toFixed(1)+'x < BE '+beRoas.toFixed(1)+'x'});
+      else if (a > 0 && roas > 8) focusItems.push({k, roas, type:'green', msg:'skalowac Ads (ROAS '+roas.toFixed(1)+'x)'});
+    });
+    if (focusItems.length) {
+      const colors = {red:'var(--red)',green:'var(--green)',yellow:'var(--yellow)'};
+      focusEl.innerHTML = focusItems.slice(0,3).map(f => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--border);border-left:2px solid ${colors[f.type]||'var(--text3)'}">
+          <span style="font-size:12px">${f.k} — ${f.msg}</span>
+          <span style="flex:1"></span>
+          <span style="color:var(--text3)">→</span>
+        </div>`).join('');
+    }
+  }
+  // Delta (vs previous month)
   const deltaEl = document.getElementById('dzisQuickDelta');
   if (deltaEl && totalSales > 0) {
-    const prevMonth = MONTHS[(new Date().getMonth() - 1 + 12) % 12];
-    let prevSales = 0;
-    accs.forEach(k => { const d = DATA[k] && DATA[k][prevMonth]; if (d) prevSales += (parseFloat(d.sales)||0); });
+    const prevMonth = MONTHS[(now.getMonth() - 1 + 12) % 12];
+    let prevSales = 0, prevAds = 0;
+    accs.forEach(k => { const d = DATA[k]?.[prevMonth]; if(d){prevSales+=(parseFloat(d.sales)||0);prevAds+=(parseFloat(d.ads)||0);} });
+    const mkRow = (label, val, suffix) => {
+      const up = parseFloat(val) >= 0;
+      return `<div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text2)">${label}</span>
+        <span style="font-family:var(--mono);font-size:12px;color:${up?'#9ee9cd':'#ffb7c4'}">${up?'▲':'▼'} ${Math.abs(val)}${suffix}</span>
+      </div>`;
+    };
     if (prevSales > 0) {
-      const sDelta = ((totalSales - prevSales) / prevSales * 100).toFixed(1);
-      const up = parseFloat(sDelta) >= 0;
-      deltaEl.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-family:var(--mono);font-size:12px;color:var(--text2)">Sprzedaz</span>
-          <span style="font-family:var(--mono);font-size:12px;color:${up?'#9ee9cd':'#ffb7c4'}">${up?'▲':'▼'} ${Math.abs(sDelta)}%</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-family:var(--mono);font-size:12px;color:var(--text2)">ROAS</span>
-          <span style="font-family:var(--mono);font-size:12px;color:${avgRoas>0?'#9ee9cd':'var(--text3)'}">
-            ${avgRoas > 0 ? avgRoas.toFixed(2)+'x' : '—'}
-          </span>
-        </div>`;
+      const sDelta = ((totalSales-prevSales)/prevSales*100).toFixed(1);
+      const prevRoas = prevAds>0 ? prevSales/prevAds : 0;
+      const rDelta = avgRoas>0&&prevRoas>0 ? (avgRoas-prevRoas).toFixed(2) : null;
+      const aDelta = prevAds>0 ? ((totalAds-prevAds)/prevAds*100).toFixed(1) : null;
+      deltaEl.innerHTML = mkRow('Sprzedaz', sDelta, '%')
+        + (rDelta !== null ? mkRow('ROAS', rDelta, 'x') : '')
+        + (aDelta !== null ? mkRow('Koszt Ads', aDelta, '%') : '');
     }
   }
 }
@@ -20584,7 +20632,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.73</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.74</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
