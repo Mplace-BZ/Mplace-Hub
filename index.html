@@ -4065,8 +4065,6 @@ function showView(v){
     if(userRole === 'none' && typeof zmShowNoAccess==='function') zmShowNoAccess();
     return;
   }
-  // Highlight sidebar item + update breadcrumb
-  mpHighlightSidebar(v);
   ['viewDzis','viewEntry','viewAccount','viewDashboard','viewCompare','viewRozliczenie','viewBiznes','viewD2d','viewInsights','viewMonths','viewSim','viewAgent','viewWiedza','viewPodcasts','viewImportAds','viewKalendar','viewAnaliza','viewCrossBorder','viewKanibalizator','viewStrategia','viewCentrumAds','viewScreener','viewTitleAnalyzer','viewKalkulator','viewArkusz','viewWyniki'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.remove('active');
@@ -4074,6 +4072,8 @@ function showView(v){
   // Close zespol overlay if open
   document.getElementById('zmPanel')?.classList.remove('open');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  // Highlight sidebar item + update breadcrumb (AFTER reset)
+  mpHighlightSidebar(v);
   const _navDzis = document.getElementById('navDzis');
   const _navCB = document.getElementById('navCrossBorder');
   if (_navDzis) _navDzis.style.boxShadow='0 0 6px rgba(239,68,68,.4)';
