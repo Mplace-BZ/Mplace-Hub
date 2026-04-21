@@ -10,6 +10,7 @@
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
 <title>MPlace Hub v7.71</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,800,700,500,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -114,10 +115,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .container{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:1.5rem 1.25rem 4rem;}
 
 /* ── PAGE HEADER ── */
-.ph-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.3rem;}
-.ph-title{font-family:var(--mono);font-size:24px;font-weight:500;line-height:1.1;margin-bottom:.25rem;}
+.ph-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.4rem;}
+.ph-title{font-family:'Satoshi',-apple-system,sans-serif;font-size:48px;font-weight:800;line-height:1.0;letter-spacing:-.02em;margin-bottom:.3rem;}
 .ph-title span{color:var(--accent);}
-.ph-sub{font-size:12px;color:var(--text3);}
+.ph-sub{font-family:var(--mono);font-size:13px;color:var(--text2);}
 .group-badge{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;border-radius:4px;border:1px solid;}
 .g-meble-badge{color:var(--g-meble);border-color:rgba(255,107,53,.3);background:rgba(255,107,53,.07);}
 .g-luxsen-badge{color:var(--g-luxsen);border-color:rgba(45,212,160,.3);background:rgba(45,212,160,.07);}
@@ -350,7 +351,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .dashboard-card .metric-row{display:flex;justify-content:space-between;font-size:12px;margin:4px 0;color:#374151;}
 .dashboard-card .progress-bar-wrap{background:#f3f4f6;border-radius:4px;height:6px;margin:6px 0;}
 .dashboard-card .progress-bar-fill{height:6px;border-radius:4px;transition:width .3s;}
-.metric-green{color:#16a34a;}.metric-yellow{color:#d97706;}.metric-red{color:#dc2626;}
+.metric-green{color:#16a34a;}.metric-yellow{color:#ff6b35;}.metric-red{color:#dc2626;}
 
 /* ── ARKUSZ ── */
 table.arkusz-tbl{width:100%;border-collapse:collapse;font-size:11px;min-width:1200px;}
@@ -383,7 +384,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .mv,.bk-total td,.ac-metric-val{color:#000!important;}
   .tg,.mv.green{color:#16a34a!important;}
   .tr,.mv.red{color:#dc2626!important;}
-  .ty,.mv.yellow{color:#d97706!important;}
+  .ty,.mv.yellow{color:#ff6b35!important;}
   .tb,.mv.blue{color:#2563eb!important;}
   .ta{color:#ea580c!important;}
   .tm,.ms,.sb,.text3{color:#6b7280!important;}
@@ -788,7 +789,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .nav-glbl{display:none;}
   .nav-btn{font-size:10px;padding:3px 7px;}
   .container{padding:1rem .75rem 3rem;}
-  .ph-title{font-size:20px;}
+  .ph-title{font-size:32px;}
   .g2,.g3,.g4,.g5,.g2-1,.dash-cards{grid-template-columns:1fr!important;}
   .fr-a,.fr-b{grid-template-columns:1fr 1fr!important;}
   .aec-hdr{flex-wrap:wrap;gap:.4rem;}
@@ -1115,8 +1116,8 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .topbar-accounts .nav-btn{font-size:10px;padding:6px 10px;border-radius:6px;}
   .topbar-accounts .nav-glbl{font-size:9px;}
   /* Titles */
-  .ph-title{font-size:22px !important;}
-  .ph-eyebrow{font-size:8px !important;}
+  .ph-title{font-size:28px !important;}
+  .ph-eyebrow{font-size:9px !important;}
   .ph-sub{font-size:10px !important;}
   /* Agent */
   #agentInput{font-size:12px !important;min-height:60px;}
@@ -1781,14 +1782,12 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
 <div class="view" id="viewDzis">
 <div class="container" style="max-width:900px">
   <!-- HEADER -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:36px;height:36px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(239,68,68,.4)"><svg width="14" height="16" viewBox="0 0 12 14" fill="none"><path d="M2 1L11 7L2 13V1Z" fill="#fff"/></svg></div>
-      <div>
-        <div class="ph-title" style="margin:0;line-height:1.2">Cockpit</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--text3)" id="dzisDate"></div>
-      </div>
-    </div>
+  <div style="margin-bottom:1.5rem">
+    <div class="ph-eyebrow" style="color:var(--accent)">▸ DZIS</div>
+    <div class="ph-title">Cockpit <span id="dzisWeekday"></span></div>
+    <div class="ph-sub" id="dzisDate"></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-top:-3rem;margin-bottom:1rem">
     <div style="display:flex;gap:8px;align-items:center">
       <div id="dzisTimer" style="font-family:var(--mono);font-size:13px;color:var(--text3)"></div>
     </div>
@@ -2114,8 +2113,8 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
 <div class="container">
   <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
     <div>
-      <div class="ph-eyebrow" style="color:var(--yellow)">▸ Twoje wynagrodzenie agencyjne</div>
-      <div class="ph-title">Rozliczenie <span style="color:var(--yellow)">LUXSEN</span></div>
+      <div class="ph-eyebrow" style="color:var(--accent)">▸ TWOJE WYNAGRODZENIE AGENCYJNE</div>
+      <div class="ph-title">Rozliczenie <span>LUXSEN</span></div>
       <div class="ph-sub" id="rozSub">Luxsen · Semmi · BOTAVIT · stawka 20% od marży po reklamie</div>
     </div>
     <div style="display:flex;align-items:center;gap:.5rem">
@@ -2324,8 +2323,8 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
 <div class="container">
   <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
     <div>
-      <div class="ph-eyebrow" style="color:var(--yellow)">▸ Inteligentna analiza</div>
-      <div class="ph-title">Insights <span style="color:var(--yellow)">& Sygnały</span></div>
+      <div class="ph-eyebrow" style="color:var(--accent)">▸ INTELIGENTNA ANALIZA</div>
+      <div class="ph-title">Insights <span>& Sygnały</span></div>
       <div class="ph-sub" id="insightsSub">Zagrożenia, szanse i obserwacje per konto</div>
     </div>
     <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">
@@ -2400,7 +2399,7 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
     <button onclick="openPlaybook('KP')" class="agent-chip" style="border-color:rgba(244,114,182,.3);color:#f472b6;background:rgba(244,114,182,.06)">Kanibalizacja</button>
     <button onclick="openPlaybook('DT')" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.06)">D2D / Trend</button>
     <button onclick="openPlaybook('SE')" class="agent-chip" style="border-color:rgba(232,121,249,.3);color:#e879f9;background:rgba(232,121,249,.06)">Symulator</button>
-    <button onclick="openPlaybook('IA')" class="agent-chip" style="border-color:rgba(251,191,36,.3);color:#fbbf24;background:rgba(251,191,36,.06)">Insights</button>
+    <button onclick="openPlaybook('IA')" class="agent-chip" style="border-color:rgba(255,107,53,.3);color:#ff6b35;background:rgba(255,107,53,.06)">Insights</button>
     <button onclick="openPlaybook('RC')" class="agent-chip" style="border-color:rgba(156,163,175,.3);color:#9ca3af;background:rgba(156,163,175,.06)">Raporty</button>
     <button onclick="openPlaybook('MC')" class="agent-chip" style="border-color:rgba(52,211,153,.3);color:#34d399;background:rgba(52,211,153,.06)">Mentor</button>
     <button onclick="openPlaybook('BA')" class="agent-chip" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.08)">Biznes</button>
@@ -4092,7 +4091,8 @@ function showView(v){
     const now2 = new Date();
     const dayN2 = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
     const moN2 = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
-    document.getElementById('dzisDate').textContent = `${dayN2[now2.getDay()]}, ${now2.getDate()} ${moN2[now2.getMonth()]} ${now2.getFullYear()} · Dzień ${now2.getDate()}/${DAYS_IN[MONTHS[now2.getMonth()]]||30}`;
+    const wd = document.getElementById('dzisWeekday'); if (wd) wd.textContent = dayN2[now2.getDay()].toLowerCase();
+    document.getElementById('dzisDate').textContent = `${now2.getDate()} ${moN2[now2.getMonth()]} ${now2.getFullYear()} · Dzień ${now2.getDate()}/${DAYS_IN[MONTHS[now2.getMonth()]]||30} miesiąca`;
     const cached2 = JSON.parse(localStorage.getItem(DZIS_CACHE_KEY)||'{}');
     if (cached2.date === now2.toLocaleDateString('pl-PL') && cached2.tasks) dzisRenderTasks(cached2.tasks, cached2.summary);
   } else if(v==='entry'){
@@ -23558,7 +23558,7 @@ self.addEventListener('fetch', e => e.respondWith(
         <label style="font-family:var(--mono);font-size:10px;color:var(--text2)">Do:</label>
         <input type="date" id="reportDateTo" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none;color-scheme:dark">
       </div>
-      <div id="reportDateWarning" style="font-family:var(--mono);font-size:9px;color:#f59e0b;margin-top:.4rem;display:none"></div>
+      <div id="reportDateWarning" style="font-family:var(--mono);font-size:9px;color:#ff6b35;margin-top:.4rem;display:none"></div>
     </div>
 
     <div class="report-modal-actions">
@@ -23617,7 +23617,7 @@ self.addEventListener('fetch', e => e.respondWith(
         <label style="font-family:var(--mono);font-size:10px;color:var(--text2)">Do:</label>
         <input type="date" id="slideDateTo" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none;color-scheme:dark">
       </div>
-      <div id="slideDateWarning" style="font-family:var(--mono);font-size:9px;color:#f59e0b;margin-top:.4rem;display:none"></div>
+      <div id="slideDateWarning" style="font-family:var(--mono);font-size:9px;color:#ff6b35;margin-top:.4rem;display:none"></div>
     </div>
 
     <div class="report-modal-actions">
