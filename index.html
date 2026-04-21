@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v7.70</title>
+<title>MPlace Hub v7.71</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -37,8 +37,61 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px;}
 
-/* ── TOPBAR ── */
-.topbar{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+/* ── SIDEBAR ── */
+.mp-sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--bg2);border-right:1px solid var(--border);z-index:110;display:flex;flex-direction:column}
+.mp-sidebar-brand{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;flex-shrink:0}
+.mp-sidebar-brand .brand-mark{flex-shrink:0}
+.mp-sidebar-brand .brand-name{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--text);white-space:nowrap}
+.mp-sidebar-brand .brand-name em{font-style:normal;color:var(--accent)}
+.mp-sidebar-brand .brand-ver{font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:auto;letter-spacing:.04em}
+.mp-sidebar-search{display:flex;align-items:center;gap:8px;margin:4px 12px 8px;padding:7px 10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color .15s}
+.mp-sidebar-search:hover{border-color:var(--border2)}
+.mp-sidebar-search span{font-family:var(--mono);font-size:11px;color:var(--text3)}
+.mp-sidebar-search .spacer{flex:1}
+.mp-sidebar-search .kbd{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;font-family:var(--mono);font-size:9px;color:var(--text3)}
+.mp-sidebar-nav{flex:1;overflow-y:auto;padding:4px 0 8px}
+.mp-nav-group{padding:0 8px 0 20px;margin-bottom:2px}
+.mp-nav-group-h{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);padding:14px 8px 6px;user-select:none}
+.mp-nav-group-h::after{content:'';flex:1;height:1px;background:var(--border)}
+.mp-nav-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer;transition:all .12s;color:var(--text);font-size:13px;position:relative;border:1px solid transparent}
+.mp-nav-item:hover{background:var(--bg3);color:#fff}
+.mp-nav-item.active{background:linear-gradient(90deg,rgba(255,107,53,.14),rgba(255,107,53,.04));color:#fff;border-color:transparent}
+.mp-nav-item.active::before{content:'';position:absolute;left:-12px;top:6px;bottom:6px;width:2px;background:var(--accent);border-radius:0 2px 2px 0}
+.mp-nav-item .ico{display:flex;align-items:center;justify-content:center;width:16px;flex-shrink:0;color:var(--text2)}
+.mp-nav-item:hover .ico{color:var(--text)}
+.mp-nav-item.active .ico{color:var(--accent)}
+.mp-nav-item .badge{font-family:var(--mono);font-size:9.5px;min-width:18px;height:18px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;margin-left:auto}
+.mp-nav-item .badge.info{background:rgba(77,159,255,.14);color:#9bc3ff}
+.mp-nav-item .badge.alert{background:rgba(255,77,106,.18);color:#ff8da0}
+.mp-sidebar-foot{flex-shrink:0;padding:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.mp-sidebar-foot .avatar{width:28px;height:28px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);display:grid;place-items:center;flex-shrink:0;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text2)}
+.mp-sidebar-foot .meta{flex:1;min-width:0}
+.mp-sidebar-foot .name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-sidebar-foot .mail{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-sidebar-foot .icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:28px;height:28px;display:grid;place-items:center;cursor:pointer;color:var(--text3);transition:all .15s}
+.mp-sidebar-foot .icon-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+/* body offset for sidebar (applied via JS on login) */
+/* ── TOPBAR (new: breadcrumb + accounts + right) ── */
+.mp-topbar{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 16px;height:44px;overflow-x:auto}
+.mp-crumbs{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0;margin-right:8px}
+.mp-crumbs .sep{color:var(--border2)}
+.mp-crumbs .here{color:var(--text)}
+.mp-accounts{display:flex;align-items:center;gap:5px;flex:1;overflow-x:auto}
+.mp-acc{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:10px;padding:4px 9px;border-radius:5px;border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.mp-acc:hover{background:var(--bg3);color:var(--text)}
+.mp-acc.active{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+.mp-acc-sep{width:1px;height:16px;background:var(--border2);margin:0 2px;flex-shrink:0}
+.mp-acc .gd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.mp-acc[data-g="meble"] .gd{background:var(--g-meble)}
+.mp-acc[data-g="luxsen"] .gd{background:var(--g-luxsen)}
+.mp-acc[data-g="one"] .gd{background:var(--g-one)}
+.mp-topbar-right{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto}
+.mp-status-pill{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:#9ee9cd;padding:4px 12px;border-radius:999px;background:rgba(45,212,160,.1);border:1px solid rgba(45,212,160,.3)}
+.mp-status-pill .dot{width:6px;height:6px;border-radius:50%;background:#2dd4a0;box-shadow:0 0 6px rgba(45,212,160,.6)}
+.mp-topbar-right .icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:28px;height:28px;display:grid;place-items:center;cursor:pointer;color:var(--text3);transition:all .15s;flex-shrink:0}
+.mp-topbar-right .icon-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+/* ── OLD TOPBAR (hidden, kept for compat) ── */
+.topbar{display:none!important}
 .topbar-inner{display:flex;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;}
 .topbar-accounts{display:flex;align-items:center;gap:5px;padding:0 16px;height:34px;border-top:1px solid var(--border);overflow-x:auto;}
 .brand{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;padding-right:16px;border-right:1px solid var(--border2);margin-right:8px;}
@@ -1298,7 +1351,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 /* Announcement banner */
 #zmAnnounceBar{position:sticky;top:0;z-index:99;background:linear-gradient(90deg,rgba(245,166,35,.15),rgba(239,68,68,.1));border-bottom:1px solid rgba(245,166,35,.3);padding:10px 16px;font-family:var(--mono);font-size:12px;color:#f5a623;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .zm-worker-view #zmAnnounceBar{top:0}
-body:not(.zm-worker-view) #zmAnnounceBar{top:44px}
+body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
 #zmAnnounceBar .zm-announce-title{font-weight:600;color:#fbbf24}
 #zmAnnounceBar .zm-announce-text{color:var(--text2);font-size:11px}
 /* Briefing card */
@@ -1446,6 +1499,9 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px}
 .zm-stat-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--text)}
 .zm-stat-label{font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
 .zm-worker-view .topbar-inner,.zm-worker-view .topbar-accounts{display:none!important}
+.zm-worker-view .mp-sidebar{display:none!important}
+.zm-worker-view .mp-topbar{display:none!important}
+.zm-worker-view{padding-left:0!important}
 /* Worker: hide all views EXCEPT allowed ones (viewWiedza) */
 .zm-worker-view .view:not(#viewWiedza){display:none!important}
 .zm-worker-view #viewWiedza:not(.active){display:none!important}
@@ -1483,22 +1539,93 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px}
     <div class="login-note">Twoje dane są bezpieczne na Twoim koncie Google.<br>Nikt inny nie ma dostępu.</div>
   </div>
 </div>
-<div class="auth-bar" id="authBar" style="display:none">
-  <div style="display:flex;align-items:center;gap:.75rem">
-    <div class="brand" style="padding-right:0;border-right:none;margin-right:0">MPlace <span>Hub</span><span style="font-size:9px;font-family:var(--mono);color:var(--text3);margin-left:6px;font-weight:400;letter-spacing:.04em">v7.70</span></div>
-    <div class="nav-sep"></div>
-    <div id="topDate" style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap"></div>
+<!-- auth-bar hidden: sidebar has user/logout, topbar has POŁĄCZONO -->
+<div class="auth-bar" id="authBar" style="display:none!important">
+  <div id="topDate" style="display:none"></div>
+  <span class="sync-msg" id="syncMsg"></span>
+  <span id="authStatusText" style="display:none"></span>
+  <div class="auth-dot" id="authDot" style="display:none"></div>
+  <span class="auth-user" id="authUserEmail" style="display:none"></span>
+  <button class="auth-btn logout" id="authLogoutBtn" style="display:none"></button>
+</div>
+
+<!-- ═══ SIDEBAR (redesign shell) ═══ -->
+<aside class="mp-sidebar" id="mpSidebar" style="display:none">
+  <div class="mp-sidebar-brand">
+    <div class="brand-mark">
+      <svg width="22" height="26" viewBox="0 0 22 26" fill="none">
+        <defs><linearGradient id="flame" x1="11" y1="2" x2="11" y2="26" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#ffb07a"/><stop offset=".45" stop-color="#ff6b35"/><stop offset="1" stop-color="#c93a0d"/>
+        </linearGradient></defs>
+        <path d="M11 1.5C13 5.5 16.5 7.5 18 11.5 20 16.5 17.5 23.5 11 24.5 4.5 23.5 2 17 4 12 5.5 8.5 7.5 8 8.5 5.5 10 7.5 10.5 5 11 1.5Z" fill="url(#flame)"/>
+        <path d="M11 10C12 12 13.5 13 14 15 14.5 17.5 13 20.5 11 20.8 9 20.5 7.5 17.5 8 15 8.5 13 10 12.5 11 10Z" fill="#ffd89a" opacity=".65"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">MPlace<em> Hub</em></div>
+    </div>
+    <span class="brand-ver">v7.71</span>
   </div>
-  <div style="display:flex;align-items:center;gap:.75rem">
-    <span class="sync-msg" id="syncMsg"></span>
-    <span id="authStatusText" style="color:var(--text3)">Łączenie...</span>
-    <div class="auth-dot" id="authDot"></div>
-    <span class="auth-user" id="authUserEmail"></span>
-    <button class="auth-btn logout" id="authLogoutBtn" onclick="signOutUser()" style="display:none">Wyloguj</button>
+  <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
+    <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span>Szukaj lub skocz...</span>
+    <span class="spacer" style="flex:1"></span>
+    <span class="kbd">&#8984;</span><span class="kbd">K</span>
+  </div>
+  <nav class="mp-sidebar-nav" id="mpSidebarNav"></nav>
+  <div class="mp-sidebar-foot" id="mpSidebarFoot">
+    <div class="avatar" id="mpSbAvatar">?</div>
+    <div class="meta">
+      <div class="name" id="mpSbName"></div>
+      <div class="mail" id="mpSbEmail"></div>
+    </div>
+    <span style="flex:1"></span>
+    <button class="icon-btn" title="Wyloguj" onclick="signOutUser()">
+      <svg width="13" height="13" viewBox="0 0 16 16" style="display:block"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3H13.5V13H9.5"/><path d="M2 8H10M7 5L10 8 7 11"/></g></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- ═══ NEW TOPBAR (breadcrumb + accounts + right) ═══ -->
+<div class="mp-topbar" id="mpTopbar" style="display:none">
+  <div class="mp-crumbs">
+    <span id="mpCrumbDate"></span>
+    <span class="sep">/</span>
+    <span class="here" id="mpCrumbView">Cockpit</span>
+  </div>
+  <div class="mp-accounts" id="mpAccounts">
+    <div class="mp-acc active" data-acc="all" onclick="mpSelectAccount('all')"><span style="color:var(--text);font-weight:600">ALL</span> <span style="color:var(--text3)">9</span></div>
+    <div class="mp-acc-sep"></div>
+    <div class="mp-acc" data-g="meble" data-acc="MEBLE" onclick="mpSelectAccount('MEBLE')"><span class="gd"></span><span style="color:var(--text)">MEBLE</span></div>
+    <div class="mp-acc" data-g="meble" data-acc="MobelKap" onclick="showView('MobelKap')"><span>MbK</span></div>
+    <div class="mp-acc" data-g="meble" data-acc="PerfektCiecie" onclick="showView('PerfektCiecie')"><span>PeC</span></div>
+    <div class="mp-acc" data-g="meble" data-acc="MeblenaCzasie" onclick="showView('MeblenaCzasie')"><span>MnC</span></div>
+    <div class="mp-acc-sep"></div>
+    <div class="mp-acc" data-g="luxsen" data-acc="LUXSEN" onclick="mpSelectAccount('LUXSEN')"><span class="gd"></span><span style="color:var(--text)">LUXSEN</span></div>
+    <div class="mp-acc" data-g="luxsen" data-acc="Luxsen" onclick="showView('Luxsen')"><span>Lux</span></div>
+    <div class="mp-acc" data-g="luxsen" data-acc="Semmi" onclick="showView('Semmi')"><span>Sem</span></div>
+    <div class="mp-acc" data-g="luxsen" data-acc="BOTAVIT" onclick="showView('BOTAVIT')"><span>BoV</span></div>
+    <div class="mp-acc-sep"></div>
+    <div class="mp-acc" data-g="one" data-acc="ONE" onclick="mpSelectAccount('ONE')"><span class="gd"></span><span style="color:var(--text)">ONE</span></div>
+    <div class="mp-acc" data-g="one" data-acc="Materazzi" onclick="showView('Materazzi')"><span>Mtz</span></div>
+    <div class="mp-acc" data-g="one" data-acc="MtzzEU" onclick="showView('MtzzEU')"><span>mEU</span></div>
+    <div class="mp-acc" data-g="one" data-acc="Ankado24" onclick="showView('Ankado24')"><span>a24</span></div>
+  </div>
+  <div class="mp-topbar-right">
+    <div class="mp-status-pill" id="mpStatusPill"><span class="dot"></span> POLACZONO</div>
+    <button class="icon-btn" title="Powiadomienia" onclick="if(typeof bellOpen==='function')bellOpen()">
+      <svg width="13" height="13" viewBox="0 0 16 16" style="display:block"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11V7.5C4 5 6 3 8 3 10 3 12 5 12 7.5V11L13 12H3L4 11Z"/><path d="M6.5 13C6.5 14 7.2 14.5 8 14.5 8.8 14.5 9.5 14 9.5 13"/></g></svg>
+    </button>
+    <button class="icon-btn" title="Mikrofon">
+      <svg width="13" height="13" viewBox="0 0 16 16" style="display:block"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="4" height="8" rx="2"/><path d="M3.5 9C3.5 11.5 5.5 13.5 8 13.5 10.5 13.5 12.5 11.5 12.5 9M8 13.5V15.5"/></g></svg>
+    </button>
+    <button class="icon-btn" title="Szybka akcja">
+      <svg width="13" height="13" viewBox="0 0 16 16" style="display:block"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3V13M3 8H13"/></g></svg>
+    </button>
   </div>
 </div>
 
-<div class="topbar">
+<div class="topbar" style="display:none!important">
   <div class="topbar-inner">
     <button class="nav-btn" onclick="showView('agent')" id="navAgent" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Agent ✦</button>
     <button class="nav-btn" onclick="showView('analiza')" id="navAnaliza" style="color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2)">Analysis</button>
@@ -3945,11 +4072,15 @@ function showView(v){
   // Close zespol overlay if open
   document.getElementById('zmPanel')?.classList.remove('open');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('navDzis').style.boxShadow='0 0 6px rgba(239,68,68,.4)';
-  document.getElementById('navCrossBorder').style.boxShadow='0 0 6px rgba(59,130,246,.4)';
+  // Highlight sidebar item + update breadcrumb (AFTER reset)
+  mpHighlightSidebar(v);
+  const _navDzis = document.getElementById('navDzis');
+  const _navCB = document.getElementById('navCrossBorder');
+  if (_navDzis) _navDzis.style.boxShadow='0 0 6px rgba(239,68,68,.4)';
+  if (_navCB) _navCB.style.boxShadow='0 0 6px rgba(59,130,246,.4)';
   if(v==='dzis'){
     document.getElementById('viewDzis').classList.add('active');
-    document.getElementById('navDzis').style.boxShadow='0 0 12px rgba(239,68,68,.6)';
+    if (_navDzis) _navDzis.style.boxShadow='0 0 12px rgba(239,68,68,.6)';
     dzisCheckStep1();
     dzisStartTimer();
     catRenderStatus();
@@ -4032,7 +4163,7 @@ function showView(v){
     mhRenderSavedList('analiza','aaSavedList');
   } else if(v==='crossborder'){
     document.getElementById('viewCrossBorder').classList.add('active');
-    document.getElementById('navCrossBorder').style.boxShadow='0 0 12px rgba(59,130,246,.6)';
+    if (_navCB) _navCB.style.boxShadow='0 0 12px rgba(59,130,246,.6)';
     cbLoadData();
     mhRenderSavedList('crossborder','cbSavedList');
     cbRenderHistory();
@@ -4088,6 +4219,10 @@ function showView(v){
     document.getElementById('viewAccount').classList.add('active');
     document.getElementById('nav'+v)?.classList.add('active');
     renderAccount(v);
+    // Highlight account chip in new topbar
+    mpSelectAccount(v);
+    const ce = document.getElementById('mpCrumbView');
+    if (ce) ce.textContent = v;
   }
   window.scrollTo(0,0);
   try{ localStorage.setItem('lastActiveTab', v); }catch(e){}
@@ -6168,9 +6303,8 @@ auth.onAuthStateChanged(async user => {
   if(user){
     currentUser = user;
     document.getElementById('loginWall').style.display = 'none';
-    document.getElementById('authBar').style.display = 'flex';
+    // auth-bar hidden — sidebar/topbar replace it
     document.getElementById('authDot').className = 'auth-dot online';
-    document.getElementById('authStatusText').textContent = '☁ Połączono';
     document.getElementById('authUserEmail').textContent = user.email;
     document.getElementById('authLogoutBtn').style.display = 'inline-block';
     // Hide worker nav immediately (before async calls)
@@ -6181,6 +6315,12 @@ auth.onAuthStateChanged(async user => {
     if(userRole === 'worker' || userRole === 'none') return;
     // Owner confirmed — ensure worker UI is gone
     zmRemoveWorkerView();
+    // Init sidebar + update user
+    mpInitSidebar();
+    mpUpdateSidebarUser();
+    document.getElementById('mpSidebar').style.display = 'flex';
+    document.getElementById('mpTopbar').style.display = 'flex';
+    document.body.style.paddingLeft = '240px';
     // Load from Firebase only on first login this session
     if(!_fsLoaded){
       _fsLoaded = true;
@@ -6213,6 +6353,9 @@ auth.onAuthStateChanged(async user => {
     zmStopRealtimeTasks();
     document.getElementById('loginWall').style.display = 'flex';
     document.getElementById('authBar').style.display = 'none';
+    document.getElementById('mpSidebar').style.display = 'none';
+    document.getElementById('mpTopbar').style.display = 'none';
+    document.body.style.paddingLeft = '0';
   }
 });
 
@@ -8941,8 +9084,128 @@ function mpIcon(name, size, color) {
     plus:     `<path d="M8 3V13M3 8H13" ${a}/>`,
     filter:   `<path d="M2 3H14L10 8V13L6 11V8Z" ${a}/>`,
     mic:      `<rect x="6" y="2" width="4" height="8" rx="2" ${a}/><path d="M3.5 9C3.5 11.5 5.5 13.5 8 13.5 10.5 13.5 12.5 11.5 12.5 9M8 13.5V15.5" ${a}/>`,
+    cockpit:  `<circle cx="8" cy="8" r="5" ${a}/><path d="M8 3V1M8 15V13M3 8H1M15 8H13" ${a}/><path d="M8 8L11 5" ${a}/>`,
+    dashboard:`<rect x="1.5" y="1.5" width="5.5" height="6.5" rx="1" ${a}/><rect x="9" y="1.5" width="5.5" height="4" rx="1" ${a}/><rect x="1.5" y="9.5" width="5.5" height="5" rx="1" ${a}/><rect x="9" y="7" width="5.5" height="7.5" rx="1" ${a}/>`,
+    agent:    `<path d="M8 1.5L2 4.5V9C2 12 4.5 14 8 14.5 11.5 14 14 12 14 9V4.5Z" ${a}/><path d="M6 8L7.5 9.5 10.5 6.5" ${a}/>`,
+    trend:    `<path d="M2 12L6 8 9 10 14 4" ${a}/><path d="M14 4H10M14 4V8" ${a}/>`,
+    insights: `<circle cx="8" cy="8" r="5.5" ${a}/><path d="M8 4.5V8L10.5 10.5" ${a}/>`,
+    compare:  `<rect x="2" y="3" width="5" height="10" rx="1" ${a}/><rect x="9" y="3" width="5" height="10" rx="1" ${a}/><path d="M4.5 6V10M11.5 5V11" ${a}/>`,
+    results:  `<rect x="2.5" y="2" width="11" height="12" rx="1.5" ${a}/><path d="M5 6H11M5 9H11M5 12H9" ${a}/>`,
+    d2d:      `<path d="M2 12L5 12 5 7 8 7 8 10 11 10 11 4 14 4" ${a}/>`,
+    sheet:    `<rect x="2" y="2" width="12" height="12" rx="1.5" ${a}/><path d="M2 6H14M6 2V14M2 10H14M10 2V14" ${a}/>`,
+    ads:      `<path d="M2 10L10 4 10 12Z" ${a}/><path d="M10 6H13V10H10" ${a}/><path d="M6 12V14" ${a}/>`,
+    screener: `<circle cx="7" cy="7" r="5" ${a}/><path d="M11 11L14 14" ${a}/><path d="M5 7H9M7 5V9" ${a}/>`,
+    titles:   `<path d="M3 4H13M3 8H13M3 12H10" ${a}/><path d="M3 2L3 4 5 4" ${a}/>`,
+    import_:  `<path d="M8 2V10M5 7L8 10 11 7" ${a}/><path d="M2.5 12V13.5H13.5V12" ${a}/>`,
+    calc:     `<rect x="3" y="1.5" width="10" height="13" rx="1.5" ${a}/><path d="M5 4H11M5 8H6M8 8H9M11 8H11M5 11H6M8 11H9M11 11H11" ${a}/>`,
+    sim:      `<circle cx="8" cy="8" r="5.5" ${a}/><path d="M8 4V8L11 9.5" ${a}/><path d="M3 3L4 4M13 3L12 4" ${a}/>`,
+    knowledge:`<path d="M3 2.5H11C12.1 2.5 13 3.4 13 4.5V13.5H4C3.2 13.5 2.5 12.8 2.5 12V4C2.5 3.2 3.2 2.5 4 2.5" ${a}/><path d="M4.5 13.5C4.5 12.7 5.2 12 6 12H13" ${a}/>`,
+    podcasts: `<circle cx="8" cy="7" r="4.5" ${a}/><path d="M8 11.5V14M5.5 14H10.5" ${a}/><path d="M6 7V8M8 6V9M10 7V8" ${a}/>`,
+    biz:      `<rect x="1.5" y="5" width="13" height="8" rx="1.5" ${a}/><path d="M5 5V3.5C5 2.7 5.7 2 6.5 2H9.5C10.3 2 11 2.7 11 3.5V5" ${a}/>`,
+    settle:   `<circle cx="6" cy="8" r="3.5" ${a}/><path d="M9 5C9.8 4.5 10.9 4.5 11.5 5 12.5 5.8 12.5 7.5 11.5 8.3L9.5 10" ${a}/><path d="M4.5 8H7.5M6 6.5V9.5" ${a}/>`,
+    pie:      `<path d="M8 3V8L12.5 10.5" ${a}/><circle cx="8" cy="8" r="5.5" ${a}/>`,
+    split:    `<path d="M2 4H6L10 12H14" ${a}/><path d="M10 4H14M6 12H2" ${a}/>`,
+    delta:    `<path d="M8 3L14 13H2Z" ${a}/>`,
+    eye:      `<path d="M1.5 8C3 5 5.5 3.5 8 3.5 10.5 3.5 13 5 14.5 8 13 11 10.5 12.5 8 12.5 5.5 12.5 3 11 1.5 8Z" ${a}/><circle cx="8" cy="8" r="2" ${a}/>`,
+    logout:   `<path d="M9.5 3H13.5V13H9.5" ${a}/><path d="M2 8H10M7 5L10 8 7 11" ${a}/>`,
+    search:   `<circle cx="7" cy="7" r="4.5" ${a}/><path d="M10.5 10.5L14 14" ${a}/>`,
+    bell:     `<path d="M4 11V7.5C4 5 6 3 8 3 10 3 12 5 12 7.5V11L13 12H3L4 11Z" ${a}/><path d="M6.5 13C6.5 14 7.2 14.5 8 14.5 8.8 14.5 9.5 14 9.5 13" ${a}/>`,
   };
   return `<svg width="${size}" height="${size}" viewBox="0 0 16 16" style="display:block;flex-shrink:0">${map[name]||map.check}</svg>`;
+}
+
+// ── Sidebar nav builder ──
+const MP_NAV = [
+  { group:'Dzis', items:[
+    { k:'dzis',          id:'navSbCockpit',   label:'Cockpit',   icon:'cockpit' },
+    { k:'entry',         id:'navSbEntry',     label:'Data',      icon:'data' },
+    { k:'dashboard',     id:'navSbDashboard', label:'Dashboard', icon:'dashboard' },
+    { k:'agent',         id:'navSbAgent',     label:'Agent',     icon:'agent', badge:'mpAgentBadge', badgeCls:'info' },
+  ]},
+  { group:'Analiza', items:[
+    { k:'months',        id:'navSbTrend',     label:'Trend',     icon:'trend' },
+    { k:'insights',      id:'navSbInsights',  label:'Insights',  icon:'insights', badge:'mpAlertBadge', badgeCls:'alert' },
+    { k:'compare',       id:'navSbCompare',   label:'Compare',   icon:'compare' },
+    { k:'wyniki',        id:'navSbResults',   label:'Results',   icon:'results' },
+    { k:'d2d',           id:'navSbD2d',       label:'D2D',       icon:'d2d' },
+    { k:'arkusz',        id:'navSbSheet',     label:'Sheet',     icon:'sheet' },
+  ]},
+  { group:'Operacyjne', items:[
+    { k:'centrumads',    id:'navSbAds',       label:'Ads Hub',   icon:'ads' },
+    { k:'analiza',       id:'navSbAnaliza',   label:'Analysis',  icon:'screener' },
+    { k:'kanibalizator', id:'navSbPromos',    label:'Promos',    icon:'spark' },
+    { k:'strategia',     id:'navSbStrategy',  label:'Strategy',  icon:'pie' },
+    { k:'screener',      id:'navSbScreener',  label:'Screener',  icon:'screener' },
+    { k:'titleanalyzer', id:'navSbTitles',    label:'Titles',    icon:'titles' },
+    { k:'importads',     id:'navSbImport',    label:'Import',    icon:'import_' },
+  ]},
+  { group:'Narzedzia', items:[
+    { k:'kalkulator',    id:'navSbCalc',      label:'Calc',      icon:'calc' },
+    { k:'sim',           id:'navSbSim',       label:'Simulator', icon:'sim' },
+    { k:'wiedza',        id:'navSbKnowledge', label:'Knowledge', icon:'knowledge' },
+    { k:'podcasts',      id:'navSbPodcasts',  label:'Podcasts',  icon:'podcasts' },
+  ]},
+  { group:'Zespol', items:[
+    { k:'zespol',        id:'navSbTeam',      label:'Zespol',    icon:'team', badge:'mpTeamBadge', badgeCls:'alert' },
+    { k:'kalendarz',     id:'navSbCalendar',  label:'Kalendarz', icon:'calendar' },
+    { k:'biznes',        id:'navSbBiz',       label:'Biznes',    icon:'biz' },
+    { k:'rozliczenie',   id:'navSbSettle',    label:'Rozliczenie', icon:'settle' },
+  ]},
+];
+
+// View key → breadcrumb label (just the view name)
+const MP_CRUMB = { entry: 'Data', crossborder: 'Cross-Border' };
+MP_NAV.forEach(g => g.items.forEach(it => { MP_CRUMB[it.k] = it.label; }));
+
+function mpInitSidebar() {
+  // Set date in breadcrumb
+  const now = new Date();
+  const dayN = ['nd','pn','wt','śr','cz','pt','sb'];
+  const moN = ['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','paź','lis','gru'];
+  const dateEl = document.getElementById('mpCrumbDate');
+  if (dateEl) dateEl.textContent = dayN[now.getDay()] + '. ' + now.getDate() + ' ' + moN[now.getMonth()] + ' ' + now.getFullYear();
+  const nav = document.getElementById('mpSidebarNav');
+  if (!nav) return;
+  nav.innerHTML = MP_NAV.map(g => `
+    <div class="mp-nav-group">
+      <div class="mp-nav-group-h">${g.group}</div>
+      ${g.items.map(it => `
+        <div class="mp-nav-item nav-btn" id="${it.id}" onclick="showView('${it.k}')">
+          <span class="ico">${mpIcon(it.icon, 13)}</span>${it.label}${it.badge ? `<span class="badge ${it.badgeCls||''}" id="${it.badge}" style="display:none"></span>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function mpUpdateCrumb(viewKey) {
+  const el = document.getElementById('mpCrumbView');
+  if (el) el.textContent = MP_CRUMB[viewKey] || viewKey;
+}
+
+function mpHighlightSidebar(viewKey) {
+  document.querySelectorAll('.mp-nav-item').forEach(el => el.classList.remove('active'));
+  const item = MP_NAV.flatMap(g => g.items).find(it => it.k === viewKey);
+  if (item) {
+    const el = document.getElementById(item.id);
+    if (el) el.classList.add('active');
+  }
+  mpUpdateCrumb(viewKey);
+}
+
+function mpSelectAccount(acc) {
+  document.querySelectorAll('.mp-acc').forEach(el => el.classList.remove('active'));
+  const el = document.querySelector(`.mp-acc[data-acc="${acc}"]`);
+  if (el) el.classList.add('active');
+}
+
+function mpUpdateSidebarUser() {
+  if (!currentUser) return;
+  const name = currentUser.displayName || currentUser.email.split('@')[0];
+  const initials = name.split(/\s+/).map(s=>s[0]).join('').toUpperCase().slice(0,2);
+  const el = document.getElementById('mpSbAvatar'); if (el) el.textContent = initials;
+  const ne = document.getElementById('mpSbName'); if (ne) ne.textContent = name;
+  const me = document.getElementById('mpSbEmail'); if (me) me.textContent = currentUser.email;
 }
 
 function zmRenderTasks() {
@@ -9226,6 +9489,9 @@ function zmUpdateNavBadge() {
   const unread = src.reduce((sum, t) => sum + zmUnreadCommentCount(t), 0);
   if (badge) { badge.textContent = unread || ''; badge.style.display = unread ? 'inline-flex' : 'none'; }
   if (wBadge) { wBadge.textContent = unread || ''; wBadge.style.display = unread ? 'inline-flex' : 'none'; }
+  // Sidebar team badge
+  const sbBadge = document.getElementById('mpTeamBadge');
+  if (sbBadge) { sbBadge.textContent = unread || ''; sbBadge.style.display = unread ? 'inline-flex' : 'none'; }
 }
 
 // ── Voice input for comments (SpeechRecognition pl-PL) ──
@@ -20191,7 +20457,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.70</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.71</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
