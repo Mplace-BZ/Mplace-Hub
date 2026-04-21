@@ -51,15 +51,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .mp-sidebar-search .kbd{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;font-family:var(--mono);font-size:9px;color:var(--text3)}
 .mp-sidebar-nav{flex:1;overflow-y:auto;padding:4px 0 8px}
 .mp-nav-group{padding:0 8px;margin-bottom:2px}
-.mp-nav-group-h{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding:12px 8px 4px;user-select:none}
-.mp-nav-item{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:all .12s;color:var(--text);font-size:13px;position:relative}
-.mp-nav-item:hover{background:var(--bg3);color:var(--text)}
-.mp-nav-item.active{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
-.mp-nav-item:not(.active){border:1px solid transparent}
-.mp-nav-item .ico{display:flex;align-items:center;justify-content:center;width:16px;flex-shrink:0;color:var(--text3)}
-.mp-nav-item.active .ico{color:var(--text)}
-.mp-nav-item .badge{font-family:var(--mono);font-size:9px;min-width:18px;height:18px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:rgba(255,255,255,.08);color:var(--text2);margin-left:auto}
-.mp-nav-item .badge.info{background:rgba(45,212,160,.14);color:#9ee9cd}
+.mp-nav-group-h{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);padding:14px 8px 6px;user-select:none}
+.mp-nav-group-h::after{content:'';flex:1;height:1px;background:var(--border)}
+.mp-nav-item{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:all .12s;color:var(--text);font-size:13px;position:relative;border:1px solid transparent}
+.mp-nav-item:hover{background:var(--bg3);color:#fff}
+.mp-nav-item.active{background:linear-gradient(90deg,rgba(255,107,53,.14),rgba(255,107,53,.04));color:#fff;border-color:transparent}
+.mp-nav-item.active::before{content:'';position:absolute;left:-8px;top:4px;bottom:4px;width:2px;background:var(--accent);border-radius:1px}
+.mp-nav-item .ico{display:flex;align-items:center;justify-content:center;width:16px;flex-shrink:0;color:var(--text2)}
+.mp-nav-item:hover .ico{color:var(--text)}
+.mp-nav-item.active .ico{color:var(--accent)}
+.mp-nav-item .badge{font-family:var(--mono);font-size:9.5px;min-width:18px;height:18px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;margin-left:auto}
+.mp-nav-item .badge.info{background:rgba(77,159,255,.14);color:#9bc3ff}
+.mp-nav-item .badge.alert{background:rgba(255,77,106,.18);color:#ff8da0}
 .mp-sidebar-foot{flex-shrink:0;padding:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
 .mp-sidebar-foot .avatar{width:28px;height:28px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);display:grid;place-items:center;flex-shrink:0;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text2)}
 .mp-sidebar-foot .meta{flex:1;min-width:0}
@@ -9100,6 +9103,7 @@ function mpIcon(name, size, color) {
     podcasts: `<circle cx="8" cy="7" r="4.5" ${a}/><path d="M8 11.5V14M5.5 14H10.5" ${a}/><path d="M6 7V8M8 6V9M10 7V8" ${a}/>`,
     biz:      `<rect x="1.5" y="5" width="13" height="8" rx="1.5" ${a}/><path d="M5 5V3.5C5 2.7 5.7 2 6.5 2H9.5C10.3 2 11 2.7 11 3.5V5" ${a}/>`,
     settle:   `<circle cx="6" cy="8" r="3.5" ${a}/><path d="M9 5C9.8 4.5 10.9 4.5 11.5 5 12.5 5.8 12.5 7.5 11.5 8.3L9.5 10" ${a}/><path d="M4.5 8H7.5M6 6.5V9.5" ${a}/>`,
+    pie:      `<path d="M8 3V8L12.5 10.5" ${a}/><circle cx="8" cy="8" r="5.5" ${a}/>`,
     split:    `<path d="M2 4H6L10 12H14" ${a}/><path d="M10 4H14M6 12H2" ${a}/>`,
     delta:    `<path d="M8 3L14 13H2Z" ${a}/>`,
     eye:      `<path d="M1.5 8C3 5 5.5 3.5 8 3.5 10.5 3.5 13 5 14.5 8 13 11 10.5 12.5 8 12.5 5.5 12.5 3 11 1.5 8Z" ${a}/><circle cx="8" cy="8" r="2" ${a}/>`,
@@ -9115,11 +9119,11 @@ const MP_NAV = [
   { group:'Dzis', items:[
     { k:'dzis',          id:'navSbCockpit',   label:'Cockpit',   icon:'cockpit' },
     { k:'dashboard',     id:'navSbDashboard', label:'Dashboard', icon:'dashboard' },
-    { k:'agent',         id:'navSbAgent',     label:'Agent',     icon:'agent', badge:'mpAgentBadge' },
+    { k:'agent',         id:'navSbAgent',     label:'Agent',     icon:'agent', badge:'mpAgentBadge', badgeCls:'info' },
   ]},
   { group:'Analiza', items:[
     { k:'months',        id:'navSbTrend',     label:'Trend',     icon:'trend' },
-    { k:'insights',      id:'navSbInsights',  label:'Insights',  icon:'insights', badge:'mpAlertBadge' },
+    { k:'insights',      id:'navSbInsights',  label:'Insights',  icon:'insights', badge:'mpAlertBadge', badgeCls:'alert' },
     { k:'compare',       id:'navSbCompare',   label:'Compare',   icon:'compare' },
     { k:'wyniki',        id:'navSbResults',   label:'Results',   icon:'results' },
     { k:'d2d',           id:'navSbD2d',       label:'D2D',       icon:'d2d' },
@@ -9128,9 +9132,9 @@ const MP_NAV = [
   { group:'Operacyjne', items:[
     { k:'centrumads',    id:'navSbAds',       label:'Ads Hub',   icon:'ads' },
     { k:'analiza',       id:'navSbAnaliza',   label:'Analysis',  icon:'screener' },
-    { k:'kanibalizator', id:'navSbPromos',    label:'Promos',    icon:'split' },
-    { k:'strategia',     id:'navSbStrategy',  label:'Strategy',  icon:'delta' },
-    { k:'screener',      id:'navSbScreener',  label:'Screener',  icon:'eye' },
+    { k:'kanibalizator', id:'navSbPromos',    label:'Promos',    icon:'spark' },
+    { k:'strategia',     id:'navSbStrategy',  label:'Strategy',  icon:'pie' },
+    { k:'screener',      id:'navSbScreener',  label:'Screener',  icon:'screener' },
     { k:'titleanalyzer', id:'navSbTitles',    label:'Titles',    icon:'titles' },
     { k:'importads',     id:'navSbImport',    label:'Import',    icon:'import_' },
   ]},
@@ -9141,7 +9145,7 @@ const MP_NAV = [
     { k:'podcasts',      id:'navSbPodcasts',  label:'Podcasts',  icon:'podcasts' },
   ]},
   { group:'Zespol', items:[
-    { k:'zespol',        id:'navSbTeam',      label:'Zespol',    icon:'team', badge:'mpTeamBadge' },
+    { k:'zespol',        id:'navSbTeam',      label:'Zespol',    icon:'team', badge:'mpTeamBadge', badgeCls:'alert' },
     { k:'kalendarz',     id:'navSbCalendar',  label:'Kalendarz', icon:'calendar' },
     { k:'biznes',        id:'navSbBiz',       label:'Biznes',    icon:'biz' },
     { k:'rozliczenie',   id:'navSbSettle',    label:'Rozliczenie', icon:'settle' },
@@ -9166,7 +9170,7 @@ function mpInitSidebar() {
       <div class="mp-nav-group-h">${g.group}</div>
       ${g.items.map(it => `
         <div class="mp-nav-item nav-btn" id="${it.id}" onclick="showView('${it.k}')">
-          <span class="ico">${mpIcon(it.icon, 13)}</span>${it.label}${it.badge ? `<span class="badge" id="${it.badge}" style="display:none"></span>` : ''}
+          <span class="ico">${mpIcon(it.icon, 13)}</span>${it.label}${it.badge ? `<span class="badge ${it.badgeCls||''}" id="${it.badge}" style="display:none"></span>` : ''}
         </div>
       `).join('')}
     </div>
