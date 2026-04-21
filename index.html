@@ -72,23 +72,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .mp-sidebar-foot .icon-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
 /* body offset for sidebar (applied via JS on login) */
 /* ── TOPBAR (new: breadcrumb + accounts + right) ── */
-.mp-topbar{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 16px;height:44px;overflow-x:auto}
-.mp-crumbs{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0;margin-right:8px}
-.mp-crumbs .sep{color:var(--border2)}
+.mp-topbar{position:sticky;top:0;z-index:100;background:rgba(10,10,12,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 20px;height:52px;overflow-x:auto}
+.mp-crumbs{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0;margin-right:12px}
+.mp-crumbs .sep{color:var(--border2);margin:0 2px}
 .mp-crumbs .here{color:var(--text)}
-.mp-accounts{display:flex;align-items:center;gap:5px;flex:1;overflow-x:auto}
-.mp-acc{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:10px;padding:4px 9px;border-radius:5px;border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.mp-accounts{display:flex;align-items:center;gap:4px;flex:1;overflow-x:auto;scrollbar-width:none}
+.mp-accounts::-webkit-scrollbar{display:none}
+.mp-acc{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;padding:5px 10px;border-radius:6px;border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
 .mp-acc:hover{background:var(--bg3);color:var(--text)}
-.mp-acc.active{background:var(--bg3);color:var(--text);border-color:var(--border2)}
-.mp-acc-sep{width:1px;height:16px;background:var(--border2);margin:0 2px;flex-shrink:0}
-.mp-acc .gd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.mp-acc.active{background:var(--bg3);color:#fff;border-color:var(--border2)}
+.mp-acc-sep{width:1px;height:18px;background:var(--border);margin:0 4px;flex-shrink:0}
+.mp-acc .gd{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .mp-acc[data-g="meble"] .gd{background:var(--g-meble)}
 .mp-acc[data-g="luxsen"] .gd{background:var(--g-luxsen)}
 .mp-acc[data-g="one"] .gd{background:var(--g-one)}
-.mp-topbar-right{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto}
-.mp-status-pill{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:#9ee9cd;padding:4px 12px;border-radius:999px;background:rgba(45,212,160,.1);border:1px solid rgba(45,212,160,.3)}
+.mp-topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.mp-status-pill{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:#9ee9cd;padding:5px 14px;border-radius:999px;background:rgba(45,212,160,.1);border:1px solid rgba(45,212,160,.3)}
 .mp-status-pill .dot{width:6px;height:6px;border-radius:50%;background:#2dd4a0;box-shadow:0 0 6px rgba(45,212,160,.6)}
-.mp-topbar-right .icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:28px;height:28px;display:grid;place-items:center;cursor:pointer;color:var(--text3);transition:all .15s;flex-shrink:0}
+.mp-topbar-right .icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:30px;height:30px;display:grid;place-items:center;cursor:pointer;color:var(--text3);transition:all .15s;flex-shrink:0}
 .mp-topbar-right .icon-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
 /* ── OLD TOPBAR (hidden, kept for compat) ── */
 .topbar{display:none!important}
@@ -1589,9 +1590,9 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
 <!-- ═══ NEW TOPBAR (breadcrumb + accounts + right) ═══ -->
 <div class="mp-topbar" id="mpTopbar" style="display:none">
   <div class="mp-crumbs">
-    <span id="mpCrumbDate"></span>
+    <span>Owner</span>
     <span class="sep">/</span>
-    <span class="here" id="mpCrumbView">Cockpit</span>
+    <span class="here" id="mpCrumbView">Dzis <span class="sep">/</span> Cockpit</span>
   </div>
   <div class="mp-accounts" id="mpAccounts">
     <div class="mp-acc active" data-acc="all" onclick="mpSelectAccount('all')"><span style="color:var(--text);font-weight:600">ALL</span> <span style="color:var(--text3)">9</span></div>
@@ -4222,7 +4223,7 @@ function showView(v){
     // Highlight account chip in new topbar
     mpSelectAccount(v);
     const ce = document.getElementById('mpCrumbView');
-    if (ce) ce.textContent = v;
+    if (ce) ce.innerHTML = 'Konto <span class="sep">/</span> ' + v;
   }
   window.scrollTo(0,0);
   try{ localStorage.setItem('lastActiveTab', v); }catch(e){}
@@ -9153,17 +9154,11 @@ const MP_NAV = [
   ]},
 ];
 
-// View key → breadcrumb label (just the view name)
-const MP_CRUMB = { entry: 'Data', crossborder: 'Cross-Border' };
-MP_NAV.forEach(g => g.items.forEach(it => { MP_CRUMB[it.k] = it.label; }));
+// View key → breadcrumb parts [group, label]
+const MP_CRUMB = { entry: ['Dzis','Data'], crossborder: ['Operacyjne','Cross-Border'] };
+MP_NAV.forEach(g => g.items.forEach(it => { MP_CRUMB[it.k] = [g.group, it.label]; }));
 
 function mpInitSidebar() {
-  // Set date in breadcrumb
-  const now = new Date();
-  const dayN = ['nd','pn','wt','śr','cz','pt','sb'];
-  const moN = ['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','paź','lis','gru'];
-  const dateEl = document.getElementById('mpCrumbDate');
-  if (dateEl) dateEl.textContent = dayN[now.getDay()] + '. ' + now.getDate() + ' ' + moN[now.getMonth()] + ' ' + now.getFullYear();
   const nav = document.getElementById('mpSidebarNav');
   if (!nav) return;
   nav.innerHTML = MP_NAV.map(g => `
@@ -9180,7 +9175,13 @@ function mpInitSidebar() {
 
 function mpUpdateCrumb(viewKey) {
   const el = document.getElementById('mpCrumbView');
-  if (el) el.textContent = MP_CRUMB[viewKey] || viewKey;
+  if (!el) return;
+  const parts = MP_CRUMB[viewKey];
+  if (parts) {
+    el.innerHTML = parts[0] + ' <span class="sep">/</span> ' + parts[1];
+  } else {
+    el.textContent = viewKey;
+  }
 }
 
 function mpHighlightSidebar(viewKey) {
