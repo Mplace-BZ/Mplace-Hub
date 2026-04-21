@@ -1387,6 +1387,58 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px}
 .zm-task-status.done{background:linear-gradient(135deg,rgba(45,212,160,.25),rgba(45,212,160,.15));color:#2dd4a0;border:1px solid rgba(45,212,160,.45);box-shadow:0 0 8px rgba(45,212,160,.15)}
 .zm-task-status.verified{background:linear-gradient(135deg,rgba(167,139,250,.25),rgba(167,139,250,.15));color:#a78bfa;border:1px solid rgba(167,139,250,.45);box-shadow:0 0 8px rgba(167,139,250,.15)}
 .zm-task-actions{display:flex;gap:6px;margin-top:.85rem;padding-top:.75rem;border-top:1px dashed var(--border);flex-wrap:wrap;align-items:center}
+/* ── mp-task: redesign pilot task card ── */
+.mp-task{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;transition:border-color .15s}
+.mp-task:hover{border-color:var(--border2)}
+.mp-task.verified{opacity:.55}
+.mp-task-head{display:flex;align-items:flex-start;gap:12px}
+.mp-task-avatar{width:28px;height:28px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);display:grid;place-items:center;flex-shrink:0;color:var(--text2);font-family:var(--mono);font-size:10px;font-weight:600}
+.mp-task-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.mp-task-title{font-size:14px;font-weight:600;color:var(--text);flex:1;min-width:0}
+.mp-task-body{flex:1;min-width:0}
+.mp-task-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.mp-task-desc{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.55;margin-bottom:10px;color:var(--text)}
+.mp-task-progress{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:10px;position:relative}
+.mp-task-progress-fill{height:100%;background:linear-gradient(90deg,#2dd4a0,#7af0c3);border-radius:3px}
+.mp-task-progress-label{position:absolute;right:0;top:-16px;font-family:var(--mono);font-size:10px;color:var(--text3)}
+.mp-task-checks{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;list-style:none;margin:0 0 10px;padding:0}
+.mp-task-checks li{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text);cursor:pointer;transition:color .15s}
+.mp-task-checks li:hover{color:#fff}
+.mp-task-checks li.done{color:var(--text3);text-decoration:line-through}
+.mp-task-checks li .mp-check-box{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border2);background:transparent;display:grid;place-items:center;flex-shrink:0;transition:all .15s}
+.mp-task-checks li.done .mp-check-box{background:#2dd4a0;border-color:#2dd4a0}
+.mp-task-comment-preview{background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.25);border-radius:8px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s}
+.mp-task-comment-preview:hover{background:rgba(77,159,255,.14);border-color:rgba(77,159,255,.4)}
+.mp-task-comment-author{font-family:var(--mono);font-size:11px;color:#4d9fff;font-weight:500}
+.mp-task-comment-text{font-size:12.5px;color:var(--text)}
+.mp-task-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.mp-task-actions .spacer{flex:1}
+/* mp-chip: 9 tones from redesign atoms */
+.mp-chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;line-height:1;letter-spacing:.04em;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.mp-chip.neutral{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#cbd0e0}
+.mp-chip.orange{background:rgba(255,107,53,.14);border:1px solid rgba(255,107,53,.45);color:#ffc9ac}
+.mp-chip.green{background:rgba(45,212,160,.12);border:1px solid rgba(45,212,160,.42);color:#9ee9cd}
+.mp-chip.red{background:rgba(255,77,106,.12);border:1px solid rgba(255,77,106,.42);color:#ffb7c4}
+.mp-chip.yellow{background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.42);color:#f7d38a}
+.mp-chip.blue{background:rgba(77,159,255,.12);border:1px solid rgba(77,159,255,.42);color:#bcd6ff}
+.mp-chip.violet{background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.42);color:#d4c6ff}
+.mp-chip.pink{background:rgba(232,121,249,.12);border:1px solid rgba(232,121,249,.42);color:#f4c6fa}
+.mp-chip.cyan{background:rgba(6,182,212,.14);border:1px solid rgba(6,182,212,.45);color:#9ee7f2}
+/* mp-pri: priority pills */
+.mp-pri{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:10.5px;line-height:1;letter-spacing:.14em;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.mp-pri.pilne{background:rgba(255,77,106,.12);border:1px solid rgba(255,77,106,.42);color:#ffb7c4}
+.mp-pri.wazne{background:rgba(255,107,53,.14);border:1px solid rgba(255,107,53,.45);color:#ffc9ac}
+.mp-pri.info{background:rgba(77,159,255,.12);border:1px solid rgba(77,159,255,.42);color:#bcd6ff}
+/* mp-btn: action buttons with tone */
+.mp-btn{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:6px;border:1px solid transparent;background:transparent;cursor:pointer;transition:all .15s;font-weight:500;color:var(--text2);position:relative}
+.mp-btn:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.mp-btn.green{background:rgba(45,212,160,.14);border-color:rgba(45,212,160,.45);color:#9ee9cd}
+.mp-btn.blue{background:rgba(77,159,255,.12);border-color:rgba(77,159,255,.42);color:#bcd6ff}
+.mp-btn.violet{background:rgba(167,139,250,.14);border-color:rgba(167,139,250,.42);color:#d4c6ff}
+.mp-btn.orange{background:rgba(255,107,53,.12);border-color:rgba(255,107,53,.4);color:#ffc9ac}
+.mp-btn.red{background:rgba(255,77,106,.1);border-color:rgba(255,77,106,.38);color:#ffb7c4}
+.mp-btn.pink{background:rgba(232,121,249,.12);border-color:rgba(232,121,249,.42);color:#f4c6fa}
+.mp-btn .mp-badge{position:absolute;top:-4px;right:-4px;min-width:14px;height:14px;padding:0 3px;background:#ff4d6a;color:#fff;border-radius:999px;font-size:9px;display:grid;place-items:center;font-family:var(--mono)}
 .zm-filter-bar{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
 .zm-filter-bar select,.zm-filter-bar input{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;color:var(--text);font-size:11px;font-family:var(--mono)}
 .zm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin-bottom:1.25rem}
@@ -8188,7 +8240,7 @@ function zmCalClickTask(taskId) {
   setTimeout(() => {
     const el = document.querySelector(`[onclick*="zmToggleComments('${taskId}')"]`);
     if (el) {
-      const card = el.closest('.zm-task');
+      const card = el.closest('.mp-task') || el.closest('.zm-task');
       if (card) {
         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
         card.style.boxShadow = '0 0 0 2px #60a5fa, 0 0 20px rgba(96,165,250,.3)';
@@ -8870,6 +8922,29 @@ function zmInitials(name) {
   return name.split(/\s+/).map(s => s[0]).join('').toUpperCase().slice(0,2);
 }
 
+// ── mpIcon: SVG inline helper (redesign atoms) ──
+function mpIcon(name, size, color) {
+  size = size || 14; color = color || 'currentColor';
+  const a = `fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"`;
+  const map = {
+    team:     `<circle cx="5.5" cy="6" r="2.5" ${a}/><circle cx="11" cy="7" r="2" ${a}/><path d="M1.5 13C1.5 10.5 3.5 9 5.5 9 7.5 9 9.5 10.5 9.5 13" ${a}/><path d="M9 13C9.2 11 10.5 10 12 10 13.4 10 14.5 11 14.5 13" ${a}/>`,
+    data:     `<ellipse cx="8" cy="4" rx="5.5" ry="2" ${a}/><path d="M2.5 4V11C2.5 12.3 4.9 13.5 8 13.5 11.1 13.5 13.5 12.3 13.5 11V4" ${a}/><path d="M2.5 7.5C2.5 8.8 4.9 10 8 10 11.1 10 13.5 8.8 13.5 7.5" ${a}/>`,
+    calendar: `<rect x="1.5" y="3" width="13" height="11" rx="1.5" ${a}/><path d="M5 1.5V4.5M11 1.5V4.5M1.5 7H14.5" ${a}/>`,
+    clock:    `<circle cx="8" cy="8" r="5.5" ${a}/><path d="M8 5V8L10 9.5" ${a}/>`,
+    history:  `<path d="M3 8A5 5 0 1 0 4.3 4.3" ${a}/><path d="M2 3V6H5" ${a}/><path d="M8 5.5V8L10 9.5" ${a}/>`,
+    spark:    `<path d="M2 11L5 8 7 10 11 5 14 9" ${a}/>`,
+    check:    `<path d="M3 8.5L6.5 12 13 5" ${a}/>`,
+    bubble:   `<path d="M2.5 3.5H13.5V11H8L5 14V11H2.5Z" ${a}/>`,
+    edit:     `<path d="M3 13L3 11 11 3 13 5 5 13Z" ${a}/><path d="M9 5L11 7" ${a}/>`,
+    trash:    `<path d="M3 4.5H13M5.5 4.5V3H10.5V4.5M5 4.5L5.5 13.5H10.5L11 4.5" ${a}/>`,
+    verify:   `<path d="M2.5 8L3 4 8 2 13 4 13.5 8C13.5 11 11 13 8 14 5 13 2.5 11 2.5 8Z" ${a}/><path d="M5.5 8L7.5 10 11 6" ${a}/>`,
+    plus:     `<path d="M8 3V13M3 8H13" ${a}/>`,
+    filter:   `<path d="M2 3H14L10 8V13L6 11V8Z" ${a}/>`,
+    mic:      `<rect x="6" y="2" width="4" height="8" rx="2" ${a}/><path d="M3.5 9C3.5 11.5 5.5 13.5 8 13.5 10.5 13.5 12.5 11.5 12.5 9M8 13.5V15.5" ${a}/>`,
+  };
+  return `<svg width="${size}" height="${size}" viewBox="0 0 16 16" style="display:block;flex-shrink:0">${map[name]||map.check}</svg>`;
+}
+
 function zmRenderTasks() {
   const list = document.getElementById('zmTaskList');
   if (!list) return;
@@ -8936,73 +9011,82 @@ function zmRenderTasks() {
     const unreadBadge = unreadCount > 0 ? `<span class="zm-badge-unread">${unreadCount}</span>` : '';
     // Preview last comment if unread
     const lastComment = unreadCount > 0 && comments.length ? comments[comments.length - 1] : null;
+    const statusTone = { todo:'neutral', in_progress:'blue', done:'green', verified:'violet' };
+    const dueTone = due ? ({overdue:'red',today:'orange',soon:'blue',later:'neutral'}[due.cls]||'neutral') : 'neutral';
+    const groupBorder = kontoColor ? `border-left:2px solid ${kontoColor}` : '';
     return `
-      <div class="zm-task${t.status === 'verified' ? ' verified' : ''}">
-        <div class="zm-task-top">
-          <div class="zm-avatar" title="${esc(workerName)}">${esc(zmInitials(workerName))}</div>
-          <div class="zm-task-title">${esc(t.title)}</div>
-          <span class="zm-task-pri ${priClass}">${esc(t.priority || 'INFO')}</span>
-        </div>
-        <div class="zm-task-meta">
-          <span class="zm-chip"><span class="zm-chip-ico">👤</span> ${esc(workerName)}</span>
-          ${t.konto ? `<span class="zm-chip" style="${kontoColor?`color:${kontoColor};border-color:${kontoColor}44`:''}"><span class="zm-chip-ico">▸</span> ${esc(t.konto)}</span>` : ''}
-          <span class="zm-chip"><span class="zm-chip-ico">📅</span> Utworzone: ${fmtDate(t.createdAt) || '—'}</span>
-          ${due ? `<span class="zm-chip zm-due ${due.cls}"><span class="zm-chip-ico">⏰</span> Termin: ${due.label}</span>` : `<span class="zm-chip"><span class="zm-chip-ico">⏰</span> Bez terminu</span>`}
-          ${t.updatedAt && t.updatedAt !== t.createdAt ? `<span class="zm-chip zm-chip-muted"><span class="zm-chip-ico">↻</span> Aktualizacja: ${fmtRelative(t.updatedAt)}</span>` : ''}
-          ${t.tfSource ? `<span class="zm-task-source" title="${esc(t.tfSourceTitle||t.tfSource)}">⚡ z raportu: ${esc(t.tfSource)}</span>` : ''}
-        </div>
-        ${t.desc ? `<div class="zm-task-desc">${esc(t.desc)}</div>` : ''}
-        ${checkTotal ? `
-          <div class="zm-progress-wrap">
-            <div class="zm-progress-bar"><div class="zm-progress-fill" style="width:${checkPct}%"></div></div>
-            <div class="zm-progress-text">${checkDone}/${checkTotal} (${checkPct}%)</div>
-          </div>
-          <ul class="zm-task-checklist">${t.checklist.map((c,i) =>
-            `<li class="${c.done ? 'done' : ''}" onclick="zmToggleCheckItem('${t.id}',${i})">${esc(c.text)}</li>`
-          ).join('')}</ul>
-        ` : ''}
-        ${lastComment ? `
-          <div class="zm-unread-preview" onclick="zmToggleComments('${t.id}')" title="Kliknij żeby zobaczyć wszystkie komentarze">
-            <span class="zm-unread-icon">💬</span>
-            <span class="zm-unread-author">${esc(lastComment.authorName || lastComment.author)}:</span>
-            <span class="zm-unread-text">${esc(lastComment.text.slice(0, 120))}${lastComment.text.length > 120 ? '...' : ''}</span>
-          </div>
-        ` : ''}
-        <div class="zm-task-actions">
-          <span class="zm-task-status ${t.status}" onclick="zmSetTaskStatus('${t.id}','${nextSt}')" title="Kliknij → ${ZM_STATUS_LABELS[nextSt] || nextSt}">${ZM_STATUS_LABELS[t.status] || t.status}</span>
-          <button type="button" class="zm-btn zm-btn-sm zm-btn-comment" onclick="zmToggleComments('${t.id}')">💬 ${comments.length}${unreadBadge}</button>
-          ${isOwner ? `<button type="button" class="zm-btn zm-btn-sm zm-btn-history" onclick="zmToggleHistory('${t.id}')">⧗ Historia</button>` : ''}
-          ${isOwner ? `<button type="button" class="zm-btn zm-btn-sm zm-btn-edit" onclick="zmEditTask('${t.id}')">✎ Edytuj</button>` : ''}
-          ${isOwner || (t.fromSOS && t.assignee === currentUser.email.toLowerCase()) ? `<button type="button" class="zm-btn zm-btn-danger zm-btn-sm" onclick="zmDeleteTask('${t.id}')">🗑 Usuń</button>` : ''}
-          ${isOwner && t.status === 'done' ? `<button type="button" class="zm-btn zm-btn-success zm-btn-sm" onclick="zmSetTaskStatus('${t.id}','verified')">✓ Weryfikuj</button>` : ''}
-        </div>
-        <div class="zm-comments" id="zmComments_${t.id}" style="display:${zmOpenComments.has(t.id)?'block':'none'}">
-          <div class="zm-comments-list">
-            ${comments.map(c => `
-              <div class="zm-comment">
-                <div class="zm-comment-head">
-                  <span class="zm-comment-author">${esc(c.authorName || c.author)}</span>
-                  <span class="zm-comment-date">${new Date(c.createdAt).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
-                </div>
-                <div class="zm-comment-text">${esc(c.text)}</div>
+      <div class="mp-task${t.status === 'verified' ? ' verified' : ''}" style="${groupBorder}">
+        <div class="mp-task-head">
+          <div class="mp-task-avatar" title="${esc(workerName)}">${esc(zmInitials(workerName))}</div>
+          <div class="mp-task-body">
+            <div class="mp-task-row">
+              <div class="mp-task-title">${esc(t.title)}</div>
+              <span class="mp-chip ${statusTone[t.status]||'neutral'}" style="font-size:9.5px" onclick="zmSetTaskStatus('${t.id}','${nextSt}')" title="Kliknij → ${ZM_STATUS_LABELS[nextSt] || nextSt}">${ZM_STATUS_LABELS[t.status] || t.status}</span>
+              <span class="mp-pri ${priClass}">${t.priority==='PILNE'?'&#9679; ':''}${t.priority==='WAŻNE'||t.priority==='WAZNE'?'&#9650; ':''}${t.priority==='INFO'?'&#9632; ':''}${esc(t.priority || 'INFO')}</span>
+            </div>
+            <div class="mp-task-meta">
+              <span class="mp-chip neutral">${mpIcon('team',11)} ${esc(workerName)}</span>
+              ${t.konto ? `<span class="mp-chip orange">${mpIcon('data',11)} ${esc(t.konto)}</span>` : ''}
+              <span class="mp-chip neutral">${mpIcon('calendar',11)} Utworzone: ${fmtDate(t.createdAt) || '—'}</span>
+              ${due ? `<span class="mp-chip ${dueTone}">${mpIcon('clock',11)} Termin: ${due.label}</span>` : `<span class="mp-chip neutral">${mpIcon('clock',11)} Bez terminu</span>`}
+              ${t.updatedAt && t.updatedAt !== t.createdAt ? `<span class="mp-chip neutral">${mpIcon('history',11)} ${fmtRelative(t.updatedAt)}</span>` : ''}
+              ${t.tfSource ? `<span class="mp-chip blue">${mpIcon('spark',11)} z ${esc(t.tfSource)}</span>` : ''}
+            </div>
+            ${t.desc ? `<div class="mp-task-desc">${esc(t.desc)}</div>` : ''}
+            ${checkTotal ? `
+              <div class="mp-task-progress">
+                <div class="mp-task-progress-fill" style="width:${checkPct}%"></div>
+                <span class="mp-task-progress-label">${checkDone}/${checkTotal} (${checkPct}%)</span>
               </div>
-            `).join('') || '<div class="zm-empty" style="padding:.5rem">Brak komentarzy</div>'}
-          </div>
-          <div class="zm-comment-form">
-            <textarea id="zmCommentInput_${t.id}" placeholder="Napisz lub podyktuj komentarz..." rows="2"></textarea>
-            <div style="display:flex;flex-direction:column;gap:4px">
-              <button type="button" class="zm-btn zm-btn-voice zm-btn-sm" id="zmMicBtn_${t.id}" onclick="zmVoiceComment('${t.id}')" title="Dyktuj (powiedz 'koniec' żeby wysłać)">🎤</button>
-              <button type="button" class="zm-btn zm-btn-primary zm-btn-sm" onclick="zmAddComment('${t.id}')">Wyślij</button>
+              <ul class="mp-task-checks">${t.checklist.map((c,i) =>
+                `<li class="${c.done ? 'done' : ''}" onclick="zmToggleCheckItem('${t.id}',${i})"><span class="mp-check-box">${c.done ? mpIcon('check',10,'#0b0d13') : ''}</span>${esc(c.text)}</li>`
+              ).join('')}</ul>
+            ` : ''}
+            ${lastComment ? `
+              <div class="mp-task-comment-preview" onclick="zmToggleComments('${t.id}')" title="Kliknij żeby zobaczyć wszystkie komentarze">
+                ${mpIcon('bubble',12,'#4d9fff')}
+                <span class="mp-task-comment-author">${esc(lastComment.authorName || lastComment.author)}:</span>
+                <span class="mp-task-comment-text">${esc(lastComment.text.slice(0, 120))}${lastComment.text.length > 120 ? '...' : ''}</span>
+              </div>
+            ` : ''}
+            <div class="mp-task-actions">
+              <button type="button" class="mp-btn green" onclick="zmSetTaskStatus('${t.id}','${nextSt}')">${mpIcon('check',11)} Gotowe</button>
+              <button type="button" class="mp-btn blue" onclick="zmToggleComments('${t.id}')">${mpIcon('bubble',11)} ${comments.length}${unreadCount > 0 ? `<span class="mp-badge">${unreadCount}</span>` : ''}</button>
+              ${isOwner ? `<button type="button" class="mp-btn violet" onclick="zmToggleHistory('${t.id}')">${mpIcon('history',11)} Historia</button>` : ''}
+              ${isOwner ? `<button type="button" class="mp-btn orange" onclick="zmEditTask('${t.id}')">${mpIcon('edit',11)} Edytuj</button>` : ''}
+              ${isOwner || (t.fromSOS && t.assignee === currentUser.email.toLowerCase()) ? `<button type="button" class="mp-btn red" onclick="zmDeleteTask('${t.id}')">${mpIcon('trash',11)} Usuń</button>` : ''}
+              <span class="spacer" style="flex:1"></span>
+              ${isOwner && t.status === 'done' ? `<button type="button" class="mp-btn pink" onclick="zmSetTaskStatus('${t.id}','verified')">${mpIcon('verify',11)} Weryfikuj</button>` : ''}
+            </div>
+            <div class="zm-comments" id="zmComments_${t.id}" style="display:${zmOpenComments.has(t.id)?'block':'none'}">
+              <div class="zm-comments-list">
+                ${comments.map(c => `
+                  <div class="zm-comment">
+                    <div class="zm-comment-head">
+                      <span class="zm-comment-author">${esc(c.authorName || c.author)}</span>
+                      <span class="zm-comment-date">${new Date(c.createdAt).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+                    </div>
+                    <div class="zm-comment-text">${esc(c.text)}</div>
+                  </div>
+                `).join('') || '<div class="zm-empty" style="padding:.5rem">Brak komentarzy</div>'}
+              </div>
+              <div class="zm-comment-form">
+                <textarea id="zmCommentInput_${t.id}" placeholder="Napisz lub podyktuj komentarz..." rows="2"></textarea>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <button type="button" class="zm-btn zm-btn-voice zm-btn-sm" id="zmMicBtn_${t.id}" onclick="zmVoiceComment('${t.id}')" title="Dyktuj (powiedz 'koniec' żeby wysłać)">${mpIcon('mic',14)}</button>
+                  <button type="button" class="zm-btn zm-btn-primary zm-btn-sm" onclick="zmAddComment('${t.id}')">Wyślij</button>
+                </div>
+              </div>
+            </div>
+            <div class="zm-history" id="zmHistory_${t.id}" style="display:${zmOpenHistory.has(t.id)?'block':'none'}">
+              ${(t.history || []).map(h => `
+                <div class="zm-history-item">
+                  <span class="zm-history-date">${new Date(h.at).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+                  <span class="zm-history-action">${esc(h.author || '')} — ${esc(h.action)}</span>
+                </div>
+              `).join('') || '<div class="zm-empty" style="padding:.5rem">Brak historii</div>'}
             </div>
           </div>
-        </div>
-        <div class="zm-history" id="zmHistory_${t.id}" style="display:${zmOpenHistory.has(t.id)?'block':'none'}">
-          ${(t.history || []).map(h => `
-            <div class="zm-history-item">
-              <span class="zm-history-date">${new Date(h.at).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
-              <span class="zm-history-action">${esc(h.author || '')} — ${esc(h.action)}</span>
-            </div>
-          `).join('') || '<div class="zm-empty" style="padding:.5rem">Brak historii</div>'}
         </div>
       </div>
     `;
