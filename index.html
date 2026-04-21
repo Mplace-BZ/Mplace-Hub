@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v7.71</title>
+<title>MPlace Hub v7.74</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -16,6 +16,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <style>
 :root{
+  /* frozen design tokens */
   --bg:#0f1117;--bg2:#181c26;--bg3:#1e2333;
   --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
   --text:#e8eaf0;--text2:#8b91a8;--text3:#4a5068;
@@ -27,18 +28,21 @@
   --blue-in:rgba(77,159,255,.09);--blue-in-bd:rgba(77,159,255,.3);
   --g-meble:#ff6b35;--g-luxsen:#2dd4a0;--g-one:#b47fff;
   --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+  --display:'DM Mono',monospace;
+  --sidebar-w:240px;--sidebar-w-compact:64px;
+  --grid-opacity:0.022;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(255,107,53,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,53,.02) 1px,transparent 1px);
+  background-image:linear-gradient(rgba(255,107,53,var(--grid-opacity)) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,53,var(--grid-opacity)) 1px,transparent 1px);
   background-size:40px 40px;}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px;}
 
 /* ── SIDEBAR ── */
-.mp-sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--bg2);border-right:1px solid var(--border);z-index:110;display:flex;flex-direction:column}
+.mp-sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);z-index:110;display:flex;flex-direction:column}
 .mp-sidebar-brand{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;flex-shrink:0}
 .mp-sidebar-brand .brand-mark{flex-shrink:0}
 .mp-sidebar-brand .brand-name{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--text);white-space:nowrap}
@@ -50,16 +54,17 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .mp-sidebar-search .spacer{flex:1}
 .mp-sidebar-search .kbd{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;font-family:var(--mono);font-size:9px;color:var(--text3)}
 .mp-sidebar-nav{flex:1;overflow-y:auto;padding:4px 0 8px}
-.mp-nav-group{padding:0 8px 0 20px;margin-bottom:2px}
+.mp-nav-group{padding:0 8px 0 8px;margin-bottom:2px}
 .mp-nav-group-h{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);padding:14px 8px 6px;user-select:none}
 .mp-nav-group-h::after{content:'';flex:1;height:1px;background:var(--border)}
-.mp-nav-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer;transition:all .12s;color:var(--text);font-size:13px;position:relative;border:1px solid transparent}
-.mp-nav-item:hover{background:var(--bg3);color:#fff}
-.mp-nav-item.active{background:linear-gradient(90deg,rgba(255,107,53,.14),rgba(255,107,53,.04));color:#fff;border-color:transparent}
-.mp-nav-item.active::before{content:'';position:absolute;left:-12px;top:6px;bottom:6px;width:2px;background:var(--accent);border-radius:0 2px 2px 0}
+.mp-nav-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer;transition:all .12s;color:var(--text2);font-size:13px;position:relative;background:transparent;outline:none}
+.mp-nav-item:not(.active):hover{background:rgba(255,255,255,.04);color:#e9ebf2}
+.mp-nav-item:not(.active):hover .ico{color:var(--text)}
+.mp-nav-item:focus-visible{outline:2px solid rgba(255,107,53,.5);outline-offset:-2px;border-radius:6px}
+.mp-nav-item.active{background:linear-gradient(90deg,rgba(255,107,53,.18),rgba(255,107,53,.04));color:#fff;font-weight:600;border-radius:0 6px 6px 0}
+.mp-nav-item.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:3px;background:#ff6b35;border-radius:0 3px 3px 0;box-shadow:0 0 12px rgba(255,107,53,.5)}
 .mp-nav-item .ico{display:flex;align-items:center;justify-content:center;width:16px;flex-shrink:0;color:var(--text2)}
-.mp-nav-item:hover .ico{color:var(--text)}
-.mp-nav-item.active .ico{color:var(--accent)}
+.mp-nav-item.active .ico svg *{stroke:#ff6b35!important}
 .mp-nav-item .badge{font-family:var(--mono);font-size:9.5px;min-width:18px;height:18px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;margin-left:auto}
 .mp-nav-item .badge.info{background:rgba(77,159,255,.14);color:#9bc3ff}
 .mp-nav-item .badge.alert{background:rgba(255,77,106,.18);color:#ff8da0}
@@ -72,23 +77,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .mp-sidebar-foot .icon-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
 /* body offset for sidebar (applied via JS on login) */
 /* ── TOPBAR (new: breadcrumb + accounts + right) ── */
-.mp-topbar{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 16px;height:44px;overflow-x:auto}
-.mp-crumbs{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0;margin-right:8px}
-.mp-crumbs .sep{color:var(--border2)}
+.mp-topbar{position:sticky;top:0;z-index:100;background:rgba(10,10,12,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 20px;height:52px;overflow-x:auto}
+.mp-crumbs{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0;margin-right:12px}
+.mp-crumbs .sep{color:var(--border2);margin:0 2px}
 .mp-crumbs .here{color:var(--text)}
-.mp-accounts{display:flex;align-items:center;gap:5px;flex:1;overflow-x:auto}
-.mp-acc{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:10px;padding:4px 9px;border-radius:5px;border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.mp-accounts{display:flex;align-items:center;gap:4px;flex:1;overflow-x:auto;scrollbar-width:none}
+.mp-accounts::-webkit-scrollbar{display:none}
+.mp-acc{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;padding:5px 10px;border-radius:6px;border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
 .mp-acc:hover{background:var(--bg3);color:var(--text)}
-.mp-acc.active{background:var(--bg3);color:var(--text);border-color:var(--border2)}
-.mp-acc-sep{width:1px;height:16px;background:var(--border2);margin:0 2px;flex-shrink:0}
-.mp-acc .gd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.mp-acc.active{background:var(--bg3);color:#fff;border-color:var(--border2)}
+.mp-acc-sep{width:1px;height:18px;background:var(--border);margin:0 4px;flex-shrink:0}
+.mp-acc .gd{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .mp-acc[data-g="meble"] .gd{background:var(--g-meble)}
 .mp-acc[data-g="luxsen"] .gd{background:var(--g-luxsen)}
 .mp-acc[data-g="one"] .gd{background:var(--g-one)}
-.mp-topbar-right{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto}
-.mp-status-pill{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:#9ee9cd;padding:4px 12px;border-radius:999px;background:rgba(45,212,160,.1);border:1px solid rgba(45,212,160,.3)}
+.mp-topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.mp-status-pill{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:#9ee9cd;padding:5px 14px;border-radius:999px;background:rgba(45,212,160,.1);border:1px solid rgba(45,212,160,.3)}
 .mp-status-pill .dot{width:6px;height:6px;border-radius:50%;background:#2dd4a0;box-shadow:0 0 6px rgba(45,212,160,.6)}
-.mp-topbar-right .icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:28px;height:28px;display:grid;place-items:center;cursor:pointer;color:var(--text3);transition:all .15s;flex-shrink:0}
+.mp-topbar-right .icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:30px;height:30px;display:grid;place-items:center;cursor:pointer;color:var(--text3);transition:all .15s;flex-shrink:0}
 .mp-topbar-right .icon-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
 /* ── OLD TOPBAR (hidden, kept for compat) ── */
 .topbar{display:none!important}
@@ -113,10 +119,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .container{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:1.5rem 1.25rem 4rem;}
 
 /* ── PAGE HEADER ── */
-.ph-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.3rem;}
-.ph-title{font-family:var(--mono);font-size:24px;font-weight:500;line-height:1.1;margin-bottom:.25rem;}
-.ph-title span{color:var(--accent);}
-.ph-sub{font-size:12px;color:var(--text3);}
+/* ── PAGE HEADER ── */
+.page-header{margin:32px 0 40px}
+.ph-eyebrow{font:11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.ph-title{font:800 72px/1.02 var(--display);letter-spacing:-.025em;color:var(--text);margin:0}
+.ph-title span{color:var(--accent)}
+.ph-sub{font:400 14px/1.5 var(--mono);color:var(--text2);margin-top:14px}
+.ph-sub .sep{color:var(--text3)}
+@media(max-width:1200px){.ph-title{font-size:52px}.ph-sub{font-size:13px}}
+@media(max-width:800px){.ph-title{font-size:40px}}
 .group-badge{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;border-radius:4px;border:1px solid;}
 .g-meble-badge{color:var(--g-meble);border-color:rgba(255,107,53,.3);background:rgba(255,107,53,.07);}
 .g-luxsen-badge{color:var(--g-luxsen);border-color:rgba(45,212,160,.3);background:rgba(45,212,160,.07);}
@@ -349,7 +360,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .dashboard-card .metric-row{display:flex;justify-content:space-between;font-size:12px;margin:4px 0;color:#374151;}
 .dashboard-card .progress-bar-wrap{background:#f3f4f6;border-radius:4px;height:6px;margin:6px 0;}
 .dashboard-card .progress-bar-fill{height:6px;border-radius:4px;transition:width .3s;}
-.metric-green{color:#16a34a;}.metric-yellow{color:#d97706;}.metric-red{color:#dc2626;}
+.metric-green{color:#16a34a;}.metric-yellow{color:#ff6b35;}.metric-red{color:#dc2626;}
 
 /* ── ARKUSZ ── */
 table.arkusz-tbl{width:100%;border-collapse:collapse;font-size:11px;min-width:1200px;}
@@ -382,7 +393,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .mv,.bk-total td,.ac-metric-val{color:#000!important;}
   .tg,.mv.green{color:#16a34a!important;}
   .tr,.mv.red{color:#dc2626!important;}
-  .ty,.mv.yellow{color:#d97706!important;}
+  .ty,.mv.yellow{color:#ff6b35!important;}
   .tb,.mv.blue{color:#2563eb!important;}
   .ta{color:#ea580c!important;}
   .tm,.ms,.sb,.text3{color:#6b7280!important;}
@@ -787,7 +798,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .nav-glbl{display:none;}
   .nav-btn{font-size:10px;padding:3px 7px;}
   .container{padding:1rem .75rem 3rem;}
-  .ph-title{font-size:20px;}
+  .ph-title{font-size:32px;}
   .g2,.g3,.g4,.g5,.g2-1,.dash-cards{grid-template-columns:1fr!important;}
   .fr-a,.fr-b{grid-template-columns:1fr 1fr!important;}
   .aec-hdr{flex-wrap:wrap;gap:.4rem;}
@@ -1114,8 +1125,8 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .topbar-accounts .nav-btn{font-size:10px;padding:6px 10px;border-radius:6px;}
   .topbar-accounts .nav-glbl{font-size:9px;}
   /* Titles */
-  .ph-title{font-size:22px !important;}
-  .ph-eyebrow{font-size:8px !important;}
+  .ph-title{font-size:28px !important;}
+  .ph-eyebrow{font-size:9px !important;}
   .ph-sub{font-size:10px !important;}
   /* Agent */
   #agentInput{font-size:12px !important;min-height:60px;}
@@ -1564,7 +1575,7 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v7.71</span>
+    <span class="brand-ver">v7.74</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -1589,11 +1600,11 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
 <!-- ═══ NEW TOPBAR (breadcrumb + accounts + right) ═══ -->
 <div class="mp-topbar" id="mpTopbar" style="display:none">
   <div class="mp-crumbs">
-    <span id="mpCrumbDate"></span>
+    <span>Owner</span>
     <span class="sep">/</span>
-    <span class="here" id="mpCrumbView">Cockpit</span>
+    <span class="here" id="mpCrumbView">Dzis <span class="sep">/</span> Cockpit</span>
   </div>
-  <div class="mp-accounts" id="mpAccounts">
+  <div class="mp-accounts" id="mpAccounts" role="tablist" aria-label="Konta">
     <div class="mp-acc active" data-acc="all" onclick="mpSelectAccount('all')"><span style="color:var(--text);font-weight:600">ALL</span> <span style="color:var(--text3)">9</span></div>
     <div class="mp-acc-sep"></div>
     <div class="mp-acc" data-g="meble" data-acc="MEBLE" onclick="mpSelectAccount('MEBLE')"><span class="gd"></span><span style="color:var(--text)">MEBLE</span></div>
@@ -1778,28 +1789,33 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
 
 <!-- ═══ VIEW: DZIŚ — COCKPIT ═══ -->
 <div class="view" id="viewDzis">
-<div class="container" style="max-width:900px">
+<div class="container" style="max-width:1280px">
   <!-- HEADER -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:36px;height:36px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(239,68,68,.4)"><svg width="14" height="16" viewBox="0 0 12 14" fill="none"><path d="M2 1L11 7L2 13V1Z" fill="#fff"/></svg></div>
-      <div>
-        <div class="ph-title" style="margin:0;line-height:1.2">Cockpit</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--text3)" id="dzisDate"></div>
-      </div>
+  <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+    <div>
+      <div class="ph-eyebrow">▸ DZIS</div>
+      <div class="ph-title">Cockpit <span id="dzisWeekday"></span></div>
+      <div class="ph-sub" id="dzisDate"></div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <div id="dzisTimer" style="font-family:var(--mono);font-size:13px;color:var(--text3)"></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:40px">
+      <div style="font-family:var(--mono);font-size:13px;color:var(--text3)">START</div>
+      <div id="dzisTimer" style="font-family:var(--mono);font-size:18px;color:var(--text);font-weight:600"></div>
+      <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;margin-left:8px">→ Kopiuj dzien</button>
+      <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer">Drukuj</button>
     </div>
   </div>
+
+  <!-- 2-COL LAYOUT -->
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start">
+  <div><!-- LEFT COLUMN: kroki dnia -->
 
   <!-- KROK 0: KATALOG OFERT -->
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:24px;height:24px;border-radius:50%;background:rgba(167,139,250,.15);color:#a78bfa;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">0</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(167,139,250,.35);color:#a78bfa;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(167,139,250,.35)">8</div>
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--text)">Katalog ofert (upload raz / miesiąc)</div>
+          <div style="font-size:15px;font-weight:600;color:var(--text)">Katalog ofert <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">MIESIECZNE</span></div>
           <div style="font-size:10px;color:var(--text3)" id="dzisCatalogStatus">Agent wie co masz wystawione — ceny, SKU, stany</div>
         </div>
       </div>
@@ -1825,9 +1841,9 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:24px;height:24px;border-radius:50%;background:rgba(255,107,53,.15);color:var(--accent);font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">1</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(255,77,106,.4);color:#ff4d6a;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,77,106,.4)">1</div>
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--text)">Dane sprzedażowe</div>
+          <div style="font-size:15px;font-weight:600;color:var(--text)">Dane sprzedażowe <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,77,106,.12);color:#ff4d6a;border:1px solid rgba(255,77,106,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">BLOKADA</span></div>
           <div style="font-size:10px;color:var(--text3)" id="dzisStep1Status">Sprawdzam...</div>
         </div>
       </div>
@@ -1838,10 +1854,10 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   <!-- KROK 2: RAPORTY XLSX -->
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div style="width:24px;height:24px;border-radius:50%;background:rgba(56,189,248,.15);color:#38bdf8;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">2</div>
+      <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(77,159,255,.35);color:#4d9fff;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(77,159,255,.35)">2</div>
       <div>
-        <div style="font-size:12px;font-weight:600;color:var(--text)">Raporty Allegro (opcjonalne)</div>
-        <div style="font-size:10px;color:var(--text3)">Upload Ads + Sprzedaż + Konwersja → głębsza analiza z numerami aukcji</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text)">Raporty Allegro <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(77,159,255,.12);color:#4d9fff;border:1px solid rgba(77,159,255,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">OPCJONALNE</span></div>
+        <div style="font-size:10px;color:var(--text3)">Upload Ads + Sprzedaz + Konwersja → glebsza analiza z numerami aukcji</div>
       </div>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
@@ -1865,9 +1881,9 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:1.25rem">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:24px;height:24px;border-radius:50%;background:rgba(239,68,68,.15);color:#ef4444;font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">3</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(255,107,53,.4);color:#ff6b35;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,107,53,.4)">3</div>
         <div>
-          <div style="font-size:12px;font-weight:600;color:var(--text)">Generuj 23 zadania na dziś</div>
+          <div style="font-size:15px;font-weight:600;color:var(--text)">Generuj 23 zadania na dzis <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,107,53,.12);color:#ff6b35;border:1px solid rgba(255,107,53,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">AKCJA</span></div>
           <div style="font-size:10px;color:var(--text3)" id="dzisStep3Info">Dane kont + Wiedza + ostatnie analizy</div>
         </div>
       </div>
@@ -1879,10 +1895,69 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   </div>
 
   <!-- DID YOU KNOW -->
-  <div id="dzisDYK" style="display:none;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-size:11px;color:#a78bfa">
-    <span style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px">Did you know?</span>
-    <span id="dzisDYKText"></span>
+  <div id="dzisDYK" style="display:none;background:linear-gradient(90deg,rgba(167,139,250,.08),rgba(167,139,250,.01));border:1px solid rgba(167,139,250,.22);border-radius:10px;padding:14px 16px;margin-bottom:1rem">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="color:#a78bfa;margin-top:2px;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 16 16" style="display:block"><path d="M1.5 8C3 5 5.5 3.5 8 3.5 10.5 3.5 13 5 14.5 8 13 11 10.5 12.5 8 12.5 5.5 12.5 3 11 1.5 8Z" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="2" fill="none" stroke="#a78bfa" stroke-width="1.5"/></svg></div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#d4c6ff;margin-bottom:6px;font-weight:600">DID YOU KNOW?</div>
+        <div id="dzisDYKText" style="font-size:13px;line-height:1.5;color:var(--text)"></div>
+        <div style="margin-top:10px;display:flex;gap:6px">
+          <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Kopiuj</button>
+          <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Drukuj</button>
+          <button onclick="if(typeof wkQuickAdd==='function'){const t=document.getElementById('dzisDYKText');wkQuickAdd(t?t.textContent:'')}" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Zapisz w Wiedzy</button>
+        </div>
+      </div>
+    </div>
   </div>
+
+  </div><!-- /LEFT COLUMN -->
+
+  <!-- RIGHT COLUMN: szybki podglad -->
+  <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:68px">
+    <!-- DZIŚ · SZYBKI PODGLĄD -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px">DZIS · SZYBKI PODGLAD</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">SPRZEDAZ MTD</div>
+          <div id="dzisQuickSales" style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);line-height:1">—</div>
+          <div id="dzisQuickSalesEom" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px"></div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">SREDNI ROAS</div>
+          <div id="dzisQuickRoas" style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);line-height:1">—</div>
+          <div id="dzisQuickRoasRange" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px"></div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">KONTA W CZERWIENI</div>
+          <div id="dzisQuickRed" style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);line-height:1">—</div>
+          <div id="dzisQuickRedNames" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px"></div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">ZADANIA DZIS</div>
+          <div id="dzisQuickTasks" style="font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);line-height:1">—</div>
+          <div id="dzisQuickTasksSub" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOCUS (WYBRANE PRZEZ AGENTA) -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">FOCUS (WYBRANE PRZEZ AGENTA)</div>
+      <div id="dzisQuickFocus" style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3)">Wygeneruj plan, zeby zobaczyc focus</div>
+      </div>
+    </div>
+
+    <!-- WCZORAJ · DELTA -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">WCZORAJ · DELTA</div>
+      <div id="dzisQuickDelta" style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3)">Dane pojawia sie po wpisaniu</div>
+      </div>
+    </div>
+  </div><!-- /RIGHT COLUMN -->
+  </div><!-- /2-COL GRID -->
 
   <!-- STATS + PROGRESS -->
   <div id="dzisStats" class="dzis-stats" style="display:none"></div>
@@ -1903,11 +1978,8 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
   <!-- TASKS -->
   <div id="dzisContent"></div>
 
-  <!-- FOOTER -->
-  <div id="dzisFooter" style="display:none;margin-top:1.5rem;display:flex;gap:.5rem">
-    <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Kopiuj</button>
-    <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Drukuj</button>
-  </div>
+  <!-- FOOTER (buttons moved to header) -->
+  <div id="dzisFooter" style="display:none"></div>
 </div>
 </div>
 
@@ -2113,8 +2185,8 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
 <div class="container">
   <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
     <div>
-      <div class="ph-eyebrow" style="color:var(--yellow)">▸ Twoje wynagrodzenie agencyjne</div>
-      <div class="ph-title">Rozliczenie <span style="color:var(--yellow)">LUXSEN</span></div>
+      <div class="ph-eyebrow" style="color:var(--accent)">▸ TWOJE WYNAGRODZENIE AGENCYJNE</div>
+      <div class="ph-title">Rozliczenie <span>LUXSEN</span></div>
       <div class="ph-sub" id="rozSub">Luxsen · Semmi · BOTAVIT · stawka 20% od marży po reklamie</div>
     </div>
     <div style="display:flex;align-items:center;gap:.5rem">
@@ -2323,8 +2395,8 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
 <div class="container">
   <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
     <div>
-      <div class="ph-eyebrow" style="color:var(--yellow)">▸ Inteligentna analiza</div>
-      <div class="ph-title">Insights <span style="color:var(--yellow)">& Sygnały</span></div>
+      <div class="ph-eyebrow" style="color:var(--accent)">▸ INTELIGENTNA ANALIZA</div>
+      <div class="ph-title">Insights <span>& Sygnały</span></div>
       <div class="ph-sub" id="insightsSub">Zagrożenia, szanse i obserwacje per konto</div>
     </div>
     <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">
@@ -2399,7 +2471,7 @@ body:not(.zm-worker-view) #zmAnnounceBar{top:44px;margin-left:0}
     <button onclick="openPlaybook('KP')" class="agent-chip" style="border-color:rgba(244,114,182,.3);color:#f472b6;background:rgba(244,114,182,.06)">Kanibalizacja</button>
     <button onclick="openPlaybook('DT')" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.06)">D2D / Trend</button>
     <button onclick="openPlaybook('SE')" class="agent-chip" style="border-color:rgba(232,121,249,.3);color:#e879f9;background:rgba(232,121,249,.06)">Symulator</button>
-    <button onclick="openPlaybook('IA')" class="agent-chip" style="border-color:rgba(251,191,36,.3);color:#fbbf24;background:rgba(251,191,36,.06)">Insights</button>
+    <button onclick="openPlaybook('IA')" class="agent-chip" style="border-color:rgba(255,107,53,.3);color:#ff6b35;background:rgba(255,107,53,.06)">Insights</button>
     <button onclick="openPlaybook('RC')" class="agent-chip" style="border-color:rgba(156,163,175,.3);color:#9ca3af;background:rgba(156,163,175,.06)">Raporty</button>
     <button onclick="openPlaybook('MC')" class="agent-chip" style="border-color:rgba(52,211,153,.3);color:#34d399;background:rgba(52,211,153,.06)">Mentor</button>
     <button onclick="openPlaybook('BA')" class="agent-chip" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.08)">Biznes</button>
@@ -4084,6 +4156,7 @@ function showView(v){
     dzisCheckStep1();
     dzisStartTimer();
     catRenderStatus();
+    if (typeof dzisPopulateQuickView === 'function') dzisPopulateQuickView();
     // Show DYK
     const wE = getWiedza();
     if (wE.length) { const r = wE[Math.floor(Math.random()*wE.length)]; document.getElementById('dzisDYKText').textContent = r.title+' — '+r.content.substring(0,120)+'...'; document.getElementById('dzisDYK').style.display='block'; }
@@ -4091,7 +4164,8 @@ function showView(v){
     const now2 = new Date();
     const dayN2 = ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'];
     const moN2 = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
-    document.getElementById('dzisDate').textContent = `${dayN2[now2.getDay()]}, ${now2.getDate()} ${moN2[now2.getMonth()]} ${now2.getFullYear()} · Dzień ${now2.getDate()}/${DAYS_IN[MONTHS[now2.getMonth()]]||30}`;
+    const wd = document.getElementById('dzisWeekday'); if (wd) wd.textContent = dayN2[now2.getDay()].toLowerCase();
+    document.getElementById('dzisDate').textContent = `${now2.getDate()} ${moN2[now2.getMonth()]} ${now2.getFullYear()} · Dzień ${now2.getDate()}/${DAYS_IN[MONTHS[now2.getMonth()]]||30} miesiąca`;
     const cached2 = JSON.parse(localStorage.getItem(DZIS_CACHE_KEY)||'{}');
     if (cached2.date === now2.toLocaleDateString('pl-PL') && cached2.tasks) dzisRenderTasks(cached2.tasks, cached2.summary);
   } else if(v==='entry'){
@@ -4222,7 +4296,7 @@ function showView(v){
     // Highlight account chip in new topbar
     mpSelectAccount(v);
     const ce = document.getElementById('mpCrumbView');
-    if (ce) ce.textContent = v;
+    if (ce) ce.innerHTML = 'Konto <span class="sep">/</span> ' + v;
   }
   window.scrollTo(0,0);
   try{ localStorage.setItem('lastActiveTab', v); }catch(e){}
@@ -9124,7 +9198,7 @@ const MP_NAV = [
   ]},
   { group:'Analiza', items:[
     { k:'months',        id:'navSbTrend',     label:'Trend',     icon:'trend' },
-    { k:'insights',      id:'navSbInsights',  label:'Insights',  icon:'insights', badge:'mpAlertBadge', badgeCls:'alert' },
+    { k:'insights',      id:'navSbInsights',  label:'Insights',  icon:'eye', badge:'mpAlertBadge', badgeCls:'alert' },
     { k:'compare',       id:'navSbCompare',   label:'Compare',   icon:'compare' },
     { k:'wyniki',        id:'navSbResults',   label:'Results',   icon:'results' },
     { k:'d2d',           id:'navSbD2d',       label:'D2D',       icon:'d2d' },
@@ -9153,17 +9227,11 @@ const MP_NAV = [
   ]},
 ];
 
-// View key → breadcrumb label (just the view name)
-const MP_CRUMB = { entry: 'Data', crossborder: 'Cross-Border' };
-MP_NAV.forEach(g => g.items.forEach(it => { MP_CRUMB[it.k] = it.label; }));
+// View key → breadcrumb parts [group, label]
+const MP_CRUMB = { entry: ['Dzis','Data'], crossborder: ['Operacyjne','Cross-Border'] };
+MP_NAV.forEach(g => g.items.forEach(it => { MP_CRUMB[it.k] = [g.group, it.label]; }));
 
 function mpInitSidebar() {
-  // Set date in breadcrumb
-  const now = new Date();
-  const dayN = ['nd','pn','wt','śr','cz','pt','sb'];
-  const moN = ['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','paź','lis','gru'];
-  const dateEl = document.getElementById('mpCrumbDate');
-  if (dateEl) dateEl.textContent = dayN[now.getDay()] + '. ' + now.getDate() + ' ' + moN[now.getMonth()] + ' ' + now.getFullYear();
   const nav = document.getElementById('mpSidebarNav');
   if (!nav) return;
   nav.innerHTML = MP_NAV.map(g => `
@@ -9180,11 +9248,20 @@ function mpInitSidebar() {
 
 function mpUpdateCrumb(viewKey) {
   const el = document.getElementById('mpCrumbView');
-  if (el) el.textContent = MP_CRUMB[viewKey] || viewKey;
+  if (!el) return;
+  const parts = MP_CRUMB[viewKey];
+  if (parts) {
+    el.innerHTML = parts[0] + ' <span class="sep">/</span> ' + parts[1];
+  } else {
+    el.textContent = viewKey;
+  }
 }
 
 function mpHighlightSidebar(viewKey) {
-  document.querySelectorAll('.mp-nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.mp-nav-item').forEach(el => {
+    el.classList.remove('active');
+    el.style.background = '';
+  });
   const item = MP_NAV.flatMap(g => g.items).find(it => it.k === viewKey);
   if (item) {
     const el = document.getElementById(item.id);
@@ -18100,6 +18177,104 @@ function dzisStartTimer() {
   }, 1000);
 }
 
+function dzisPopulateQuickView() {
+  // Sales MTD
+  const accs = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
+  let totalSales = 0, totalAds = 0, roasArr = [], redNames = [];
+  const cm = MONTHS[new Date().getMonth()];
+  accs.forEach(k => {
+    const d = DATA[k] && DATA[k][cm];
+    if (!d) return;
+    const s = parseFloat(d.sales) || 0;
+    const a = parseFloat(d.ads) || 0;
+    totalSales += s;
+    totalAds += a;
+    if (a > 0) roasArr.push(s / a);
+    const m = AC_META[k]?.margin || 60;
+    const beRoas = 1 / (m / 100);
+    if (a > 0 && (s / a) < beRoas) redNames.push(k);
+  });
+  const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  el('dzisQuickSales', totalSales > 0 ? (totalSales >= 1e6 ? (totalSales/1e6).toFixed(2)+'M' : Math.round(totalSales/1000)+'k') + ' zl' : '—');
+  const avgRoas = roasArr.length ? roasArr.reduce((a,b)=>a+b,0)/roasArr.length : 0;
+  el('dzisQuickRoas', avgRoas > 0 ? avgRoas.toFixed(2) + 'x' : '—');
+  const minR = roasArr.length ? Math.min(...roasArr).toFixed(1) : '—';
+  const maxR = roasArr.length ? Math.max(...roasArr).toFixed(1) : '—';
+  el('dzisQuickRoasRange', avgRoas > 0 ? 'min ' + minR + ' · max ' + maxR : '');
+  el('dzisQuickRed', String(redNames.length));
+  el('dzisQuickRedNames', redNames.length ? redNames.join(' · ') : 'Brak');
+  // Tasks today
+  const todayTasks = zmTasks.filter(t => {
+    if (!t.dueDate || t.status === 'verified') return false;
+    const d = new Date(t.dueDate); d.setHours(0,0,0,0);
+    const n = new Date(); n.setHours(0,0,0,0);
+    return d.getTime() === n.getTime();
+  });
+  const pilne = todayTasks.filter(t => t.priority === 'PILNE').length;
+  el('dzisQuickTasks', String(todayTasks.length));
+  el('dzisQuickTasksSub', pilne ? pilne + ' PILNE' : '');
+  // EOM estimate
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const dayOfMonth = now.getDate();
+  if (totalSales > 0 && dayOfMonth > 1) {
+    const eom = totalSales / (dayOfMonth - 1) * daysInMonth;
+    el('dzisQuickSalesEom', 'est. EOM ' + (eom >= 1e6 ? (eom/1e6).toFixed(2)+'M' : Math.round(eom/1000)+'k') + ' zl');
+  }
+  // Overdue tasks
+  const overdue = zmTasks.filter(t => {
+    if (!t.dueDate || t.status === 'verified' || t.status === 'done') return false;
+    return new Date(t.dueDate) < new Date(new Date().setHours(0,0,0,0));
+  }).length;
+  el('dzisQuickTasksSub', [pilne ? pilne+' PILNE' : '', overdue ? overdue+' po terminie' : ''].filter(Boolean).join(' · ') || '');
+  // Focus — find worst performing accounts (TODO: podpiąć do Firestore AI)
+  const focusEl = document.getElementById('dzisQuickFocus');
+  if (focusEl && totalSales > 0) {
+    const focusItems = [];
+    accs.forEach(k => {
+      const d = DATA[k] && DATA[k][cm]; if (!d) return;
+      const s = parseFloat(d.sales)||0, a = parseFloat(d.ads)||0;
+      const m = AC_META[k]?.margin || 60;
+      const beRoas = 1/(m/100);
+      const roas = a > 0 ? s/a : 0;
+      if (a > 0 && roas < beRoas) focusItems.push({k, roas, type:'red', msg:'ROAS '+roas.toFixed(1)+'x < BE '+beRoas.toFixed(1)+'x'});
+      else if (a > 0 && roas > 8) focusItems.push({k, roas, type:'green', msg:'skalowac Ads (ROAS '+roas.toFixed(1)+'x)'});
+    });
+    if (focusItems.length) {
+      const colors = {red:'var(--red)',green:'var(--green)',yellow:'var(--yellow)'};
+      focusEl.innerHTML = focusItems.slice(0,3).map(f => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--border);border-left:2px solid ${colors[f.type]||'var(--text3)'}">
+          <span style="font-size:12px">${f.k} — ${f.msg}</span>
+          <span style="flex:1"></span>
+          <span style="color:var(--text3)">→</span>
+        </div>`).join('');
+    }
+  }
+  // Delta (vs previous month)
+  const deltaEl = document.getElementById('dzisQuickDelta');
+  if (deltaEl && totalSales > 0) {
+    const prevMonth = MONTHS[(now.getMonth() - 1 + 12) % 12];
+    let prevSales = 0, prevAds = 0;
+    accs.forEach(k => { const d = DATA[k]?.[prevMonth]; if(d){prevSales+=(parseFloat(d.sales)||0);prevAds+=(parseFloat(d.ads)||0);} });
+    const mkRow = (label, val, suffix) => {
+      const up = parseFloat(val) >= 0;
+      return `<div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text2)">${label}</span>
+        <span style="font-family:var(--mono);font-size:12px;color:${up?'#9ee9cd':'#ffb7c4'}">${up?'▲':'▼'} ${Math.abs(val)}${suffix}</span>
+      </div>`;
+    };
+    if (prevSales > 0) {
+      const sDelta = ((totalSales-prevSales)/prevSales*100).toFixed(1);
+      const prevRoas = prevAds>0 ? prevSales/prevAds : 0;
+      const rDelta = avgRoas>0&&prevRoas>0 ? (avgRoas-prevRoas).toFixed(2) : null;
+      const aDelta = prevAds>0 ? ((totalAds-prevAds)/prevAds*100).toFixed(1) : null;
+      deltaEl.innerHTML = mkRow('Sprzedaz', sDelta, '%')
+        + (rDelta !== null ? mkRow('ROAS', rDelta, 'x') : '')
+        + (aDelta !== null ? mkRow('Koszt Ads', aDelta, '%') : '');
+    }
+  }
+}
+
 function generateDzisRefresh() {
   localStorage.removeItem(DZIS_CACHE_KEY);
   const todayStr = new Date().toLocaleDateString('pl-PL');
@@ -20457,7 +20632,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.71</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.74</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -23557,7 +23732,7 @@ self.addEventListener('fetch', e => e.respondWith(
         <label style="font-family:var(--mono);font-size:10px;color:var(--text2)">Do:</label>
         <input type="date" id="reportDateTo" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none;color-scheme:dark">
       </div>
-      <div id="reportDateWarning" style="font-family:var(--mono);font-size:9px;color:#f59e0b;margin-top:.4rem;display:none"></div>
+      <div id="reportDateWarning" style="font-family:var(--mono);font-size:9px;color:#ff6b35;margin-top:.4rem;display:none"></div>
     </div>
 
     <div class="report-modal-actions">
@@ -23616,7 +23791,7 @@ self.addEventListener('fetch', e => e.respondWith(
         <label style="font-family:var(--mono);font-size:10px;color:var(--text2)">Do:</label>
         <input type="date" id="slideDateTo" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none;color-scheme:dark">
       </div>
-      <div id="slideDateWarning" style="font-family:var(--mono);font-size:9px;color:#f59e0b;margin-top:.4rem;display:none"></div>
+      <div id="slideDateWarning" style="font-family:var(--mono);font-size:9px;color:#ff6b35;margin-top:.4rem;display:none"></div>
     </div>
 
     <div class="report-modal-actions">
