@@ -57,13 +57,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .mp-nav-group{padding:0 8px 0 8px;margin-bottom:2px}
 .mp-nav-group-h{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);padding:14px 8px 6px;user-select:none}
 .mp-nav-group-h::after{content:'';flex:1;height:1px;background:var(--border)}
-.mp-nav-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer;transition:all .12s;color:var(--text2);font-size:13px;position:relative;border-left:2px solid transparent;background:transparent;outline:none}
-.mp-nav-item:hover:not(.active){background:rgba(255,255,255,.04);color:var(--text)}
-.mp-nav-item:focus:not(.active){background:transparent}
-.mp-nav-item.active{background:linear-gradient(90deg,rgba(255,107,53,.14),rgba(255,107,53,.04));color:#fff;border-left:2px solid var(--accent);border-radius:0 6px 6px 0}
+.mp-nav-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer;transition:all .12s;color:var(--text2);font-size:13px;position:relative;background:transparent;outline:none}
+.mp-nav-item:not(.active):hover{background:rgba(255,255,255,.04);color:#e9ebf2}
+.mp-nav-item:not(.active):hover .ico{color:var(--text)}
+.mp-nav-item:focus-visible{outline:2px solid rgba(255,107,53,.5);outline-offset:-2px;border-radius:6px}
+.mp-nav-item.active{background:linear-gradient(90deg,rgba(255,107,53,.18),rgba(255,107,53,.04));color:#fff;font-weight:600;border-radius:0 6px 6px 0}
+.mp-nav-item.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:3px;background:#ff6b35;border-radius:0 3px 3px 0;box-shadow:0 0 12px rgba(255,107,53,.5)}
 .mp-nav-item .ico{display:flex;align-items:center;justify-content:center;width:16px;flex-shrink:0;color:var(--text2)}
-.mp-nav-item:hover:not(.active) .ico{color:var(--text)}
-.mp-nav-item.active .ico{color:var(--accent)}
+.mp-nav-item.active .ico svg{stroke:#ff6b35!important}
 .mp-nav-item .badge{font-family:var(--mono);font-size:9.5px;min-width:18px;height:18px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;margin-left:auto}
 .mp-nav-item .badge.info{background:rgba(77,159,255,.14);color:#9bc3ff}
 .mp-nav-item .badge.alert{background:rgba(255,77,106,.18);color:#ff8da0}
