@@ -17,6 +17,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <style>
 :root{
+  /* frozen design tokens */
   --bg:#0f1117;--bg2:#181c26;--bg3:#1e2333;
   --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
   --text:#e8eaf0;--text2:#8b91a8;--text3:#4a5068;
@@ -28,18 +29,21 @@
   --blue-in:rgba(77,159,255,.09);--blue-in-bd:rgba(77,159,255,.3);
   --g-meble:#ff6b35;--g-luxsen:#2dd4a0;--g-one:#b47fff;
   --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+  --display:'Satoshi',-apple-system,sans-serif;
+  --sidebar-w:240px;--sidebar-w-compact:64px;
+  --grid-opacity:0.022;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(255,107,53,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,53,.02) 1px,transparent 1px);
+  background-image:linear-gradient(rgba(255,107,53,var(--grid-opacity)) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,53,var(--grid-opacity)) 1px,transparent 1px);
   background-size:40px 40px;}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px;}
 
 /* ── SIDEBAR ── */
-.mp-sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--bg2);border-right:1px solid var(--border);z-index:110;display:flex;flex-direction:column}
+.mp-sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);z-index:110;display:flex;flex-direction:column}
 .mp-sidebar-brand{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;flex-shrink:0}
 .mp-sidebar-brand .brand-mark{flex-shrink:0}
 .mp-sidebar-brand .brand-name{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--text);white-space:nowrap}
@@ -118,7 +122,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 /* ── PAGE HEADER ── */
 .page-header{margin:32px 0 40px}
 .ph-eyebrow{font:11px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
-.ph-title{font:800 72px/1.02 'Satoshi',-apple-system,sans-serif;letter-spacing:-.025em;color:var(--text);margin:0}
+.ph-title{font:800 72px/1.02 var(--display);letter-spacing:-.025em;color:var(--text);margin:0}
 .ph-title span{color:var(--accent)}
 .ph-sub{font:400 14px/1.5 var(--mono);color:var(--text2);margin-top:14px}
 .ph-sub .sep{color:var(--text3)}
