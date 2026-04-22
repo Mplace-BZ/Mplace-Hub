@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v7.97</title>
+<title>MPlace Hub v7.98</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1574,7 +1574,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v7.97</span>
+    <span class="brand-ver">v7.98</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -18247,31 +18247,44 @@ function dzisPopulateQuickView() {
     const best = withAds.filter(a => a.roas >= a.beRoas).sort((a,b) => b.roas - a.roas)[0];
     const mid = withAds.filter(a => a !== worst && a !== best && a.roas >= a.beRoas).sort((a,b) => a.roas - b.roas)[0];
     const items = [];
-    if (worst) items.push({name: worst.name, msg: 'marza ' + worst.marginAfter.toFixed(0) + '%, interwencja', type: 'red'});
-    if (best) items.push({name: best.name, msg: 'skalowac Ads (ROAS ' + best.roas.toFixed(1) + 'x)', type: 'green'});
-    if (mid) items.push({name: mid.name, msg: 'wyroznienia w kanibalizacji', type: 'yellow'});
+    if (worst) items.push({name: worst.name, key: worst.k, msg: 'marza ' + worst.marginAfter.toFixed(0) + '%, interwencja', type: 'red', view: worst.k});
+    if (best) items.push({name: best.name, key: best.k, msg: 'skalowac Ads (ROAS ' + best.roas.toFixed(1) + 'x)', type: 'green', view: best.k});
+    if (mid) items.push({name: mid.name, key: mid.k, msg: 'wyroznienia w kanibalizacji', type: 'yellow', view: 'kanibalizator'});
     if (items.length) {
       const colors = {red:'#ff4d6a',green:'#2dd4a0',yellow:'#f5a623'};
       focusEl.innerHTML = items.map(f => `
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);border-left:3px solid ${colors[f.type]}">
+        <div onclick="showView('${f.view}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);border-left:3px solid ${colors[f.type]};cursor:pointer;transition:background .15s" onmouseenter="this.style.background='var(--bg2)'" onmouseleave="this.style.background='var(--bg3)'">
           <span style="font-size:12px;color:var(--text)">${f.name} — ${f.msg}</span>
           <span style="flex:1"></span>
           <span style="color:var(--text3);font-size:14px">→</span>
         </div>`).join('');
     }
   }
-  // Delta (vs previous month) — 4 rows: Sprzedaz, ROAS, Marza, Koszt Ads
+  // Delta (EOM estimate vs previous closed month) — 4 rows: Sprzedaz, ROAS, Marza, Koszt Ads
   const deltaEl = document.getElementById('dzisQuickDelta');
   if (deltaEl && totalSales > 0) {
     const prevMonth = MONTHS[(now.getMonth() - (hasCurrentData ? 1 : 2) + 12) % 12];
-    let prevSales = 0, prevAds = 0, prevMarginSum = 0, curMarginSum = 0;
+    let prevSales = 0, prevAds = 0, prevMarginSum = 0, prevMarginCount = 0;
+    let curMarginSum = 0, eomSales = 0, eomAds = 0;
     accs.forEach(k => {
       const d = getMonth(k, prevMonth); if (!d) return;
-      const ps = parseFloat(d.sprzedaz)||0, pa = parseFloat(d.adsCost)||0;
-      prevSales += ps; prevAds += pa;
-      const pC = calc(d, getProd(k)); if (pC) prevMarginSum += pC.mAfter;
+      prevSales += parseFloat(d.sprzedaz)||0;
+      prevAds += parseFloat(d.adsCost)||0;
+      const pC = calc(d, getProd(k)); if (pC) { prevMarginSum += pC.mAfter; prevMarginCount++; }
+    });
+    // EOM estimates for current month
+    accs.forEach(k => {
+      const d = getMonth(k, cm); if (!d) return;
+      const s = parseFloat(d.sprzedaz)||0, a = parseFloat(d.adsCost)||0;
+      if (!d.dzien || d.dzien <= 1) { eomSales += s; eomAds += a; return; }
+      const ed = effectiveDzien(d.dzien);
+      const daysIn = DAYS_IN[d.m]||30;
+      eomSales += d.estOver ? d.estOver : Math.round(s * daysIn / ed);
+      eomAds += Math.round(a * daysIn / ed);
     });
     acData.forEach(a => { curMarginSum += a.marginAfter; });
+    const isEom = hasCurrentData && dayOfMonth < daysInMonth;
+    const labelSfx = isEom ? ' (est.)' : '';
     const mkRow = (label, val, suffix) => {
       const up = parseFloat(val) >= 0;
       return `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">
@@ -18280,17 +18293,20 @@ function dzisPopulateQuickView() {
       </div>`;
     };
     if (prevSales > 0) {
-      const sDelta = ((totalSales-prevSales)/prevSales*100).toFixed(1);
+      const compSales = isEom ? eomSales : totalSales;
+      const compAds = isEom ? eomAds : totalAds;
+      const sDelta = ((compSales-prevSales)/prevSales*100).toFixed(1);
       const prevWRoas = prevAds > 0 ? prevSales/prevAds : 0;
-      const rDelta = wRoas > 0 && prevWRoas > 0 ? (wRoas - prevWRoas).toFixed(2) : null;
+      const curWRoas = compAds > 0 ? compSales/compAds : 0;
+      const rDelta = curWRoas > 0 && prevWRoas > 0 ? (curWRoas - prevWRoas).toFixed(2) : null;
       const avgCurM = acData.length ? (curMarginSum / acData.length) : 0;
-      const avgPrevM = accs.length ? (prevMarginSum / accs.length) : 0;
+      const avgPrevM = prevMarginCount > 0 ? (prevMarginSum / prevMarginCount) : 0;
       const mDelta = avgPrevM !== 0 ? (avgCurM - avgPrevM).toFixed(1) : null;
-      const aDelta = prevAds > 0 ? ((totalAds-prevAds)/prevAds*100).toFixed(1) : null;
-      deltaEl.innerHTML = mkRow('Sprzedaz', sDelta, '%')
+      const aDelta = prevAds > 0 ? ((compAds-prevAds)/prevAds*100).toFixed(1) : null;
+      deltaEl.innerHTML = mkRow('Sprzedaz' + labelSfx, sDelta, '%')
         + (rDelta !== null ? mkRow('ROAS', rDelta, 'x') : '')
         + (mDelta !== null ? mkRow('Marza', mDelta, ' p.p.') : '')
-        + (aDelta !== null ? mkRow('Koszt Ads', aDelta, '%') : '');
+        + (aDelta !== null ? mkRow('Koszt Ads' + labelSfx, aDelta, '%') : '');
     }
   }
 }
@@ -20652,7 +20668,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.97</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.98</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
