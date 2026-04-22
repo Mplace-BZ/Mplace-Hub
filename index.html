@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.08</title>
+<title>MPlace Hub v8.09</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1645,7 +1645,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.08</span>
+    <span class="brand-ver">v8.09</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -1807,28 +1807,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   </div>
 </div>
 
-<!-- MEBLE GLOBAL -->
-<div style="border:1px solid rgba(255,107,53,.22);border-radius:10px;padding:.85rem 1rem;margin:0 1.25rem .85rem;background:rgba(255,107,53,.03)">
-  <div class="entry-group-hdr egh-m" style="margin-top:0">MEBLE — Rynki globalne (Centrum Finansow)</div>
-  <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:.75rem;letter-spacing:.05em">Wpisz dane per konto z zakladki Centrum Finansow → Podsumowanie oplat (wszystkie rynki lacznie)</div>
-  <div id="entryGlobal"></div>
-  <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem">
-    <button class="btn" onclick="saveGlobal()" style="color:var(--g-meble);border-color:rgba(255,107,53,.3)">▸ Zapisz globalne</button>
-    <span class="smsg" id="globalMsg"></span>
-  </div>
-</div>
-
-<!-- Save bar -->
-<div class="save-bar" style="margin:0 1.25rem 2rem">
-  <button class="btn primary" onclick="saveAllWithSync()">▸ Zapisz wszystkie wpisy</button>
-  <button id="closingToggle" class="btn" onclick="toggleClosingMode()" style="color:var(--text3);border-color:var(--border)" title="Zamkniecie poprzedniego miesiaca">↩ Zamkniecie</button>
-  <button class="btn" onclick="showBackupModal()" style="color:var(--green);border-color:rgba(45,212,160,.3)">Backup</button>
-  <button class="btn" onclick="showHistEditModal()" style="color:#b47fff;border-color:rgba(180,127,255,.3)" title="Edytuj dane historycznego miesiaca">✎ Korekta historii</button>
-  <button class="btn" onclick="exportCSV()">↗ Eksport CSV</button>
-  <button class="btn" onclick="saveSnapshotD2D()" style="color:#b47fff;border-color:rgba(180,127,255,.3)">Zapisz do D2D</button>
-  <input type="file" id="importFileInput" accept=".json" onchange="importJSON(event)">
-  <span class="smsg" id="saveMsg">✓ Zapisano</span>
-</div>
+<!-- Hidden: MEBLE Global + Save bar moved into data-center via JS -->
+<div style="display:none" id="entryGlobal"></div>
+<span style="display:none" id="globalMsg"></span>
+<span style="display:none" id="saveMsg"></span>
+<input type="file" id="importFileInput" accept=".json" onchange="importJSON(event)" style="display:none">
+<button style="display:none" id="closingToggle"></button>
 
 <!-- Hidden containers for legacy renderEntry compatibility -->
 <div style="display:none" id="entryMEBLE"></div>
@@ -5426,12 +5410,43 @@ function renderDataCenter(k){
         <button class="data-nav-btn" onclick="dataNavPrev()">← POPRZEDNIE</button>
         <button class="data-nav-btn primary" onclick="dataSaveAndNext()">ZAPISZ → NASTEPNE KONTO ≫</button>
       </div>
+    </div>
+
+    <!-- MEBLE GLOBAL (inline) -->
+    <div id="dataGlobalWrap" style="border:1px solid rgba(255,107,53,.22);border-radius:10px;padding:.85rem 1rem;margin-top:1.5rem;background:rgba(255,107,53,.03)">
+      <div class="entry-group-hdr egh-m" style="margin-top:0">MEBLE — Rynki globalne (Centrum Finansow)</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:.75rem;letter-spacing:.05em">Wpisz dane per konto z zakladki Centrum Finansow → Podsumowanie oplat (wszystkie rynki lacznie)</div>
+      <div id="entryGlobalInline"></div>
+      <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem">
+        <button class="btn" onclick="saveGlobal()" style="color:var(--g-meble);border-color:rgba(255,107,53,.3)">▸ Zapisz globalne</button>
+        <span class="smsg" id="globalMsgInline"></span>
+      </div>
+    </div>
+
+    <!-- Save bar -->
+    <div class="save-bar" style="margin-top:.85rem">
+      <button class="btn primary" onclick="saveAllWithSync()">▸ Zapisz wszystkie wpisy</button>
+      <button onclick="toggleClosingMode()" class="btn" style="color:var(--text3);border-color:var(--border)">↩ Zamkniecie</button>
+      <button class="btn" onclick="showBackupModal()" style="color:var(--green);border-color:rgba(45,212,160,.3)">Backup</button>
+      <button class="btn" onclick="showHistEditModal()" style="color:#b47fff;border-color:rgba(180,127,255,.3)">✎ Korekta historii</button>
+      <button class="btn" onclick="exportCSV()">↗ Eksport CSV</button>
+      <button class="btn" onclick="saveSnapshotD2D()" style="color:#b47fff;border-color:rgba(180,127,255,.3)">Zapisz do D2D</button>
+      <span class="smsg" id="saveMsgInline"></span>
     </div>`;
 
   document.getElementById('dataCenterContent').innerHTML = html;
   updateAuto(k);
   // Load notes
   if(typeof renderNoteLog==='function') renderNoteLog(k);
+  // Render global entry form into inline container
+  if(typeof renderGlobalEntryForm==='function'){
+    const origEl = document.getElementById('entryGlobal');
+    const inlineEl = document.getElementById('entryGlobalInline');
+    if(origEl && inlineEl) inlineEl.innerHTML = origEl.innerHTML || '';
+    renderGlobalEntryForm();
+    // Copy rendered content
+    setTimeout(()=>{ if(origEl&&inlineEl&&origEl.innerHTML) inlineEl.innerHTML=origEl.innerHTML; },50);
+  }
 }
 
 function renderDataRight(k){
@@ -21054,7 +21069,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.08</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.09</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
