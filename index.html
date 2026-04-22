@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v7.96</title>
+<title>MPlace Hub v7.97</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1574,7 +1574,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v7.96</span>
+    <span class="brand-ver">v7.97</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -1812,7 +1812,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(167,139,250,.35);color:#a78bfa;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(167,139,250,.35)">8</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(167,139,250,.35);color:#a78bfa;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(167,139,250,.35)">1</div>
         <div>
           <div style="font-size:15px;font-weight:600;color:var(--text)">Katalog ofert <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">MIESIECZNE</span></div>
           <div style="font-family:var(--mono);font-size:11px;color:var(--text2)" id="dzisCatalogStatus">upload raz / miesiac · 1 018 ofert zaladowanych</div>
@@ -1843,7 +1843,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(255,77,106,.4);color:#ff4d6a;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,77,106,.4)">1</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(255,77,106,.4);color:#ff4d6a;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,77,106,.4)">2</div>
         <div>
           <div style="font-size:15px;font-weight:600;color:var(--text)">Dane sprzedażowe <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,77,106,.12);color:#ff4d6a;border:1px solid rgba(255,77,106,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">BLOKADA</span></div>
           <div style="font-size:10px;color:var(--text3)" id="dzisStep1Status">Sprawdzam...</div>
@@ -1856,7 +1856,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <!-- KROK 2: RAPORTY XLSX -->
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(77,159,255,.35);color:#4d9fff;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(77,159,255,.35)">2</div>
+      <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(77,159,255,.35);color:#4d9fff;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(77,159,255,.35)">3</div>
       <div>
         <div style="font-size:15px;font-weight:600;color:var(--text)">Raporty Allegro <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(77,159,255,.12);color:#4d9fff;border:1px solid rgba(77,159,255,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">OPCJONALNE</span></div>
         <div style="font-size:10px;color:var(--text3)">Upload Ads + Sprzedaz + Konwersja → glebsza analiza z numerami aukcji</div>
@@ -1883,7 +1883,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:1.25rem">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(255,107,53,.4);color:#ff6b35;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,107,53,.4)">3</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(255,107,53,.4);color:#ff6b35;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,107,53,.4)">4</div>
         <div>
           <div style="font-size:15px;font-weight:600;color:var(--text)">Generuj 23 zadania na dzis <span style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,107,53,.12);color:#ff6b35;border:1px solid rgba(255,107,53,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">AKCJA</span></div>
           <div style="font-size:10px;color:var(--text3)" id="dzisStep3Info">Dane kont + Wiedza + ostatnie analizy</div>
@@ -20652,7 +20652,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.96</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.97</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
