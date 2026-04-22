@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.29</title>
+<title>MPlace Hub v8.30</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1652,7 +1652,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.29</span>
+    <span class="brand-ver">v8.30</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -4472,16 +4472,16 @@ function renderArkusz(){
 // ═══════════════════════════════════════════════════════════
 const INFO_SECTIONS = [
   { id:'main', label:'Core Tools', items:[
-    {name:'◎ Cockpit', desc:'Generuje 23 zadan na dzis z AI. Gamifikacja, checkboxy, progress bar, streak, Did You Know.', steps:['Kliknij ▶ Play w sidebarze','AI analizuje dane 9 kont + baze Wiedzy','Odhaczaj zadania jedno po drugim','Cel: 100% dziennie — buduj streak'], useWhen:'Codziennie rano — zacznij dzien od Cockpita. AI przygotuje spersonalizowane zadania na podstawie Twoich danych i ostatnich zmian.', caseStudy:'Poniedzialek rano: otwierasz Cockpit, AI widzi ze Semmi miala spadek -25% w piatek i generuje zadanie "Sprawdz kampanie Semmi — spadek sprzedazy". Odhaczasz po sprawdzeniu.'},
-    {name:'◧ Dashboard', desc:'Przeglad 9 kont w jednym widoku. Karty z ROAS AKG, marza, estymacja EOM. Heatmap marzy, ranking, traffic light.', steps:['Kliknij Dashboard','Przejrzyj karty kont (zielone=OK, czerwone=interwencja)','Kliknij karte → szczegoly konta'], useWhen:'Szybki przeglad portfela — ktore konta wymagaja uwagi, ktore mozna skalowac.', caseStudy:'Dashboard pokazuje BOTAVIT z czerwona karta (marza -9%). Klikasz → widzisz ze ROAS 1.30x jest ponizej BE 5.34x. Wchodzisz w Analiza.'},
-    {name:'◉ Data', desc:'Wpisz dane miesieczne per konto. 3-kolumnowy layout: lista kont, formularz, sanity check + dane wczorajsze.', steps:['Kliknij Data','Wybierz konto z lewego menu','Wypelnij 01 Koszty / 02 Sprzedaz / 03 Dostawa','KPI aktualizuje sie live + sanity check po prawej','Kliknij nastepne konto (auto-save)','Na koncu: Zapisz wszystkie wpisy → Firebase sync'], useWhen:'Codziennie po pobraniu danych z Allegro. Dane za dzien N wpisujesz w dniu N+1.', caseStudy:'Wpisujesz dane PerfektCiecie: sprzedaz 62 491 zl. Sanity check od razu pokazuje "Sprzedaz -8% vs wczoraj" z czerwonym alertem. Sprawdzasz czy to sezon czy problem.'},
-    {name:'✦ Agent', desc:'Glowny chat AI (Sonnet 4.6). 9 kategorii Playbook (100 promptow). Pelny kontekst danych + baza Wiedzy. Eksporty PDF/PPTX.', steps:['Kliknij Agent','Wybierz prompt z Playbooka LUB wpisz wlasne pytanie','Enter = wyslij','Agent analizuje dane 9 kont i odpowiada','Kopiuj / Drukuj / Email pod odpowiedzia'], useWhen:'Gdy potrzebujesz szybkiej analizy, symulacji, raportu lub porady — zamiast robic to recznie.', caseStudy:'Pytasz: "Jesli podniose ROAS BOTAVIT do 7x to jaki wynik na koniec miesiaca?" Agent liczy: przy budzetcie 4327 zl i ROAS 7x → sprzedaz wzrosnie o ~40%, marza do +12%.'},
+    {name:'Cockpit', icon:'cockpit', desc:'Generuje 23 zadan na dzis z AI. Gamifikacja, checkboxy, progress bar, streak, Did You Know.', steps:['Kliknij ▶ Play w sidebarze','AI analizuje dane 9 kont + baze Wiedzy','Odhaczaj zadania jedno po drugim','Cel: 100% dziennie — buduj streak'], useWhen:'Codziennie rano — zacznij dzien od Cockpita. AI przygotuje spersonalizowane zadania na podstawie Twoich danych i ostatnich zmian.', caseStudy:'Poniedzialek rano: otwierasz Cockpit, AI widzi ze Semmi miala spadek -25% w piatek i generuje zadanie "Sprawdz kampanie Semmi — spadek sprzedazy". Odhaczasz po sprawdzeniu.'},
+    {name:'Dashboard', icon:'dashboard', desc:'Przeglad 9 kont w jednym widoku. Karty z ROAS AKG, marza, estymacja EOM. Heatmap marzy, ranking, traffic light.', steps:['Kliknij Dashboard','Przejrzyj karty kont (zielone=OK, czerwone=interwencja)','Kliknij karte → szczegoly konta'], useWhen:'Szybki przeglad portfela — ktore konta wymagaja uwagi, ktore mozna skalowac.', caseStudy:'Dashboard pokazuje BOTAVIT z czerwona karta (marza -9%). Klikasz → widzisz ze ROAS 1.30x jest ponizej BE 5.34x. Wchodzisz w Analiza.'},
+    {name:'Data', icon:'data', desc:'Wpisz dane miesieczne per konto. 3-kolumnowy layout: lista kont, formularz, sanity check + dane wczorajsze.', steps:['Kliknij Data','Wybierz konto z lewego menu','Wypelnij 01 Koszty / 02 Sprzedaz / 03 Dostawa','KPI aktualizuje sie live + sanity check po prawej','Kliknij nastepne konto (auto-save)','Na koncu: Zapisz wszystkie wpisy → Firebase sync'], useWhen:'Codziennie po pobraniu danych z Allegro. Dane za dzien N wpisujesz w dniu N+1.', caseStudy:'Wpisujesz dane PerfektCiecie: sprzedaz 62 491 zl. Sanity check od razu pokazuje "Sprzedaz -8% vs wczoraj" z czerwonym alertem. Sprawdzasz czy to sezon czy problem.'},
+    {name:'Agent', icon:'agent', desc:'Glowny chat AI (Sonnet 4.6). 9 kategorii Playbook (100 promptow). Pelny kontekst danych + baza Wiedzy. Eksporty PDF/PPTX.', steps:['Kliknij Agent','Wybierz prompt z Playbooka LUB wpisz wlasne pytanie','Enter = wyslij','Agent analizuje dane 9 kont i odpowiada','Kopiuj / Drukuj / Email pod odpowiedzia'], useWhen:'Gdy potrzebujesz szybkiej analizy, symulacji, raportu lub porady — zamiast robic to recznie.', caseStudy:'Pytasz: "Jesli podniose ROAS BOTAVIT do 7x to jaki wynik na koniec miesiaca?" Agent liczy: przy budzetcie 4327 zl i ROAS 7x → sprzedaz wzrosnie o ~40%, marza do +12%.'},
   ]},
   { id:'ai', label:'AI Workflow', items:[
-    {name:'⊙ Analysis', desc:'Wgraj 3-4 raporty Allegro XLSX (Ads/Odwiedziny/Sprzedaz + opcja 30d kontekst) → AI generuje 10-sekcyjny raport per konto.', steps:['Wybierz konto z dropdown','Ustaw okres (7d/14d/30d lub custom daty)','Wgraj 3 pliki XLSX','Opcja: wgraj Ads 30d jako kontekst historyczny','Wpisz uwagi/obserwacje w textarea','Kliknij Analizuj z AI','Raport: Diagnoza → Zatrzymaj → Tnij → Skaluj → Kanibalizacja → Martwe punkty → Placement → Plan'], useWhen:'Co tydzien per konto MEBLE. Co 2 tygodnie dla LUXSEN/ONE. Gdy zobaczysz spadek na Dashboard.', caseStudy:'Upload 3 plikow MobelKap za ostatnie 14 dni. AI wykrywa 12 kampanii z ROAS < 3 do wylaczenia, 5 kampanii z ROAS > 10 do skalowania, kanibalizacje miedzy szafka pralkowa 62 i 65.'},
-    {name:'◇ Strategy', desc:'Karty 3 kont MEBLE z rolami portfelowymi (SCALE/NICHE/PREMIUM). KPI vs targety, specjalizacje, AI plan reorganizacji.', steps:['Kliknij Strategy','Przejrzyj karty rol: MK=Scale, PC=Niche, MnC=Premium','Sprawdz KPI vs cele per konto','AI generuje plan reorganizacji kampanii'], useWhen:'Raz w miesiacu lub po duzych zmianach. Gdy chcesz przekalibrowac role kont w portfelu.', caseStudy:'PC ma ROAS 4.82x ponizej BE 6.96x. Strategy pokazuje ze PC powinno skupic sie na niszach (donice, kwietniki) zamiast walczyc z MK o szafki pralkowe.'},
-    {name:'⚡ Ads Hub', desc:'Generator nazw kampanii Format A v2. Walidator konwencji. AI Architect — pelny plan reorganizacji 3 kont MEBLE + eksport CSV.', steps:['Wypelnij formularz (konto, kategoria, linia, wymiar)','Kliknij Generuj nazwy → gotowe nazwy kampanii/grup','Opcja: AI Architect analizuje wszystkie kampanie i generuje plan + CSV'], useWhen:'Gdy tworzysz nowe kampanie lub reorganizujesz istniejace. CSV importujesz do Allegro.', caseStudy:'Tworzysz nowa kampanie dla KARO 92: /010/ LAZIENKA_PRALKA_62 → [MK][010][WW][RW] PRALKA_62_WOTAN. Architect reorganizuje 47 kampanii MK/PC/MnC i eksportuje CSV.'},
-    {name:'◆ Screener', desc:'Multi-turn chat z AI + paste screenshotow (Ctrl+V). Vision: agent widzi obrazki. Historia rozmow zapisywana.', steps:['Kliknij Screener','Wklej screenshot z panelu Allegro (Ctrl+V)','Lub wpisz pytanie','Agent widzi obrazki + kontekst 9 kont','Kontynuuj rozmowe (multi-turn)','Zapisz rozmowe do historii'], useWhen:'Gdy widzisz cos dziwnego w panelu Allegro i chcesz szybka opinie AI. Iteracyjna analiza screenshotow.', caseStudy:'Wklejasz screenshot statystyk kampanii Semmi — AI widzi ze CPC wynosi 3.20 zl (2x wyzej niz norma) i rekomenduje przelaczenie na Dynamic CPC.'},
+    {name:'Analysis', icon:'screener', desc:'Wgraj 3-4 raporty Allegro XLSX (Ads/Odwiedziny/Sprzedaz + opcja 30d kontekst) → AI generuje 10-sekcyjny raport per konto.', steps:['Wybierz konto z dropdown','Ustaw okres (7d/14d/30d lub custom daty)','Wgraj 3 pliki XLSX','Opcja: wgraj Ads 30d jako kontekst historyczny','Wpisz uwagi/obserwacje w textarea','Kliknij Analizuj z AI','Raport: Diagnoza → Zatrzymaj → Tnij → Skaluj → Kanibalizacja → Martwe punkty → Placement → Plan'], useWhen:'Co tydzien per konto MEBLE. Co 2 tygodnie dla LUXSEN/ONE. Gdy zobaczysz spadek na Dashboard.', caseStudy:'Upload 3 plikow MobelKap za ostatnie 14 dni. AI wykrywa 12 kampanii z ROAS < 3 do wylaczenia, 5 kampanii z ROAS > 10 do skalowania, kanibalizacje miedzy szafka pralkowa 62 i 65.'},
+    {name:'Strategy', icon:'pie', desc:'Karty 3 kont MEBLE z rolami portfelowymi (SCALE/NICHE/PREMIUM). KPI vs targety, specjalizacje, AI plan reorganizacji.', steps:['Kliknij Strategy','Przejrzyj karty rol: MK=Scale, PC=Niche, MnC=Premium','Sprawdz KPI vs cele per konto','AI generuje plan reorganizacji kampanii'], useWhen:'Raz w miesiacu lub po duzych zmianach. Gdy chcesz przekalibrowac role kont w portfelu.', caseStudy:'PC ma ROAS 4.82x ponizej BE 6.96x. Strategy pokazuje ze PC powinno skupic sie na niszach (donice, kwietniki) zamiast walczyc z MK o szafki pralkowe.'},
+    {name:'Ads Hub', icon:'ads', desc:'Generator nazw kampanii Format A v2. Walidator konwencji. AI Architect — pelny plan reorganizacji 3 kont MEBLE + eksport CSV.', steps:['Wypelnij formularz (konto, kategoria, linia, wymiar)','Kliknij Generuj nazwy → gotowe nazwy kampanii/grup','Opcja: AI Architect analizuje wszystkie kampanie i generuje plan + CSV'], useWhen:'Gdy tworzysz nowe kampanie lub reorganizujesz istniejace. CSV importujesz do Allegro.', caseStudy:'Tworzysz nowa kampanie dla KARO 92: /010/ LAZIENKA_PRALKA_62 → [MK][010][WW][RW] PRALKA_62_WOTAN. Architect reorganizuje 47 kampanii MK/PC/MnC i eksportuje CSV.'},
+    {name:'Screener', icon:'screener', desc:'Multi-turn chat z AI + paste screenshotow (Ctrl+V). Vision: agent widzi obrazki. Historia rozmow zapisywana.', steps:['Kliknij Screener','Wklej screenshot z panelu Allegro (Ctrl+V)','Lub wpisz pytanie','Agent widzi obrazki + kontekst 9 kont','Kontynuuj rozmowe (multi-turn)','Zapisz rozmowe do historii'], useWhen:'Gdy widzisz cos dziwnego w panelu Allegro i chcesz szybka opinie AI. Iteracyjna analiza screenshotow.', caseStudy:'Wklejasz screenshot statystyk kampanii Semmi — AI widzi ze CPC wynosi 3.20 zl (2x wyzej niz norma) i rekomenduje przelaczenie na Dynamic CPC.'},
   ]},
   { id:'meble', label:'MEBLE Roles', items:[
     {name:'MobelKap — SCALE', desc:'Rola: wolumen i skala. Produkty: szafki pralkowe, nowosci, polki, t-box, KARO 92. Ads cel 6.5%, Wyroznienia cel 5.0%, pricing base.', useWhen:'MK jest glownym kontem wolumenowym — tu skalujesz bestsellery i testujesz nowosci.'},
@@ -4490,20 +4490,20 @@ const INFO_SECTIONS = [
     {name:'Regula wlasnosci frazy', desc:'Aukcja na 2+ kontach → wygrywa konto z najwyzszym ROAS + zgodne z rola. Pozostale wylaczaja Ads na te fraze, zostawiaja listing organicznie.', caseStudy:'Szafka pralkowa 62 jest na MK i PC. MK ma ROAS 8.2x, PC ma 4.1x. Wedlug reguly: MK wygrywa, PC wylacza Ads na te fraze.'},
   ]},
   { id:'analiza', label:'Analytics', items:[
-    {name:'∿ Trend', desc:'12 miesiecy historycznych per konto. Przelaczniki pill: SPRZEDAZ EST / MARZA / ROAS ADS / ZYSK NETTO / ACOS LACZNY.', useWhen:'Gdy chcesz zobaczyc trend sprzedazy lub marzy w czasie. Porownanie kont miesieczne.', caseStudy:'Przelaczasz na MARZA % — widzisz ze Semmi spada od 3 miesiecy z 15% do -9%. Sygnalizujesz problem.'},
-    {name:'⊙ Insights', desc:'Auto-alerty per konto. Zagrozenia (czerwone), Szanse (zielone), Obserwuj (zolte). Czerwona kropka w menu = sa nowe alerty.', useWhen:'Sprawdzaj raz dziennie — Insights automatycznie flaguje problemy i szanse ktore mozesz przegapic.', caseStudy:'Insights flaguje: "MtzzEU: ROAS spada 3 miesiace z rzedu (9.2→7.4→5.8)" jako Zagrozenie z impact wysoki.'},
-    {name:'⊞ Compare', desc:'Wybierz 2-3 konta i porownaj metryki side-by-side.', useWhen:'Gdy chcesz porownac dwa konta bezposrednio — np. MK vs MnC albo Luxsen vs Semmi.'},
-    {name:'⌁ D2D', desc:'Day-to-day snapshoty. Filtruj po koncie, dniu tygodnia, miesiaku, metryce. Tabela z deltami % dzien-do-dnia.', useWhen:'Gdy chcesz zobaczyc wzorce dzienne — np. czy poniedzialek jest zawsze lepszy niz piatek.', caseStudy:'Filtrujesz D2D po "Pt" i "Sb" — widzisz ze weekend to -30% sprzedazy vs poniedzialek. Zmniejszasz budzet Ads na weekendy.'},
-    {name:'◧ Results', desc:'Wyniki finansowe per konto per miesiac. Najnowszy na gorze. ROAS, ACOS, marza, estymacja.', useWhen:'Szybki przeglad wynikow finansowych — ktore konto zarabia, ktore traci.'},
-    {name:'⊞ Sheet', desc:'Tabela wszystkich danych w jednym widoku. Eksport-ready. Wszystkie metryki w kolumnach.', useWhen:'Gdy potrzebujesz surowych danych do Excela lub prezentacji.'},
+    {name:'Trend', icon:'trend', desc:'12 miesiecy historycznych per konto. Przelaczniki pill: SPRZEDAZ EST / MARZA / ROAS ADS / ZYSK NETTO / ACOS LACZNY.', useWhen:'Gdy chcesz zobaczyc trend sprzedazy lub marzy w czasie. Porownanie kont miesieczne.', caseStudy:'Przelaczasz na MARZA % — widzisz ze Semmi spada od 3 miesiecy z 15% do -9%. Sygnalizujesz problem.'},
+    {name:'Insights', icon:'eye', desc:'Auto-alerty per konto. Zagrozenia (czerwone), Szanse (zielone), Obserwuj (zolte). Czerwona kropka w menu = sa nowe alerty.', useWhen:'Sprawdzaj raz dziennie — Insights automatycznie flaguje problemy i szanse ktore mozesz przegapic.', caseStudy:'Insights flaguje: "MtzzEU: ROAS spada 3 miesiace z rzedu (9.2→7.4→5.8)" jako Zagrozenie z impact wysoki.'},
+    {name:'Compare', icon:'compare', desc:'Wybierz 2-3 konta i porownaj metryki side-by-side.', useWhen:'Gdy chcesz porownac dwa konta bezposrednio — np. MK vs MnC albo Luxsen vs Semmi.'},
+    {name:'D2D', icon:'d2d', desc:'Day-to-day snapshoty. Filtruj po koncie, dniu tygodnia, miesiaku, metryce. Tabela z deltami % dzien-do-dnia.', useWhen:'Gdy chcesz zobaczyc wzorce dzienne — np. czy poniedzialek jest zawsze lepszy niz piatek.', caseStudy:'Filtrujesz D2D po "Pt" i "Sb" — widzisz ze weekend to -30% sprzedazy vs poniedzialek. Zmniejszasz budzet Ads na weekendy.'},
+    {name:'Results', icon:'results', desc:'Wyniki finansowe per konto per miesiac. Najnowszy na gorze. ROAS, ACOS, marza, estymacja.', useWhen:'Szybki przeglad wynikow finansowych — ktore konto zarabia, ktore traci.'},
+    {name:'Sheet', icon:'sheet', desc:'Tabela wszystkich danych w jednym widoku. Eksport-ready. Wszystkie metryki w kolumnach.', useWhen:'Gdy potrzebujesz surowych danych do Excela lub prezentacji.'},
   ]},
   { id:'tools', label:'Tools', items:[
-    {name:'⊿ Calc', desc:'Kalkulator ROAS, ACoS, marza, BE, CPC, CTR, CPA. 3 tryby obliczen.', useWhen:'Szybkie obliczenia "ile potrzebuje ROAS zeby wyjsc na zero" — bez szukania w glowie.'},
-    {name:'△ Simulator', desc:'"Co jesli" — testuj zmiany cen/Ads/marzy. Suwaki z live preview wyniku.', useWhen:'Przed podjechiem decyzji: "co jesli podnosze cene o 5%?" albo "co jesli podwajam budzet Ads?".', caseStudy:'Suwak: budzet Ads MK +50%. Simulator pokazuje: sprzedaz +22%, ale marza spada z 10.7% do 7.3%. Decyzja: nie warto.'},
-    {name:'⊞ Kalendarz', desc:'Allegro Days, Smart! Weeks, Black Weeks, swieta 2026. Planuj kampanie z wyprzedzeniem.', useWhen:'Co miesiac sprawdz co nadchodzi — przygotuj kampanie na Allegro Days z 2-tygodniowym wyprzedzeniem.'},
-    {name:'✦ Knowledge', desc:'Baza wiedzy: slownik, benchmark, zasady, artykuly, case study. Auto-wstrzykiwana do kazdego zapytania Agenta.', useWhen:'Dodaj nowa wiedze gdy odkryjesz cos waznego — Agent bedzie to uwzglednial we wszystkich odpowiedziach.'},
-    {name:'◎ Biznes', desc:'Fee agencji per grupa, marza grupy, zysk netto. Przeglad finansowy portfela.', useWhen:'Na koniec miesiaca — sprawdz ile zarobiles i ile placisz agencji.'},
-    {name:'◉ Rozliczenie', desc:'Faktury miesieczne per grupa. MEBLE 7500 zl stale, LUXSEN 20% marzy, ONE stale stawki.', useWhen:'Przy wystawianiu faktur — sprawdz kwoty per grupa.'},
+    {name:'Calc', icon:'calc', desc:'Kalkulator ROAS, ACoS, marza, BE, CPC, CTR, CPA. 3 tryby obliczen.', useWhen:'Szybkie obliczenia "ile potrzebuje ROAS zeby wyjsc na zero" — bez szukania w glowie.'},
+    {name:'Simulator', icon:'sim', desc:'"Co jesli" — testuj zmiany cen/Ads/marzy. Suwaki z live preview wyniku.', useWhen:'Przed podjechiem decyzji: "co jesli podnosze cene o 5%?" albo "co jesli podwajam budzet Ads?".', caseStudy:'Suwak: budzet Ads MK +50%. Simulator pokazuje: sprzedaz +22%, ale marza spada z 10.7% do 7.3%. Decyzja: nie warto.'},
+    {name:'Kalendarz', icon:'calendar', desc:'Allegro Days, Smart! Weeks, Black Weeks, swieta 2026. Planuj kampanie z wyprzedzeniem.', useWhen:'Co miesiac sprawdz co nadchodzi — przygotuj kampanie na Allegro Days z 2-tygodniowym wyprzedzeniem.'},
+    {name:'Knowledge', icon:'knowledge', desc:'Baza wiedzy: slownik, benchmark, zasady, artykuly, case study. Auto-wstrzykiwana do kazdego zapytania Agenta.', useWhen:'Dodaj nowa wiedze gdy odkryjesz cos waznego — Agent bedzie to uwzglednial we wszystkich odpowiedziach.'},
+    {name:'Biznes', icon:'biz', desc:'Fee agencji per grupa, marza grupy, zysk netto. Przeglad finansowy portfela.', useWhen:'Na koniec miesiaca — sprawdz ile zarobiles i ile placisz agencji.'},
+    {name:'Rozliczenie', icon:'settle', desc:'Faktury miesieczne per grupa. MEBLE 7500 zl stale, LUXSEN 20% marzy, ONE stale stawki.', useWhen:'Przy wystawianiu faktur — sprawdz kwoty per grupa.'},
   ]},
   { id:'workflow', label:'Daily Workflow', items:[
     {name:'Rano (15 min)', desc:'▶ Cockpit → 23 zadan → odhacz po kolei. Dashboard szybki przeglad. Data wpis danych z wczoraj.', useWhen:'Codziennie 8:00-8:15. Nie pomijaj — streak motywuje.'},
@@ -4560,15 +4560,12 @@ function renderInfoContent(id){
     <div style="font-family:var(--sans);font-size:28px;font-weight:800;color:var(--text);margin-bottom:1.2rem">${colorLabel}</div>`;
 
   section.items.forEach(item => {
-    // Extract icon from name (first char if special)
-    const nameMatch = item.name.match(/^([^\w\s])\s*(.+)$/);
-    const icon = nameMatch ? nameMatch[1] : '▸';
-    const title = nameMatch ? nameMatch[2] : item.name;
+    const iconSvg = item.icon ? mpIcon(item.icon, 18, '#ff6b35') : '<span style="color:var(--accent)">▸</span>';
 
     html += `<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:14px 18px;margin-bottom:.75rem">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <span style="font-size:16px;color:var(--accent)">${icon}</span>
-        <span style="font-family:var(--sans);font-size:16px;font-weight:700;color:var(--text)">${title}</span>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        ${iconSvg}
+        <span style="font-family:var(--sans);font-size:16px;font-weight:700;color:var(--text)">${item.name}</span>
       </div>
       <div style="font-family:var(--sans);font-size:13px;color:var(--text2);line-height:1.7">${item.desc}</div>`;
 
@@ -21250,7 +21247,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.29</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.30</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
