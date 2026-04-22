@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.23</title>
+<title>MPlace Hub v8.24</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -704,14 +704,15 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .agent-live-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:#34d399;margin-bottom:1rem;}
 .agent-live-dot{width:6px;height:6px;border-radius:50%;background:#34d399;animation:mPulse 1.5s infinite;}
 @media(max-width:800px){.agent-panels{grid-template-columns:1fr;}.agent-pb-grid{grid-template-columns:repeat(2,1fr);}}
-.ins-filter{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;}
-.ins-filter.active{background:var(--bg3);color:var(--text);border-color:var(--border2);}
-.ins-filter:hover{background:var(--bg3);color:var(--text);}
-.ins-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.6rem;}
+.ins-filter{font-family:var(--mono);font-size:11px;padding:7px 14px;border:none;border-right:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.ins-filter:last-child{border-right:none;}
+.ins-filter.active{background:var(--bg3);color:var(--fc,var(--text));font-weight:600;}
+.ins-filter:hover{background:var(--bg3);color:var(--fc,var(--text));}
+.ins-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.2rem 1.3rem;margin-bottom:.75rem;}
 .ins-card.danger{border-left:3px solid var(--red);}
 .ins-card.chance{border-left:3px solid var(--green);}
 .ins-card.watch{border-left:3px solid var(--yellow);}
-.ins-signal{display:flex;align-items:flex-start;gap:.6rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;line-height:1.5;}
+.ins-signal{display:flex;align-items:flex-start;gap:.75rem;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;line-height:1.6;}
 .ins-signal:last-child{border-bottom:none;}
 .ins-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;}
 .ins-dot.danger{background:var(--red);}
@@ -1651,7 +1652,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.23</span>
+    <span class="brand-ver">v8.24</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2454,48 +2455,23 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     </div>
   </div>
 
-  <!-- Progress bar -->
-  <div class="entry-date-bar" id="insightsDateBar" style="margin-bottom:.85rem">
-    <div>
-      <div class="edb-lbl">Bieżący miesiąc</div>
-      <div style="display:flex;align-items:center;gap:.55rem;margin-top:2px">
-        <div class="edb-val" id="insMonth">—</div>
-        <span class="month-status ms-active"><span class="ms-pulse"></span>w toku</span>
-      </div>
-    </div>
-    <div class="nav-sep" style="height:26px"></div>
-    <div>
-      <div class="edb-lbl">Dzień miesiąca</div>
-      <div class="day-wrap">
-        <label>dzień</label>
-        <span style="color:var(--accent);font-family:var(--mono);font-size:14px;font-weight:500;padding:3px 8px" id="insDayNum">—</span>
-        <label id="insDayOf">/31</label>
-      </div>
-    </div>
-    <div class="nav-sep" style="height:26px"></div>
-    <div>
-      <div class="edb-lbl">Postęp</div>
-      <div style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent)" id="insProg">—</div>
-    </div>
-    <div class="nav-sep" style="height:26px"></div>
-    <div>
-      <div class="edb-lbl">Historia</div>
-      <div class="tl-bar" id="insTL"></div>
-    </div>
-  </div>
+  <!-- Hidden date bar elements for renderInsights compatibility -->
+  <div style="display:none" id="insightsDateBar"><span id="insMonth"></span><span id="insDayNum"></span><span id="insDayOf"></span><span id="insProg"></span><div id="insTL"></div></div>
 
-  <!-- Summary bar -->
+  <!-- Summary tiles -->
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1.2rem" id="insightsSummary"></div>
 
   <!-- Filters -->
   <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">
-    <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase">Pokaż:</span>
-    <button class="ins-filter active" data-f="all" onclick="insSetFilter('all',this)">Wszystkie</button>
-    <button class="ins-filter" data-f="danger" onclick="insSetFilter('danger',this)" style="color:var(--red)">↓ Zagrożenia</button>
-    <button class="ins-filter" data-f="chance" onclick="insSetFilter('chance',this)" style="color:var(--green)">↑ Szanse</button>
-    <button class="ins-filter" data-f="watch" onclick="insSetFilter('watch',this)" style="color:var(--yellow)">→ Obserwuj</button>
+    <span style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase">POKAŻ:</span>
+    <div style="display:inline-flex;align-items:center;gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden">
+      <button class="ins-filter active" data-f="all" onclick="insSetFilter('all',this)">Wszystkie</button>
+      <button class="ins-filter" data-f="danger" onclick="insSetFilter('danger',this)" style="--fc:var(--red)">↓ Zagrożenia</button>
+      <button class="ins-filter" data-f="chance" onclick="insSetFilter('chance',this)" style="--fc:var(--green)">↑ Szanse</button>
+      <button class="ins-filter" data-f="watch" onclick="insSetFilter('watch',this)" style="--fc:var(--yellow)">→ Obserwuj</button>
+    </div>
     <div style="flex:1"></div>
-    <button onclick="printInsights()" style="font-family:var(--mono);font-size:10px;padding:4px 12px;border-radius:5px;border:1px solid rgba(245,166,35,.3);background:transparent;color:var(--yellow);cursor:pointer">⎙ Drukuj</button>
+    <button onclick="printInsights()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:5px;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.06);color:var(--yellow);cursor:pointer">⎙ Drukuj</button>
   </div>
 
   <div id="insightsContent"></div>
@@ -21112,7 +21088,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.23</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.24</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
