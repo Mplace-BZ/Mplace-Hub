@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.12</title>
+<title>MPlace Hub v8.13</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1645,7 +1645,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.12</span>
+    <span class="brand-ver">v8.13</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5316,10 +5316,44 @@ function renderDataLeft(){
 }
 
 function dataSelectAccount(k){
+  // Auto-save current account to localStorage before switching
+  if(_dataActiveKey && _dataActiveKey !== k) dataSaveCurrentToLocal(_dataActiveKey);
   _dataActiveKey = k;
   renderDataLeft();
   renderDataCenter(k);
   renderDataRight(k);
+}
+
+function dataSaveCurrentToLocal(k){
+  const sp = gN(`e_${k}_sp`);
+  const adsC = gN(`e_${k}_adsC`);
+  if(!sp && !adsC) return; // nothing to save
+  const dzienGlobal = parseInt(document.getElementById('globalDay').value) || new Date().getDate();
+  const {m:curM} = getSaveMonth(dzienGlobal);
+  const dzienLocal = gN(`e_${k}_dzien`);
+  const entry = {
+    m: curM,
+    ss: document.getElementById(`e_${k}_ss`)?.value || '',
+    qlt: gN(`e_${k}_qlt`),
+    sprzedaz: sp || 0,
+    delivery: gN(`e_${k}_del`) || 0,
+    commission: gN(`e_${k}_comm`) || 0,
+    adsCost: adsC || 0,
+    roas: gN(`e_${k}_roas`) || 0,
+    wartoscAds: gN(`e_${k}_wartoscAds`) || 0,
+    promoC: gN(`e_${k}_promoC`) || 0,
+    elasticC: 0,
+    coinsC: gN(`e_${k}_coinsC`) || 0,
+    dzien: dzienLocal || dzienGlobal,
+    note: (document.getElementById(`e_${k}_note`)?.value || '').trim(),
+    estOver: null,
+    savedAt: Date.now(),
+    savedDay: new Date().toLocaleDateString('pl-PL'),
+  };
+  const D = getData(k);
+  const idx = D.findIndex(x => x.m === curM);
+  if(idx >= 0) D[idx] = entry; else D.push(entry);
+  setData(k, D);
 }
 
 function renderDataCenter(k){
@@ -5560,11 +5594,11 @@ function dataNavPrev(){
 }
 
 function dataSaveAndNext(){
-  saveAllWithSync();
+  dataSaveCurrentToLocal(_dataActiveKey);
   const keys = Object.keys(AC_META);
   const idx = keys.indexOf(_dataActiveKey);
   if (idx < keys.length - 1) dataSelectAccount(keys[idx + 1]);
-  else renderDataLeft(); // refresh checkmarks on last account
+  else { renderDataLeft(); saveAllWithSync(); } // last account → full sync
 }
 
 function gN(id){const v=parseFloat(document.getElementById(id)?.value);return isNaN(v)?null:v;}
@@ -21065,7 +21099,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.12</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.13</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
