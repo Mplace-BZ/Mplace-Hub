@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v7.93</title>
+<title>MPlace Hub v7.94</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1180,10 +1180,10 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 }
 
 /* ── ZESPÓŁ — overlay panel (nie .view system) ── */
-.zm-panel{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;animation:fi .2s ease}
+.zm-panel{display:none;background:var(--bg);overflow-y:auto;animation:fi .2s ease}
 .zm-panel.open{display:block}
-.zm-worker-view .zm-panel{position:static;z-index:auto;inset:auto;overflow:visible}
-.zm-worker-view .zm-panel .zm-panel-close{display:none}
+.zm-worker-view .zm-panel{overflow:visible}
+.zm-panel-close{display:none}
 /* Worker: hide Wszyscy filter */
 .zm-worker-view #zmFilterWorker{display:none}
 /* Task card enhancements */
@@ -1574,7 +1574,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v7.93</span>
+    <span class="brand-ver">v7.94</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -1788,7 +1788,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 <!-- ═══ VIEW: DZIŚ — COCKPIT ═══ -->
 <div class="view" id="viewDzis">
-<div class="container" style="max-width:1280px">
+<div class="container">
   <!-- HEADER -->
   <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
     <div>
@@ -2768,7 +2768,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 </div>
 <!-- ═══ VIEW: ANALIZA OFERT ═══ -->
 <div class="view" id="viewAnaliza">
-<div class="container" style="max-width:860px">
+<div class="container">
   <div style="margin-bottom:1rem">
     <div class="ph-eyebrow">► ANALIZA DANYCH ALLEGRO</div>
     <div class="ph-title">Analiza <span>Ofert</span></div>
@@ -2892,7 +2892,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 <!-- ═══ VIEW: CROSS-BORDER CZ/SK ═══ -->
 <div class="view" id="viewCrossBorder">
-<div class="container" style="max-width:920px">
+<div class="container">
   <div style="margin-bottom:1rem">
     <div class="ph-eyebrow">► CROSS-BORDER CZ / SK</div>
     <div class="ph-title">Scanner <span>Zagraniczny</span></div>
@@ -3021,7 +3021,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 <!-- ═══ VIEW: KANIBALIZATOR ═══ -->
 <div class="view" id="viewKanibalizator">
-<div class="container" style="max-width:1100px">
+<div class="container">
   <div style="margin-bottom:1rem">
     <div class="ph-eyebrow">► PLANOWANIE WYRÓŻNIEŃ</div>
     <div class="ph-title">Wyróżnienia <span>◆</span> Manager</div>
@@ -3095,7 +3095,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 <!-- ═══ VIEW: SCREENER ═══ -->
 <div class="view" id="viewScreener">
-<div class="container" style="max-width:860px">
+<div class="container">
   <div style="margin-bottom:1rem">
     <div class="ph-eyebrow">► ROZMOWA Z AGENTEM</div>
     <div class="ph-title">Screener <span>◆</span></div>
@@ -3174,7 +3174,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 <!-- ═══ VIEW: TITLE ANALYZER ═══ -->
 <div class="view" id="viewTitleAnalyzer">
-<div class="container" style="max-width:900px">
+<div class="container">
   <div style="margin-bottom:1rem">
     <div class="ph-eyebrow">► OPTYMALIZACJA TYTUŁÓW OFERT</div>
     <div class="ph-title">Title <span>Analyzer</span></div>
@@ -3251,7 +3251,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 <!-- ═══ VIEW: STRATEGIA ═══ -->
 <div class="view" id="viewStrategia">
-<div class="container" style="max-width:1200px">
+<div class="container">
   <div style="margin-bottom:1.5rem">
     <div class="ph-eyebrow">► STRATEGIA PORTFELOWA</div>
     <div class="ph-title">Strategia <span>◆</span> Grupy</div>
@@ -3290,7 +3290,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 <!-- ═══ VIEW: CENTRUM ADS ═══ -->
 <div class="view" id="viewCentrumAds">
-<div class="container" style="max-width:1200px">
+<div class="container">
   <div style="margin-bottom:1.5rem">
     <div class="ph-eyebrow">► CENTRUM KAMPANII ALLEGRO ADS</div>
     <div class="ph-title">Centrum <span>◆</span> Ads</div>
@@ -3674,19 +3674,13 @@ IDs: 123456 789012 ..."></textarea>
 </div>
 </div>
 
-<!-- ═══ PANEL: ZESPÓŁ (overlay, nie .view system) ═══ -->
+<!-- ═══ PANEL: ZESPÓŁ (inline view, z sidebarem) ═══ -->
 <div class="zm-panel" id="zmPanel">
-<div class="zm-panel-close">
-  <button onclick="zmClosePanel()">← Wróć</button>
-  <span>Zespół</span>
-</div>
-<div class="container" style="max-width:960px">
-  <div class="zm-header">
-    <div>
-      <div class="ph-eyebrow">► ZARZĄDZANIE ZESPOŁEM</div>
-      <div class="ph-title">Zespół <span>✦</span></div>
-      <div class="ph-sub">Acta, non verba — czyny, nie słowa</div>
-    </div>
+<div class="container">
+  <div class="page-header">
+    <div class="ph-eyebrow">▸ ZARZADZANIE ZESPOLEM</div>
+    <div class="ph-title">Zespol <span>✦</span></div>
+    <div class="ph-sub">Acta, non verba — czyny, nie slowa</div>
   </div>
 
   <div class="zm-tabs">
@@ -9208,8 +9202,8 @@ const MP_NAV = [
     { k:'months',        id:'navSbTrend',     label:'Trend',     icon:'trend' },
     { k:'insights',      id:'navSbInsights',  label:'Insights',  icon:'eye', badge:'mpAlertBadge', badgeCls:'alert' },
     { k:'compare',       id:'navSbCompare',   label:'Compare',   icon:'compare' },
-    { k:'wyniki',        id:'navSbResults',   label:'Results',   icon:'results' },
     { k:'d2d',           id:'navSbD2d',       label:'D2D',       icon:'d2d' },
+    { k:'wyniki',        id:'navSbResults',   label:'Results',   icon:'results' },
     { k:'arkusz',        id:'navSbSheet',     label:'Sheet',     icon:'sheet' },
   ]},
   { group:'Operacyjne', items:[
@@ -20657,7 +20651,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.93</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.94</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
