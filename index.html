@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.15</title>
+<title>MPlace Hub v8.16</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1651,7 +1651,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.15</span>
+    <span class="brand-ver">v8.16</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -11000,9 +11000,9 @@ function renderMonths(){
 
   function fmtVal(v){
     if(v === null) return '<span style="color:var(--text3)">—</span>';
-    if(metric === 'est' || metric === 'zysk') return Math.round(v).toLocaleString('pl-PL') + ' <span style="color:var(--text3);font-size:9px">zł</span>';
-    if(metric === 'marza' || metric === 'acos') return v.toFixed(1) + '<span style="color:var(--text3);font-size:9px">%</span>';
-    if(metric === 'roas') return v.toFixed(2) + '<span style="color:var(--text3);font-size:9px">x</span>';
+    if(metric === 'est' || metric === 'zysk') return Math.round(v).toLocaleString('pl-PL') + ' <span style="color:var(--text3);font-size:11px">zl</span>';
+    if(metric === 'marza' || metric === 'acos') return v.toFixed(1) + '<span style="color:var(--text3);font-size:11px">%</span>';
+    if(metric === 'roas') return v.toFixed(2) + '<span style="color:var(--text3);font-size:11px">x</span>';
     return v;
   }
 
@@ -11027,18 +11027,18 @@ function renderMonths(){
   // Month header — mark current
   const thMonths = allMonths.map(m => {
     const isCur = m === curM;
-    return `<th style="padding:8px 10px;text-align:right;font-family:var(--mono);font-size:10px;font-weight:${isCur?'600':'400'};
-      color:${isCur?'var(--accent)':'var(--text2)'};white-space:nowrap;border-bottom:1px solid var(--border2);min-width:90px">
-      ${m.substring(0,3).toUpperCase()}${isCur?` <span style="font-size:8px;color:var(--accent)">est.</span>`:''}
+    return `<th style="padding:10px 12px;text-align:right;font-family:var(--mono);font-size:11px;font-weight:${isCur?'700':'400'};letter-spacing:.06em;text-transform:uppercase;
+      color:${isCur?'var(--accent)':'var(--text2)'};white-space:nowrap;border-bottom:1px solid var(--border2);min-width:100px">
+      ${m.substring(0,3).toUpperCase()}${isCur?` '26 EST.`:''}
     </th>`;
   }).join('');
 
   // Build rows per group
   let html = `<div style="overflow-x:auto">
-  <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px">
+  <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:14px">
   <thead>
     <tr style="background:var(--bg3)">
-      <th style="padding:8px 12px;text-align:left;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);min-width:130px">Konto</th>
+      <th style="padding:10px 14px;text-align:left;color:var(--text3);font-weight:400;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--border2);min-width:140px">Konto</th>
       ${thMonths}
     </tr>
   </thead>
@@ -11065,23 +11065,20 @@ function renderMonths(){
         const color = valColor(k, v, m);
         const isCur = m === curM;
         const dHtml = d !== null
-          ? `<div style="font-size:9px;color:${d>=0?'var(--green)':'var(--red)'};margin-top:1px">${d>=0?'▲':'▼'}${Math.abs(d).toFixed(0)}%</div>`
+          ? `<div style="font-size:11px;color:${d>=0?'var(--green)':'var(--red)'};margin-top:2px">${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(0)}%</div>`
           : '';
-        const cellVal = v!==null
-          ? `<span class="cp-wrap">${fmtVal(v)}<button class="cp-btn" onclick="event.stopPropagation();cpCopy(this,${Number.isInteger(v)?v:+v.toFixed(4)})">⧉</button></span>`
-          : fmtVal(v);
-        return `<td style="padding:7px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.03);
+        return `<td style="padding:10px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,.04);
           ${isCur?'background:rgba(255,107,53,.04)':''}cursor:pointer"
           onclick="showView('${k}')">
-          <div style="font-weight:${isCur?'600':'400'};color:${color}">${cellVal}</div>
+          <div style="font-size:15px;font-weight:${isCur?'600':'500'};color:${color}">${fmtVal(v)}</div>
           ${dHtml}
         </td>`;
       }).join('');
 
       html += `<tr style="background:${rowBg}" class="months-row">
-        <td style="padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03);white-space:nowrap;cursor:pointer" onclick="showView('${k}')">
-          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${g.c};margin-right:6px;vertical-align:middle"></span>
-          <span style="color:var(--text)">${meta.name}</span>
+        <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;cursor:pointer" onclick="showView('${k}')">
+          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${g.c};margin-right:8px;vertical-align:middle"></span>
+          <span style="color:var(--text);font-size:14px;font-weight:500">${meta.name}</span>
         </td>
         ${cells}
       </tr>`;
@@ -11107,17 +11104,17 @@ function renderMonths(){
       const d = prevDisplay && prevDisplay !== 0 ? (display - prevDisplay) / Math.abs(prevDisplay) * 100 : null;
       const isCur = m === curM;
       const dHtml = d !== null
-        ? `<div style="font-size:9px;color:${d>=0?'var(--green)':'var(--red)'};margin-top:1px">${d>=0?'▲':'▼'}${Math.abs(d).toFixed(0)}%</div>`
+        ? `<div style="font-size:11px;color:${d>=0?'var(--green)':'var(--red)'};margin-top:2px">${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(0)}%</div>`
         : '';
-      return `<td style="padding:7px 10px;text-align:right;border-top:1px solid var(--border2);${isCur?'background:rgba(255,107,53,.04)':''}">
-        <div style="font-weight:600;color:${g.c}">${display!==null?fmtVal(display):'—'}</div>
+      return `<td style="padding:10px 12px;text-align:right;border-top:1px solid var(--border2);${isCur?'background:rgba(255,107,53,.04)':''}">
+        <div style="font-size:15px;font-weight:600;color:${g.c}">${display!==null?fmtVal(display):'—'}</div>
         ${dHtml}
       </td>`;
     }).join('');
 
     html += `<tr style="background:var(--bg3)">
-      <td style="padding:7px 12px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:9px;
-        letter-spacing:.1em;text-transform:uppercase;color:${g.c}">${rowLabel}</td>
+      <td style="padding:10px 14px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:11px;
+        letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:${g.c}">${rowLabel}</td>
       ${sumCells}
     </tr>`;
   });
@@ -21113,7 +21110,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.15</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.16</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
