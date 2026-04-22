@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.31</title>
+<title>MPlace Hub v8.32</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -990,6 +990,15 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .cmdk-tag.g-one{color:#b47fff;background:rgba(180,127,255,.1);}
 .cmdk-tag.g-tab{color:var(--text3);background:var(--bg3);}
 .cmdk-empty{padding:20px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text3);}
+.cmdk-section{padding:6px 20px 2px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);opacity:.6;}
+.cmdk-tool{display:flex;align-items:flex-start;gap:10px;padding:10px 20px;cursor:pointer;transition:background .1s;border-left:2px solid transparent;}
+.cmdk-tool:hover,.cmdk-tool.cmdk-active{background:var(--bg3);border-left-color:var(--accent);}
+.cmdk-tool-icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border);border-radius:6px;flex-shrink:0;color:var(--text2);}
+.cmdk-tool-body{flex:1;min-width:0;}
+.cmdk-tool-name{font-family:var(--sans);font-size:13px;color:#fff;font-weight:500;}
+.cmdk-tool-desc{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px;line-height:1.4;}
+.cmdk-tool-open{font-family:var(--mono);font-size:9px;letter-spacing:.06em;padding:3px 10px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;flex-shrink:0;align-self:center;transition:all .15s;}
+.cmdk-tool-open:hover{border-color:var(--accent);color:var(--accent);}
 /* Welcome Stats */
 .wk-subtext{font-family:var(--mono);font-size:10px;color:var(--text3);opacity:.4;margin-top:1.75rem;text-align:center;line-height:2;letter-spacing:.04em;}
 /* Kalendarz */
@@ -1652,7 +1661,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.31</span>
+    <span class="brand-ver">v8.32</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -21281,7 +21290,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.31</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.32</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -24135,27 +24144,33 @@ function taRenderHistory(){
     event.stopPropagation();
   }
 
-  // ── Cmd+K Global Search ──
+  // ── Cmd+K Global Search + Smart Search ──
   const CMDK_ITEMS = [
-    {type:'tab', name:'Data',          action:()=>showView('entry')},
-    {type:'tab', name:'Trend',         action:()=>showView('months')},
-    {type:'tab', name:'Dashboard',     action:()=>showView('dashboard')},
-    {type:'tab', name:'Insights',      action:()=>showView('insights')},
-    {type:'tab', name:'Agent',         action:()=>showView('agent')},
-    {type:'tab', name:'Porównaj',      action:()=>showView('compare')},
-    {type:'tab', name:'Import Ads',    action:()=>showView('importads')},
-    {type:'tab', name:'D2D',           action:()=>showView('d2d')},
-    {type:'tab', name:'Symulator',     action:()=>showView('sim')},
-    {type:'tab', name:'Kalendarz',     action:()=>showView('kalendarz')},
-    {type:'tab', name:'Analiza Ofert', action:()=>showView('analiza')},
-    {type:'tab', name:'Screener',      action:()=>showView('screener')},
-    {type:'tab', name:'Tytuły',       action:()=>showView('titleanalyzer')},
-    {type:'tab', name:'Kanibalizator', action:()=>showView('kanibalizator')},
-    {type:'tab', name:'Kalkulator',    action:()=>showView('kalkulator')},
-    {type:'tab', name:'Wiedza',        action:()=>showView('wiedza')},
-    {type:'tab', name:'Podcasts',      action:()=>showView('podcasts')},
-    {type:'tab', name:'Biznes',        action:()=>showView('biznes')},
-    {type:'tab', name:'Rozliczenie',   action:()=>showView('rozliczenie')},
+    {type:'tab', name:'Data',          action:()=>showView('entry'),         icon:'data'},
+    {type:'tab', name:'Trend',         action:()=>showView('months'),        icon:'trend'},
+    {type:'tab', name:'Dashboard',     action:()=>showView('dashboard'),     icon:'dashboard'},
+    {type:'tab', name:'Insights',      action:()=>showView('insights'),      icon:'insights'},
+    {type:'tab', name:'Agent',         action:()=>showView('agent'),         icon:'agent'},
+    {type:'tab', name:'Compare',       action:()=>showView('compare'),       icon:'compare'},
+    {type:'tab', name:'Import Ads',    action:()=>showView('importads'),     icon:'import_'},
+    {type:'tab', name:'D2D',           action:()=>showView('d2d'),           icon:'d2d'},
+    {type:'tab', name:'Simulator',     action:()=>showView('sim'),           icon:'sim'},
+    {type:'tab', name:'Kalendarz',     action:()=>showView('kalendarz'),     icon:'calendar'},
+    {type:'tab', name:'Analysis',      action:()=>showView('analiza'),       icon:'screener'},
+    {type:'tab', name:'Screener',      action:()=>showView('screener'),      icon:'screener'},
+    {type:'tab', name:'Titles',        action:()=>showView('titleanalyzer'), icon:'titles'},
+    {type:'tab', name:'Promos',        action:()=>showView('kanibalizator'), icon:'spark'},
+    {type:'tab', name:'Calc',          action:()=>showView('kalkulator'),    icon:'calc'},
+    {type:'tab', name:'Knowledge',     action:()=>showView('wiedza'),        icon:'knowledge'},
+    {type:'tab', name:'Podcasts',      action:()=>showView('podcasts'),      icon:'podcasts'},
+    {type:'tab', name:'Biznes',        action:()=>showView('biznes'),        icon:'biz'},
+    {type:'tab', name:'Rozliczenie',   action:()=>showView('rozliczenie'),   icon:'settle'},
+    {type:'tab', name:'Cockpit',       action:()=>showView('dzis'),          icon:'cockpit'},
+    {type:'tab', name:'Results',       action:()=>showView('wyniki'),        icon:'results'},
+    {type:'tab', name:'Sheet',         action:()=>showView('arkusz'),        icon:'sheet'},
+    {type:'tab', name:'Ads Hub',       action:()=>showView('centrumads'),    icon:'ads'},
+    {type:'tab', name:'Strategy',      action:()=>showView('strategia'),     icon:'pie'},
+    {type:'tab', name:'Info',          action:()=>showView('info'),          icon:'knowledge'},
     {type:'acc',  name:'MobelKap',       group:'MEBLE',  gcls:'g-meble',  action:()=>showView('MobelKap')},
     {type:'acc',  name:'Perfekt Cięcie', group:'MEBLE',  gcls:'g-meble',  action:()=>showView('PerfektCiecie')},
     {type:'acc',  name:'Meble na Czasie',group:'MEBLE',  gcls:'g-meble',  action:()=>showView('MeblenaCzasie')},
@@ -24167,7 +24182,100 @@ function taRenderHistory(){
     {type:'acc',  name:'Ankado24',       group:'ONE',    gcls:'g-one',    action:()=>showView('Ankado24')},
   ];
 
+  // ── Smart Search: keyword → tool suggestions ──
+  const SMART_TOOLS = [
+    { id:'calc',    name:'Calc',       icon:'calc',      view:'kalkulator',
+      desc:'ROAS, BE ROAS, marza, break even, symulacje',
+      keys:['roas','be roas','break even','breakeven','marza','marża','margin','zysk','profit','kalkulator','calc','oblicz','policz','przelicz','prowizja'] },
+    { id:'dash',    name:'Dashboard',  icon:'dashboard', view:'dashboard',
+      desc:'Karty kont, ROAS, AKG, trendy, heatmapa',
+      keys:['dashboard','roas','akg','karta','karty','przegląd','przeglad','overview','heatmap','status','wyniki kont'] },
+    { id:'trend',   name:'Trend',      icon:'trend',     view:'months',
+      desc:'Historia miesieczna, trendy sprzedazy i kosztow',
+      keys:['trend','historia','miesiąc','miesiac','miesieczny','monthly','wykres','chart','sprzedaż','sprzedaz'] },
+    { id:'compare', name:'Compare',    icon:'compare',   view:'compare',
+      desc:'Porownanie kont side-by-side',
+      keys:['porównaj','porownaj','compare','vs','versus','zestawienie','side by side','kontra'] },
+    { id:'insights',name:'Insights',   icon:'eye',       view:'insights',
+      desc:'Alerty, zagrozenia, sygnaly ostrzegawcze',
+      keys:['alert','zagrożenie','zagrozenie','problem','spadek','alarm','sygnał','sygnal','ostrzeżenie','ostrzezenie','uwaga','czerwony','red'] },
+    { id:'d2d',     name:'D2D',        icon:'d2d',       view:'d2d',
+      desc:'Dzienne snapshoty, filtr konto/dzien/metryka',
+      keys:['dzień','dzien','daily','d2d','day','dzienny','snapshot','wczoraj','yesterday'] },
+    { id:'analysis',name:'Analysis',   icon:'screener',  view:'analiza',
+      desc:'Analiza ofert Ads — upload XLSX, 8-sekcyjny raport',
+      keys:['analiza','analysis','oferty','xlsx','upload','zatrzymaj','tnij','skaluj','kanibalizacja','diagnoza','placement'] },
+    { id:'promos',  name:'Promos',     icon:'spark',     view:'kanibalizator',
+      desc:'Kanibalizator, wyroznienia flat/elastic',
+      keys:['wyróżnienia','wyroznienia','promo','flat','elastic','kanibalizator','kanibalizacja','promowanie','promuj'] },
+    { id:'screener',name:'Screener',   icon:'screener',  view:'screener',
+      desc:'Chat z Agentem + paste screenshotow (vision)',
+      keys:['screener','screenshot','screen','zrzut','zdjęcie','zdjecie','paste','obraz','image','vision','ctrl+v'] },
+    { id:'agent',   name:'Agent',      icon:'agent',     view:'agent',
+      desc:'AI Agent — playbook, raporty, prezentacje',
+      keys:['agent','ai','raport','report','prezentacja','presentation','playbook','prompt','claude','generuj'] },
+    { id:'cockpit', name:'Cockpit',    icon:'cockpit',   view:'dzis',
+      desc:'23 zadan dziennych, checkboxy, streak, timer',
+      keys:['cockpit','zadania','tasks','plan dnia','dzisiaj','today','todo','checklist','streak'] },
+    { id:'data',    name:'Data',       icon:'data',      view:'entry',
+      desc:'Wprowadzanie danych dziennych per konto',
+      keys:['dane','data','wpis','wpisz','wprowadz','wprowadź','formularz','input','brutto'] },
+    { id:'know',    name:'Knowledge',  icon:'knowledge', view:'wiedza',
+      desc:'Baza wiedzy — slownik, benchmarki, artykuly',
+      keys:['wiedza','knowledge','slownik','słownik','benchmark','artykuł','artykul','definicja','pojecie','pojęcie','glossary'] },
+    { id:'ads',     name:'Ads Hub',    icon:'ads',       view:'centrumads',
+      desc:'Centrum kampanii Ads — CPC, budżety, strategie',
+      keys:['kampania','ads','reklama','cpc','budżet','budzet','dynamic','stawka','bid','kampanie'] },
+    { id:'results', name:'Results',    icon:'results',   view:'wyniki',
+      desc:'Podsumowanie wynikow miesiecznych',
+      keys:['wyniki','results','podsumowanie','summary','zamknięcie','zamkniecie','eom','end of month'] },
+    { id:'biznes',  name:'Biznes',     icon:'biz',       view:'biznes',
+      desc:'Fee agencji, faktury, rozliczenia grup',
+      keys:['fee','agencja','faktura','invoice','biznes','business','netto','brutto'] },
+    { id:'settle',  name:'Rozliczenie',icon:'settle',    view:'rozliczenie',
+      desc:'Rozliczenie fee per grupa',
+      keys:['rozliczenie','settlement','rozlicz','prowizja','fee grupy'] },
+    { id:'titles',  name:'Titles',     icon:'titles',    view:'titleanalyzer',
+      desc:'Optymalizacja tytulow ofert Allegro',
+      keys:['tytuł','tytul','title','tytuły','tytuly','titles','nazwa oferty','seo','optymalizacja tytulu'] },
+    { id:'sim',     name:'Simulator',  icon:'sim',       view:'sim',
+      desc:'Symulacje scenariuszy what-if',
+      keys:['symulator','simulator','symulacja','what if','scenariusz','prognoza','forecast','projekcja'] },
+    { id:'import',  name:'Import',     icon:'import_',   view:'importads',
+      desc:'Import danych Ads z pliku',
+      keys:['import','importuj','wgraj','załaduj','zaladuj','plik'] },
+    { id:'calendar',name:'Kalendarz',  icon:'calendar',  view:'kalendarz',
+      desc:'Kalendarz kampanii, sezony, święta',
+      keys:['kalendarz','calendar','sezon','święto','swieto','black friday','boże narodzenie','boze narodzenie'] },
+    { id:'podcasts',name:'Podcasts',   icon:'podcasts',  view:'podcasts',
+      desc:'Podcasty audio z raportow',
+      keys:['podcast','podcasts','audio','odsłuchaj','odsluchaj','nagraj','mp3'] },
+    { id:'strategy',name:'Strategy',   icon:'pie',       view:'strategia',
+      desc:'Strategie per konto, plany dzialania',
+      keys:['strategia','strategy','plan','działanie','dzialanie','restart','total restart'] },
+    { id:'info',    name:'Info',       icon:'knowledge',  view:'info',
+      desc:'Wiki — instrukcja obslugi, FAQ, zasady',
+      keys:['info','instrukcja','faq','pomoc','help','jak','how','zasady','rules','wiki'] },
+    { id:'sheet',   name:'Sheet',      icon:'sheet',     view:'arkusz',
+      desc:'Arkusz surowych danych tabelarycznych',
+      keys:['arkusz','sheet','tabela','table','surowe dane','raw data','excel'] },
+  ];
+
+  // Account aliases for fuzzy matching
+  const CMDK_ACC_ALIASES = {
+    'MobelKap':       ['mobelkap','mk','mok','mobel','kap'],
+    'PerfektCiecie':  ['perfektciecie','pc','perfekt','ciecie','cięcie'],
+    'MeblenaCzasie':  ['meblenaczas','mnc','meble na czasie','meblenaczas','meble','czas'],
+    'Luxsen':         ['luxsen','lux','lx'],
+    'Semmi':          ['semmi','sem'],
+    'BOTAVIT':        ['botavit','bv','bot'],
+    'Materazzi':      ['materazzi','mat','mtz'],
+    'MtzzEU':         ['mtzzeu','mtzz','eu'],
+    'Ankado24':       ['ankado24','ankado','ank','ak24'],
+  };
+
   let cmdkActiveIdx = 0;
+  let _cmdkAllItems = []; // flat list of all rendered items for keyboard nav
 
   function cmdkOpen(){
     document.getElementById('cmdkBackdrop').style.display='flex';
@@ -24189,35 +24297,151 @@ function taRenderHistory(){
     return text.slice(0,idx)+'<b>'+text.slice(idx,idx+query.length)+'</b>'+text.slice(idx+query.length);
   }
 
-  function cmdkRender(){
-    const q=document.getElementById('cmdkInput').value.trim();
-    const list=document.getElementById('cmdkList');
-    let filtered=CMDK_ITEMS;
-    if(q.length>0){
-      filtered=CMDK_ITEMS.filter(i=>i.name.toLowerCase().includes(q.toLowerCase())||(i.group||'').toLowerCase().includes(q.toLowerCase()));
+  function _cmdkScoreItem(item, qLow) {
+    const nameLow = item.name.toLowerCase();
+    const groupLow = (item.group||'').toLowerCase();
+    if (nameLow === qLow) return 100;
+    if (nameLow.startsWith(qLow)) return 80;
+    if (nameLow.includes(qLow)) return 60;
+    if (groupLow.includes(qLow)) return 40;
+    // check account aliases
+    if (item.type === 'acc') {
+      const viewKey = Object.keys(CMDK_ACC_ALIASES).find(k => {
+        const it = CMDK_ITEMS.find(ci => ci.type==='acc' && ci.name === (k==='PerfektCiecie'?'Perfekt Cięcie':k==='MeblenaCzasie'?'Meble na Czasie':k));
+        return it === item;
+      });
+      if (viewKey && CMDK_ACC_ALIASES[viewKey]) {
+        if (CMDK_ACC_ALIASES[viewKey].some(a => a.includes(qLow) || qLow.includes(a))) return 70;
+      }
     }
-    filtered=filtered.slice(0,8);
-    if(cmdkActiveIdx>=filtered.length) cmdkActiveIdx=0;
-
-    if(filtered.length===0){
-      list.innerHTML=`<div class="cmdk-empty">Nie znaleziono — spróbuj innej frazy</div>`;
-      return;
-    }
-    list.innerHTML=filtered.map((item,i)=>{
-      const icon=item.type==='tab'?'►':'·';
-      const tag=item.type==='acc'
-        ?`<span class="cmdk-tag ${item.gcls}">${item.group}</span>`
-        :`<span class="cmdk-tag g-tab">zakładka</span>`;
-      return `<div class="cmdk-row${i===cmdkActiveIdx?' cmdk-active':''}" onclick="cmdkSelect(${CMDK_ITEMS.indexOf(item)})">
-        <span class="cmdk-icon">${icon}</span>
-        <span class="cmdk-name">${cmdkHighlight(item.name,q)}</span>
-        ${tag}
-      </div>`;
-    }).join('');
+    return 0;
   }
 
-  function cmdkSelect(idx){
-    CMDK_ITEMS[idx].action();
+  function _cmdkScoreTool(tool, qLow) {
+    const words = qLow.split(/\s+/);
+    let score = 0;
+    for (const w of words) {
+      if (w.length < 2) continue;
+      for (const k of tool.keys) {
+        if (k === w) { score += 50; break; }
+        if (k.includes(w) || w.includes(k)) { score += 30; break; }
+      }
+      if (tool.name.toLowerCase().includes(w)) score += 20;
+      if (tool.desc.toLowerCase().includes(w)) score += 5;
+    }
+    return score;
+  }
+
+  function cmdkRender(){
+    const q = document.getElementById('cmdkInput').value.trim();
+    const list = document.getElementById('cmdkList');
+    const qLow = q.toLowerCase();
+    _cmdkAllItems = [];
+
+    // No query → show all tabs + accounts
+    if (!q) {
+      const tabs = CMDK_ITEMS.filter(i=>i.type==='tab').slice(0,6);
+      const accs = CMDK_ITEMS.filter(i=>i.type==='acc');
+      _cmdkAllItems = [...tabs, ...accs];
+      if(cmdkActiveIdx >= _cmdkAllItems.length) cmdkActiveIdx = 0;
+      let html = `<div class="cmdk-section">Zakladki</div>`;
+      html += tabs.map((item,i)=>{
+        const icon = item.icon ? mpIcon(item.icon,12) : '►';
+        return `<div class="cmdk-row${i===cmdkActiveIdx?' cmdk-active':''}" onclick="_cmdkRunItem(${i})">
+          <span class="cmdk-icon">${icon}</span>
+          <span class="cmdk-name">${item.name}</span>
+          <span class="cmdk-tag g-tab">tab</span>
+        </div>`;
+      }).join('');
+      html += `<div class="cmdk-section">Konta</div>`;
+      html += accs.map((item,j)=>{
+        const i = tabs.length + j;
+        return `<div class="cmdk-row${i===cmdkActiveIdx?' cmdk-active':''}" onclick="_cmdkRunItem(${i})">
+          <span class="cmdk-icon">·</span>
+          <span class="cmdk-name">${item.name}</span>
+          <span class="cmdk-tag ${item.gcls}">${item.group}</span>
+        </div>`;
+      }).join('');
+      list.innerHTML = html;
+      return;
+    }
+
+    // Score direct matches (tabs + accounts)
+    let directMatches = CMDK_ITEMS.map(item => ({item, score: _cmdkScoreItem(item, qLow)}))
+      .filter(x => x.score > 0)
+      .sort((a,b) => b.score - a.score)
+      .slice(0, 5)
+      .map(x => x.item);
+
+    // Score smart tool suggestions
+    let toolMatches = SMART_TOOLS.map(tool => ({tool, score: _cmdkScoreTool(tool, qLow)}))
+      .filter(x => x.score >= 20)
+      .sort((a,b) => b.score - a.score)
+      .slice(0, 5);
+
+    // Deduplicate: if direct match view === tool view, skip the tool
+    const directViews = new Set(directMatches.map(i => {
+      const nav = CMDK_ITEMS.indexOf(i);
+      return i.type === 'tab' ? i.name : i.group;
+    }));
+    // Actually track by view key from action
+    toolMatches = toolMatches.filter(t => {
+      return !directMatches.some(d => d.type==='tab' && d.name === t.tool.name);
+    });
+
+    _cmdkAllItems = [];
+    let html = '';
+
+    // Direct matches section
+    if (directMatches.length > 0) {
+      html += `<div class="cmdk-section">Wyniki</div>`;
+      directMatches.forEach((item, i) => {
+        _cmdkAllItems.push({type:'direct', item});
+        const icon = item.icon ? mpIcon(item.icon,12) : (item.type==='tab' ? '►' : '·');
+        const tag = item.type==='acc'
+          ? `<span class="cmdk-tag ${item.gcls}">${item.group}</span>`
+          : `<span class="cmdk-tag g-tab">tab</span>`;
+        html += `<div class="cmdk-row${_cmdkAllItems.length-1===cmdkActiveIdx?' cmdk-active':''}" onclick="_cmdkRunItem(${_cmdkAllItems.length-1})">
+          <span class="cmdk-icon">${icon}</span>
+          <span class="cmdk-name">${cmdkHighlight(item.name, q)}</span>
+          ${tag}
+        </div>`;
+      });
+    }
+
+    // Smart tool suggestions
+    if (toolMatches.length > 0) {
+      html += `<div class="cmdk-section">Sugerowane narzedzia</div>`;
+      toolMatches.forEach(({tool}) => {
+        _cmdkAllItems.push({type:'tool', tool});
+        const idx = _cmdkAllItems.length - 1;
+        html += `<div class="cmdk-tool${idx===cmdkActiveIdx?' cmdk-active':''}" onclick="_cmdkRunItem(${idx})">
+          <div class="cmdk-tool-icon">${mpIcon(tool.icon,16)}</div>
+          <div class="cmdk-tool-body">
+            <div class="cmdk-tool-name">${tool.name}</div>
+            <div class="cmdk-tool-desc">${tool.desc}</div>
+          </div>
+          <button class="cmdk-tool-open" onclick="event.stopPropagation();_cmdkRunItem(${idx})">Otworz</button>
+        </div>`;
+      });
+    }
+
+    if (_cmdkAllItems.length === 0) {
+      html = `<div class="cmdk-empty">Nie znaleziono — sprobuj innej frazy</div>`;
+    }
+
+    if (cmdkActiveIdx >= _cmdkAllItems.length) cmdkActiveIdx = 0;
+    list.innerHTML = html;
+  }
+
+  function _cmdkRunItem(idx) {
+    const entry = _cmdkAllItems[idx];
+    if (!entry) return;
+    if (entry.type === 'direct') {
+      entry.item.action();
+    } else if (entry.type === 'tool') {
+      showView(entry.tool.view);
+    }
     cmdkClose();
   }
 
@@ -24230,12 +24454,10 @@ function taRenderHistory(){
       return;
     }
     if(document.getElementById('cmdkBackdrop').style.display==='none') return;
-    const q=document.getElementById('cmdkInput').value.trim();
-    let filtered=CMDK_ITEMS.filter(i=>!q||i.name.toLowerCase().includes(q.toLowerCase())||(i.group||'').toLowerCase().includes(q.toLowerCase())).slice(0,8);
     if(e.key==='Escape'){ cmdkClose(); e.preventDefault(); }
-    else if(e.key==='ArrowDown'){ e.preventDefault(); cmdkActiveIdx=(cmdkActiveIdx+1)%Math.max(filtered.length,1); cmdkRender(); }
-    else if(e.key==='ArrowUp'){ e.preventDefault(); cmdkActiveIdx=(cmdkActiveIdx-1+Math.max(filtered.length,1))%Math.max(filtered.length,1); cmdkRender(); }
-    else if(e.key==='Enter'&&filtered.length>0){ cmdkSelect(CMDK_ITEMS.indexOf(filtered[cmdkActiveIdx])); }
+    else if(e.key==='ArrowDown'){ e.preventDefault(); cmdkActiveIdx=(cmdkActiveIdx+1)%Math.max(_cmdkAllItems.length,1); cmdkRender(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); cmdkActiveIdx=(cmdkActiveIdx-1+Math.max(_cmdkAllItems.length,1))%Math.max(_cmdkAllItems.length,1); cmdkRender(); }
+    else if(e.key==='Enter'&&_cmdkAllItems.length>0){ _cmdkRunItem(cmdkActiveIdx); }
   });
   </script>
 
@@ -24527,7 +24749,7 @@ self.addEventListener('fetch', e => e.respondWith(
 <!-- Cmd+K Search Modal -->
 <div id="cmdkBackdrop" style="display:none" onclick="if(event.target===this)cmdkClose()">
   <div id="cmdkModal">
-    <input id="cmdkInput" placeholder="Szukaj zakładki lub konta..." autocomplete="off" oninput="cmdkRender()">
+    <input id="cmdkInput" placeholder="Szukaj narzedzia, konta lub wpisz pytanie..." autocomplete="off" oninput="cmdkRender()">
     <div id="cmdkList"></div>
   </div>
 </div>
