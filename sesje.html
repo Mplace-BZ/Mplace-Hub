@@ -83,6 +83,72 @@ tr:nth-child(even) td{background:#fafafa}
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SESJA: 22.04.2026 — MEGA REDESIGN v7.94→v8.31 -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="sesja" style="border-color:#ff6b35">
+  <div class="sesja-header" style="background:#fff7ed">
+    <div>
+      <span class="sesja-date">22.04.2026</span>
+      <span class="sesja-badge badge-dev">DEV</span>
+      <span class="sesja-badge badge-strategy">REDESIGN</span>
+    </div>
+    <div class="sesja-meta">v7.94 → v8.31<br>37 commitow · ~600 linii nowego kodu</div>
+  </div>
+  <div class="sesja-body">
+    <div class="sesja-section">
+      <div class="sesja-section-title orange">REDESIGN — nowe layouty</div>
+      <ul>
+        <li><strong>Data view</strong> — 3-kolumnowy layout: lista kont z progress barem (lewa), formularz jednego konta z sekcjami 01/02/03 + KPI bar z deltami vs wczoraj (srodek), Agent Sanity Check + Wczoraj Referencja (prawa pod lewa). Auto-save do localStorage przy przelaczaniu kont.</li>
+        <li><strong>Agent view</strong> — 2-kolumnowy: Playbook grid 3x3 z SVG ikonami + Eksporty (Raport MTD/PDF/PPTX/CSV). Chat bubbles (user po prawej, agent po lewej z awatarem "A"). LIVE badge, input bar z kontekstem.</li>
+        <li><strong>Dashboard</strong> — wieksze karty: nazwa 16px bold, ROAS AKG 22px, trend pill badge (▲24% na zielonym tle). Heatmap marzy z subtelnymi kolorami i borderami.</li>
+        <li><strong>Months (Trend)</strong> — pill toggle buttons zamiast dropdown (SPRZEDAZ EST / MARZA % / ROAS ADS / ZYSK NETTO / ACOS LACZNY). Fonty 15px wartosci, 14px nazwy, 11px delty.</li>
+        <li><strong>D2D</strong> — fonty dopasowane do Trend. Grupy kont w filtrze z labelami (MEBLE/LUXSEN/ONE osobno).</li>
+        <li><strong>Insights</strong> — usuniety date bar, pill-style filtry w ramce.</li>
+        <li><strong>Szerokosc widokow</strong> — usuniety inline max-width z 9 kontenerow, wszystkie 1320px.</li>
+      </ul>
+    </div>
+    <div class="sesja-section">
+      <div class="sesja-section-title green">INFO — profesjonalna wiki</div>
+      <ul>
+        <li><strong>14 sekcji, 60+ pozycji</strong>: Core Tools, AI Workflow, MEBLE Roles, Analytics, Reports & Exports, Tools, Team Panel, Data Operations, 9 Accounts, Daily Workflow, Ads Naming, Key Rules, Shortcuts, FAQ/Troubleshooting</li>
+        <li>Kazda pozycja: SVG ikona z menu + angielska nazwa + opis PL + STEP BY STEP + KIEDY UZYWAC (teal) + CASE STUDY (pomaranczowy border, italic)</li>
+        <li>Layout: lewe menu z sekcjami + tresc w srodku (jak Data view)</li>
+      </ul>
+    </div>
+    <div class="sesja-section">
+      <div class="sesja-section-title blue">POPRAWKI logiki</div>
+      <ul>
+        <li><strong>Quick view (Cockpit)</strong> — ROAS i red accounts teraz identyczna logika jak Dashboard (C.roasAds wazony, mAfter < 5)</li>
+        <li><strong>Delta (Cockpit)</strong> — porownanie EOM estymacja vs zamkniety miesiac (nie MTD vs pelny)</li>
+        <li><strong>Results + Sheet</strong> — najnowszy miesiac na gorze (reverse)</li>
+        <li><strong>Menu sidebar</strong> — D2D przed Results</li>
+        <li><strong>Cockpit steps</strong> — numeracja 1-4 (bylo 8,1,2,3)</li>
+      </ul>
+    </div>
+    <div class="sesja-section">
+      <div class="sesja-section-title">NASTEPNA SESJA</div>
+      <ul>
+        <li><strong>Smart Search (Cmd+K)</strong> — rozbudowa wyszukiwarki: pytania po polsku → sugestie narzedzi (bez AI, czysto JS keyword matching). Spec w memory.</li>
+        <li>Mobile responsive — sprawdzic nowe layouty</li>
+        <li>Info wiki — rozbudowa przy nowych features</li>
+      </ul>
+    </div>
+    <div class="tag-list">
+      <span class="tag tag-done">Data 3-col</span>
+      <span class="tag tag-done">Agent chat</span>
+      <span class="tag tag-done">Dashboard cards</span>
+      <span class="tag tag-done">Months pills</span>
+      <span class="tag tag-done">D2D fonts</span>
+      <span class="tag tag-done">Insights pills</span>
+      <span class="tag tag-done">Info wiki 14 sek.</span>
+      <span class="tag tag-done">Quick view fix</span>
+      <span class="tag tag-done">Delta EOM</span>
+      <span class="tag tag-open">Smart Search</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
 <!-- SESJA 5: 12.04.2026 (dzień) — MEBLE RESTART WDROŻENIE -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div class="sesja" style="border-color:#ff6b35">
