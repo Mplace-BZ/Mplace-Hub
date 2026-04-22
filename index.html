@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.07</title>
+<title>MPlace Hub v8.08</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1645,7 +1645,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.07</span>
+    <span class="brand-ver">v8.08</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5359,6 +5359,13 @@ function renderDataCenter(k){
   const cur = D.find(x=>x.m===curM) || {};
   const pfV = (f,def='') => cur[f]!=null ? cur[f] : def;
   const ss = pfV('ss');
+  // Yesterday data for input highlighting
+  const _curEntries = D.filter(d => d.m === curM);
+  let _yest = null;
+  if (_curEntries.length >= 2) _yest = _curEntries[_curEntries.length - 2];
+  else { const _pm = MONTHS[(MONTHS.indexOf(curM)-1+12)%12]; const _pe = D.filter(d=>d.m===_pm); if(_pe.length) _yest=_pe[_pe.length-1]; }
+  window._dataYestSp = _yest ? (_yest.sprzedaz||0) : 0;
+  window._dataYestData = _yest;
 
   let html = `
     <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">WPISZ DANE ▸ ${grp} ▸ DZIEN ${todayDay}</div>
@@ -5370,57 +5377,55 @@ function renderDataCenter(k){
       <span style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;background:var(--bg3);border:1px solid var(--border);color:var(--text3)">ostatni wpis: ${lastDate}</span>
     </div>
 
-    <div class="data-section-title"><span class="data-section-num">01</span> Koszty reklamy <span style="flex:1"></span><span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Tab → przeskok pola</span></div>
-    <div class="fr fr-a" style="margin-bottom:1rem">
-      <div class="fw"><label>Koszt Ads (zl) <span style="color:var(--accent)">*</span></label><input type="number" min="0" max="999999" id="e_${k}_adsC" placeholder="5 341" value="${pfV('adsCost')}" oninput="updateAuto('${k}');dataUpdateSanity('${k}')"></div>
-      <div class="fw"><label>ROAS kampanii <span style="color:var(--accent)">*</span></label><input type="number" step="0.01" min="0" max="99" id="e_${k}_roas" placeholder="6.11" value="${pfV('roas')}" oninput="updateAuto('${k}');dataUpdateSanity('${k}')"></div>
-      <div class="fw"><label>Wartosc Ads (zl) <span style="color:var(--accent)">*</span></label><input type="number" min="0" max="9999999" id="e_${k}_wartoscAds" placeholder="32 619" value="${pfV('wartoscAds')}" oninput="updateAuto('${k}')"></div>
-      <div class="fw"><label>Wyroznienia (zl)</label><input type="number" min="0" max="999999" id="e_${k}_promoC" placeholder="4 449" value="${pfV('promoC')}" oninput="updateAuto('${k}');dataUpdateSanity('${k}')"></div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px"><div style="display:flex;align-items:center;gap:6px"><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent)">01</span><span style="font-family:var(--sans);font-size:15px;font-weight:600;color:var(--text)">Koszty reklamy</span></div><span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Tab → przeskok pola</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.2rem">
+      <div class="fw"><label>KOSZT ADS (ZL) <span style="color:var(--accent)">*</span></label><input type="number" min="0" max="999999" id="e_${k}_adsC" placeholder="5 341" value="${pfV('adsCost')}" oninput="updateAuto('${k}');dataUpdateSanity('${k}')"></div>
+      <div class="fw"><label>ROAS KAMPANII <span style="color:var(--accent)">*</span></label><input type="number" step="0.01" min="0" max="99" id="e_${k}_roas" placeholder="6.11" value="${pfV('roas')}" oninput="updateAuto('${k}');dataUpdateSanity('${k}')" style="${pfV('roas')>0?'background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.3)':''}"></div>
+      <div class="fw"><label>WARTOSC ADS (ZL) <span style="color:var(--accent)">*</span></label><input type="number" min="0" max="9999999" id="e_${k}_wartoscAds" placeholder="32 619" value="${pfV('wartoscAds')}" oninput="updateAuto('${k}')"></div>
     </div>
 
-    <div class="data-section-title"><span class="data-section-num">02</span> Sprzedaz <span style="flex:1"></span><span style="font-family:var(--mono);font-size:9px;color:var(--text3)">auto-compute w rail'u</span></div>
-    <div class="fr fr-a" style="margin-bottom:1rem">
-      <div class="fw"><label>Sprzedaz brutto (zl) <span style="color:var(--accent)">*</span></label><input type="number" min="0" max="9999999" id="e_${k}_sp" placeholder="79 175" value="${pfV('sprzedaz')}" oninput="updateAuto('${k}');dataUpdateSanity('${k}')"></div>
-      <div class="fw"><label>Prowizja Allegro %</label><input type="number" step="0.1" min="0" max="30" id="e_${k}_comm" placeholder="11.1" value="${pfV('commission')}" oninput="updateAuto('${k}')"></div>
-      <div class="fw"><label>SS</label><select id="e_${k}_ss"><option value="" ${ss===''?'selected':''}>—</option><option value="T" ${ss==='T'?'selected':''}>T</option><option value="N" ${ss==='N'?'selected':''}>N</option></select></div>
-      <div class="fw"><label>Qlt</label><input type="number" min="0" max="500" id="e_${k}_qlt" placeholder="340" value="${pfV('qlt')}"></div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px"><div style="display:flex;align-items:center;gap:6px"><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent)">02</span><span style="font-family:var(--sans);font-size:15px;font-weight:600;color:var(--text)">Sprzedaz</span></div><span style="font-family:var(--mono);font-size:9px;color:var(--text3)">auto-compute w rail'u</span></div>
+    <div style="display:grid;grid-template-columns:2fr 1.2fr auto auto;gap:8px;margin-bottom:1.2rem">
+      <div class="fw"><label>SPRZEDAZ BRUTTO (ZL) <span style="color:var(--accent)">*</span></label><input type="number" min="0" max="9999999" id="e_${k}_sp" placeholder="79 175" value="${pfV('sprzedaz')}" oninput="updateAuto('${k}');dataUpdateSanity('${k}')" style="${pfV('sprzedaz')>0&&_dataYestSp>0&&pfV('sprzedaz')<_dataYestSp*0.92?'background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3)':''}"></div>
+      <div class="fw"><label>PROWIZJA ALLEGRO %</label><input type="number" step="0.1" min="0" max="30" id="e_${k}_comm" placeholder="11.1" value="${pfV('commission')}" oninput="updateAuto('${k}')"></div>
+      <div class="fw" style="min-width:60px"><label>SS</label><select id="e_${k}_ss" style="width:100%"><option value="" ${ss===''?'selected':''}>—</option><option value="T" ${ss==='T'?'selected':''}>T</option><option value="N" ${ss==='N'?'selected':''}>N</option></select></div>
+      <div class="fw" style="min-width:70px"><label>QLT</label><input type="number" min="0" max="500" id="e_${k}_qlt" placeholder="340" value="${pfV('qlt')}"></div>
     </div>
 
-    <div class="data-section-title"><span class="data-section-num">03</span> Dostawa i pozostale</div>
-    <div class="fr fr-b" style="margin-bottom:1rem">
-      <div class="fw bi"><label>Dostawa (zl)</label><input type="number" min="0" max="999999" id="e_${k}_del" placeholder="3 971" value="${pfV('delivery')}" oninput="updateAuto('${k}')"></div>
-      <div class="fw bi"><label>Monety (zl)</label><input type="number" min="0" max="999999" id="e_${k}_coinsC" placeholder="0" value="${pfV('coinsC')}" oninput="updateAuto('${k}')"></div>
-      <div class="fw bi"><label>Dzien wpisu (-1 auto)</label><input type="number" id="e_${k}_dzien" placeholder="globalny" value=""></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent)">03</span><span style="font-family:var(--sans);font-size:15px;font-weight:600;color:var(--text)">Dostawa i pozostale</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:1.2rem">
+      <div class="fw bi"><label>DOSTAWA (ZL)</label><input type="number" min="0" max="999999" id="e_${k}_del" placeholder="3 971" value="${pfV('delivery')}" oninput="updateAuto('${k}')"></div>
+      <div class="fw bi"><label>MONETY (ZL)</label><input type="number" min="0" max="999999" id="e_${k}_coinsC" placeholder="0" value="${pfV('coinsC')}" oninput="updateAuto('${k}')"></div>
+      <div class="fw"><label>WYROZNIENIA (ZL)</label><input type="number" min="0" max="999999" id="e_${k}_promoC" placeholder="4 449" value="${pfV('promoC')}" oninput="updateAuto('${k}');dataUpdateSanity('${k}')"></div>
+      <div class="fw bi"><label>DZIEN WPISU (-1 AUTO)</label><input type="number" id="e_${k}_dzien" placeholder="globalny" value=""></div>
     </div>
 
-    <div class="aec-auto" id="eAuto_${k}" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:1rem">
-      <span>Udzial Ads: <span class="av" id="ea_ua_${k}">—</span></span>
-      <span>ACOS Ads: <span class="av" id="ea_acosAds_${k}">—</span></span>
-      <span>ACOS lacz: <span class="av" id="ea_acosT_${k}">—</span></span>
-      <span>ROAS Glob: <span class="av" id="ea_roasG_${k}">—</span></span>
-      <span>Marza po rek: <span class="av" id="ea_maft_${k}">—</span></span>
-      <span>Estymacja: <span class="av" id="ea_est_${k}">—</span></span>
+    <div id="eAuto_${k}" style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:1.2rem">
+      <div><div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px">Udzial Ads</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text)" id="ea_ua_${k}">—</div><div style="font-family:var(--mono);font-size:10px;margin-top:2px" id="ea_ua_d_${k}"></div></div>
+      <div><div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px">ACOS Ads</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text)" id="ea_acosAds_${k}">—</div><div style="font-family:var(--mono);font-size:10px;margin-top:2px" id="ea_acosAds_d_${k}"></div></div>
+      <div><div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px">ACOS lacz.</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text)" id="ea_acosT_${k}">—</div><div style="font-family:var(--mono);font-size:10px;margin-top:2px" id="ea_acosT_d_${k}"></div></div>
+      <div><div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px">ROAS Glob.</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text)" id="ea_roasG_${k}">—</div><div style="font-family:var(--mono);font-size:10px;margin-top:2px" id="ea_roasG_d_${k}"></div></div>
+      <div><div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px">Marza po rek.</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text)" id="ea_maft_${k}">—</div><div style="font-family:var(--mono);font-size:10px;margin-top:2px" id="ea_maft_d_${k}"></div></div>
     </div>
 
-    <div style="margin-bottom:1rem">
-      <div style="font-family:var(--mono);font-size:9px;color:rgba(245,166,35,.7);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">DZIENNIK KONTA <span style="color:var(--text3)">NOTATKA DLA DNIA ${todayDay}</span></div>
-      <textarea class="note-input" id="e_${k}_note" rows="1" placeholder="Wpisz notatke lub dyktuj..." style="width:100%;margin-bottom:6px">${pfV('note')}</textarea>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:1.2rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text)">DZIENNIK KONTA</span><span style="font-family:var(--mono);font-size:9px;color:var(--text3)">NOTATKA DLA DNIA ${todayDay}</span></div>
+      <textarea class="note-input" id="e_${k}_note" rows="1" placeholder="Wpisz notatke lub dyktuj..." style="width:100%;margin-bottom:8px;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text);font-size:13px;font-family:var(--sans);resize:vertical;outline:none">${pfV('note')}</textarea>
       <div style="display:flex;gap:6px;align-items:center">
-        <button onclick="voiceNote('e_${k}_note','${k}')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.08);color:#f5a623;cursor:pointer">Dyktuj</button>
-        <button onclick="document.getElementById('e_${k}_note').value='Reklama OK — dane zgodne z planem.'" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Szablon „reklama OK"</button>
+        <button onclick="voiceNote('e_${k}_note','${k}')" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:5px;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.08);color:#f5a623;cursor:pointer;display:flex;align-items:center;gap:4px">🎙 Dyktuj</button>
+        <button onclick="document.getElementById('e_${k}_note').value='Reklama OK — dane zgodne z planem.'" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer">Szablon „reklama OK"</button>
         <div style="flex:1"></div>
-        <button class="notelog-add" onclick="addNoteFromInput('${k}')">+ Dodaj</button>
+        <button onclick="addNoteFromInput('${k}')" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:5px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.08);color:#34d399;cursor:pointer">+ Dodaj</button>
       </div>
       <div class="notelog" id="notelog_${k}"></div>
     </div>
 
-    <div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.75rem">
-      Auto-save <em style="color:#2dd4a0">wlaczone</em>
-    </div>
-
-    <div class="data-nav-bar">
-      <button class="data-nav-btn" onclick="dataNavPrev()">← POPRZEDNIE</button>
-      <button class="data-nav-btn primary" onclick="dataSaveAndNext()">ZAPISZ → NASTEPNE KONTO ≫</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 16px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.6">Auto-save <strong style="color:#2dd4a0">wlaczone</strong><br>— zapisano <span id="dataSaveAgo">—</span> temu</div>
+      <div style="display:flex;gap:8px">
+        <button class="data-nav-btn" onclick="dataNavPrev()">← POPRZEDNIE</button>
+        <button class="data-nav-btn primary" onclick="dataSaveAndNext()">ZAPISZ → NASTEPNE KONTO ≫</button>
+      </div>
     </div>`;
 
   document.getElementById('dataCenterContent').innerHTML = html;
@@ -5578,6 +5583,20 @@ function updateAuto(k){
   set('ea_acosT_'+k,(adsC||promoC)&&sp?pct(c.acosTotal):'—', c.acosTotal<20?'good':c.acosTotal<30?'warn':'bad');
   set('ea_roasG_'+k,(adsC||promoC)&&sp?xf(c.roasGlob):'—', c.roasGlob>=5?'good':c.roasGlob>=3?'warn':'bad');
   set('ea_maft_'+k,sp?pct(c.mAfter):'—', c.mAfter>=10?'good':c.mAfter>=5?'warn':'bad');
+
+  // KPI deltas vs yesterday
+  if(window._dataYestData && sp){
+    const y=window._dataYestData, yProd=prod;
+    const yC=calc(y,yProd);
+    if(yC){
+      const setD=(id,cur,prev,unit,inv)=>{const el=document.getElementById(id);if(!el||!prev)return;const d=cur-prev;const up=inv?d<=0:d>=0;el.innerHTML=`<span style="color:${up?'#2dd4a0':'#ef4444'}">${up?'▲':'▼'} ${d>=0?'+':''}${d.toFixed(unit==='x'?2:1)} ${unit}</span>`;};
+      setD('ea_ua_d_'+k,c.udzialAds,yC.udzialAds,'pp',true);
+      setD('ea_acosAds_d_'+k,c.acosAds,yC.acosAds,'pp',true);
+      setD('ea_acosT_d_'+k,c.acosTotal,yC.acosTotal,'pp',true);
+      setD('ea_roasG_d_'+k,c.roasGlob,yC.roasGlob,'x',false);
+      setD('ea_maft_d_'+k,c.mAfter,yC.mAfter,'pp',false);
+    }
+  }
 
   if(sp&&dzien){
     const ed=effectiveDzien(dzien);
@@ -21035,7 +21054,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.07</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.08</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
