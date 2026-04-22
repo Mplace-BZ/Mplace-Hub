@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v7.98</title>
+<title>MPlace Hub v7.99</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -627,6 +627,39 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .agent-thinking-dot{width:6px;height:6px;border-radius:50%;background:#34d399;animation:mPulse 1s infinite;}
 .agent-thinking-dot:nth-child(2){animation-delay:.2s;}
 .agent-thinking-dot:nth-child(3){animation-delay:.4s;}
+/* ── Agent redesign v2 ── */
+.agent-panels{display:grid;grid-template-columns:1fr 340px;gap:1rem;margin-bottom:1.2rem;}
+.agent-panel{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;}
+.agent-panel-hdr{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem;}
+.agent-pb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;}
+.agent-pb-btn{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.agent-pb-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2);}
+.agent-pb-btn .pb-ico{font-size:13px;width:18px;text-align:center;flex-shrink:0;}
+.agent-exp-row{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;transition:all .15s;margin-bottom:.35rem;font-family:var(--mono);font-size:12px;color:var(--text2);}
+.agent-exp-row:hover{background:var(--bg3);color:var(--text);border-color:var(--border2);}
+.agent-exp-badge{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;border:1px solid var(--border2);color:var(--text3);letter-spacing:.04em;}
+.agent-chat-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:1rem;display:flex;flex-direction:column;min-height:200px;}
+.agent-chat-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.06em;}
+.agent-chat-body{flex:1;padding:14px;overflow-y:auto;max-height:60vh;}
+.agent-bubble{margin-bottom:12px;display:flex;gap:8px;}
+.agent-bubble-user{justify-content:flex-end;}
+.agent-bubble-user .agent-bubble-content{background:var(--bg3);border:1px solid var(--border2);border-radius:10px 10px 2px 10px;padding:10px 14px;max-width:75%;font-size:13px;color:var(--text);line-height:1.5;}
+.agent-bubble-ai{justify-content:flex-start;}
+.agent-bubble-ai .agent-bubble-content{background:var(--bg);border:1px solid var(--border);border-left:3px solid #34d399;border-radius:10px 10px 10px 2px;padding:10px 14px;max-width:85%;font-size:13px;color:var(--text);line-height:1.7;}
+.agent-bubble-ai .agent-bubble-content h3{font-size:13px;font-weight:600;color:#34d399;margin:.8rem 0 .3rem;}
+.agent-bubble-ai .agent-bubble-content strong{color:var(--accent);font-weight:600;}
+.agent-bubble-ai .agent-bubble-content em{color:var(--text2);font-style:italic;}
+.agent-avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-family:var(--mono);font-size:12px;font-weight:700;display:grid;place-items:center;flex-shrink:0;}
+.agent-bubble-time{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:3px;}
+.agent-bubble-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+.agent-bubble-tag{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:4px;border:1px solid var(--border2);color:var(--text3);background:var(--bg3);}
+.agent-bubble-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.agent-input-bar{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:flex-end;gap:10px;}
+.agent-input-bar textarea{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--sans);font-size:13px;resize:none;outline:none;line-height:1.5;min-height:24px;max-height:120px;}
+.agent-input-meta{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9px;color:var(--text3);}
+.agent-live-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:#34d399;margin-bottom:1rem;}
+.agent-live-dot{width:6px;height:6px;border-radius:50%;background:#34d399;animation:mPulse 1.5s infinite;}
+@media(max-width:800px){.agent-panels{grid-template-columns:1fr;}.agent-pb-grid{grid-template-columns:repeat(2,1fr);}}
 .ins-filter{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;}
 .ins-filter.active{background:var(--bg3);color:var(--text);border-color:var(--border2);}
 .ins-filter:hover{background:var(--bg3);color:var(--text);}
@@ -1574,7 +1607,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v7.98</span>
+    <span class="brand-ver">v7.99</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2464,39 +2497,59 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="ph-sub">Zadaj pytanie — agent analizuje Twoje dane i odpowiada</div>
   </div>
 
-  <!-- Playbook row -->
-  <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;align-items:center">
-    <span style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Playbook:</span>
-    <button onclick="openPlaybook('PD')" class="agent-chip" style="border-color:rgba(245,166,35,.3);color:var(--yellow);background:rgba(245,166,35,.06)">Plan Dnia</button>
-    <button onclick="openPlaybook('RM')" class="agent-chip" style="border-color:rgba(45,212,160,.3);color:var(--green);background:rgba(45,212,160,.06)">Rentowność</button>
-    <button onclick="openPlaybook('RA')" class="agent-chip" style="border-color:rgba(77,159,255,.3);color:var(--blue);background:rgba(77,159,255,.06)">ROAS / Ads</button>
-    <button onclick="openPlaybook('KP')" class="agent-chip" style="border-color:rgba(244,114,182,.3);color:#f472b6;background:rgba(244,114,182,.06)">Kanibalizacja</button>
-    <button onclick="openPlaybook('DT')" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.06)">D2D / Trend</button>
-    <button onclick="openPlaybook('SE')" class="agent-chip" style="border-color:rgba(232,121,249,.3);color:#e879f9;background:rgba(232,121,249,.06)">Symulator</button>
-    <button onclick="openPlaybook('IA')" class="agent-chip" style="border-color:rgba(255,107,53,.3);color:#ff6b35;background:rgba(255,107,53,.06)">Insights</button>
-    <button onclick="openPlaybook('RC')" class="agent-chip" style="border-color:rgba(156,163,175,.3);color:#9ca3af;background:rgba(156,163,175,.06)">Raporty</button>
-    <button onclick="openPlaybook('MC')" class="agent-chip" style="border-color:rgba(52,211,153,.3);color:#34d399;background:rgba(52,211,153,.06)">Mentor</button>
-    <button onclick="openPlaybook('BA')" class="agent-chip" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.08)">Biznes</button>
-    <div style="flex:1"></div>
-    <button onclick="generateMTDReport()" class="agent-chip" style="border-color:rgba(255,107,53,.4);color:#ff6b35;background:rgba(255,107,53,.08)">Raport MTD</button>
-    <button onclick="openPDFsModal()" class="agent-chip" style="border-color:rgba(255,107,53,.3);color:#ff6b35;background:rgba(255,107,53,.07)">PDF</button>
-    <button onclick="generateSlideReport()" class="agent-chip" style="border-color:rgba(180,127,255,.4);color:#b47fff;background:rgba(180,127,255,.08)">◆ Prezentacja</button>
-    <button onclick="openPDFsPRModal()" class="agent-chip" style="border-color:rgba(180,127,255,.3);color:#b47fff;background:rgba(180,127,255,.07)">PDF PR</button>
-  </div>
+  <!-- LIVE badge -->
+  <div class="agent-live-badge"><span class="agent-live-dot"></span> LIVE · kontekst <span id="agentCtxCount">9</span> kont</div>
 
-  <!-- Input -->
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem">
-    <textarea id="agentInput" placeholder="Zapytaj o swoje konta... np. 'Jeśli podniosę ROAS BOTAVIT do 7 to jaki wynik na koniec miesiąca?'" 
-      style="width:100%;background:transparent;border:none;color:var(--text);font-family:var(--sans);font-size:13px;resize:vertical;outline:none;line-height:1.6;min-height:200px"
-      onkeydown="if(event.key==='Enter'&&(event.metaKey||event.ctrlKey))agentSend()"></textarea>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem">
-      <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Enter+Cmd/Ctrl = wyślij</span>
-      <button onclick="agentSend()" id="agentSendBtn" style="font-family:var(--mono);font-size:11px;padding:6px 16px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer;transition:all .15s">▸ Wyślij</button>
+  <!-- Playbook + Exports — 2 columns -->
+  <div class="agent-panels">
+    <div class="agent-panel">
+      <div class="agent-panel-hdr">Playbook · zapytaj w kontekscie</div>
+      <div class="agent-pb-grid">
+        <button onclick="openPlaybook('PD')" class="agent-pb-btn"><span class="pb-ico">≡</span> Plan Dnia</button>
+        <button onclick="openPlaybook('RM')" class="agent-pb-btn"><span class="pb-ico">◎</span> Rentownosc</button>
+        <button onclick="openPlaybook('RA')" class="agent-pb-btn"><span class="pb-ico">∿</span> ROAS / Ads</button>
+        <button onclick="openPlaybook('KP')" class="agent-pb-btn"><span class="pb-ico">⌁</span> Kanibalizacja</button>
+        <button onclick="openPlaybook('DT')" class="agent-pb-btn"><span class="pb-ico">△</span> D2D / Trend</button>
+        <button onclick="openPlaybook('SE')" class="agent-pb-btn"><span class="pb-ico">⊿</span> Symulator</button>
+        <button onclick="openPlaybook('IA')" class="agent-pb-btn"><span class="pb-ico">⊙</span> Insights</button>
+        <button onclick="openPlaybook('MC')" class="agent-pb-btn"><span class="pb-ico">▣</span> Mentor</button>
+        <button onclick="openPlaybook('BA')" class="agent-pb-btn"><span class="pb-ico">◇</span> Biznes</button>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:.6rem">Kliknij → input wypelnia sie gotowa forma pytania z kontekstem.</div>
+    </div>
+    <div class="agent-panel">
+      <div class="agent-panel-hdr">Eksporty · wygeneruj artefakt</div>
+      <button onclick="generateMTDReport()" class="agent-exp-row">Raport MTD <span class="agent-exp-badge">PDF</span></button>
+      <button onclick="openPDFsPRModal()" class="agent-exp-row">PR jednostronicowy <span class="agent-exp-badge">PDF</span></button>
+      <button onclick="generateSlideReport()" class="agent-exp-row">Prezentacja <span class="agent-exp-badge">PPTX</span></button>
+      <button onclick="exportCSV()" class="agent-exp-row">Eksport danych <span class="agent-exp-badge">CSV</span></button>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:.4rem">Eksporty pobieraja ostatnie dane + analizy i renderuja plik.</div>
     </div>
   </div>
 
-  <!-- Response -->
-  <div id="agentResponse"></div>
+  <!-- Chat container -->
+  <div class="agent-chat-wrap">
+    <div class="agent-chat-hdr">
+      <span>KONWERSACJA · DZIS <span id="agentChatTime"></span></span>
+      <button onclick="document.getElementById('agentResponse').innerHTML='';document.getElementById('agentInput').value=''" style="font-family:var(--mono);font-size:9px;padding:3px 10px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer">+ Nowy watek</button>
+    </div>
+    <div class="agent-chat-body" id="agentResponse"></div>
+  </div>
+
+  <!-- Input bar -->
+  <div class="agent-input-bar">
+    <textarea id="agentInput" placeholder="Zapytaj o swoje konta... np. &#8222;Jesli podnose ROAS BOTAVIT do 7x to jaki wynik na koniec miesiaca?&#8221;"
+      rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();agentSend()}"></textarea>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+      <div class="agent-input-meta">
+        <span id="agentInputCtx">Kontekst: 9 kont</span>
+        <span style="color:var(--border2)">·</span>
+        <span>Enter = wyslij · ↵+Enter = nowa linia</span>
+      </div>
+      <button onclick="agentSend()" id="agentSendBtn" style="font-family:var(--mono);font-size:11px;padding:6px 16px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer;transition:all .15s">▸ Wyslij</button>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -10717,6 +10770,14 @@ function renderMonths(){
 function initAgent(){
   const inp = document.getElementById('agentInput');
   if(inp && !inp.value) inp.focus();
+  // Populate context badges
+  const n = typeof ALL_KEYS!=='undefined' ? ALL_KEYS.length : 9;
+  const ctxEl = document.getElementById('agentCtxCount'); if(ctxEl) ctxEl.textContent = n;
+  const mName = MONTHS[new Date().getMonth()];
+  const ctxBar = document.getElementById('agentInputCtx');
+  if(ctxBar) ctxBar.textContent = 'Kontekst: '+n+' kont · '+(mName[0].toUpperCase()+mName.slice(1))+' '+new Date().getFullYear();
+  const chatTime = document.getElementById('agentChatTime');
+  if(chatTime) chatTime.textContent = new Date().toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
 }
 
 function agentAsk(q){
@@ -10937,13 +10998,21 @@ async function agentSend(){
   const q = input.value.trim();
   if(!q) return;
 
-  // Show thinking
-  responseEl.innerHTML = `<div class="agent-thinking">
-    <div class="agent-thinking-dot"></div>
-    <div class="agent-thinking-dot"></div>
-    <div class="agent-thinking-dot"></div>
-    <span style="margin-left:.3rem">Analizuję Twoje dane...</span>
-  </div>`;
+  // Show user bubble + thinking
+  const qTime = new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'});
+  responseEl.innerHTML += `
+    <div class="agent-bubble agent-bubble-user">
+      <div><div class="agent-bubble-content">${q.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div>
+      <div class="agent-bubble-time" style="text-align:right">${qTime}</div></div>
+    </div>
+    <div id="agentThinkingBubble" class="agent-bubble agent-bubble-ai">
+      <div class="agent-avatar">A</div>
+      <div><div class="agent-thinking">
+        <div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div><div class="agent-thinking-dot"></div>
+        <span style="margin-left:.3rem">Analizuje Twoje dane...</span>
+      </div></div>
+    </div>`;
+  responseEl.scrollTop = responseEl.scrollHeight;
   btn.disabled = true;
   btn.textContent = '⟳ Myślę...';
 
@@ -10976,32 +11045,35 @@ async function agentSend(){
       .replace(/\n\n/g, '</p><p>')
       .replace(/\n/g, '<br>');
 
-    // Show question + answer
-    const time = new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'});
-    responseEl.innerHTML = `
-      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem">
-        <span style="color:#34d399">✦ Agent</span> · ${time}
-        <button onclick="copyAgentResponse(this)"
-          style="margin-left:auto;font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(255,107,53,.3);background:rgba(255,107,53,.07);color:var(--accent);cursor:pointer">⧉ Kopiuj</button>
-        <button onclick="printAgentResponse()"
-          style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(77,159,255,.3);background:rgba(77,159,255,.07);color:var(--blue);cursor:pointer">⎙ Drukuj</button>
-        <button onclick="emailAgentResponse()" 
-          style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(45,212,160,.3);background:rgba(45,212,160,.07);color:var(--green);cursor:pointer">✉ Email</button>
-        <button onclick="speakText(document.querySelector('#agentResponse .agent-msg')?.innerText||'')"
-          style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.07);color:#34d399;cursor:pointer">&#9679; Czytaj</button>
-        <button onclick="stopSpeaking()"
-          style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.07);color:#ef4444;cursor:pointer">&#9632; Stop</button>
-        <button onclick="replayVoice()"
-          style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(168,139,250,.3);background:rgba(168,139,250,.07);color:#a78bfa;cursor:pointer">&#9654; Powtórz</button>
-        <button onclick="saveVoice()"
-          style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(244,114,182,.3);background:rgba(244,114,182,.07);color:#f472b6;cursor:pointer">&#8595; MP3</button>
-        <button onclick="document.getElementById('agentResponse').innerHTML='';document.getElementById('agentInput').value=''"
-          style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer">✕ Wyczyść</button>
-      </div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.75rem;padding:.5rem .75rem;background:var(--bg3);border-radius:6px">
-        Pytanie: ${q}
-      </div>
-      <div class="agent-msg"><p>${html}</p></div>`;
+    // Replace thinking bubble with AI response bubble
+    const aTime = new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'});
+    const thinkEl = document.getElementById('agentThinkingBubble');
+    if(thinkEl) thinkEl.remove();
+    // Detect context tags from question
+    const tagWords = [];
+    const acNames = typeof ALL_KEYS!=='undefined' ? ALL_KEYS : Object.keys(AC_META||{});
+    acNames.forEach(k => { const nm = (AC_META[k]?.name||k).split(' ')[0]; if(q.toLowerCase().includes(nm.toLowerCase())||q.toLowerCase().includes(k.toLowerCase())) tagWords.push(nm); });
+    ['ROAS','Ads','Symulator','Kanibalizacja','Trend','Marza','Prognoza','Budget'].forEach(t => { if(q.toLowerCase().includes(t.toLowerCase())) tagWords.push(t); });
+    const tagsHtml = tagWords.length ? `<div class="agent-bubble-tags">${tagWords.map(t=>`<span class="agent-bubble-tag">${t}</span>`).join('')}</div>` : '';
+    responseEl.innerHTML += `
+      <div class="agent-bubble agent-bubble-ai">
+        <div class="agent-avatar">A</div>
+        <div style="flex:1;min-width:0">
+          <div class="agent-bubble-content agent-msg"><p>${html}</p></div>
+          ${tagsHtml}
+          <div class="agent-bubble-actions">
+            <button onclick="copyAgentResponse(this)" style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(255,107,53,.3);background:rgba(255,107,53,.07);color:var(--accent);cursor:pointer">Kopiuj</button>
+            <button onclick="printAgentResponse()" style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(77,159,255,.3);background:rgba(77,159,255,.07);color:var(--blue);cursor:pointer">Drukuj</button>
+            <button onclick="emailAgentResponse()" style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(45,212,160,.3);background:rgba(45,212,160,.07);color:var(--green);cursor:pointer">Email</button>
+            <button onclick="speakText(this.closest('.agent-bubble-ai').querySelector('.agent-msg')?.innerText||'')" style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.07);color:#34d399;cursor:pointer">Czytaj</button>
+            <button onclick="stopSpeaking()" style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.07);color:#ef4444;cursor:pointer">Stop</button>
+            <button onclick="replayVoice()" style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(168,139,250,.3);background:rgba(168,139,250,.07);color:#a78bfa;cursor:pointer">Powtorz</button>
+            <button onclick="saveVoice()" style="font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid rgba(244,114,182,.3);background:rgba(244,114,182,.07);color:#f472b6;cursor:pointer">MP3</button>
+          </div>
+          <div class="agent-bubble-time">${aTime}</div>
+        </div>
+      </div>`;
+    responseEl.scrollTop = responseEl.scrollHeight;
 
     // Auto-read if query was voice
     if (_voiceLastWasVoice && typeof speakText === 'function') {
@@ -11011,9 +11083,13 @@ async function agentSend(){
 
     input.value = '';
   } catch(err) {
-    responseEl.innerHTML = `<div class="agent-msg" style="border-left-color:var(--red)">
-      <strong>Błąd połączenia z API.</strong> Sprawdź czy jesteś zalogowany i masz dostęp do internetu.<br>
-      <span style="font-size:11px;color:var(--text3)">${err.message}</span>
+    const thinkEl2 = document.getElementById('agentThinkingBubble'); if(thinkEl2) thinkEl2.remove();
+    responseEl.innerHTML += `<div class="agent-bubble agent-bubble-ai">
+      <div class="agent-avatar" style="background:var(--red)">!</div>
+      <div><div class="agent-bubble-content" style="border-left-color:var(--red)">
+        <strong>Blad polaczenia z API.</strong> Sprawdz czy jestes zalogowany i masz dostep do internetu.<br>
+        <span style="font-size:11px;color:var(--text3)">${err.message}</span>
+      </div></div>
     </div>`;
   }
 
@@ -11037,10 +11113,10 @@ function copyAgentResponse(btn) {
 
 function printAgentResponse() {
   const msgEl = document.querySelector('#agentResponse .agent-msg');
-  const qEl   = document.querySelector('#agentResponse [style*="Pytanie"]');
+  const qEl   = document.querySelector('#agentResponse .agent-bubble-user .agent-bubble-content');
   if (!msgEl) return;
   const time = new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  const question = qEl ? qEl.textContent.replace('Pytanie: ','').trim() : '';
+  const question = qEl ? qEl.textContent.trim() : '';
 
   let overlay = document.getElementById('reportOverlay');
   if (!overlay) { overlay = document.createElement('div'); overlay.id = 'reportOverlay'; document.body.appendChild(overlay); }
@@ -11086,10 +11162,10 @@ function printAgentResponse() {
 
 function emailAgentResponse() {
   const msgEl = document.querySelector('#agentResponse .agent-msg');
-  const qEl   = document.querySelector('#agentResponse [style*="Pytanie"]');
+  const qEl   = document.querySelector('#agentResponse .agent-bubble-user .agent-bubble-content');
   if (!msgEl) return;
   const time = new Date().toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  const question = qEl ? qEl.textContent.replace('Pytanie:','').trim() : '';
+  const question = qEl ? qEl.textContent.trim() : '';
 
   // Convert HTML to structured plain text
   let plain = msgEl.innerHTML
@@ -20668,7 +20744,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.98</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v7.99</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
