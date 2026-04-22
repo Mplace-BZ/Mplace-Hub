@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.28</title>
+<title>MPlace Hub v8.29</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1652,7 +1652,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.28</span>
+    <span class="brand-ver">v8.29</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -4471,64 +4471,63 @@ function renderArkusz(){
 // INFO — Ściąga menu & workflow
 // ═══════════════════════════════════════════════════════════
 const INFO_SECTIONS = [
-  { id:'main', label:'Glowne narzedzia', items:[
-    {name:'Cockpit (Play)', desc:'Czerwony przycisk ▶. Generuje 23 zadan na dzis z AI. Gamifikacja, checkboxy, progress bar, Did You Know.', steps:['Kliknij ▶ Play w sidebarze','AI analizuje dane 9 kont + Wiedze','Odhaczaj zadania jedno po drugim','Cel: 100% dziennie']},
-    {name:'Dashboard', desc:'Przeglad 9 kont w jednym widoku. KPI, BE ROAS, marza, alarmy, heatmap, ranking.', steps:['Kliknij Dashboard','Przejrzyj karty kont (zielone=OK, czerwone=interwencja)','Kliknij karte → szczegoly konta']},
-    {name:'Data', desc:'Wpisz dane miesieczne per konto: sprzedaz, Ads, prowizja, wyroznienia, dostawa.', steps:['Kliknij Data','Wybierz konto z lewego menu','Wypelnij pola 01/02/03','KPI aktualizuje sie live','Kliknij ZAPISZ → NASTEPNE KONTO','Na koncu: Zapisz wszystkie wpisy']},
-    {name:'Agent', desc:'Glowny chat AI (Sonnet 4.6). 100 promptow Playbook. Pelny kontekst 9 kont + baza Wiedzy.', steps:['Kliknij Agent','Wybierz prompt z Playbooka LUB wpisz pytanie','Enter = wyslij','Agent analizuje dane i odpowiada','Kopiuj/Drukuj/Email pod odpowiedzia']},
+  { id:'main', label:'Core Tools', items:[
+    {name:'◎ Cockpit', desc:'Generuje 23 zadan na dzis z AI. Gamifikacja, checkboxy, progress bar, streak, Did You Know.', steps:['Kliknij ▶ Play w sidebarze','AI analizuje dane 9 kont + baze Wiedzy','Odhaczaj zadania jedno po drugim','Cel: 100% dziennie — buduj streak'], useWhen:'Codziennie rano — zacznij dzien od Cockpita. AI przygotuje spersonalizowane zadania na podstawie Twoich danych i ostatnich zmian.', caseStudy:'Poniedzialek rano: otwierasz Cockpit, AI widzi ze Semmi miala spadek -25% w piatek i generuje zadanie "Sprawdz kampanie Semmi — spadek sprzedazy". Odhaczasz po sprawdzeniu.'},
+    {name:'◧ Dashboard', desc:'Przeglad 9 kont w jednym widoku. Karty z ROAS AKG, marza, estymacja EOM. Heatmap marzy, ranking, traffic light.', steps:['Kliknij Dashboard','Przejrzyj karty kont (zielone=OK, czerwone=interwencja)','Kliknij karte → szczegoly konta'], useWhen:'Szybki przeglad portfela — ktore konta wymagaja uwagi, ktore mozna skalowac.', caseStudy:'Dashboard pokazuje BOTAVIT z czerwona karta (marza -9%). Klikasz → widzisz ze ROAS 1.30x jest ponizej BE 5.34x. Wchodzisz w Analiza.'},
+    {name:'◉ Data', desc:'Wpisz dane miesieczne per konto. 3-kolumnowy layout: lista kont, formularz, sanity check + dane wczorajsze.', steps:['Kliknij Data','Wybierz konto z lewego menu','Wypelnij 01 Koszty / 02 Sprzedaz / 03 Dostawa','KPI aktualizuje sie live + sanity check po prawej','Kliknij nastepne konto (auto-save)','Na koncu: Zapisz wszystkie wpisy → Firebase sync'], useWhen:'Codziennie po pobraniu danych z Allegro. Dane za dzien N wpisujesz w dniu N+1.', caseStudy:'Wpisujesz dane PerfektCiecie: sprzedaz 62 491 zl. Sanity check od razu pokazuje "Sprzedaz -8% vs wczoraj" z czerwonym alertem. Sprawdzasz czy to sezon czy problem.'},
+    {name:'✦ Agent', desc:'Glowny chat AI (Sonnet 4.6). 9 kategorii Playbook (100 promptow). Pelny kontekst danych + baza Wiedzy. Eksporty PDF/PPTX.', steps:['Kliknij Agent','Wybierz prompt z Playbooka LUB wpisz wlasne pytanie','Enter = wyslij','Agent analizuje dane 9 kont i odpowiada','Kopiuj / Drukuj / Email pod odpowiedzia'], useWhen:'Gdy potrzebujesz szybkiej analizy, symulacji, raportu lub porady — zamiast robic to recznie.', caseStudy:'Pytasz: "Jesli podniose ROAS BOTAVIT do 7x to jaki wynik na koniec miesiaca?" Agent liczy: przy budzetcie 4327 zl i ROAS 7x → sprzedaz wzrosnie o ~40%, marza do +12%.'},
   ]},
-  { id:'ai', label:'AI Workflow Ads', items:[
-    {name:'Analiza', desc:'Wgraj 4 raporty Allegro (Ads/Odwiedziny/Sprzedaz/30d) → AI generuje 10-sekcyjny raport per konto. Tu zaczynasz kazdy raport.', steps:['Wybierz konto','Wgraj 3 pliki XLSX (opcja: Ads 30d jako kontekst)','Wpisz uwagi/obserwacje','Kliknij Analizuj z AI','Raport: Diagnoza → Zatrzymaj → Tnij → Skaluj → Kanibalizacja → Plan']},
-    {name:'Strategia', desc:'Karty 3 kont MEBLE z rolami (SCALE/NICHE/PREMIUM). KPI vs targets, specjalizacje per konto.', steps:['Kliknij Strategia','Przejrzyj role kont: MK=Scale, PC=Niche, MnC=Premium','Sprawdz KPI vs cele','AI generuje plan reorganizacji']},
-    {name:'Centrum Ads', desc:'Generator nazw kampanii Format A v2. Walidator konwencji. AI Architect — plan reorganizacji 3 kont + CSV.', steps:['Wypelnij formularz (konto, kategoria, linia, wymiar)','Kliknij Generuj nazwy','Opcja: AI Architect generuje pelny plan z CSV']},
-    {name:'Screener', desc:'Multi-turn chat z AI. Paste screenshotow (Ctrl+V). Multi-image. Historia rozmow.', steps:['Kliknij Screener','Wklej screenshot (Ctrl+V) lub wpisz pytanie','Agent widzi obrazki + dane kont','Kontynuuj rozmowe (multi-turn)']},
+  { id:'ai', label:'AI Workflow', items:[
+    {name:'⊙ Analysis', desc:'Wgraj 3-4 raporty Allegro XLSX (Ads/Odwiedziny/Sprzedaz + opcja 30d kontekst) → AI generuje 10-sekcyjny raport per konto.', steps:['Wybierz konto z dropdown','Ustaw okres (7d/14d/30d lub custom daty)','Wgraj 3 pliki XLSX','Opcja: wgraj Ads 30d jako kontekst historyczny','Wpisz uwagi/obserwacje w textarea','Kliknij Analizuj z AI','Raport: Diagnoza → Zatrzymaj → Tnij → Skaluj → Kanibalizacja → Martwe punkty → Placement → Plan'], useWhen:'Co tydzien per konto MEBLE. Co 2 tygodnie dla LUXSEN/ONE. Gdy zobaczysz spadek na Dashboard.', caseStudy:'Upload 3 plikow MobelKap za ostatnie 14 dni. AI wykrywa 12 kampanii z ROAS < 3 do wylaczenia, 5 kampanii z ROAS > 10 do skalowania, kanibalizacje miedzy szafka pralkowa 62 i 65.'},
+    {name:'◇ Strategy', desc:'Karty 3 kont MEBLE z rolami portfelowymi (SCALE/NICHE/PREMIUM). KPI vs targety, specjalizacje, AI plan reorganizacji.', steps:['Kliknij Strategy','Przejrzyj karty rol: MK=Scale, PC=Niche, MnC=Premium','Sprawdz KPI vs cele per konto','AI generuje plan reorganizacji kampanii'], useWhen:'Raz w miesiacu lub po duzych zmianach. Gdy chcesz przekalibrowac role kont w portfelu.', caseStudy:'PC ma ROAS 4.82x ponizej BE 6.96x. Strategy pokazuje ze PC powinno skupic sie na niszach (donice, kwietniki) zamiast walczyc z MK o szafki pralkowe.'},
+    {name:'⚡ Ads Hub', desc:'Generator nazw kampanii Format A v2. Walidator konwencji. AI Architect — pelny plan reorganizacji 3 kont MEBLE + eksport CSV.', steps:['Wypelnij formularz (konto, kategoria, linia, wymiar)','Kliknij Generuj nazwy → gotowe nazwy kampanii/grup','Opcja: AI Architect analizuje wszystkie kampanie i generuje plan + CSV'], useWhen:'Gdy tworzysz nowe kampanie lub reorganizujesz istniejace. CSV importujesz do Allegro.', caseStudy:'Tworzysz nowa kampanie dla KARO 92: /010/ LAZIENKA_PRALKA_62 → [MK][010][WW][RW] PRALKA_62_WOTAN. Architect reorganizuje 47 kampanii MK/PC/MnC i eksportuje CSV.'},
+    {name:'◆ Screener', desc:'Multi-turn chat z AI + paste screenshotow (Ctrl+V). Vision: agent widzi obrazki. Historia rozmow zapisywana.', steps:['Kliknij Screener','Wklej screenshot z panelu Allegro (Ctrl+V)','Lub wpisz pytanie','Agent widzi obrazki + kontekst 9 kont','Kontynuuj rozmowe (multi-turn)','Zapisz rozmowe do historii'], useWhen:'Gdy widzisz cos dziwnego w panelu Allegro i chcesz szybka opinie AI. Iteracyjna analiza screenshotow.', caseStudy:'Wklejasz screenshot statystyk kampanii Semmi — AI widzi ze CPC wynosi 3.20 zl (2x wyzej niz norma) i rekomenduje przelaczenie na Dynamic CPC.'},
   ]},
-  { id:'meble', label:'Role 3 kont MEBLE', items:[
-    {name:'MobelKap — SCALE', desc:'Wolumen. Szafki pralkowe, nowosci, polki, t-box, KARO 92. Ads cel 6.5%, Wyroz. cel 5.0%, pricing base.'},
-    {name:'PerfektCiecie — NICHE', desc:'Nisze. Donice Craft/Lancelot, kwietniki, szafki lustro, SLIM, sezonowe. Ads cel 5.5%, Wyroz. cel 3.0%, pricing base.'},
-    {name:'MeblenaCzasie — PREMIUM', desc:'Gwiazdy. TOP92 Wotan, KARO 65 Wotan, podnoszone. Ads cel 6.5%, Wyroz. cel 4.5%, pricing +2.5%.'},
-    {name:'Regula wlasnosci frazy', desc:'Aukcja na 2+ kontach → wygrywa konto z najwyzszym ROAS + zgodne z rola. Pozostale wylaczaja Ads, zostawiaja listing organicznie.'},
+  { id:'meble', label:'MEBLE Roles', items:[
+    {name:'MobelKap — SCALE', desc:'Rola: wolumen i skala. Produkty: szafki pralkowe, nowosci, polki, t-box, KARO 92. Ads cel 6.5%, Wyroznienia cel 5.0%, pricing base.', useWhen:'MK jest glownym kontem wolumenowym — tu skalujesz bestsellery i testujesz nowosci.'},
+    {name:'PerfektCiecie — NICHE', desc:'Rola: nisze i specjalizacja. Produkty: donice Craft/Lancelot, kwietniki, szafki lustro, SLIM, sezonowe. Ads cel 5.5%, Wyroznienia cel 3.0%, pricing base.', useWhen:'PC obsluguje nisze gdzie nie walczy z MK. Niski budzet Ads, wysoka konwersja organiczna.'},
+    {name:'MeblenaCzasie — PREMIUM', desc:'Rola: gwiazdy i premium. Produkty: TOP92 Wotan, KARO 65 Wotan, podnoszone. Ads cel 6.5%, Wyroznienia cel 4.5%, pricing +2.5%.', useWhen:'MnC = benchmark efektywnosci. Najwyzsze ceny, najlepsza marza. Tu testujesz premium pricing.'},
+    {name:'Regula wlasnosci frazy', desc:'Aukcja na 2+ kontach → wygrywa konto z najwyzszym ROAS + zgodne z rola. Pozostale wylaczaja Ads na te fraze, zostawiaja listing organicznie.', caseStudy:'Szafka pralkowa 62 jest na MK i PC. MK ma ROAS 8.2x, PC ma 4.1x. Wedlug reguly: MK wygrywa, PC wylacza Ads na te fraze.'},
   ]},
-  { id:'analiza', label:'Analiza & raporty', items:[
-    {name:'Trend', desc:'12 miesiecy historycznych per konto. Przelaczniki: Sprzedaz/Marza/ROAS/Zysk/ACOS.'},
-    {name:'Insights', desc:'Auto-alerty per konto. Zagrozenia (czerwone), Szanse (zielone), Obserwuj (zolte). Czerwona kropka w menu = sa alerty.'},
-    {name:'Compare', desc:'Wybierz 2-3 konta side-by-side. Porownanie metryk.'},
-    {name:'D2D', desc:'Day-to-day snapshoty. Filtruj po koncie, dniu tygodnia, metryce. Tabela z deltami %.'},
-    {name:'Results', desc:'Wyniki finansowe per konto per miesiac. Najnowszy miesiac na gorze.'},
-    {name:'Sheet', desc:'Tabela wszystkich danych w jednym widoku. Eksport-ready.'},
+  { id:'analiza', label:'Analytics', items:[
+    {name:'∿ Trend', desc:'12 miesiecy historycznych per konto. Przelaczniki pill: SPRZEDAZ EST / MARZA / ROAS ADS / ZYSK NETTO / ACOS LACZNY.', useWhen:'Gdy chcesz zobaczyc trend sprzedazy lub marzy w czasie. Porownanie kont miesieczne.', caseStudy:'Przelaczasz na MARZA % — widzisz ze Semmi spada od 3 miesiecy z 15% do -9%. Sygnalizujesz problem.'},
+    {name:'⊙ Insights', desc:'Auto-alerty per konto. Zagrozenia (czerwone), Szanse (zielone), Obserwuj (zolte). Czerwona kropka w menu = sa nowe alerty.', useWhen:'Sprawdzaj raz dziennie — Insights automatycznie flaguje problemy i szanse ktore mozesz przegapic.', caseStudy:'Insights flaguje: "MtzzEU: ROAS spada 3 miesiace z rzedu (9.2→7.4→5.8)" jako Zagrozenie z impact wysoki.'},
+    {name:'⊞ Compare', desc:'Wybierz 2-3 konta i porownaj metryki side-by-side.', useWhen:'Gdy chcesz porownac dwa konta bezposrednio — np. MK vs MnC albo Luxsen vs Semmi.'},
+    {name:'⌁ D2D', desc:'Day-to-day snapshoty. Filtruj po koncie, dniu tygodnia, miesiaku, metryce. Tabela z deltami % dzien-do-dnia.', useWhen:'Gdy chcesz zobaczyc wzorce dzienne — np. czy poniedzialek jest zawsze lepszy niz piatek.', caseStudy:'Filtrujesz D2D po "Pt" i "Sb" — widzisz ze weekend to -30% sprzedazy vs poniedzialek. Zmniejszasz budzet Ads na weekendy.'},
+    {name:'◧ Results', desc:'Wyniki finansowe per konto per miesiac. Najnowszy na gorze. ROAS, ACOS, marza, estymacja.', useWhen:'Szybki przeglad wynikow finansowych — ktore konto zarabia, ktore traci.'},
+    {name:'⊞ Sheet', desc:'Tabela wszystkich danych w jednym widoku. Eksport-ready. Wszystkie metryki w kolumnach.', useWhen:'Gdy potrzebujesz surowych danych do Excela lub prezentacji.'},
   ]},
-  { id:'tools', label:'Narzedzia & pomoc', items:[
-    {name:'Calc', desc:'Kalkulator ROAS, ACoS, marza, BE, CPC, CTR, CPA. 3 tryby obliczen.'},
-    {name:'Simulator', desc:'"Co jesli" — testuj zmiany cen/Ads/marzy. Suwaki z live preview.'},
-    {name:'Kalendarz', desc:'Allegro Days, Smart! Weeks, Black Weeks, swieta 2026. Planuj kampanie.'},
-    {name:'Wiedza', desc:'Baza wiedzy: slownik, benchmark, zasady, artykuly. Auto-wstrzykiwana do kazdego zapytania Agenta.'},
-    {name:'Biznes', desc:'Fee agencji, marza grupy, zysk netto. Przeglad finansowy.'},
-    {name:'Rozliczenie', desc:'Faktury miesieczne per grupa.'},
+  { id:'tools', label:'Tools', items:[
+    {name:'⊿ Calc', desc:'Kalkulator ROAS, ACoS, marza, BE, CPC, CTR, CPA. 3 tryby obliczen.', useWhen:'Szybkie obliczenia "ile potrzebuje ROAS zeby wyjsc na zero" — bez szukania w glowie.'},
+    {name:'△ Simulator', desc:'"Co jesli" — testuj zmiany cen/Ads/marzy. Suwaki z live preview wyniku.', useWhen:'Przed podjechiem decyzji: "co jesli podnosze cene o 5%?" albo "co jesli podwajam budzet Ads?".', caseStudy:'Suwak: budzet Ads MK +50%. Simulator pokazuje: sprzedaz +22%, ale marza spada z 10.7% do 7.3%. Decyzja: nie warto.'},
+    {name:'⊞ Kalendarz', desc:'Allegro Days, Smart! Weeks, Black Weeks, swieta 2026. Planuj kampanie z wyprzedzeniem.', useWhen:'Co miesiac sprawdz co nadchodzi — przygotuj kampanie na Allegro Days z 2-tygodniowym wyprzedzeniem.'},
+    {name:'✦ Knowledge', desc:'Baza wiedzy: slownik, benchmark, zasady, artykuly, case study. Auto-wstrzykiwana do kazdego zapytania Agenta.', useWhen:'Dodaj nowa wiedze gdy odkryjesz cos waznego — Agent bedzie to uwzglednial we wszystkich odpowiedziach.'},
+    {name:'◎ Biznes', desc:'Fee agencji per grupa, marza grupy, zysk netto. Przeglad finansowy portfela.', useWhen:'Na koniec miesiaca — sprawdz ile zarobiles i ile placisz agencji.'},
+    {name:'◉ Rozliczenie', desc:'Faktury miesieczne per grupa. MEBLE 7500 zl stale, LUXSEN 20% marzy, ONE stale stawki.', useWhen:'Przy wystawianiu faktur — sprawdz kwoty per grupa.'},
   ]},
-  { id:'workflow', label:'Codzienny workflow', items:[
-    {name:'Rano', desc:'▶ Play (Cockpit) → 23 zadan → odhacz po kolei.'},
-    {name:'Tydzien', desc:'Analiza dla 3 kont MEBLE → Strategia MEBLE w Screenerze → plan dzialan.'},
-    {name:'Wieczor', desc:'Centrum Ads → AI Architect → CSV → wykonanie w panelu Allegro.'},
+  { id:'workflow', label:'Daily Workflow', items:[
+    {name:'Rano (15 min)', desc:'▶ Cockpit → 23 zadan → odhacz po kolei. Dashboard szybki przeglad. Data wpis danych z wczoraj.', useWhen:'Codziennie 8:00-8:15. Nie pomijaj — streak motywuje.'},
+    {name:'Tydzien (1h)', desc:'Analysis dla 3 kont MEBLE → Screener z wynikami → plan dzialan na nastepny tydzien.', useWhen:'Poniedzialek lub wtorek. Upload XLSX, przejrzyj raporty, zapisz wnioski.'},
+    {name:'Wieczor (30 min)', desc:'Ads Hub → AI Architect → CSV eksport → wykonanie zmian w panelu Allegro.', useWhen:'Po pracy operacyjnej. Reorganizacja kampanii na podstawie wniskow z Analysis.'},
   ]},
-  { id:'konwencja', label:'Konwencja Ads', items:[
-    {name:'Format A v2 (od 09.04.2026)', desc:'Kampania: /NNN/ KATEGORIA_LINIA_WYMIAR. Grupa: [KONTO][NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR.'},
-    {name:'Kody', desc:'KONTO: MK/PC/MC. NNN: 010, 020, 030. PLACEMENT: WW (default), WL+ (agresywny). TARGETING: RW (Dynamic CPC), R (Reguly).'},
-    {name:'Przyklad', desc:'/010/ LAZIENKA_PRALKA_62 → [MK][010][WW][RW] PRALKA_62_WOTAN'},
+  { id:'konwencja', label:'Ads Naming', items:[
+    {name:'Format A v2 (od 09.04.2026)', desc:'Kampania: /NNN/ KATEGORIA_LINIA_WYMIAR<br>Grupa: [KONTO][NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR', caseStudy:'/010/ LAZIENKA_PRALKA_62 → [MK][010][WW][RW] PRALKA_62_WOTAN'},
+    {name:'Kody referencyjne', desc:'KONTO: MK / PC / MC<br>NNN: 010, 020, 030 (numeracja kampanii)<br>PLACEMENT: WW (default), WL+ (agresywny Top3)<br>TARGETING: RW (Dynamic CPC default), R (Reguly start)'},
+    {name:'Dynamic CPC', desc:'Domyslna strategia. 7 dni nauki po kazdej zmianie. Zakres ±2x docelowej stawki. Jedna aukcja = jedna grupa reklamowa. CPC typowy: 0.80-1.50 zl.'},
   ]},
-  { id:'reguly', label:'Reguly kluczowe', items:[
-    {name:'ROAS progi', desc:'ROAS < 3 = wylacz. 3-4 = ostrzezenie. 4-BE = optymalizuj. > BE = OK.'},
-    {name:'Min 3 transakcje', desc:'Min 3 szt do JAKIEJKOLWIEK rekomendacji (skalowanie, kanibalizacja, wykluczenie).'},
-    {name:'Wyroznienia flat vs elastic', desc:'>7 dni stale → flat 19.90/10d (-34% kosztu vs 2.90/dzien).'},
-    {name:'Smart vs DPD', desc:'Smart konwertuje 4-7x lepiej (MK proba: Smart 2.10% vs DPD 0.46%).'},
-    {name:'Cykl tygodniowy', desc:'pn-wt = peak. pt-sb = dolek. Wielkanoc -50%.'},
-    {name:'Dynamic CPC', desc:'7 dni nauki, max ±2x docelowej, jedna aukcja = jedna grupa.'},
+  { id:'reguly', label:'Key Rules', items:[
+    {name:'ROAS progi decyzyjne', desc:'ROAS < 3 = wylacz natychmiast. 3-4 = ostrzezenie, monitoruj. 4-BE = optymalizuj (stawki, placement). > BE = OK, rozważ skalowanie.', caseStudy:'Kampania szafka lustro PC: ROAS 2.8x. Decyzja: wylacz Ads, zostaw listing organicznie. Oszczednosc ~200 zl/mies.'},
+    {name:'Min 3 transakcje', desc:'Minimum 3 sztuki sprzedazy zanim podejmiesz JAKAKOLWIEK decyzje: skalowanie, kanibalizacja, wykluczenie. Mniej = za malo danych.', caseStudy:'Kampania KARO 65 ma ROAS 15x ale 2 transakcje. Za wczesnie na skalowanie — czekaj na 3+ szt.'},
+    {name:'Wyroznienia flat vs elastic', desc:'Jezeli wyroznienie trwa >7 dni stale → przelacz na flat 19.90/10d. Oszczednosc -34% kosztu vs elastic 2.90/dzien.', caseStudy:'Szafka pralkowa 62 wyrózniona ciągle od 3 miesiecy: elastic = 87 zl/mies, flat = 57 zl/mies. Oszczednosc 30 zl.'},
+    {name:'Smart vs DPD', desc:'Smart dostawy konwertuja 4-7x lepiej niz DPD 2/3 paczki. Kluczowa zmienna konwersji MEBLE.', caseStudy:'MK proba A/B: Smart CVR 2.10% vs DPD CVR 0.46%. Roznica 4.6x → Smart = must-have dla mebli.'},
+    {name:'Cykl tygodniowy mebli', desc:'Poniedzialek-wtorek = peak sprzedazy. Piatek-sobota = dolek (-20-30%). Wielkanoc/swieta = -50%.', caseStudy:'Budzet Ads poniedzialek 150 zl, sobota 80 zl. Dopasowaanie do cyklu = lepszy ROAS.'},
   ]},
-  { id:'skroty', label:'Skroty & tipy', items:[
-    {name:'Ctrl+Shift+R', desc:'Hard refresh po nowej wersji.'},
-    {name:'Ctrl+V w Screenerze', desc:'Paste screenshotow — multi-image.'},
-    {name:'Enter w Agencie', desc:'Wyslij pytanie. Shift+Enter = nowa linia.'},
-    {name:'F12', desc:'Konsola debug parsera XLSX.'},
-    {name:'Klik konto w lewym menu', desc:'Auto-save biezacego + przelacz (Data view).'},
+  { id:'skroty', label:'Shortcuts', items:[
+    {name:'Ctrl+Shift+R', desc:'Hard refresh przegladarki po nowej wersji. Czysci cache CSS/JS.', useWhen:'Gdy widzisz stara wersje (numer w topbarze nie zgadza sie).'},
+    {name:'Ctrl+V w Screener', desc:'Paste screenshotow z panelu Allegro. Obsluguje wiele obrazkow naraz (multi-image).', useWhen:'Gdy chcesz szybka opinie AI na screenshot kampanii/statystyk.'},
+    {name:'Enter w Agent', desc:'Wyslij pytanie. Shift+Enter = nowa linia (bez wysylania).', useWhen:'Zawsze w Agencie. Enter = wyslij, Shift+Enter = nowa linia.'},
+    {name:'F12 → Console', desc:'Konsola debug przegladarki. Logi parsera XLSX, bledy API, sync Firebase.', useWhen:'Gdy cos nie dziala — sprawdz konsole na bledy.'},
+    {name:'Klik konto (Data)', desc:'W widoku Data klik na konto w lewym menu = auto-save biezacego konta do localStorage + przelaczenie.', useWhen:'Nie musisz klikac Zapisz przy kazdym koncie — auto-save dziala.'},
   ]},
 ];
 
@@ -4555,24 +4554,53 @@ function renderInfoContent(id){
   const section = INFO_SECTIONS.find(s => s.id === id);
   if (!section) return;
   const el = document.getElementById('infoContent');
-  let html = `<div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">INFO ▸ ${section.label.toUpperCase()}</div>
-    <div style="font-family:var(--sans);font-size:28px;font-weight:800;color:var(--text);margin-bottom:1.2rem">${section.label}</div>`;
+  // Color keywords in section label
+  const colorLabel = section.label.replace(/(MEBLE|LUXSEN|ONE|AI|Ads)/g, '<span style="color:var(--accent)">$1</span>');
+  let html = `<div style="font-family:var(--mono);font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">INFO ▸ ${section.label.toUpperCase()}</div>
+    <div style="font-family:var(--sans);font-size:28px;font-weight:800;color:var(--text);margin-bottom:1.2rem">${colorLabel}</div>`;
 
   section.items.forEach(item => {
-    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:.65rem">
-      <div style="font-family:var(--sans);font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px">${item.name}</div>
-      <div style="font-family:var(--sans);font-size:13px;color:var(--text2);line-height:1.6">${item.desc}</div>`;
+    // Extract icon from name (first char if special)
+    const nameMatch = item.name.match(/^([^\w\s])\s*(.+)$/);
+    const icon = nameMatch ? nameMatch[1] : '▸';
+    const title = nameMatch ? nameMatch[2] : item.name;
+
+    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:14px 18px;margin-bottom:.75rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:16px;color:var(--accent)">${icon}</span>
+        <span style="font-family:var(--sans);font-size:16px;font-weight:700;color:var(--text)">${title}</span>
+      </div>
+      <div style="font-family:var(--sans);font-size:13px;color:var(--text2);line-height:1.7">${item.desc}</div>`;
+
+    // Steps
     if (item.steps && item.steps.length) {
-      html += `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+      html += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
         <div style="font-family:var(--mono);font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">STEP BY STEP</div>`;
       item.steps.forEach((step, i) => {
-        html += `<div style="display:flex;align-items:flex-start;gap:8px;padding:3px 0;font-size:12px;color:var(--text2)">
-          <span style="font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:600;min-width:18px">${i+1}.</span>
+        html += `<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:12px;color:var(--text2)">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;min-width:20px">${i+1}.</span>
           <span>${step}</span>
         </div>`;
       });
       html += `</div>`;
     }
+
+    // When to use
+    if (item.useWhen) {
+      html += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:9px;color:#2dd4a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">KIEDY UZYWAC</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6">${item.useWhen}</div>
+      </div>`;
+    }
+
+    // Case study
+    if (item.caseStudy) {
+      html += `<div style="margin-top:10px;padding:10px 14px;border-left:3px solid var(--accent);background:rgba(255,107,53,.04);border-radius:0 6px 6px 0">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">CASE STUDY</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6;font-style:italic">${item.caseStudy}</div>
+      </div>`;
+    }
+
     html += `</div>`;
   });
 
@@ -21222,7 +21250,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.28</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.29</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
