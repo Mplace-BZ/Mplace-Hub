@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.20</title>
+<title>MPlace Hub v8.21</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -263,11 +263,11 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .data-nav-btn.primary:hover{background:rgba(255,107,53,.18);}
 @media(max-width:900px){.data-layout{grid-template-columns:1fr;}.data-left{position:static;max-height:none;border:none;padding:.5rem 0;}}
 /* ── MONTHS PILL TOGGLE ── */
-.months-pill{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:7px 14px;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;border-right:1px solid var(--border);}
+.months-pill{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:10px 18px;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;border-right:1px solid var(--border);text-align:center;line-height:1.4;min-width:80px;}
 .months-pill:last-child{border-right:none;}
 .months-pill:hover{color:var(--text);background:var(--bg3);}
 .months-pill.active{background:var(--bg3);color:var(--accent);font-weight:600;}
-.months-pill.active::before{content:'● ';font-size:7px;vertical-align:middle;}
+.months-pill.active::before{content:'● ';font-size:8px;}
 /* ── ENTRY FORM ── */
 .entry-date-bar{display:flex;align-items:center;gap:1rem;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.75rem 1.1rem;margin-bottom:1rem;flex-wrap:wrap;}
 .edb-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);}
@@ -1651,7 +1651,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.20</span>
+    <span class="brand-ver">v8.21</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2744,11 +2744,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <div style="display:flex;align-items:center;gap:1.5rem;margin-top:.4rem;flex-wrap:nowrap">
         <div class="ph-sub" style="margin:0;white-space:nowrap;flex-shrink:0">Wszystkie konta · wszystkie miesiące · <strong>estymacja końca miesiąca</strong></div>
         <div id="monthsMetricBar" style="display:inline-flex;align-items:center;gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;flex-shrink:0">
-          <button onclick="monthsSetMetric('est',this)" class="months-pill active" data-v="est">SPRZEDAZ EST.</button>
-          <button onclick="monthsSetMetric('marza',this)" class="months-pill" data-v="marza">MARZA %</button>
-          <button onclick="monthsSetMetric('roas',this)" class="months-pill" data-v="roas">ROAS ADS</button>
-          <button onclick="monthsSetMetric('zysk',this)" class="months-pill" data-v="zysk">ZYSK NETTO</button>
-          <button onclick="monthsSetMetric('acos',this)" class="months-pill" data-v="acos">ACOS LACZNY</button>
+          <button onclick="monthsSetMetric('est',this)" class="months-pill active" data-v="est">SPRZEDAŻ<br>EST.</button>
+          <button onclick="monthsSetMetric('marza',this)" class="months-pill" data-v="marza">MARŻA<br>%</button>
+          <button onclick="monthsSetMetric('roas',this)" class="months-pill" data-v="roas">ROAS<br>ADS</button>
+          <button onclick="monthsSetMetric('zysk',this)" class="months-pill" data-v="zysk">ZYSK<br>NETTO</button>
+          <button onclick="monthsSetMetric('acos',this)" class="months-pill" data-v="acos">ACOS<br>ŁĄCZNY</button>
         </div>
       </div>
     </div>
@@ -21112,7 +21112,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.20</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.21</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
