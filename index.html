@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.35</title>
+<title>MPlace Hub v8.36</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1661,7 +1661,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.35</span>
+    <span class="brand-ver">v8.36</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -3178,7 +3178,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div style="margin-bottom:1rem">
     <div class="ph-eyebrow">► ROZMOWA Z AGENTEM</div>
     <div class="ph-title">Screener <span>◆</span></div>
-    <div class="ph-sub">Wklej screenshot (Ctrl+V) lub napisz pytanie — Agent widzi dane wszystkich kont i bazę Wiedzy</div>
+    <div class="ph-sub">Wklej screenshot (Ctrl+V), wgraj XLSX/PDF lub napisz pytanie — Agent widzi dane wszystkich kont i bazę Wiedzy</div>
   </div>
 
   <div id="scrMessages" style="min-height:100px;max-height:600px;overflow-y:auto;margin-bottom:1rem"></div>
@@ -3186,12 +3186,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <!-- ═══ Sekcja UPLOAD plików XLSX (collapsible) ═══ -->
   <details id="scrFilesSection" style="margin-bottom:1rem;border:1px solid rgba(232,121,249,.25);border-radius:8px;background:rgba(232,121,249,.03)">
     <summary style="padding:10px 14px;cursor:pointer;font-family:var(--mono);font-size:11px;color:#e879f9;display:flex;justify-content:space-between;align-items:center">
-      <span>📂 Wgraj pliki XLSX (Ads / Odwiedziny / Sprzedaż / Katalog) — <span id="scrFilesCount">0 plików</span></span>
+      <span>📂 Wgraj pliki XLSX / PDF (Ads / Odwiedziny / Sprzedaż / PDF) — <span id="scrFilesCount">0 plików</span></span>
       <span style="font-size:10px;color:var(--text3)">rozwiń ▼</span>
     </summary>
     <div style="padding:10px 14px;border-top:1px solid rgba(232,121,249,.15)">
       <div style="font-size:10px;color:var(--text3);margin-bottom:8px;line-height:1.5">
-        <strong style="color:#e879f9">🤖 Auto-detekcja:</strong> wgraj wiele plików naraz — system wykryje konto i typ z nazwy pliku lub zawartości XLSX. Możesz też wybrać ręcznie z dropdownu (override).
+        <strong style="color:#e879f9">🤖 Auto-detekcja:</strong> wgraj XLSX lub PDF — system wykryje konto i typ z nazwy pliku lub zawartości. PDF = pełny tekst dokumentu jako kontekst dla Agenta.
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:8px;align-items:end;margin-bottom:8px">
         <div>
@@ -3218,11 +3218,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
             <option value="konwersja">Sprzedaż wg ofert</option>
             <option value="ads30d">Ads 30 dni (kontekst)</option>
             <option value="oferta">Aktywne oferty (lista)</option>
+            <option value="pdf">PDF (dokument tekstowy)</option>
           </select>
         </div>
         <div>
-          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">PLIKI XLSX (możesz wybrać wiele)</div>
-          <input type="file" id="scrFileInput" accept=".xlsx" multiple onchange="scrAddFile(this)" style="width:100%;font-family:var(--mono);font-size:10px;color:var(--text2)">
+          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">PLIKI XLSX / PDF (możesz wybrać wiele)</div>
+          <input type="file" id="scrFileInput" accept=".xlsx,.pdf" multiple onchange="scrAddFile(this)" style="width:100%;font-family:var(--mono);font-size:10px;color:var(--text2)">
         </div>
       </div>
       <div id="scrFilesList" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px"></div>
@@ -4558,7 +4559,7 @@ const INFO_SECTIONS = [
   ]},
   { id:'skroty', label:'Shortcuts', items:[
     {name:'Ctrl+Shift+R', desc:'Hard refresh. Czyści cache. Sprawdź wersję w topbarze.', useWhen:'Stara wersja w topbarze.'},
-    {name:'Ctrl+V (Screener)', desc:'Paste screenshotów. Multi-image. Auto-resize 1024px, base64.', useWhen:'Szybka opinia AI na screenshot.'},
+    {name:'Ctrl+V / PDF (Screener)', desc:'Paste screenshotów (multi-image, auto-resize 1024px) + upload PDF (tekst wyciągany pdf.js, max 50 stron).', useWhen:'Szybka opinia AI na screenshot lub analiza dokumentu PDF.'},
     {name:'Enter (Agent)', desc:'Wyślij. Shift+Enter = nowa linia.'},
     {name:'F12 → Console', desc:'Debug: parser XLSX, API błędy, Firebase sync logi.', useWhen:'Coś nie działa.'},
     {name:'Klik konto (Data)', desc:'Auto-save bieżącego + przełącz. Nie musisz klikać Zapisz.'},
@@ -21290,7 +21291,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.35</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.36</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -22073,6 +22074,26 @@ async function scrAddFile(input) {
 
   for (const file of files) {
     try {
+      // ═══ PDF — osobna ścieżka parsowania ═══
+      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+      if (isPdf) {
+        const pdfText = await scrParsePdf(file);
+        const konto = useAutoKonto
+          ? file.name.replace(/\.pdf$/i, '').replace(/[_\-]/g, ' ').substring(0, 40)
+          : dropdownKonto;
+        window._scrFiles.push({
+          konto,
+          type: 'pdf',
+          fileName: file.name,
+          parsed: { text: pdfText, pages: (pdfText.match(/--- Strona \d+/g) || []).length, size: file.size },
+          source: useAutoKonto ? 'filename' : 'manual',
+          addedAt: Date.now()
+        });
+        window._scrFilesContextSent = false;
+        continue;
+      }
+
+      // ═══ XLSX — standardowa ścieżka ═══
       // Wczytaj workbook RAW żeby móc detekcji przed parserem
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
@@ -22145,6 +22166,34 @@ async function scrAddFile(input) {
   }
 }
 
+async function scrParsePdf(file) {
+  // Załaduj pdf.js jeśli nie ma
+  if (typeof pdfjsLib === 'undefined') {
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.onload = () => {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        resolve();
+      };
+      script.onerror = () => reject(new Error('Nie można załadować czytnika PDF'));
+      document.head.appendChild(script);
+    });
+  }
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = '';
+  const maxPages = Math.min(pdf.numPages, 50);
+  for (let i = 1; i <= maxPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const pageText = content.items.map(item => item.str).join(' ');
+    fullText += `\n--- Strona ${i} ---\n${pageText}`;
+  }
+  if (pdf.numPages > 50) fullText += `\n\n[Plik ma ${pdf.numPages} stron — wczytano pierwsze 50]`;
+  return fullText.trim();
+}
+
 function scrRemoveFile(idx) {
   window._scrFiles.splice(idx, 1);
   window._scrFilesContextSent = false;
@@ -22180,8 +22229,8 @@ function scrRenderFilesList() {
   }
 
   const kontoSkrot = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC', Luxsen: 'Lux', Semmi: 'Sem', BOTAVIT: 'BoV', Materazzi: 'Mtz', MtzzEU: 'mEU', Ankado24: 'a24' };
-  const typeLabels = { ads: 'Ads', sprzedaz: 'Odwiedziny', konwersja: 'Sprzedaż', ads30d: 'Ads 30d' };
-  const typeColors = { ads: '#38bdf8', sprzedaz: '#34d399', konwersja: '#f5a623', ads30d: '#a78bfa' };
+  const typeLabels = { ads: 'Ads', sprzedaz: 'Odwiedziny', konwersja: 'Sprzedaż', ads30d: 'Ads 30d', pdf: 'PDF' };
+  const typeColors = { ads: '#38bdf8', sprzedaz: '#34d399', konwersja: '#f5a623', ads30d: '#a78bfa', pdf: '#4d9fff' };
   const sourceIcon = { name: '📁', file: '📄', manual: '✋' };
   const sourceTitle = { name: 'wykryto z nazwy pliku', file: 'wykryto z zawartości XLSX', manual: 'ręcznie z dropdownu' };
 
@@ -22208,6 +22257,8 @@ function scrRenderFilesList() {
         const ofertN = (p.oferty && Array.isArray(p.oferty)) ? p.oferty.length : 0;
         const wartosc = typeof p.totWartosc === 'number' ? p.totWartosc : 0;
         stats = `${ofertN} ofert · ${wartosc.toFixed(0)} zł`;
+      } else if (f.type === 'pdf') {
+        stats = `${p.pages || '?'} stron · ${Math.round((p.size||0)/1024)}KB`;
       }
     }
 
@@ -22225,7 +22276,7 @@ function scrRenderFilesList() {
 function scrBuildFilesContext() {
   if (!window._scrFiles.length) return '';
 
-  let ctx = `\n\n=== WGRANE PLIKI XLSX (kontekst do analizy) ===\n`;
+  let ctx = `\n\n=== WGRANE PLIKI (kontekst do analizy) ===\n`;
   ctx += `Liczba plików: ${window._scrFiles.length}\n\n`;
 
   // Wstrzyknij strategię portfelową z AC_META (żeby Agent nie mylił ról)
@@ -22311,6 +22362,16 @@ function scrBuildFilesContext() {
           p.oferty.forEach(o => {
             ctx += `  [${o.id}] ${o.oferta}${o.cena ? ' | Cena:'+o.cena.toFixed(0)+'zł' : ''}${o.stan && o.stan !== 'aktywna' ? ' | Stan:'+o.stan : ''}\n`;
           });
+        }
+      } else if (f.type === 'pdf') {
+        ctx += `\n[PDF DOKUMENT] ${f.fileName} (${p.pages || '?'} stron, ${Math.round((p.size||0)/1024)}KB)\n`;
+        // Limit tekstu do ~12000 znaków żeby zmieścić się w kontekście
+        const maxChars = 12000;
+        const txt = p.text || '';
+        if (txt.length > maxChars) {
+          ctx += txt.substring(0, maxChars) + `\n\n[...SKRÓCONO — pełny dokument ma ${txt.length} znaków, pokazano pierwsze ${maxChars}]\n`;
+        } else {
+          ctx += txt + '\n';
         }
       }
     });
