@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.45</title>
+<title>MPlace Hub v8.46</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1661,7 +1661,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.45</span>
+    <span class="brand-ver">v8.46</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5946,7 +5946,7 @@ function updateAuto(k){
   const dzienLocal=gN(`e_${k}_dzien`);
   const dzienGlobal=parseInt(document.getElementById('globalDay').value)||new Date().getDate();
   const dzien=dzienLocal||dzienGlobal;
-  const curM=MONTHS[new Date().getMonth()];
+  const {m:curM}=getSaveMonth(dzienGlobal);
 
   const d={sprzedaz:sp,delivery:del,commission:comm,adsCost:adsC,wartoscAds:wa,promoC,elasticC,coinsC,dzien,m:curM};
   const c=calc(d,prod);
@@ -6760,7 +6760,7 @@ async function loadNotelogFromFS() {
     }
     const fsEntries = snap.data().entries;
     const fsTime = snap.data().updatedAt || 0;
-    const localTime = localEntries.reduce((m, e) => Math.max(m, e.id || 0), 0);
+    const localTime = localEntries.reduce((m, e) => Math.max(m, e.updated || e.created || e.savedAt || 0), 0);
     if (fsTime >= localTime || !localEntries.length) {
       localStorage.setItem('mplace_notelog_v1', JSON.stringify(fsEntries));
       console.log('[sync] Notatki załadowane z Firebase:', fsEntries.length, 'wpisów');
@@ -6802,7 +6802,7 @@ async function loadPodcastsMetaFromFS() {
     }
     const fsEntries = snap.data().entries;
     const fsTime = snap.data().updatedAt || 0;
-    const localTime = localEntries.reduce((m, e) => Math.max(m, e.id || 0), 0);
+    const localTime = localEntries.reduce((m, e) => Math.max(m, e.updated || e.created || e.savedAt || 0), 0);
     if (fsTime >= localTime || !localEntries.length) {
       localStorage.setItem('mplace_podcasts_meta_v2', JSON.stringify(fsEntries));
       console.log('[sync] Podcasts meta załadowane z Firebase:', fsEntries.length, 'wpisów');
@@ -6900,9 +6900,11 @@ async function _syncPush(docName) {
   if (!key) return;
   try {
     const raw = localStorage.getItem(key) || '';
+    const now = Date.now();
     await db.collection('users').doc(currentUser.uid)
       .collection('sync').doc(docName)
-      .set({ raw, updatedAt: Date.now() });
+      .set({ raw, updatedAt: now });
+    localStorage.setItem(key + '_updatedAt', String(now));
   } catch(e) { console.error('[sync] push', docName, e); }
 }
 
@@ -6929,10 +6931,15 @@ async function _syncPull(docName) {
       }
     } else {
       const fsTime = snap.data().updatedAt || 0;
-      // Both have data — take Firebase (last synced = latest save from any device)
-      if (fsRaw && fsRaw !== '[]' && fsRaw !== '{}') {
+      // Both have data — compare timestamps, keep newer
+      const localTime = parseInt(localStorage.getItem(key + '_updatedAt') || '0');
+      if (fsTime >= localTime && fsRaw && fsRaw !== '[]' && fsRaw !== '{}') {
         localStorage.setItem(key, fsRaw);
+        localStorage.setItem(key + '_updatedAt', String(fsTime));
         console.log('[sync]', docName, '← synced from Firebase');
+      } else {
+        console.log('[sync]', docName, '— local newer, pushing to Firebase');
+        await _syncPush(docName);
       }
     }
   } catch(e) { console.error('[sync] pull', docName, e); }
@@ -15834,7 +15841,8 @@ function renderD2D(){
     const lastDzien = lastEntry?.dzien || _dm;
     const lastVal = lastEntry ? d2dMetricVal(lastEntry, metric, prod) : null;
     const daysInM = lastEntry ? (DAYS_IN[lastEntry.m]||31) : _din;
-    const eom = (lastVal!=null&&lastDzien>0) ? Math.round(lastVal/lastDzien*daysInM) : null;
+    const edDzien = typeof effectiveDzien === 'function' ? effectiveDzien(lastDzien) : (lastDzien > 1 ? lastDzien - 1 : lastDzien);
+    const eom = (lastVal!=null&&edDzien>0) ? Math.round(lastVal/edDzien*daysInM) : null;
     html+=`<td style="padding:10px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,.04);border-left:1px solid var(--border2);color:var(--yellow);font-size:15px;font-weight:600">${eom!=null?fmt(eom):'—'}</td>
            <td style="padding:10px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--text3)">est.</td>
     </tr>`;
@@ -21421,7 +21429,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.45</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.46</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -23350,7 +23358,7 @@ function renderRozliczenie(){
           <td class="${r.C.mAfter>=10?'tg':r.C.mAfter>=5?'ty':'tr'}">${pct(r.C.mAfter)}</td>
           <td class="${r.zysk>=0?'tg':'tr'}" style="font-weight:600">${pln(r.zysk)}</td>
           <td class="ty" style="font-weight:600">${pln(r.feeBrutto)}</td>
-          <td class="tm">${pln(r.feeBrutto)}</td>
+          <td class="tm">${pln(r.fee)}</td>
           <td class="tm">${pln(r.vat)}</td>
           <td style="color:var(--yellow);font-weight:600;font-family:var(--mono);font-size:13px">${pln(r.brutto)}</td>
         </tr>`).join('')}
