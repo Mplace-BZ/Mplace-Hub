@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.44</title>
+<title>MPlace Hub v8.45</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1661,7 +1661,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.44</span>
+    <span class="brand-ver">v8.45</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5559,11 +5559,12 @@ function renderDataCenter(k){
   const cur = D.find(x=>x.m===curM) || {};
   const pfV = (f,def='') => cur[f]!=null ? cur[f] : def;
   const ss = pfV('ss');
-  // Yesterday data for input highlighting
-  const _curEntries = D.filter(d => d.m === curM);
+  // Yesterday = D2D snapshot z poprzedniego dnia TEGO SAMEGO miesiaca
+  // NIE porownuj z zamknietym poprzednim miesiącem (marzec 150k vs kwiecien dzien 5 = 30k to nie -80%)
   let _yest = null;
-  if (_curEntries.length >= 2) _yest = _curEntries[_curEntries.length - 2];
-  else { const _pm = MONTHS[(MONTHS.indexOf(curM)-1+12)%12]; const _pe = D.filter(d=>d.m===_pm); if(_pe.length) _yest=_pe[_pe.length-1]; }
+  const _d2dAll = typeof getD2DData === 'function' ? getD2DData() : [];
+  const _d2dThis = _d2dAll.filter(s => s.account === k && s.m === curM && s.dzien < todayDay).sort((a,b) => b.dzien - a.dzien);
+  if (_d2dThis.length) _yest = _d2dThis[0]; // najnowszy snapshot z poprzedniego dnia
   window._dataYestSp = _yest ? (_yest.sprzedaz||0) : 0;
   window._dataYestData = _yest;
 
@@ -5736,7 +5737,7 @@ function renderDataRight(k){
     const isDown = delta < -5;
     sanityHtml += `<div class="data-sanity-row">
       <div class="data-sanity-icon" style="background:${isDown?'rgba(239,68,68,.15);color:#ef4444':'rgba(52,211,153,.15);color:#34d399'}">${isDown?'!':'✓'}</div>
-      <div>Sprzedaż <strong style="color:${isDown?'#ef4444':'var(--text)'}">${pln(liveSp)}</strong> to ${delta>=0?'+':''}${delta.toFixed(0)}% vs wczoraj (${pln(yest.sprzedaz)}). ${isDown?'Sprawdź.':'OK.'}</div>
+      <div>Sprzedaż <strong style="color:${isDown?'#ef4444':'var(--text)'}">${pln(liveSp)}</strong> to ${delta>=0?'+':''}${delta.toFixed(0)}% vs dzien ${yest.dzien||'?'} (${pln(yest.sprzedaz)}). ${isDown?'Sprawdź.':'OK.'}</div>
     </div>`;
   }
   // 3. Promotions vs 5% plan
@@ -5774,7 +5775,7 @@ function renderDataRight(k){
     const spD = liveSp>0&&ySp>0 ? ((liveSp-ySp)/ySp*100).toFixed(1)+'%' : null;
 
     refHtml = `
-      <div class="data-right-hdr" style="margin-top:16px">▸ WCZORAJ (${yDay}.${String(now.getMonth()+1).padStart(2,'0')}) · REFERENCJA</div>
+      <div class="data-right-hdr" style="margin-top:16px">▸ DZIEN ${yDay} (${curM.substring(0,3).toUpperCase()}) · REFERENCJA</div>
       <div class="data-ref">
         ${mkRef('Koszt Ads', pln(yAds)+' zł', adsD)}
         ${mkRef('ROAS', yRoas.toFixed(2)+'x', roasD)}
@@ -21420,7 +21421,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.44</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.45</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
