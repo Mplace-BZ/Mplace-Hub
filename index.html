@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.41</title>
+<title>MPlace Hub v8.42</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1661,7 +1661,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.41</span>
+    <span class="brand-ver">v8.42</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5806,6 +5806,8 @@ function dataSaveAndNext(){
   dataSaveCurrentToLocal(_dataActiveKey);
   // Sync do Firebase natychmiast — nie czekaj na ostatnie konto
   if(currentUser && typeof saveAccToFS === 'function') saveAccToFS(_dataActiveKey);
+  // Auto-snapshot D2D dla tego konta (czyta z localStorage, nie DOM)
+  if(typeof saveSnapshotD2D === 'function') saveSnapshotD2D();
   const keys = Object.keys(AC_META);
   const idx = keys.indexOf(_dataActiveKey);
   if (idx < keys.length - 1) dataSelectAccount(keys[idx + 1]);
@@ -7079,6 +7081,8 @@ async function saveAllWithSync(){
   showSaveConfirm(savedKeys, saved, updated, curM, firebaseOk);
   updateAlertBadge();
   if(document.getElementById('viewDashboard')?.classList.contains('active')) initDashboardExtras();
+  // Auto-snapshot D2D po zapisie
+  if(typeof saveSnapshotD2D === 'function') saveSnapshotD2D();
 }
 
 // ── Auth state listener ──
@@ -15646,11 +15650,12 @@ function d2dMetricVal(entry, metric, prod){
   return null;
 }
 
-// Zapisz snapshot wszystkich kont z formularza do D2D storage
+// Zapisz snapshot wszystkich kont do D2D storage
+// Czyta z localStorage (getData) — NIE z formularza DOM, bo nowy layout ma pola tylko dla 1 konta
 function saveSnapshotD2D(){
-  const curM = MONTHS[new Date().getMonth()];
   const now = new Date();
   const dzienGlobal = parseInt(document.getElementById('globalDay').value)||now.getDate();
+  const {m:curM} = getSaveMonth(dzienGlobal);
   const DOW_PL = ['Nd','Pn','Wt','Śr','Cz','Pt','Sb'];
   const dow = DOW_PL[now.getDay()];
   const dateStr = now.toLocaleDateString('pl-PL');
@@ -15659,36 +15664,35 @@ function saveSnapshotD2D(){
   const snapshots = getD2DData();
 
   Object.keys(AC_META).forEach(k=>{
-    const sp = gN('e_'+k+'_sp');
-    const adsC = gN('e_'+k+'_adsC');
-    if(!sp && !adsC) return;
-    const dzien = gN('e_'+k+'_dzien')||dzienGlobal;
+    const D = getData(k);
+    const cur = D.find(x => x.m === curM);
+    if(!cur) return;
     const entry = {
       account: k,
       m: curM,
-      dzien: dzien,
+      dzien: cur.dzien || dzienGlobal,
       dow: dow,
       dateStr: dateStr,
       savedAt: Date.now(),
-      sprzedaz: sp||0,
-      delivery: gN('e_'+k+'_del')||0,
-      commission: gN('e_'+k+'_comm')||0,
-      adsCost: adsC||0,
-      roas: gN('e_'+k+'_roas')||0,
-      wartoscAds: gN('e_'+k+'_wartoscAds')||0,
-      promoC: gN('e_'+k+'_promoC')||0,
+      sprzedaz: cur.sprzedaz||0,
+      delivery: cur.delivery||0,
+      commission: cur.commission||0,
+      adsCost: cur.adsCost||0,
+      roas: cur.roas||0,
+      wartoscAds: cur.wartoscAds||0,
+      promoC: cur.promoC||0,
       elasticC: 0,
-      coinsC: gN('e_'+k+'_coinsC')||0,
+      coinsC: cur.coinsC||0,
     };
     // Remove duplicate for same account+month+dzien, then push new
-    const idx = snapshots.findIndex(s=>s.account===k && s.m===curM && s.dzien===dzien);
+    const idx = snapshots.findIndex(s=>s.account===k && s.m===curM && s.dzien===entry.dzien);
     if(idx>=0) snapshots[idx]=entry; else snapshots.push(entry);
     count++;
   });
 
   setD2DData(snapshots);
   const msgEl = document.getElementById('saveMsg');
-  msgEl.textContent = '📊 D2D: zapisano '+count+' kont · dzień '+dzienGlobal;
+  msgEl.textContent = 'D2D: zapisano '+count+' kont · dzien '+dzienGlobal;
   msgEl.classList.add('show');
   setTimeout(()=>msgEl.classList.remove('show'),4000);
 }
@@ -21435,7 +21439,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.41</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.42</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
