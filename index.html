@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.49</title>
+<title>MPlace Hub v9.00</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1606,6 +1606,192 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 /* Worker: read-only wiedza (hide add form + edit/delete buttons) */
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+
+/* ═══ v9.00 — NEW FEATURES CSS ═══ */
+
+/* ── NOTIFICATION PANEL ── */
+#notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
+#notifPanel.open{transform:translateX(0)}
+#notifBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;display:none}
+#notifBackdrop.open{display:block}
+.notif-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.notif-hdr h3{font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin:0}
+.notif-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px}
+.notif-filters{display:flex;gap:6px;padding:12px 20px;border-bottom:1px solid var(--border)}
+.notif-filter{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);color:var(--text3);cursor:pointer;transition:all .15s}
+.notif-filter.active{background:rgba(255,107,53,.15);border-color:var(--accent);color:var(--accent)}
+.notif-list{flex:1;overflow-y:auto;padding:8px 0}
+.notif-item{display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.03);cursor:pointer;transition:background .1s}
+.notif-item:hover{background:var(--bg3)}
+.notif-item.unread{background:rgba(255,107,53,.04);border-left:2px solid var(--accent)}
+.notif-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.notif-dot.danger{background:var(--red)}.notif-dot.warn{background:var(--yellow)}.notif-dot.info{background:var(--blue)}.notif-dot.success{background:var(--green)}
+.notif-body{flex:1;min-width:0}
+.notif-title{font-family:var(--sans);font-size:13px;color:var(--text);margin-bottom:3px}
+.notif-desc{font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.5}
+.notif-time{font-family:var(--mono);font-size:10px;color:var(--text3);flex-shrink:0}
+.notif-empty{text-align:center;padding:3rem 1rem;font-family:var(--mono);font-size:11px;color:var(--text3)}
+.notif-count{position:absolute;top:-4px;right:-4px;min-width:14px;height:14px;padding:0 3px;background:#ef4444;color:#fff;border-radius:999px;font-size:9px;font-family:var(--mono);display:grid;place-items:center;font-weight:700}
+
+/* ── DASHBOARD DRILL-DOWN ── */
+#dashDrillModal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);padding:1rem}
+#dashDrillModal.open{display:flex}
+.drill-box{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:780px;max-height:85vh;overflow-y:auto;padding:1.5rem}
+.drill-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+.drill-title{font-size:1.1rem;font-weight:700;color:var(--text)}
+.drill-sub{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:3px}
+.drill-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem}
+.drill-metric{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.75rem}
+.drill-metric-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.drill-metric-val{font-family:var(--mono);font-size:20px;font-weight:600}
+.drill-section{margin-bottom:1rem}
+.drill-section-title{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:6px}
+.drill-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px}
+.drill-table th{padding:6px 10px;text-align:left;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2)}
+.drill-table td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.03)}
+.drill-table tr:hover{background:var(--bg3)}
+
+/* ── D2D ANOMALY BADGES ── */
+.d2d-anomaly{display:inline-flex;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:3px;margin-left:4px}
+.d2d-anomaly.spike{background:rgba(45,212,160,.12);color:var(--green);border:1px solid rgba(45,212,160,.25)}
+.d2d-anomaly.drop{background:rgba(255,77,106,.1);color:var(--red);border:1px solid rgba(255,77,106,.25)}
+.d2d-anomaly-bar{padding:8px 16px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:8px;margin-bottom:1rem;font-family:var(--mono);font-size:11px;color:var(--yellow);display:none}
+
+/* ── COCKPIT TASK HISTORY ── */
+.cockpit-history{margin-top:1.5rem}
+.ch-calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:.75rem}
+.ch-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;font-family:var(--mono);font-size:10px;cursor:default;transition:all .15s;border:1px solid transparent}
+.ch-day.done{background:rgba(45,212,160,.12);border-color:rgba(45,212,160,.25);color:var(--green)}
+.ch-day.partial{background:rgba(245,166,35,.08);border-color:rgba(245,166,35,.2);color:var(--yellow)}
+.ch-day.missed{background:rgba(255,77,106,.06);border-color:rgba(255,77,106,.15);color:var(--red)}
+.ch-day.future{color:var(--text3);opacity:.3}
+.ch-day.today{border-color:var(--accent);box-shadow:0 0 8px rgba(255,107,53,.2)}
+.ch-day-num{font-weight:600;font-size:11px}
+.ch-day-pct{font-size:8px;opacity:.7}
+.ch-dow{font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;padding:4px 0}
+.ch-streak{display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;background:var(--bg3);border-radius:6px;margin-bottom:.75rem}
+.ch-streak-val{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--green)}
+.ch-streak-label{font-family:var(--mono);font-size:10px;color:var(--text3)}
+
+/* ── AGENT CONVERSATION HISTORY ── */
+.agent-history{margin-bottom:1rem}
+.agent-history-btn{font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all .15s}
+.agent-history-btn:hover{border-color:var(--accent);color:var(--accent)}
+.agent-history-list{background:var(--bg2);border:1px solid var(--border);border-radius:8px;max-height:300px;overflow-y:auto;margin-top:.5rem;display:none}
+.agent-history-list.open{display:block}
+.ah-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;transition:background .1s;border-bottom:1px solid rgba(255,255,255,.03)}
+.ah-item:hover{background:var(--bg3)}
+.ah-date{font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap}
+.ah-preview{font-family:var(--sans);font-size:12px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ah-badge{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;background:rgba(77,159,255,.1);color:var(--blue)}
+
+/* ── PRESENTATION TEMPLATES ── */
+.pres-templates{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+.pres-tpl{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;cursor:pointer;transition:all .15s}
+.pres-tpl:hover{border-color:var(--accent);transform:translateY(-2px)}
+.pres-tpl.active{border-color:var(--accent);background:rgba(255,107,53,.06)}
+.pres-tpl-name{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.pres-tpl-desc{font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.5}
+.pres-tpl-icon{font-size:20px;margin-bottom:6px}
+
+/* ── AI ARCHITECT ── */
+.architect-result{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-top:1rem}
+.architect-phase{display:flex;gap:12px;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.architect-phase-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-family:var(--mono);font-size:12px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+.architect-phase-body{flex:1}
+.architect-phase-title{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.architect-phase-desc{font-family:var(--mono);font-size:11px;color:var(--text2);line-height:1.6}
+
+/* ── KNOWLEDGE VERSIONING ── */
+.wk-version-btn{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid var(--border2);background:var(--bg3);color:var(--text3);cursor:pointer;transition:all .15s}
+.wk-version-btn:hover{border-color:#a78bfa;color:#a78bfa}
+.wk-diff{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.5rem .75rem;margin-top:.5rem;font-family:var(--mono);font-size:10px;line-height:1.6;max-height:200px;overflow-y:auto}
+.wk-diff-add{color:var(--green);background:rgba(45,212,160,.06)}
+.wk-diff-del{color:var(--red);background:rgba(255,77,106,.06);text-decoration:line-through}
+
+/* ── BREAKEVEN OPTIMIZER ── */
+.be-optimizer{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-top:1rem}
+.be-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.be-item:last-child{border:none}
+.be-icon{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;flex-shrink:0}
+.be-icon.below{background:rgba(255,77,106,.15);color:var(--red)}
+.be-icon.above{background:rgba(45,212,160,.12);color:var(--green)}
+.be-info{flex:1}
+.be-name{font-family:var(--sans);font-size:12px;color:var(--text)}
+.be-detail{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.be-action{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid;cursor:pointer}
+.be-action.cut{border-color:rgba(255,77,106,.4);color:var(--red);background:rgba(255,77,106,.08)}
+.be-action.scale{border-color:rgba(45,212,160,.4);color:var(--green);background:rgba(45,212,160,.08)}
+
+/* ── PDF EXPORT ── */
+.pdf-progress{position:fixed;bottom:60px;right:16px;z-index:9999;padding:8px 16px;border-radius:8px;background:#181c26;border:1px solid var(--accent);font-family:var(--mono);font-size:11px;color:var(--accent);display:none}
+
+/* ── CENTRUM ANALITYCZNE v2 ── */
+.ca2-layout{display:grid;grid-template-columns:280px 1fr;gap:1.5rem}
+.ca2-sidebar{display:flex;flex-direction:column;gap:.75rem}
+.ca2-upload-zone{border:2px dashed var(--border2);border-radius:10px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .15s}
+.ca2-upload-zone:hover{border-color:var(--accent);background:rgba(255,107,53,.03)}
+.ca2-upload-zone.has-file{border-color:var(--green);border-style:solid;background:rgba(45,212,160,.04)}
+.ca2-upload-icon{font-size:24px;margin-bottom:6px;color:var(--text3)}
+.ca2-upload-label{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.ca2-catalog-stats{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.ca2-stat{background:var(--bg3);border-radius:6px;padding:.5rem;text-align:center}
+.ca2-stat-val{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--text)}
+.ca2-stat-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.ca2-matrix{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px}
+.ca2-matrix th{padding:8px 10px;text-align:left;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2);position:sticky;top:0;background:var(--bg2)}
+.ca2-matrix td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.03)}
+.ca2-matrix tr:hover{background:var(--bg3)}
+.ca2-pill{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;display:inline-block}
+.ca2-pill.organic{background:rgba(45,212,160,.1);color:var(--green);border:1px solid rgba(45,212,160,.25)}
+.ca2-pill.paid{background:rgba(255,107,53,.1);color:var(--accent);border:1px solid rgba(255,107,53,.25)}
+.ca2-pill.mixed{background:rgba(77,159,255,.1);color:var(--blue);border:1px solid rgba(77,159,255,.25)}
+.ca2-tab-bar{display:flex;gap:4px;margin-bottom:1rem}
+.ca2-tab{font-family:var(--mono);font-size:10px;padding:5px 14px;border-radius:5px;border:1px solid var(--border2);background:var(--bg3);color:var(--text3);cursor:pointer;transition:all .15s}
+.ca2-tab.active{background:rgba(255,107,53,.12);border-color:var(--accent);color:var(--accent)}
+
+/* ── CROSS-BORDER CZ/SK ── */
+.cb-currency{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(59,130,246,.08);color:#3b82f6;border:1px solid rgba(59,130,246,.2)}
+
+/* ── ALLEGRO API SCAFFOLDING ── */
+.api-settings{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem}
+.api-status{display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+.api-status-dot{width:8px;height:8px;border-radius:50%}
+.api-status-dot.connected{background:var(--green);box-shadow:0 0 6px rgba(45,212,160,.4)}
+.api-status-dot.disconnected{background:var(--red)}
+.api-field{margin-bottom:.75rem}
+.api-field label{display:block;font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+.api-field input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text);font-family:var(--mono);font-size:12px}
+
+/* ── M/M AUTO COMPARISON ── */
+.mom-summary{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem}
+.mom-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.mom-row:last-child{border:none}
+.mom-acc{font-family:var(--sans);font-size:12px;color:var(--text);width:120px;flex-shrink:0}
+.mom-val{font-family:var(--mono);font-size:12px;flex:1;text-align:right}
+.mom-delta{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:4px;text-align:right;min-width:60px}
+.mom-delta.up{background:rgba(45,212,160,.1);color:var(--green)}
+.mom-delta.down{background:rgba(255,77,106,.08);color:var(--red)}
+
+/* ── ENHANCED MOBILE ── */
+@media(max-width:700px){
+  .mp-sidebar{width:100%!important;transform:translateX(-100%);transition:transform .25s}
+  .mp-sidebar.mobile-open{transform:translateX(0)}
+  body{padding-left:0!important}
+  .mp-topbar{left:0!important;padding-left:50px!important}
+  .mp-accounts{display:none!important}
+  .data-layout{grid-template-columns:1fr!important}
+  .data-left,.data-right{display:none}
+  .ca2-layout{grid-template-columns:1fr!important}
+  .drill-grid{grid-template-columns:1fr!important}
+  .pres-templates{grid-template-columns:1fr!important}
+  .agent-panels{grid-template-columns:1fr!important}
+  #notifPanel{width:100%}
+  .ch-calendar{grid-template-columns:repeat(7,1fr)}
+  .mom-row{flex-wrap:wrap;gap:4px}
+  .mp-mobile-toggle{display:flex!important}
+}
+.mp-mobile-toggle{display:none;position:fixed;top:10px;left:10px;z-index:111;width:36px;height:36px;border-radius:8px;background:var(--bg2);border:1px solid var(--border2);align-items:center;justify-content:center;cursor:pointer;color:var(--text)}
 </style>
 
   <!-- PWA Manifest -->
@@ -1661,7 +1847,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.49</span>
+    <span class="brand-ver">v9.00</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2322,6 +2508,68 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   </div>
   <div class="data-center" style="padding-top:1.5rem">
     <div id="infoContent"></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ VIEW: CENTRUM ANALITYCZNE v2 ═══ -->
+<div class="view" id="viewCentrum">
+<div class="container" style="max-width:1320px">
+  <div class="ph">
+    <div class="ph-eyebrow">▸ Centrum Analityczne v2</div>
+    <div class="ph-title" style="font-size:28px">Katalog + Ads + Ruch</div>
+    <div class="ph-sub" id="ca2Sub">Upload katalogu ofert, 3 cykle Ads, ruch organiczny vs platny</div>
+  </div>
+  <div class="ca2-layout">
+    <div class="ca2-sidebar">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem">1. Wybierz konto</div>
+      <select id="ca2Konto" onchange="ca2SelectKonto(this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:8px;color:var(--text);font-family:var(--mono);font-size:12px">
+        <option value="">-- wybierz --</option>
+      </select>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-top:1rem;margin-bottom:.5rem">2. Upload plikow</div>
+      <div class="ca2-upload-zone" id="ca2CatalogZone" onclick="document.getElementById('ca2CatalogFile').click()">
+        <div class="ca2-upload-icon">&#128196;</div>
+        <div class="ca2-upload-label">Katalog ofert (XLSX)</div>
+        <input type="file" id="ca2CatalogFile" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleCatalog(this)">
+      </div>
+      <div class="ca2-upload-zone" id="ca2Ads7Zone" onclick="document.getElementById('ca2Ads7File').click()">
+        <div class="ca2-upload-icon">7d</div>
+        <div class="ca2-upload-label">Ads 7 dni</div>
+        <input type="file" id="ca2Ads7File" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleAds(this,'7d')">
+      </div>
+      <div class="ca2-upload-zone" id="ca2Ads14Zone" onclick="document.getElementById('ca2Ads14File').click()">
+        <div class="ca2-upload-icon">14d</div>
+        <div class="ca2-upload-label">Ads 14 dni</div>
+        <input type="file" id="ca2Ads14File" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleAds(this,'14d')">
+      </div>
+      <div class="ca2-upload-zone" id="ca2Ads30Zone" onclick="document.getElementById('ca2Ads30File').click()">
+        <div class="ca2-upload-icon">30d</div>
+        <div class="ca2-upload-label">Ads 30 dni</div>
+        <input type="file" id="ca2Ads30File" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleAds(this,'30d')">
+      </div>
+      <div class="ca2-upload-zone" id="ca2SalesZone" onclick="document.getElementById('ca2SalesFile').click()">
+        <div class="ca2-upload-icon">&#9733;</div>
+        <div class="ca2-upload-label">Sprzedaz + Odwiedziny</div>
+        <input type="file" id="ca2SalesFile" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleSales(this)">
+      </div>
+      <div class="ca2-catalog-stats" id="ca2Stats" style="display:none"></div>
+      <button class="btn primary" onclick="ca2Analyze()" style="width:100%;margin-top:.75rem">Analizuj</button>
+      <button class="btn" onclick="ca2Clear()" style="width:100%">Wyczysc</button>
+    </div>
+    <div>
+      <div class="ca2-tab-bar" id="ca2Tabs">
+        <button class="ca2-tab active" onclick="ca2ShowTab('matrix',this)">Macierz ofert</button>
+        <button class="ca2-tab" onclick="ca2ShowTab('organic',this)">Organika vs Ads</button>
+        <button class="ca2-tab" onclick="ca2ShowTab('trends',this)">Trendy 7/14/30</button>
+        <button class="ca2-tab" onclick="ca2ShowTab('cannib',this)">Kanibalizacja</button>
+      </div>
+      <div id="ca2Content" style="min-height:400px">
+        <div style="text-align:center;padding:4rem 2rem;color:var(--text3);font-family:var(--mono);font-size:12px">
+          Wybierz konto i wgraj pliki zeby zobaczyc analityki.<br>
+          <span style="font-size:10px;margin-top:8px;display:block">Katalog ofert + min. 1 plik Ads + Sprzedaz</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 </div>
@@ -3506,7 +3754,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div id="caArchStats" style="margin:.75rem 0;display:none"></div>
 
     <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem">
-      <button id="caArchRunBtn" onclick="caRunArchitect()" disabled style="font-family:var(--mono);font-size:11px;padding:10px 20px;border-radius:6px;border:1px solid rgba(255,107,53,.4);background:rgba(255,107,53,.12);color:#ff6b35;cursor:pointer;font-weight:500;opacity:0.5">⚡ Generuj plan reorganizacji (AI)</button>
+      <button id="caArchRunBtn" onclick="if(typeof aiArchitectGenerate==='function'){const sel=document.getElementById('caKonto');if(sel&&sel.value)aiArchitectGenerate(sel.value);else alert('Wybierz konto');}else{caRunArchitect()}" style="font-family:var(--mono);font-size:11px;padding:10px 20px;border-radius:6px;border:1px solid rgba(255,107,53,.4);background:rgba(255,107,53,.12);color:#ff6b35;cursor:pointer;font-weight:500">&#9889; Generuj plan reorganizacji (AI)</button>
       <button onclick="caExportPlanCSV()" id="caArchCsvBtn" style="display:none;font-family:var(--mono);font-size:10px;padding:8px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer">📥 Eksport CSV planu</button>
       <button onclick="caExportGroupsCSV()" id="caArchGroupsCsvBtn" style="display:none;font-family:var(--mono);font-size:10px;padding:8px 14px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer">📥 Eksport CSV grup z ID</button>
       <button onclick="caPrintGroupsList()" id="caArchPrintBtn" style="display:none;font-family:var(--mono);font-size:10px;padding:8px 14px;border-radius:6px;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.1);color:#38bdf8;cursor:pointer">🖨 Drukuj listę grup</button>
@@ -3514,6 +3762,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     </div>
 
     <div id="caArchPlan" style="margin-top:.75rem"></div>
+    <div class="architect-result" id="architectResult" style="display:none"></div>
   </div>
 
   <!-- ═══ SEKCJA 5: ADS TRACKER — plan + checkpointy + porównanie ═══ -->
@@ -4334,6 +4583,10 @@ function showView(v){
     document.getElementById('viewStrategia').classList.add('active');
     document.getElementById('navStrategia').classList.add('active');
     if (typeof stratRenderMeble === 'function') stratRenderMeble();
+  } else if(v==='centrum'){
+    document.getElementById('viewCentrum').classList.add('active');
+    document.getElementById('navSbCentrum')?.classList.add('active');
+    if (typeof ca2Init === 'function') ca2Init();
   } else if(v==='centrumads'){
     document.getElementById('viewCentrumAds').classList.add('active');
     document.getElementById('navCentrumAds').classList.add('active');
@@ -9935,6 +10188,7 @@ const MP_NAV = [
     { k:'arkusz',        id:'navSbSheet',     label:'Sheet',     icon:'sheet' },
   ]},
   { group:'Operacyjne', items:[
+    { k:'centrum',       id:'navSbCentrum',   label:'Centrum v2', icon:'eye' },
     { k:'centrumads',    id:'navSbAds',       label:'Ads Hub',   icon:'ads' },
     { k:'analiza',       id:'navSbAnaliza',   label:'Analysis',  icon:'screener' },
     { k:'kanibalizator', id:'navSbPromos',    label:'Promos',    icon:'spark' },
@@ -13788,8 +14042,9 @@ function renderWkList() {
       <div class="wk-entry-hdr">
         <div class="wk-cat ${e.cat}">${CAT_LABELS[e.cat]||e.cat}</div>
         <div class="wk-entry-title">${e.title}</div>
-        <button class="wk-btn edit" onclick="editWkEntry(${e.id})">✎ edytuj</button>
-        <button class="wk-btn del" onclick="deleteWkEntry(${e.id})">✕</button>
+        <button class="wk-btn edit" onclick="editWkEntry(${e.id})">&#9998; edytuj</button>
+        <button class="wk-version-btn" onclick="showWkVersions(${e.id})">&#8987; historia</button>
+        <button class="wk-btn del" onclick="deleteWkEntry(${e.id})">&#10005;</button>
       </div>
       <div class="wk-entry-body${preview?'':' expanded'}" id="wkBody_${e.id}">${e.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
       <div class="wk-entry-footer">
@@ -21455,7 +21710,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.49</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.00</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -24699,6 +24954,1452 @@ function taRenderHistory(){
   </script>
 
   <script>
+// ═══════════════════════════════════════════════════════════
+// v9.00 — ALL NEW FEATURES
+// ═══════════════════════════════════════════════════════════
+
+// ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
+const SK_NOTIFS = 'mplace_notifications_v1';
+let _notifFilter = 'all';
+
+function getNotifications() {
+  try { return JSON.parse(localStorage.getItem(SK_NOTIFS) || '[]'); } catch(e) { return []; }
+}
+function saveNotifications(arr) {
+  localStorage.setItem(SK_NOTIFS, JSON.stringify(arr));
+}
+
+function bellOpen() {
+  generateAlerts();
+  renderNotifications();
+  document.getElementById('notifPanel').classList.add('open');
+  document.getElementById('notifBackdrop').classList.add('open');
+}
+function bellClose() {
+  document.getElementById('notifPanel').classList.remove('open');
+  document.getElementById('notifBackdrop').classList.remove('open');
+}
+
+function notifFilter(f, btn) {
+  _notifFilter = f;
+  document.querySelectorAll('.notif-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderNotifications();
+}
+
+function generateAlerts() {
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const notifs = [];
+  const today = now.toLocaleDateString('pl-PL');
+
+  Object.keys(AC_META).forEach(k => {
+    const D = getData(k);
+    const prod = getProd(k);
+    const cur = D.find(d => d.m === curM);
+    if (!cur) return;
+    const C = calc(cur, prod);
+    const est = estym(cur);
+    const name = AC_META[k].name;
+
+    // ROAS below breakeven
+    if (C.roasAds && C.beRoasAds && C.roasAds < C.beRoasAds * 0.85) {
+      notifs.push({ id: 'roas_' + k, type: 'danger', title: name + ' — ROAS ponizej BE',
+        desc: 'ROAS Ads ' + (C.roasAds).toFixed(2) + 'x vs BE ' + (C.beRoasAds).toFixed(2) + 'x. Marza po rek.: ' + C.mAfter.toFixed(1) + '%',
+        time: today, account: k });
+    }
+    // Negative margin
+    if (C.mAfter < 0) {
+      notifs.push({ id: 'margin_' + k, type: 'danger', title: name + ' — marza ujemna',
+        desc: 'Marza po reklamie: ' + C.mAfter.toFixed(1) + '%. Konto traci pieniadze.',
+        time: today, account: k });
+    }
+    // Margin warning (0-5%)
+    if (C.mAfter >= 0 && C.mAfter < 5) {
+      notifs.push({ id: 'mwarn_' + k, type: 'warn', title: name + ' — marza niska',
+        desc: 'Marza ' + C.mAfter.toFixed(1) + '% — blisko progu rentownosci.',
+        time: today, account: k });
+    }
+    // Promo threshold exceeded
+    if (cur.sprzedaz > 0 && (cur.promoC || 0) / cur.sprzedaz > 0.05) {
+      notifs.push({ id: 'promo_' + k, type: 'warn', title: name + ' — wyroznienia > 5%',
+        desc: 'Wyroznienia stanowia ' + ((cur.promoC || 0) / cur.sprzedaz * 100).toFixed(1) + '% sprzedazy (prog: 5%).',
+        time: today, account: k });
+    }
+    // D2D anomaly: sales drop >30% vs previous snapshot
+    const d2d = getD2DData().filter(s => s.account === k).sort((a, b) => b.savedAt - a.savedAt);
+    if (d2d.length >= 2) {
+      const latest = d2d[0], prev = d2d[1];
+      if (prev.sprzedaz > 0) {
+        const delta = (latest.sprzedaz - prev.sprzedaz) / prev.sprzedaz * 100;
+        if (delta < -30) {
+          notifs.push({ id: 'd2d_' + k, type: 'danger', title: name + ' — spadek sprzedazy ' + Math.abs(delta).toFixed(0) + '%',
+            desc: 'Sprzedaz: ' + Math.round(latest.sprzedaz).toLocaleString('pl-PL') + ' zl vs ' + Math.round(prev.sprzedaz).toLocaleString('pl-PL') + ' zl dzien wczesniej.',
+            time: today, account: k });
+        }
+      }
+    }
+    // Ads cost > 30zl alarm threshold
+    if (cur.adsCost > 0 && cur.sprzedaz > 0) {
+      const avgBasket = cur.sprzedaz / Math.max(1, cur.wartoscAds / (cur.adsCost || 1));
+      if (cur.adsCost > 0 && avgBasket < 30) {
+        notifs.push({ id: 'ads30_' + k, type: 'info', title: name + ' — sredni koszyk < 30 zl',
+          desc: 'Sredni koszyk Ads: ' + avgBasket.toFixed(0) + ' zl. Prog alarmu: 30 zl.',
+          time: today, account: k });
+      }
+    }
+    // BE optimizer: accounts above BE (scale opportunity)
+    if (C.roasAds && C.beRoasAds && C.roasAds > C.beRoasAds * 2.5) {
+      notifs.push({ id: 'scale_' + k, type: 'success', title: name + ' — potencjal skalowania',
+        desc: 'ROAS ' + C.roasAds.toFixed(2) + 'x to ' + (C.roasAds / C.beRoasAds).toFixed(1) + 'x powyzej BE. Mozna zwiekszyc budzet.',
+        time: today, account: k });
+    }
+  });
+
+  // Merge with existing (keep read status)
+  const existing = getNotifications();
+  const merged = notifs.map(n => {
+    const ex = existing.find(e => e.id === n.id);
+    return { ...n, read: ex ? ex.read : false };
+  });
+  saveNotifications(merged);
+  updateBellBadge();
+}
+
+function updateBellBadge() {
+  const notifs = getNotifications();
+  const unread = notifs.filter(n => !n.read).length;
+  // Update bell badge in topbar
+  let badge = document.getElementById('notifBellBadge');
+  if (!badge) {
+    const bell = document.querySelector('.mp-topbar-right .icon-btn[title="Powiadomienia"]');
+    if (bell) {
+      bell.style.position = 'relative';
+      badge = document.createElement('span');
+      badge.id = 'notifBellBadge';
+      badge.className = 'notif-count';
+      bell.appendChild(badge);
+    }
+  }
+  if (badge) {
+    badge.textContent = unread;
+    badge.style.display = unread > 0 ? 'grid' : 'none';
+  }
+}
+
+function renderNotifications() {
+  const notifs = getNotifications();
+  const filtered = _notifFilter === 'all' ? notifs : notifs.filter(n => n.type === _notifFilter);
+  const list = document.getElementById('notifList');
+  if (!filtered.length) {
+    list.innerHTML = '<div class="notif-empty">Brak powiadomien' + (_notifFilter !== 'all' ? ' w tej kategorii' : '') + '.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map((n, i) => `
+    <div class="notif-item ${n.read ? '' : 'unread'}" onclick="notifMarkRead(${i});${n.account ? "showView('" + n.account + "');bellClose()" : ''}">
+      <div class="notif-dot ${n.type}"></div>
+      <div class="notif-body">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-desc">${n.desc}</div>
+      </div>
+      <div class="notif-time">${n.time}</div>
+    </div>
+  `).join('');
+}
+
+function notifMarkRead(idx) {
+  const notifs = getNotifications();
+  if (notifs[idx]) notifs[idx].read = true;
+  saveNotifications(notifs);
+  updateBellBadge();
+}
+
+function notifMarkAllRead() {
+  const notifs = getNotifications().map(n => ({ ...n, read: true }));
+  saveNotifications(notifs);
+  updateBellBadge();
+  renderNotifications();
+}
+
+
+// ── 2. DASHBOARD DRILL-DOWN ─────────────────────────────────
+function dashDrillDown(accKey) {
+  const D = getData(accKey);
+  const prod = getProd(accKey);
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const cur = D.find(d => d.m === curM);
+  if (!cur) return;
+  const C = calc(cur, prod);
+  const est = estym(cur);
+  const meta = AC_META[accKey];
+  const g = GROUPS[meta.group];
+
+  document.getElementById('drillTitle').textContent = meta.name;
+  document.getElementById('drillTitle').style.color = g.c;
+  document.getElementById('drillSub').textContent = curM + ' ' + now.getFullYear() + ' · dzien ' + (cur.dzien || '?') + '/' + (DAYS_IN[curM] || 30);
+
+  // Metrics grid
+  const metrics = [
+    { label: 'ROAS AKG', val: xf(C.roasAds), color: C.roasAds >= C.beRoasAds ? 'var(--green)' : 'var(--red)' },
+    { label: 'BE ROAS', val: xf(C.beRoasAds), color: 'var(--text2)' },
+    { label: 'MARZA PO REK.', val: pct(C.mAfter), color: C.mAfter >= 10 ? 'var(--green)' : C.mAfter >= 0 ? 'var(--yellow)' : 'var(--red)' },
+    { label: 'ESTYMACJA EOM', val: pln(est) + ' zl', color: 'var(--yellow)' },
+    { label: 'SPRZEDAZ MTD', val: pln(cur.sprzedaz) + ' zl', color: 'var(--text)' },
+    { label: 'KOSZT ADS', val: pln(cur.adsCost) + ' zl', color: 'var(--accent)' },
+    { label: 'ZYSK NETTO', val: pln(C.zysk) + ' zl', color: C.zysk >= 0 ? 'var(--green)' : 'var(--red)' },
+    { label: 'PRODUCENT', val: prod + '%', color: 'var(--text2)' },
+  ];
+  document.getElementById('drillMetrics').innerHTML = metrics.map(m =>
+    `<div class="drill-metric"><div class="drill-metric-label">${m.label}</div><div class="drill-metric-val" style="color:${m.color}">${m.val}</div></div>`
+  ).join('');
+
+  // D2D history for this account (last 7 entries)
+  const d2d = getD2DData().filter(s => s.account === accKey).sort((a, b) => b.savedAt - a.savedAt).slice(0, 7);
+  let content = '';
+
+  if (d2d.length > 1) {
+    content += `<div class="drill-section">
+      <div class="drill-section-title" style="color:var(--blue)">&#9632; Ostatnie 7 dni (D2D)</div>
+      <table class="drill-table">
+        <thead><tr><th>Dzien</th><th>Sprzedaz</th><th>Ads</th><th>ROAS</th><th>% zmiana</th></tr></thead>
+        <tbody>${d2d.map((s, i) => {
+          const prev = d2d[i + 1];
+          const delta = prev && prev.sprzedaz > 0 ? ((s.sprzedaz - prev.sprzedaz) / prev.sprzedaz * 100) : null;
+          const dc = delta === null ? 'var(--text3)' : delta >= 0 ? 'var(--green)' : 'var(--red)';
+          return `<tr>
+            <td>${s.dow} ${s.dzien}</td>
+            <td style="color:var(--green)">${Math.round(s.sprzedaz).toLocaleString('pl-PL')} zl</td>
+            <td style="color:var(--accent)">${Math.round(s.adsCost).toLocaleString('pl-PL')} zl</td>
+            <td>${(s.roas || 0).toFixed(2)}x</td>
+            <td style="color:${dc}">${delta !== null ? (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%' : '—'}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  }
+
+  // Month history
+  const prevMonths = D.filter(d => d.m !== curM).slice(-3).reverse();
+  if (prevMonths.length) {
+    content += `<div class="drill-section">
+      <div class="drill-section-title" style="color:var(--yellow)">&#9650; Historia miesieczna</div>
+      <table class="drill-table">
+        <thead><tr><th>Miesiac</th><th>Sprzedaz</th><th>ROAS</th><th>Marza</th><th>Zysk</th></tr></thead>
+        <tbody>${prevMonths.map(d => {
+          const Cp = calc(d, prod);
+          return `<tr>
+            <td>${d.m[0].toUpperCase() + d.m.slice(1)}</td>
+            <td>${pln(d.sprzedaz)} zl</td>
+            <td>${(d.roas || 0).toFixed(2)}x</td>
+            <td style="color:${Cp.mAfter >= 10 ? 'var(--green)' : Cp.mAfter >= 0 ? 'var(--yellow)' : 'var(--red)'}">${Cp.mAfter.toFixed(1)}%</td>
+            <td style="color:${Cp.zysk >= 0 ? 'var(--green)' : 'var(--red)'}">${pln(Cp.zysk)} zl</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  }
+
+  // Breakeven analysis
+  content += `<div class="drill-section">
+    <div class="drill-section-title" style="color:var(--red)">&#9679; Analiza breakeven</div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text2);line-height:1.8">
+      Producent: ${prod}% → BE ROAS = ${xf(C.beRoasAds)}<br>
+      Aktualny ROAS: ${xf(C.roasAds)} (${C.roasAds >= C.beRoasAds ? '<span style="color:var(--green)">POWYZEJ BE</span>' : '<span style="color:var(--red)">PONIZEJ BE</span>'})<br>
+      Bufor: ${C.roasAds && C.beRoasAds ? ((C.roasAds / C.beRoasAds - 1) * 100).toFixed(0) : '?'}% ${C.roasAds >= C.beRoasAds ? 'nad' : 'pod'} progiem<br>
+      ${C.roasAds < C.beRoasAds ? '<span style="color:var(--red)">AKCJA: Obniz CPC lub wylacz slabe aukcje</span>' : '<span style="color:var(--green)">STATUS: Rentowne — mozna skalowac</span>'}
+    </div>
+  </div>`;
+
+  // Quick actions
+  content += `<div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
+    <button class="btn" onclick="dashDrillClose();showView('${accKey}')">Otworz konto</button>
+    <button class="btn" onclick="dashDrillClose();showView('agent');agentAsk('Pelna analiza konta ${meta.name} — ROAS, marza, rekomendacje')">Zapytaj Agenta</button>
+    <button class="btn" onclick="dashDrillClose();showView('analiza')">Analysis</button>
+    <button class="btn" onclick="dashDrillClose();showView('d2d')">D2D</button>
+  </div>`;
+
+  document.getElementById('drillContent').innerHTML = content;
+  document.getElementById('dashDrillModal').classList.add('open');
+}
+
+function dashDrillClose() {
+  document.getElementById('dashDrillModal').classList.remove('open');
+}
+
+
+// ── 3. D2D ANOMALY DETECTION ────────────────────────────────
+function d2dDetectAnomalies() {
+  const snapshots = getD2DData();
+  if (snapshots.length < 3) return [];
+  const anomalies = [];
+
+  // Group snapshots by account
+  const byAcc = {};
+  snapshots.forEach(s => {
+    if (!byAcc[s.account]) byAcc[s.account] = [];
+    byAcc[s.account].push(s);
+  });
+
+  Object.entries(byAcc).forEach(([acc, entries]) => {
+    entries.sort((a, b) => b.savedAt - a.savedAt);
+    if (entries.length < 3) return;
+
+    // Calculate average and std dev of sales for last 7 entries
+    const recent = entries.slice(0, 7);
+    const avg = recent.reduce((s, e) => s + e.sprzedaz, 0) / recent.length;
+    const stdDev = Math.sqrt(recent.reduce((s, e) => s + Math.pow(e.sprzedaz - avg, 2), 0) / recent.length);
+
+    const latest = entries[0];
+    const prev = entries[1];
+
+    if (stdDev > 0 && avg > 0) {
+      const zScore = (latest.sprzedaz - avg) / stdDev;
+      if (Math.abs(zScore) > 1.5) {
+        const delta = prev.sprzedaz > 0 ? ((latest.sprzedaz - prev.sprzedaz) / prev.sprzedaz * 100) : 0;
+        anomalies.push({
+          account: acc,
+          name: AC_META[acc]?.name || acc,
+          type: zScore > 0 ? 'spike' : 'drop',
+          zScore: zScore.toFixed(1),
+          delta: delta.toFixed(0),
+          val: latest.sprzedaz,
+          avg: avg,
+          dow: latest.dow,
+          dzien: latest.dzien,
+        });
+      }
+    }
+
+    // ROAS anomaly
+    const roasRecent = recent.filter(e => e.roas > 0);
+    if (roasRecent.length >= 3) {
+      const rAvg = roasRecent.reduce((s, e) => s + e.roas, 0) / roasRecent.length;
+      if (latest.roas > 0 && rAvg > 0) {
+        const rDelta = ((latest.roas - rAvg) / rAvg * 100);
+        if (Math.abs(rDelta) > 40) {
+          anomalies.push({
+            account: acc,
+            name: AC_META[acc]?.name || acc,
+            type: rDelta > 0 ? 'spike' : 'drop',
+            metric: 'ROAS',
+            delta: rDelta.toFixed(0),
+            val: latest.roas.toFixed(2),
+            avg: rAvg.toFixed(2),
+            dow: latest.dow,
+            dzien: latest.dzien,
+          });
+        }
+      }
+    }
+  });
+
+  return anomalies;
+}
+
+function d2dRenderAnomalyBar() {
+  const anomalies = d2dDetectAnomalies();
+  const bar = document.getElementById('d2dAnomalyBar');
+  if (!bar) return;
+  if (!anomalies.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+  bar.innerHTML = '<strong style="color:var(--accent)">&#9888; Anomalie wykryte:</strong> ' +
+    anomalies.map(a => {
+      const metric = a.metric || 'sprzedaz';
+      const icon = a.type === 'spike' ? '&#9650;' : '&#9660;';
+      const color = a.type === 'spike' ? 'var(--green)' : 'var(--red)';
+      return `<span style="color:${color};margin-left:8px">${a.name} ${icon} ${a.delta}% ${metric}</span>`;
+    }).join(' · ');
+}
+
+
+// ── 4. COCKPIT TASK HISTORY ─────────────────────────────────
+const SK_COCKPIT_HISTORY = 'mplace_cockpit_history_v1';
+
+function getCockpitHistory() {
+  try { return JSON.parse(localStorage.getItem(SK_COCKPIT_HISTORY) || '{}'); } catch(e) { return {}; }
+}
+
+function saveCockpitCompletion(date, pct, done, total) {
+  const hist = getCockpitHistory();
+  hist[date] = { pct, done, total, savedAt: Date.now() };
+  localStorage.setItem(SK_COCKPIT_HISTORY, JSON.stringify(hist));
+}
+
+function renderCockpitHistory() {
+  const el = document.getElementById('cockpitHistoryCal');
+  if (!el) return;
+  const hist = getCockpitHistory();
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDow = new Date(year, month, 1).getDay(); // 0=Sun
+  const DOW = ['Nd', 'Pn', 'Wt', 'Sr', 'Cz', 'Pt', 'Sb'];
+  const todayDate = now.getDate();
+
+  // Calculate streak
+  let streak = 0;
+  for (let d = todayDate; d >= 1; d--) {
+    const dateStr = new Date(year, month, d).toLocaleDateString('pl-PL');
+    const entry = hist[dateStr];
+    if (entry && entry.pct >= 80) streak++;
+    else if (d < todayDate) break; // Allow today to be incomplete
+  }
+
+  let html = `<div class="ch-streak">
+    <div class="ch-streak-val">${streak}</div>
+    <div class="ch-streak-label">dni streak<br><span style="font-size:9px;color:var(--text3)">prog: 80%+ ukonczenia</span></div>
+    <div style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--text3)">${MONTHS[month][0].toUpperCase() + MONTHS[month].slice(1)} ${year}</div>
+  </div>`;
+
+  // DOW headers
+  html += '<div class="ch-calendar">';
+  DOW.forEach(d => { html += `<div class="ch-dow">${d}</div>`; });
+
+  // Empty cells before first day
+  const offset = firstDow === 0 ? 6 : firstDow - 1; // Monday-first
+  for (let i = 0; i < offset; i++) html += '<div class="ch-day"></div>';
+
+  // Days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = new Date(year, month, d).toLocaleDateString('pl-PL');
+    const entry = hist[dateStr];
+    const isToday = d === todayDate;
+    const isFuture = d > todayDate;
+    let cls = 'ch-day';
+    if (isFuture) cls += ' future';
+    else if (isToday) cls += ' today';
+    if (entry) {
+      if (entry.pct >= 80) cls += ' done';
+      else if (entry.pct >= 30) cls += ' partial';
+      else cls += ' missed';
+    } else if (!isFuture && !isToday) {
+      // Weekday without data = missed (skip weekends)
+      const dow = new Date(year, month, d).getDay();
+      if (dow > 0 && dow < 6) cls += ' missed';
+    }
+
+    html += `<div class="${cls}" title="${dateStr}${entry ? ' · ' + entry.done + '/' + entry.total + ' (' + entry.pct + '%)' : ''}">
+      <div class="ch-day-num">${d}</div>
+      ${entry ? `<div class="ch-day-pct">${entry.pct}%</div>` : ''}
+    </div>`;
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// Auto-save cockpit progress when tasks are checked
+const _origDzisToggle = typeof dzisToggleTask === 'function' ? dzisToggleTask : null;
+if (typeof window.dzisToggleTask === 'function') {
+  const _origToggle = window.dzisToggleTask;
+  window.dzisToggleTask = function(idx) {
+    _origToggle(idx);
+    // Save progress to history
+    const cached = JSON.parse(localStorage.getItem(DZIS_CACHE_KEY) || '{}');
+    if (cached.tasks) {
+      const done = cached.tasks.filter(t => t.done).length;
+      const total = cached.tasks.length;
+      const pct = Math.round(done / total * 100);
+      saveCockpitCompletion(new Date().toLocaleDateString('pl-PL'), pct, done, total);
+    }
+  };
+}
+
+
+// ── 5. AGENT CONVERSATION HISTORY ───────────────────────────
+const SK_AGENT_HISTORY = 'mplace_agent_history_v1';
+let _agentHistoryOpen = false;
+
+function getAgentHistory() {
+  try { return JSON.parse(localStorage.getItem(SK_AGENT_HISTORY) || '[]'); } catch(e) { return []; }
+}
+
+function saveAgentConversation(question, response) {
+  const hist = getAgentHistory();
+  hist.unshift({
+    id: Date.now(),
+    q: question.substring(0, 200),
+    r: response.substring(0, 500),
+    date: new Date().toLocaleDateString('pl-PL'),
+    time: new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }),
+    month: MONTHS[new Date().getMonth()],
+  });
+  // Keep last 50
+  if (hist.length > 50) hist.length = 50;
+  localStorage.setItem(SK_AGENT_HISTORY, JSON.stringify(hist));
+}
+
+function renderAgentHistoryBtn() {
+  const wrap = document.getElementById('agentHistoryWrap');
+  if (!wrap) return;
+  const hist = getAgentHistory();
+  wrap.innerHTML = `
+    <button class="agent-history-btn" onclick="toggleAgentHistory()">
+      &#9776; Historia rozmow (${hist.length})
+    </button>
+    <div class="agent-history-list ${_agentHistoryOpen ? 'open' : ''}" id="agentHistoryList">
+      ${hist.length === 0 ? '<div style="padding:12px;text-align:center;font-family:var(--mono);font-size:10px;color:var(--text3)">Brak historii</div>' :
+        hist.map(h => `
+          <div class="ah-item" onclick="agentLoadHistory(${h.id})">
+            <div class="ah-date">${h.date} ${h.time}</div>
+            <div class="ah-preview">${h.q}</div>
+            <div class="ah-badge">${h.month}</div>
+          </div>
+        `).join('')}
+    </div>`;
+}
+
+function toggleAgentHistory() {
+  _agentHistoryOpen = !_agentHistoryOpen;
+  const list = document.getElementById('agentHistoryList');
+  if (list) list.classList.toggle('open', _agentHistoryOpen);
+}
+
+function agentLoadHistory(id) {
+  const hist = getAgentHistory();
+  const entry = hist.find(h => h.id === id);
+  if (!entry) return;
+  const input = document.getElementById('agentInput');
+  if (input) input.value = entry.q;
+  _agentHistoryOpen = false;
+  const list = document.getElementById('agentHistoryList');
+  if (list) list.classList.remove('open');
+}
+
+
+// ── 6. AUTO M/M COMPARISON ──────────────────────────────────
+function generateMoMSummary() {
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const prevIdx = (now.getMonth() - 1 + 12) % 12;
+  const prevM = MONTHS[prevIdx];
+  const rows = [];
+
+  Object.keys(AC_META).forEach(k => {
+    const D = getData(k);
+    const prod = getProd(k);
+    const cur = D.find(d => d.m === curM);
+    const prev = D.find(d => d.m === prevM);
+    if (!cur) return;
+    const C = calc(cur, prod);
+    const est = estym(cur);
+    const prevSp = prev ? prev.sprzedaz : null;
+    const prevC = prev ? calc(prev, prod) : null;
+
+    rows.push({
+      name: AC_META[k].name,
+      group: AC_META[k].group,
+      sprzedaz: cur.sprzedaz,
+      est: est,
+      prevSp: prevSp,
+      delta: prevSp && prevSp > 0 ? ((est - prevSp) / prevSp * 100) : null,
+      roas: C.roasAds,
+      prevRoas: prev ? prev.roas : null,
+      margin: C.mAfter,
+      prevMargin: prevC ? prevC.mAfter : null,
+    });
+  });
+
+  return { curM, prevM, rows };
+}
+
+function renderMoMSummary() {
+  const el = document.getElementById('momSummary');
+  if (!el) return;
+  const data = generateMoMSummary();
+  if (!data.rows.length) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+
+  const gColors = { MEBLE: 'var(--g-meble)', LUXSEN: 'var(--g-luxsen)', ONE: 'var(--g-one)' };
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)">Automatyczne porownanie M/M</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">${data.curM} EST vs ${data.prevM} real</div>
+    </div>
+    <table class="drill-table" style="width:100%">
+      <thead><tr>
+        <th>Konto</th><th style="text-align:right">Sprzedaz MTD</th><th style="text-align:right">EST EOM</th>
+        <th style="text-align:right">Prev</th><th style="text-align:right">Delta</th>
+        <th style="text-align:right">ROAS</th><th style="text-align:right">Marza</th>
+      </tr></thead>
+      <tbody>${data.rows.map(r => {
+        const dc = r.delta === null ? '' : r.delta >= 0 ? 'up' : 'down';
+        return `<tr>
+          <td><span style="color:${gColors[r.group]||'var(--text)'}">&#9632;</span> ${r.name}</td>
+          <td style="text-align:right">${pln(r.sprzedaz)}</td>
+          <td style="text-align:right;color:var(--yellow)">${pln(r.est)}</td>
+          <td style="text-align:right;color:var(--text3)">${r.prevSp ? pln(r.prevSp) : '—'}</td>
+          <td style="text-align:right"><span class="mom-delta ${dc}">${r.delta !== null ? (r.delta >= 0 ? '+' : '') + r.delta.toFixed(0) + '%' : '—'}</span></td>
+          <td style="text-align:right">${r.roas ? r.roas.toFixed(2) + 'x' : '—'}</td>
+          <td style="text-align:right;color:${r.margin >= 10 ? 'var(--green)' : r.margin >= 0 ? 'var(--yellow)' : 'var(--red)'}">${r.margin.toFixed(1)}%</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>
+    <div style="display:flex;gap:1rem;margin-top:.75rem;font-family:var(--mono);font-size:10px;color:var(--text3)">
+      <span>&#9650; Rosna: ${data.rows.filter(r => r.delta > 0).length}</span>
+      <span>&#9660; Spadaja: ${data.rows.filter(r => r.delta !== null && r.delta < 0).length}</span>
+      <span>&#9632; Brak danych: ${data.rows.filter(r => r.delta === null).length}</span>
+    </div>`;
+}
+
+
+// ── 7. PRESENTATION TEMPLATES ───────────────────────────────
+const PRES_TEMPLATES = [
+  {
+    id: 'monthly',
+    name: 'Raport miesieczny',
+    desc: 'Standardowy przeglad: KPIs, trendy, top/bottom oferty, plan na kolejny miesiac',
+    icon: '&#128202;',
+    sections: ['KPI Dashboard', 'Sprzedaz vs plan', 'ROAS per konto', 'Top 5 ofert', 'Worst 5 ofert', 'Wyroznienia', 'Koszty vs marza', 'Trend m/m', 'Plan nastepny miesiac', 'Podsumowanie']
+  },
+  {
+    id: 'quarterly',
+    name: 'Raport kwartalny',
+    desc: 'Analiza 3 miesiecy: sezonowosc, zmiany strategiczne, porownanie YoY',
+    icon: '&#128200;',
+    sections: ['Executive Summary', 'KPI Q-to-Q', 'Trend 3 miesiace', 'Sezonowosc', 'Portfolio performance', 'Koszty vs przychod', 'Strategic shifts', 'Rekomendacje Q+1', 'Risk assessment', 'Action plan']
+  },
+  {
+    id: 'problem',
+    name: 'Problem / Action',
+    desc: 'Diagnoza problemu, root cause, plan naprawy z timeline',
+    icon: '&#9888;',
+    sections: ['Problem statement', 'Impact assessment', 'Root cause analysis', 'Dane wspierajace', 'Opcje naprawy', 'Rekomendowana akcja', 'Timeline', 'KPIs do monitorowania', 'Eskalacja jesli...', 'Follow-up']
+  },
+];
+
+function renderPresTemplates() {
+  const el = document.getElementById('presTemplates');
+  if (!el) return;
+  el.innerHTML = PRES_TEMPLATES.map(t => `
+    <div class="pres-tpl" onclick="selectPresTemplate('${t.id}')">
+      <div class="pres-tpl-icon">${t.icon}</div>
+      <div class="pres-tpl-name">${t.name}</div>
+      <div class="pres-tpl-desc">${t.desc}</div>
+    </div>
+  `).join('');
+}
+
+let _selectedPresTemplate = 'monthly';
+function selectPresTemplate(id) {
+  _selectedPresTemplate = id;
+  document.querySelectorAll('.pres-tpl').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.pres-tpl[onclick*="${id}"]`)?.classList.add('active');
+}
+
+
+// ── 8. AI ARCHITECT ─────────────────────────────────────────
+async function aiArchitectGenerate(accKey) {
+  const D = getData(accKey);
+  const prod = getProd(accKey);
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const cur = D.find(d => d.m === curM);
+  if (!cur) { alert('Brak danych dla biezacego miesiaca'); return; }
+  const C = calc(cur, prod);
+  const meta = AC_META[accKey];
+  const g = GROUPS[meta.group];
+
+  const resultEl = document.getElementById('architectResult');
+  if (resultEl) {
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = '<div style="text-align:center;padding:2rem;font-family:var(--mono);font-size:11px;color:var(--accent)">Generowanie planu reorganizacji Ads...</div>';
+  }
+
+  const prompt = `Jestes ekspertem Allegro Ads. Wygeneruj plan reorganizacji kampanii dla konta ${meta.name} (grupa ${meta.group}).
+
+DANE:
+- Sprzedaz MTD: ${pln(cur.sprzedaz)} zl
+- Koszt Ads: ${pln(cur.adsCost)} zl
+- ROAS: ${(cur.roas||0).toFixed(2)}x (BE: ${xf(C.beRoasAds)})
+- Marza po reklamie: ${C.mAfter.toFixed(1)}%
+- Producent: ${prod}%
+- Wyroznienia: ${pln(cur.promoC||0)} zl
+
+STRUKTURA ODPOWIEDZI (JSON):
+{
+  "diagnosis": "1-2 zdania diagnoza",
+  "phases": [
+    {"title": "Faza 1: ...", "actions": ["akcja 1", "akcja 2"], "timeline": "tydzien 1"},
+    {"title": "Faza 2: ...", "actions": ["akcja 1", "akcja 2"], "timeline": "tydzien 2-3"},
+    {"title": "Faza 3: ...", "actions": ["akcja 1", "akcja 2"], "timeline": "tydzien 4"}
+  ],
+  "expected_roas": "X.XX",
+  "expected_margin": "XX%",
+  "risk": "1 zdanie ryzyko"
+}
+
+Odpowiedz TYLKO JSON.`;
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6-20250514',
+        max_tokens: 4096,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const text = await readSSE(response);
+
+    // Parse JSON from response
+    let plan;
+    try {
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      plan = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+    } catch(e) { plan = null; }
+
+    if (!plan || !plan.phases) {
+      resultEl.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--text2);white-space:pre-wrap">${text}</div>`;
+      return;
+    }
+
+    resultEl.innerHTML = `
+      <div style="font-family:var(--mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem">Plan reorganizacji — ${meta.name}</div>
+      <div style="font-family:var(--sans);font-size:13px;color:var(--text2);margin-bottom:1rem;line-height:1.6">${plan.diagnosis}</div>
+      ${plan.phases.map((p, i) => `
+        <div class="architect-phase">
+          <div class="architect-phase-num">${i + 1}</div>
+          <div class="architect-phase-body">
+            <div class="architect-phase-title">${p.title}</div>
+            <div class="architect-phase-desc">
+              ${p.actions.map(a => '&#8226; ' + a).join('<br>')}
+              <br><span style="color:var(--yellow)">Timeline: ${p.timeline}</span>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+      <div style="display:flex;gap:1.5rem;margin-top:.5rem;padding-top:.75rem;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:11px"><span style="color:var(--text3)">Oczekiwany ROAS:</span> <span style="color:var(--green)">${plan.expected_roas}x</span></div>
+        <div style="font-family:var(--mono);font-size:11px"><span style="color:var(--text3)">Oczekiwana marza:</span> <span style="color:var(--green)">${plan.expected_margin}</span></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--red);margin-top:.5rem">Ryzyko: ${plan.risk}</div>
+      <div style="display:flex;gap:8px;margin-top:1rem">
+        <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('architectResult').innerText)">Kopiuj</button>
+        <button class="btn" onclick="printDiv('architectResult')">Drukuj</button>
+      </div>`;
+  } catch(e) {
+    resultEl.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:11px">Blad: ${e.message}</div>`;
+  }
+}
+
+
+// ── 9. KNOWLEDGE VERSIONING ─────────────────────────────────
+const SK_WK_VERSIONS = 'mplace_wiedza_versions_v1';
+
+function getWkVersions() {
+  try { return JSON.parse(localStorage.getItem(SK_WK_VERSIONS) || '{}'); } catch(e) { return {}; }
+}
+
+function saveWkVersion(entryId, oldContent, newContent, oldTitle) {
+  const versions = getWkVersions();
+  if (!versions[entryId]) versions[entryId] = [];
+  versions[entryId].push({
+    content: oldContent,
+    title: oldTitle,
+    savedAt: Date.now(),
+  });
+  // Keep last 10 versions per entry
+  if (versions[entryId].length > 10) versions[entryId] = versions[entryId].slice(-10);
+  localStorage.setItem(SK_WK_VERSIONS, JSON.stringify(versions));
+}
+
+function showWkVersions(entryId) {
+  const versions = getWkVersions()[entryId];
+  if (!versions || !versions.length) { alert('Brak historii zmian dla tego wpisu.'); return; }
+  const entry = getWiedza().find(e => e.id === entryId);
+  const current = entry ? entry.content : '';
+
+  let html = '<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.5rem">Historia zmian (' + versions.length + ' wersji)</div>';
+  versions.reverse().forEach((v, i) => {
+    const date = new Date(v.savedAt).toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    // Simple diff: show added/removed lines
+    const oldLines = v.content.split('\n');
+    const newLines = (i === 0 ? current : versions[i - 1].content).split('\n');
+    let diffHtml = '';
+    const maxLines = Math.max(oldLines.length, newLines.length);
+    for (let j = 0; j < Math.min(maxLines, 10); j++) {
+      if (j < oldLines.length && j < newLines.length && oldLines[j] !== newLines[j]) {
+        diffHtml += `<div class="wk-diff-del">- ${oldLines[j]}</div><div class="wk-diff-add">+ ${newLines[j]}</div>`;
+      } else if (j >= newLines.length) {
+        diffHtml += `<div class="wk-diff-del">- ${oldLines[j]}</div>`;
+      } else if (j >= oldLines.length) {
+        diffHtml += `<div class="wk-diff-add">+ ${newLines[j]}</div>`;
+      }
+    }
+    if (!diffHtml) diffHtml = '<div style="color:var(--text3)">Brak roznic</div>';
+    html += `<div style="margin-bottom:.75rem">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text2);margin-bottom:3px">${date} · ${v.title || 'bez tytulu'}</div>
+      <div class="wk-diff">${diffHtml}</div>
+      <button class="wk-version-btn" style="margin-top:4px" onclick="restoreWkVersion(${entryId},${i})">Przywroc te wersje</button>
+    </div>`;
+  });
+
+  // Show in a modal or inline
+  const body = document.getElementById('wkBody_' + entryId);
+  if (body) {
+    const versionDiv = document.createElement('div');
+    versionDiv.id = 'wkVersions_' + entryId;
+    versionDiv.style.cssText = 'margin-top:.5rem;padding:.5rem;background:var(--bg);border:1px solid var(--border);border-radius:6px';
+    versionDiv.innerHTML = html;
+    const existing = document.getElementById('wkVersions_' + entryId);
+    if (existing) existing.remove();
+    body.parentElement.appendChild(versionDiv);
+  }
+}
+
+function restoreWkVersion(entryId, versionIdx) {
+  const versions = getWkVersions()[entryId];
+  if (!versions || !versions[versionIdx]) return;
+  if (!confirm('Przywrocic te wersje? Aktualna tresc zostanie zachowana w historii.')) return;
+  const entries = getWiedza();
+  const idx = entries.findIndex(e => e.id === entryId);
+  if (idx < 0) return;
+  // Save current as version
+  saveWkVersion(entryId, entries[idx].content, versions[versionIdx].content, entries[idx].title);
+  entries[idx].content = versions[versionIdx].content;
+  entries[idx].updated = Date.now();
+  saveWiedza(entries);
+  renderWkList();
+}
+
+// Patch saveWkEntry to save versions
+const _origSaveWkEntry = saveWkEntry;
+window.saveWkEntry = function() {
+  if (wkEditId) {
+    const entries = getWiedza();
+    const existing = entries.find(e => e.id === wkEditId);
+    if (existing) {
+      const newContent = document.getElementById('wkContent').value.trim();
+      if (existing.content !== newContent) {
+        saveWkVersion(wkEditId, existing.content, newContent, existing.title);
+      }
+    }
+  }
+  _origSaveWkEntry();
+};
+
+
+// ── 10. BREAKEVEN OPTIMIZER ─────────────────────────────────
+function beOptimizerAnalysis() {
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const results = { below: [], above: [], ok: [] };
+
+  Object.keys(AC_META).forEach(k => {
+    const D = getData(k);
+    const prod = getProd(k);
+    const cur = D.find(d => d.m === curM);
+    if (!cur || !cur.adsCost || !cur.roas) return;
+    const C = calc(cur, prod);
+    if (!C.beRoasAds) return;
+
+    const ratio = C.roasAds / C.beRoasAds;
+    const item = {
+      account: k,
+      name: AC_META[k].name,
+      group: AC_META[k].group,
+      roas: C.roasAds,
+      beRoas: C.beRoasAds,
+      ratio: ratio,
+      margin: C.mAfter,
+      adsCost: cur.adsCost,
+      zysk: C.zysk,
+    };
+
+    if (ratio < 0.85) results.below.push(item);
+    else if (ratio > 2.0) results.above.push(item);
+    else results.ok.push(item);
+  });
+
+  return results;
+}
+
+function renderBEOptimizer() {
+  const el = document.getElementById('beOptimizerContent');
+  if (!el) return;
+  const data = beOptimizerAnalysis();
+
+  let html = '';
+  if (data.below.length) {
+    html += '<div style="font-family:var(--mono);font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">&#9679; Ponizej breakeven — INTERWENCJA</div>';
+    data.below.forEach(item => {
+      html += `<div class="be-item">
+        <div class="be-icon below">&#9660;</div>
+        <div class="be-info">
+          <div class="be-name">${item.name}</div>
+          <div class="be-detail">ROAS ${item.roas.toFixed(2)}x vs BE ${item.beRoas.toFixed(2)}x · marza ${item.margin.toFixed(1)}% · Ads: ${pln(item.adsCost)} zl</div>
+        </div>
+        <button class="be-action cut" onclick="showView('${item.account}')">Obniz CPC</button>
+      </div>`;
+    });
+  }
+  if (data.above.length) {
+    html += '<div style="font-family:var(--mono);font-size:10px;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin:1rem 0 .5rem">&#9650; Powyzej 2x BE — SKALOWANIE</div>';
+    data.above.forEach(item => {
+      html += `<div class="be-item">
+        <div class="be-icon above">&#9650;</div>
+        <div class="be-info">
+          <div class="be-name">${item.name}</div>
+          <div class="be-detail">ROAS ${item.roas.toFixed(2)}x (${item.ratio.toFixed(1)}x BE) · marza ${item.margin.toFixed(1)}% · zysk: ${pln(item.zysk)} zl</div>
+        </div>
+        <button class="be-action scale" onclick="showView('${item.account}')">Skaluj</button>
+      </div>`;
+    });
+  }
+  if (data.ok.length) {
+    html += '<div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:1rem 0 .5rem">&#9632; W normie</div>';
+    data.ok.forEach(item => {
+      html += `<div class="be-item" style="opacity:.6">
+        <div class="be-icon" style="background:var(--bg3);color:var(--text3)">&#8226;</div>
+        <div class="be-info">
+          <div class="be-name">${item.name}</div>
+          <div class="be-detail">ROAS ${item.roas.toFixed(2)}x (${item.ratio.toFixed(1)}x BE) · marza ${item.margin.toFixed(1)}%</div>
+        </div>
+      </div>`;
+    });
+  }
+  if (!html) html = '<div style="text-align:center;padding:2rem;color:var(--text3);font-family:var(--mono);font-size:11px">Brak danych Ads do analizy BE</div>';
+  el.innerHTML = html;
+}
+
+
+// ── 11. PDF EXPORT WITH BRANDING ────────────────────────────
+async function exportPDFBranded(containerId, filename) {
+  const progress = document.getElementById('pdfProgress');
+  if (progress) { progress.style.display = 'block'; progress.textContent = 'Generowanie PDF...'; }
+
+  try {
+    const element = document.getElementById(containerId);
+    if (!element) throw new Error('Element nie znaleziony: ' + containerId);
+
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#0b0d14',
+      scale: 2,
+      useCORS: true,
+      logging: false,
+    });
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+
+    // Header branding
+    pdf.setFillColor(15, 17, 23);
+    pdf.rect(0, 0, pageW, 15, 'F');
+    pdf.setFontSize(10);
+    pdf.setTextColor(255, 107, 53);
+    pdf.text('MPlace Hub', 10, 10);
+    pdf.setTextColor(139, 145, 168);
+    pdf.text(new Date().toLocaleDateString('pl-PL') + ' · v9.00', pageW - 10, 10, { align: 'right' });
+
+    // Content
+    const imgW = pageW - 20;
+    const imgH = (canvas.height * imgW) / canvas.width;
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+    let yOffset = 18;
+    const maxContentH = pageH - 25; // Leave room for footer
+
+    if (imgH <= maxContentH) {
+      pdf.addImage(imgData, 'JPEG', 10, yOffset, imgW, imgH);
+    } else {
+      // Multi-page
+      let srcY = 0;
+      const srcPageH = (maxContentH / imgW) * canvas.width;
+      while (srcY < canvas.height) {
+        if (srcY > 0) pdf.addPage();
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = Math.min(srcPageH, canvas.height - srcY);
+        const ctx = pageCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, srcY, canvas.width, pageCanvas.height, 0, 0, canvas.width, pageCanvas.height);
+        const pageData = pageCanvas.toDataURL('image/jpeg', 0.95);
+        const pH = (pageCanvas.height * imgW) / canvas.width;
+        pdf.addImage(pageData, 'JPEG', 10, yOffset, imgW, pH);
+        srcY += srcPageH;
+      }
+    }
+
+    // Footer
+    const totalPages = pdf.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(8);
+      pdf.setTextColor(86, 92, 117);
+      pdf.text('MPlace Hub · mplace-bz.github.io/Mplace-Hub/', 10, pageH - 5);
+      pdf.text('Strona ' + i + '/' + totalPages, pageW - 10, pageH - 5, { align: 'right' });
+    }
+
+    pdf.save((filename || 'MPlace_Report') + '.pdf');
+    if (progress) { progress.textContent = 'PDF zapisany'; setTimeout(() => { progress.style.display = 'none'; }, 2000); }
+  } catch(e) {
+    console.error('PDF export error:', e);
+    if (progress) { progress.textContent = 'Blad: ' + e.message; setTimeout(() => { progress.style.display = 'none'; }, 3000); }
+  }
+}
+
+function printDiv(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const w = window.open('', '_blank');
+  w.document.write('<html><head><title>MPlace Hub</title><style>body{background:#fff;color:#111;font-family:sans-serif;padding:20px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:6px 10px;text-align:left;font-size:12px}</style></head><body>');
+  w.document.write(el.innerHTML);
+  w.document.write('</body></html>');
+  w.document.close();
+  w.print();
+}
+
+
+// ── 12. CENTRUM ANALITYCZNE v2 ──────────────────────────────
+let ca2Data = { konto: '', catalog: null, ads7: null, ads14: null, ads30: null, sales: null };
+
+function ca2SelectKonto(k) {
+  ca2Data.konto = k;
+  // Populate konto selector with all accounts
+  const sel = document.getElementById('ca2Konto');
+  if (sel && !sel.options.length || sel.options.length <= 1) {
+    sel.innerHTML = '<option value="">-- wybierz --</option>' +
+      Object.keys(AC_META).map(k2 => `<option value="${k2}" ${k2 === k ? 'selected' : ''}>${AC_META[k2].name}</option>`).join('');
+  }
+}
+
+function ca2Init() {
+  const sel = document.getElementById('ca2Konto');
+  if (sel && sel.options.length <= 1) {
+    sel.innerHTML = '<option value="">-- wybierz --</option>' +
+      Object.keys(AC_META).map(k => `<option value="${k}">${AC_META[k].name}</option>`).join('');
+  }
+}
+
+function ca2HandleCatalog(input) {
+  if (!input.files[0]) return;
+  const zone = document.getElementById('ca2CatalogZone');
+  zone.classList.add('has-file');
+  zone.querySelector('.ca2-upload-label').textContent = input.files[0].name;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      ca2Data.catalog = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      ca2UpdateStats();
+    } catch(err) { alert('Blad parsowania katalogu: ' + err.message); }
+  };
+  reader.readAsArrayBuffer(input.files[0]);
+}
+
+function ca2HandleAds(input, period) {
+  if (!input.files[0]) return;
+  const zoneId = 'ca2Ads' + period.replace('d', '') + 'Zone';
+  const zone = document.getElementById(zoneId);
+  if (zone) { zone.classList.add('has-file'); zone.querySelector('.ca2-upload-label').textContent = input.files[0].name; }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      ca2Data['ads' + period.replace('d', '')] = XLSX.utils.sheet_to_json(ws, { header: 1 });
+    } catch(err) { alert('Blad parsowania Ads ' + period + ': ' + err.message); }
+  };
+  reader.readAsArrayBuffer(input.files[0]);
+}
+
+function ca2HandleSales(input) {
+  if (!input.files[0]) return;
+  const zone = document.getElementById('ca2SalesZone');
+  zone.classList.add('has-file');
+  zone.querySelector('.ca2-upload-label').textContent = input.files[0].name;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      ca2Data.sales = XLSX.utils.sheet_to_json(ws, { header: 1 });
+    } catch(err) { alert('Blad parsowania sprzedazy: ' + err.message); }
+  };
+  reader.readAsArrayBuffer(input.files[0]);
+}
+
+function ca2UpdateStats() {
+  const el = document.getElementById('ca2Stats');
+  if (!el || !ca2Data.catalog) { el.style.display = 'none'; return; }
+  el.style.display = 'grid';
+  const rows = ca2Data.catalog.length - 1; // minus header
+  el.innerHTML = `
+    <div class="ca2-stat"><div class="ca2-stat-val">${rows}</div><div class="ca2-stat-label">Oferty</div></div>
+    <div class="ca2-stat"><div class="ca2-stat-val">${ca2Data.ads7 ? '&#10003;' : '—'}</div><div class="ca2-stat-label">Ads 7d</div></div>
+    <div class="ca2-stat"><div class="ca2-stat-val">${ca2Data.ads14 ? '&#10003;' : '—'}</div><div class="ca2-stat-label">Ads 14d</div></div>
+    <div class="ca2-stat"><div class="ca2-stat-val">${ca2Data.ads30 ? '&#10003;' : '—'}</div><div class="ca2-stat-label">Ads 30d</div></div>`;
+}
+
+function ca2ShowTab(tab, btn) {
+  document.querySelectorAll('.ca2-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  ca2RenderTab(tab);
+}
+
+function ca2Analyze() {
+  if (!ca2Data.konto) { alert('Wybierz konto'); return; }
+  if (!ca2Data.catalog) { alert('Wgraj katalog ofert'); return; }
+  ca2RenderTab('matrix');
+}
+
+function ca2RenderTab(tab) {
+  const content = document.getElementById('ca2Content');
+  if (!ca2Data.catalog || !ca2Data.konto) {
+    content.innerHTML = '<div style="text-align:center;padding:4rem;color:var(--text3);font-family:var(--mono);font-size:12px">Wgraj pliki i wybierz konto</div>';
+    return;
+  }
+
+  const catalog = ca2Data.catalog;
+  const headers = catalog[0] || [];
+  const rows = catalog.slice(1);
+
+  if (tab === 'matrix') {
+    // Offer matrix: ID, Title, Price, Status, Ads data if available
+    const titleCol = headers.findIndex(h => /tytu|nazwa|title/i.test(String(h)));
+    const idCol = headers.findIndex(h => /^id$|numer|ofert/i.test(String(h)));
+    const priceCol = headers.findIndex(h => /cena|price/i.test(String(h)));
+    const statusCol = headers.findIndex(h => /status|aktyw/i.test(String(h)));
+
+    let html = `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.5rem">${rows.length} ofert w katalogu · konto: ${AC_META[ca2Data.konto]?.name}</div>`;
+    html += `<div style="max-height:500px;overflow-y:auto"><table class="ca2-matrix">
+      <thead><tr><th>#</th><th>ID</th><th>Tytul</th><th>Cena</th><th>Status</th><th>Ruch</th></tr></thead>
+      <tbody>`;
+
+    rows.slice(0, 100).forEach((row, i) => {
+      const id = idCol >= 0 ? row[idCol] : '—';
+      const title = titleCol >= 0 ? String(row[titleCol] || '').substring(0, 60) : '—';
+      const price = priceCol >= 0 ? row[priceCol] : '—';
+      const status = statusCol >= 0 ? row[statusCol] : '—';
+
+      // Determine traffic type from ads data
+      const hasAds = ca2Data.ads7 || ca2Data.ads30;
+      let trafficType = 'organic';
+      if (hasAds) {
+        const adsData = (ca2Data.ads7 || ca2Data.ads30);
+        const adsMatch = adsData.slice(1).find(r => String(r[0]).includes(String(id)) || String(r[1] || '').includes(String(id)));
+        if (adsMatch) trafficType = 'mixed';
+      }
+
+      html += `<tr>
+        <td style="color:var(--text3)">${i + 1}</td>
+        <td style="color:var(--blue)">${id}</td>
+        <td>${title}</td>
+        <td style="color:var(--green)">${price}</td>
+        <td>${status}</td>
+        <td><span class="ca2-pill ${trafficType}">${trafficType === 'organic' ? 'Organika' : trafficType === 'paid' ? 'Ads' : 'Mix'}</span></td>
+      </tr>`;
+    });
+
+    html += '</tbody></table></div>';
+    if (rows.length > 100) html += `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:.5rem;text-align:center">Pokazano 100 / ${rows.length} ofert</div>`;
+    content.innerHTML = html;
+
+  } else if (tab === 'organic') {
+    content.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text3);font-family:var(--mono);font-size:12px">
+      Wgraj plik Sprzedaz + Odwiedziny zeby zobaczyc podzial organika vs Ads.<br>
+      ${ca2Data.sales ? '<span style="color:var(--green)">Plik wgrany — ' + (ca2Data.sales.length - 1) + ' wierszy</span>' : '<span style="color:var(--yellow)">Brak pliku sprzedazy</span>'}
+    </div>`;
+
+    if (ca2Data.sales && ca2Data.sales.length > 1) {
+      const sHeaders = ca2Data.sales[0];
+      const sRows = ca2Data.sales.slice(1, 51);
+      let html = `<table class="ca2-matrix"><thead><tr>${sHeaders.slice(0, 8).map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+      sRows.forEach(r => {
+        html += `<tr>${r.slice(0, 8).map(v => `<td>${v || '—'}</td>`).join('')}</tr>`;
+      });
+      html += '</tbody></table>';
+      content.innerHTML = html;
+    }
+
+  } else if (tab === 'trends') {
+    // Compare ads across 7d, 14d, 30d periods
+    const periods = [];
+    if (ca2Data.ads7) periods.push({ label: '7 dni', data: ca2Data.ads7 });
+    if (ca2Data.ads14) periods.push({ label: '14 dni', data: ca2Data.ads14 });
+    if (ca2Data.ads30) periods.push({ label: '30 dni', data: ca2Data.ads30 });
+
+    if (!periods.length) {
+      content.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text3);font-family:var(--mono);font-size:12px">Wgraj min. 1 plik Ads (7d, 14d, lub 30d)</div>';
+      return;
+    }
+
+    let html = '<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.75rem">Porownanie okresow Ads</div>';
+    periods.forEach(p => {
+      html += `<div style="margin-bottom:1rem">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--accent);margin-bottom:.5rem">${p.label} — ${p.data.length - 1} wierszy</div>
+        <div style="max-height:250px;overflow-y:auto"><table class="ca2-matrix">
+          <thead><tr>${p.data[0].slice(0, 8).map(h => `<th>${h}</th>`).join('')}</tr></thead>
+          <tbody>${p.data.slice(1, 21).map(r => `<tr>${r.slice(0, 8).map(v => `<td>${v || '—'}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table></div>
+      </div>`;
+    });
+    content.innerHTML = html;
+
+  } else if (tab === 'cannib') {
+    content.innerHTML = `<div style="text-align:center;padding:3rem">
+      <div style="font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:1rem">Kanibalizacja cross-account</div>
+      <div style="font-family:var(--sans);font-size:13px;color:var(--text2);line-height:1.8">
+        Upload katalogi dla wszystkich 3 kont MEBLE<br>
+        (MobelKap + PerfektCiecie + MeblenaCzasie)<br>
+        zeby wykryc nakladajace sie oferty.<br><br>
+        <button class="btn" onclick="showView('kanibalizator')">Otworz Kanibalizator</button>
+      </div>
+    </div>`;
+  }
+}
+
+function ca2Clear() {
+  ca2Data = { konto: '', catalog: null, ads7: null, ads14: null, ads30: null, sales: null };
+  ['ca2CatalogZone', 'ca2Ads7Zone', 'ca2Ads14Zone', 'ca2Ads30Zone', 'ca2SalesZone'].forEach(id => {
+    const zone = document.getElementById(id);
+    if (zone) { zone.classList.remove('has-file'); }
+  });
+  document.getElementById('ca2CatalogFile').value = '';
+  document.getElementById('ca2Stats').style.display = 'none';
+  document.getElementById('ca2Content').innerHTML = '<div style="text-align:center;padding:4rem;color:var(--text3);font-family:var(--mono);font-size:12px">Wybierz konto i wgraj pliki</div>';
+}
+
+
+// ── 13. CROSS-BORDER CZ/SK FRAMEWORK ───────────────────────
+const CB_RATES = { CZK: 0.17, EUR: 4.28 }; // 1 CZK = 0.17 PLN, 1 EUR = 4.28 PLN
+
+function cbConvertToPLN(amount, currency) {
+  if (currency === 'PLN') return amount;
+  return amount * (CB_RATES[currency] || 1);
+}
+
+function cbFormatCurrency(amount, currency) {
+  if (currency === 'CZK') return Math.round(amount).toLocaleString('cs-CZ') + ' Kc';
+  if (currency === 'EUR') return amount.toFixed(2) + ' EUR';
+  return Math.round(amount).toLocaleString('pl-PL') + ' zl';
+}
+
+function cbRenderRates() {
+  const el = document.getElementById('cbRates');
+  if (!el) return;
+  el.innerHTML = `
+    <span class="cb-currency">1 CZK = ${CB_RATES.CZK.toFixed(2)} PLN</span>
+    <span class="cb-currency">1 EUR = ${CB_RATES.EUR.toFixed(2)} PLN</span>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:8px">Kursy orientacyjne</span>`;
+}
+
+
+// ── 14. ALLEGRO API OAUTH SCAFFOLDING ───────────────────────
+const SK_ALLEGRO_API = 'mplace_allegro_api_v1';
+
+function getAllegroConfig() {
+  try { return JSON.parse(localStorage.getItem(SK_ALLEGRO_API) || '{}'); } catch(e) { return {}; }
+}
+
+function saveAllegroConfig(config) {
+  localStorage.setItem(SK_ALLEGRO_API, JSON.stringify(config));
+}
+
+function renderAllegroApiSettings() {
+  const el = document.getElementById('allegroApiSettings');
+  if (!el) return;
+  const config = getAllegroConfig();
+  const isConnected = !!(config.clientId && config.clientSecret);
+
+  el.innerHTML = `
+    <div class="api-settings">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem">Allegro REST API</div>
+      <div class="api-status">
+        <div class="api-status-dot ${isConnected ? 'connected' : 'disconnected'}"></div>
+        <span style="font-family:var(--mono);font-size:11px;color:${isConnected ? 'var(--green)' : 'var(--red)'}">${isConnected ? 'Skonfigurowane' : 'Nieskonfigurowane'}</span>
+      </div>
+      <div class="api-field">
+        <label>Client ID</label>
+        <input type="text" id="allegroClientId" value="${config.clientId || ''}" placeholder="Z apps.developer.allegro.pl">
+      </div>
+      <div class="api-field">
+        <label>Client Secret</label>
+        <input type="password" id="allegroClientSecret" value="${config.clientSecret || ''}" placeholder="Ukryty">
+      </div>
+      <div class="api-field">
+        <label>Redirect URI</label>
+        <input type="text" id="allegroRedirectUri" value="${config.redirectUri || 'https://mplace-bz.github.io/Mplace-Hub/callback'}" placeholder="https://...">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:1rem">
+        <button class="btn primary" onclick="allegroSaveConfig()">Zapisz konfiguracje</button>
+        <button class="btn" onclick="allegroTestConnection()">Testuj polaczenie</button>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:1rem;line-height:1.8">
+        1. Zarejestruj aplikacje na apps.developer.allegro.pl<br>
+        2. Wpisz Client ID i Client Secret powyzej<br>
+        3. Redirect URI: ${config.redirectUri || 'https://mplace-bz.github.io/Mplace-Hub/callback'}<br>
+        4. Po polaczeniu: auto-pull danych Ads, sprzedazy, ofert<br>
+        <span style="color:var(--yellow)">Status: Scaffolding — OAuth flow w przygotowaniu</span>
+      </div>
+    </div>`;
+}
+
+function allegroSaveConfig() {
+  const config = {
+    clientId: document.getElementById('allegroClientId').value.trim(),
+    clientSecret: document.getElementById('allegroClientSecret').value.trim(),
+    redirectUri: document.getElementById('allegroRedirectUri').value.trim(),
+    savedAt: Date.now(),
+  };
+  saveAllegroConfig(config);
+  renderAllegroApiSettings();
+  alert('Konfiguracja zapisana.');
+}
+
+function allegroTestConnection() {
+  const config = getAllegroConfig();
+  if (!config.clientId) { alert('Wpisz Client ID'); return; }
+  alert('OAuth flow nie jest jeszcze zaimplementowany.\nKonfiguracja zapisana — API bedzie dostepne w nastepnej wersji.');
+}
+
+
+// ── 15. ENHANCED SMART SEARCH (Cmd+K) ──────────────────────
+// Add Centrum Analityczne to SMART_TOOLS
+if (typeof SMART_TOOLS !== 'undefined') {
+  SMART_TOOLS.push(
+    { id:'centrum', name:'Centrum Analityczne', icon:'screener', view:'centrum',
+      desc:'Katalog ofert + 3 cykle Ads + organika vs Ads',
+      keys:['centrum','analityczne','katalog','oferty','organika','organic','paid','ads cykle','macierz'] },
+    { id:'notif', name:'Powiadomienia', icon:'bell', view:'_bell',
+      desc:'Alerty ROAS, marza, anomalie D2D',
+      keys:['powiadomienia','alerty','alert','bell','dzwonek','notyfikacja','notification','uwaga'] },
+    { id:'beopt', name:'BE Optimizer', icon:'calc', view:'insights',
+      desc:'Breakeven analiza per konto — skaluj lub tnij',
+      keys:['breakeven','be','optimizer','rentownosc','skaluj','tnij','cut','scale'] }
+  );
+}
+
+
+// ── 16. INIT ON LOAD — Wire up new features ─────────────────
+// Override initD2D to add anomaly bar
+const _origInitD2D = typeof initD2D === 'function' ? initD2D : null;
+if (_origInitD2D) {
+  window.initD2D = function() {
+    _origInitD2D();
+    // Insert anomaly bar if not exists
+    const d2dView = document.getElementById('viewD2d');
+    if (d2dView && !document.getElementById('d2dAnomalyBar')) {
+      const bar = document.createElement('div');
+      bar.className = 'd2d-anomaly-bar';
+      bar.id = 'd2dAnomalyBar';
+      const firstChild = d2dView.querySelector('.container');
+      if (firstChild) firstChild.prepend(bar);
+    }
+    d2dRenderAnomalyBar();
+  };
+}
+
+// Patch dashboard card clicks to drill-down
+const _origRenderDashboard = typeof renderDashboard === 'function' ? renderDashboard : null;
+if (_origRenderDashboard) {
+  window.renderDashboard = function() {
+    _origRenderDashboard();
+    // Replace card onclick with drill-down
+    document.querySelectorAll('.ac-card').forEach(card => {
+      const onclickStr = card.getAttribute('onclick');
+      if (onclickStr && onclickStr.includes('showView')) {
+        const match = onclickStr.match(/showView\('([^']+)'\)/);
+        if (match && AC_META[match[1]]) {
+          card.setAttribute('onclick', `dashDrillDown('${match[1]}')`);
+        }
+      }
+    });
+    // Add M/M summary
+    const dashGroups = document.getElementById('dashGroups');
+    if (dashGroups && !document.getElementById('momSummary')) {
+      const mom = document.createElement('div');
+      mom.className = 'mom-summary';
+      mom.id = 'momSummary';
+      dashGroups.parentElement.insertBefore(mom, dashGroups);
+    }
+    renderMoMSummary();
+
+    // Add BE optimizer section
+    if (!document.getElementById('beOptimizerContent')) {
+      const dashContainer = dashGroups?.closest('.container');
+      if (dashContainer) {
+        const beDiv = document.createElement('div');
+        beDiv.className = 'be-optimizer';
+        beDiv.id = 'beOptimizerContent';
+        dashContainer.appendChild(beDiv);
+      }
+    }
+    renderBEOptimizer();
+  };
+}
+
+// Wire cockpit history into dzis view
+const _origShowViewForHistory = typeof showView === 'function' ? showView : null;
+if (_origShowViewForHistory) {
+  const __origShowView = window.showView;
+  window.showView = function(v) {
+    __origShowView(v);
+    if (v === 'dzis') {
+      // Add cockpit history calendar
+      const dzisView = document.getElementById('viewDzis');
+      if (dzisView && !document.getElementById('cockpitHistoryCal')) {
+        const histDiv = document.createElement('div');
+        histDiv.className = 'cockpit-history';
+        histDiv.innerHTML = '<div style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:.5rem">Historia tasków</div><div id="cockpitHistoryCal"></div>';
+        const container = dzisView.querySelector('.container');
+        if (container) container.appendChild(histDiv);
+      }
+      renderCockpitHistory();
+    }
+    if (v === 'agent') {
+      // Add agent history button
+      const agentView = document.getElementById('viewAgent');
+      if (agentView && !document.getElementById('agentHistoryWrap')) {
+        const histWrap = document.createElement('div');
+        histWrap.className = 'agent-history';
+        histWrap.id = 'agentHistoryWrap';
+        const chatWrap = agentView.querySelector('.agent-chat-wrap') || agentView.querySelector('.container');
+        if (chatWrap) chatWrap.prepend(histWrap);
+      }
+      renderAgentHistoryBtn();
+    }
+    if (v === 'centrum') {
+      ca2Init();
+    }
+  };
+}
+
+// Generate alerts on app load
+setTimeout(() => {
+  generateAlerts();
+  updateBellBadge();
+}, 3000);
+
+// Auto-save agent conversations (patch agentSend if it exists)
+if (typeof window.agentSend === 'function') {
+  const _origAgentSend = window.agentSend;
+  window.agentSend = async function(...args) {
+    const input = document.getElementById('agentInput');
+    const question = input ? input.value : '';
+    const result = await _origAgentSend(...args);
+    // Try to capture the response
+    const chatBubbles = document.querySelectorAll('.agent-bubble-agent');
+    if (chatBubbles.length > 0) {
+      const lastBubble = chatBubbles[chatBubbles.length - 1];
+      saveAgentConversation(question, lastBubble.textContent.substring(0, 500));
+    }
+    return result;
+  };
+}
+
+  </script>
+
+  <script>
   // Service Worker — offline support
   if('serviceWorker' in navigator){
     const sw = `
@@ -24717,6 +26418,41 @@ self.addEventListener('fetch', e => e.respondWith(
   }
   </script>
 
+
+<!-- ═══ MOBILE SIDEBAR TOGGLE ═══ -->
+<button class="mp-mobile-toggle" id="mpMobileToggle" onclick="document.getElementById('mpSidebar').classList.toggle('mobile-open')">
+  <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4H14M2 8H14M2 12H14"/></svg>
+</button>
+
+<!-- ═══ NOTIFICATION PANEL ═══ -->
+<div id="notifBackdrop" onclick="bellClose()"></div>
+<div id="notifPanel">
+  <div class="notif-hdr">
+    <h3>Powiadomienia</h3>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="notif-filter active" data-f="all" onclick="notifFilter('all',this)">Wszystkie</button>
+      <button class="notif-filter" data-f="danger" onclick="notifFilter('danger',this)">Krytyczne</button>
+      <button class="notif-filter" data-f="warn" onclick="notifFilter('warn',this)">Uwagi</button>
+      <button class="notif-close" onclick="bellClose()">&#10005;</button>
+    </div>
+  </div>
+  <div class="notif-list" id="notifList"></div>
+</div>
+
+<!-- ═══ DASHBOARD DRILL-DOWN MODAL ═══ -->
+<div id="dashDrillModal" onclick="if(event.target===this)dashDrillClose()">
+  <div class="drill-box">
+    <div class="drill-hdr">
+      <div>
+        <div class="drill-title" id="drillTitle">MobelKap</div>
+        <div class="drill-sub" id="drillSub">kwiecien 2026 · dzien 22/30</div>
+      </div>
+      <button class="btn" onclick="dashDrillClose()" style="font-size:16px;border:none;background:none;color:var(--text3);cursor:pointer">&#10005;</button>
+    </div>
+    <div class="drill-grid" id="drillMetrics"></div>
+    <div id="drillContent"></div>
+  </div>
+</div>
 
 <!-- SAVE CONFIRM MODAL -->
 <div class="save-confirm-overlay" id="saveConfirmModal" style="display:none" onclick="if(event.target===this)closeSaveConfirm()">
@@ -24982,6 +26718,9 @@ self.addEventListener('fetch', e => e.respondWith(
 
 <!-- Save badge -->
 <div id="saveBadge" style="display:none"></div>
+
+<!-- PDF progress indicator -->
+<div class="pdf-progress" id="pdfProgress"></div>
 
 <!-- Cmd+K Search Modal -->
 <div id="cmdkBackdrop" style="display:none" onclick="if(event.target===this)cmdkClose()">
