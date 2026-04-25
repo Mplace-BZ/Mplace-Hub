@@ -26305,78 +26305,75 @@ function ca2UpdateStats() {
   el.innerHTML = `<div class="ca2-stat" style="text-align:left;padding:.5rem .75rem"><div class="ca2-stat-label" style="text-align:left;font-size:10px">${parts.join(' · ')}</div></div>`;
 }
 
-// Agent integration
+// Agent integration — bulletproof version
 function ca2AskAgent() {
-  // Ensure konto is set
-  const sel = document.getElementById('ca2Konto');
-  if (sel && sel.value) ca2Data.konto = sel.value;
-  if (!ca2Data.konto) {
-    // Try to get from any parsed data account
-    const keys = Object.keys(AC_META);
-    if (keys.length) ca2Data.konto = keys[0];
-  }
-  const kName = AC_META[ca2Data.konto]?.name || ca2Data.konto || 'konto';
+  try {
+    const sel = document.getElementById('ca2Konto');
+    if (sel && sel.value) ca2Data.konto = sel.value;
+    if (!ca2Data.konto) { const k = Object.keys(AC_META); if (k.length) ca2Data.konto = k[0]; }
+    const kName = AC_META[ca2Data.konto]?.name || ca2Data.konto || 'konto';
 
-  const offers = _ca2BuildOfferMap();
-  if (!offers.length) {
-    // If no offer map but we have content visible, grab it as text
-    const content = document.getElementById('ca2Content');
-    if (content && content.innerText.length > 50) {
-      showView('agent');
-      setTimeout(() => {
-        const input = document.getElementById('agentInput');
-        if (input) {
-          input.value = `Przeanalizuj dane z Przegladu ofert konta ${kName}:\n\n${content.innerText.substring(0, 3000)}\n\nDaj rekomendacje: ktore oferty wylaczyc, skalowac, zostawic.`;
-          input.focus();
-          input.scrollIntoView({behavior:'smooth'});
-        }
-      }, 500);
-      return;
-    }
-    alert('Wgraj pliki i kliknij Analizuj'); return;
-  }
+    let prompt = '';
+    let offers = [];
+    try { offers = _ca2BuildOfferMap(); } catch(e) { console.warn('[ca2] offerMap error:', e); }
 
-  // Build context summary for Agent
-  const organic = offers.filter(o => _ca2TrafficType(o) === 'organic');
-  const paid = offers.filter(o => _ca2TrafficType(o) === 'paid');
-  const mixed = offers.filter(o => _ca2TrafficType(o) === 'mixed');
-  const dead = offers.filter(o => _ca2TrafficType(o) === 'dead');
-  const adsOffers = offers.filter(o => o.ads7 || o.ads14 || o.ads30);
-  const beRoas = calc({sprzedaz:1}, getProd(ca2Data.konto||'MobelKap')).beRoasAds || 4;
+    if (offers.length > 0) {
+      const adsOffers = offers.filter(o => o.ads7 || o.ads14 || o.ads30);
+      let beRoas = 4;
+      try { beRoas = calc({sprzedaz:1}, getProd(ca2Data.konto||'MobelKap')).beRoasAds || 4; } catch(e) {}
+      const topCost = [...adsOffers].sort((a,b) => ((b.ads30||b.ads14||b.ads7)?.koszt||0) - ((a.ads30||a.ads14||a.ads7)?.koszt||0)).slice(0,15);
+      const belowBE = adsOffers.filter(o => { const ads = o.ads30||o.ads14||o.ads7; return ads && (ads.koszt||0) > 5 && (ads.roas||0) < beRoas; });
+      const organic = offers.filter(o => _ca2TrafficType(o) === 'organic').length;
+      const paid = offers.filter(o => _ca2TrafficType(o) === 'paid').length;
 
-  // Top 10 by ads cost
-  const topCost = [...adsOffers].sort((a,b) => ((b.ads30||b.ads14||b.ads7)?.koszt||0) - ((a.ads30||a.ads14||a.ads7)?.koszt||0)).slice(0,10);
-  // Below BE
-  const belowBE = adsOffers.filter(o => { const ads = o.ads30||o.ads14||o.ads7; return ads && ads.koszt > 5 && ads.roas < beRoas; });
-
-  let ctx = `PRZEGLAD OFERT — ${kName}\n`;
-  ctx += `Oferty total: ${offers.length} | Organika: ${organic.length} | Ads: ${paid.length} | Mix: ${mixed.length} | Martwe: ${dead.length}\n`;
-  ctx += `BE ROAS: ${beRoas.toFixed(2)}\n\n`;
-  ctx += `TOP 10 wg kosztu Ads:\n`;
-  topCost.forEach(o => {
-    const ads = o.ads30||o.ads14||o.ads7;
-    ctx += `  [${o.id}] ${o.title} — koszt ${Math.round(ads.koszt)} zl, sprzedaz ${Math.round(ads.sprzedaz)} zl, ROAS ${ads.roas.toFixed(2)}x\n`;
-  });
-  if (belowBE.length) {
-    ctx += `\nPONIZEJ BE ROAS (${belowBE.length} ofert):\n`;
-    belowBE.slice(0,10).forEach(o => {
-      const ads = o.ads30||o.ads14||o.ads7;
-      ctx += `  [${o.id}] ${o.title} — ROAS ${ads.roas.toFixed(2)}x vs BE ${beRoas.toFixed(2)}x, koszt ${Math.round(ads.koszt)} zl\n`;
-    });
-  }
-
-  showView('agent');
-  setTimeout(() => {
-    const input = document.getElementById('agentInput');
-    if (input) {
-      input.value = `Na podstawie przegladu ofert konta ${kName}:\n\n${ctx}\n\nPrzeanalizuj i daj rekomendacje: ktore oferty wylaczyc z Ads, ktore skalowac, ktore zostawic na organice. Format: tabela z akcjami.`;
-      input.focus();
-      input.scrollIntoView({behavior:'smooth', block:'center'});
-      console.log('[Przeglad ofert] Agent prompt set:', input.value.substring(0, 100) + '...');
+      let ctx = `PRZEGLAD OFERT — ${kName}\nOferty: ${offers.length} | Organika: ${organic} | Ads: ${paid} | BE ROAS: ${beRoas.toFixed(2)}\n\n`;
+      if (topCost.length) {
+        ctx += `TOP ${topCost.length} wg kosztu Ads:\n`;
+        topCost.forEach(o => { const a = o.ads30||o.ads14||o.ads7; ctx += `  [${o.id}] ${(o.title||'?').substring(0,50)} — koszt ${Math.round(a?.koszt||0)} zl, sprzedaz ${Math.round(a?.sprzedaz||0)} zl, ROAS ${(a?.roas||0).toFixed(2)}x\n`; });
+      }
+      if (belowBE.length) {
+        ctx += `\nPONIZEJ BE (${belowBE.length}):\n`;
+        belowBE.slice(0,10).forEach(o => { const a = o.ads30||o.ads14||o.ads7; ctx += `  [${o.id}] ${(o.title||'?').substring(0,50)} — ROAS ${(a?.roas||0).toFixed(2)}x, koszt ${Math.round(a?.koszt||0)} zl\n`; });
+      }
+      prompt = `Na podstawie przegladu ofert konta ${kName}:\n\n${ctx}\nPrzeanalizuj i daj rekomendacje: ktore oferty wylaczyc z Ads, ktore skalowac, ktore zostawic na organice. Format: tabela z akcjami per oferta.`;
     } else {
-      console.error('[Przeglad ofert] agentInput not found in DOM');
+      // Fallback: grab visible content
+      const content = document.getElementById('ca2Content');
+      const txt = content ? content.innerText.substring(0, 3000) : '';
+      if (txt.length < 20) { alert('Wgraj pliki i kliknij Analizuj'); return; }
+      prompt = `Przeanalizuj dane z Przegladu ofert konta ${kName}:\n\n${txt}\n\nDaj rekomendacje: ktore oferty wylaczyc, skalowac, zostawic.`;
     }
-  }, 500);
+
+    console.log('[ca2AskAgent] prompt ready, length:', prompt.length, '| switching to agent...');
+    showView('agent');
+
+    let attempts = 0;
+    const trySet = () => {
+      const input = document.getElementById('agentInput');
+      if (input) {
+        input.value = prompt;
+        input.focus();
+        input.style.borderColor = '#ff6b35';
+        setTimeout(() => { input.style.borderColor = ''; }, 2000);
+        input.scrollIntoView({behavior:'smooth', block:'center'});
+        console.log('[ca2AskAgent] prompt set OK');
+      } else if (attempts++ < 8) {
+        setTimeout(trySet, 300);
+      } else {
+        alert('Nie znaleziono pola Agent. Otworz Agent recznie — prompt w schowku.');
+        navigator.clipboard.writeText(prompt).catch(()=>{});
+      }
+    };
+    setTimeout(trySet, 400);
+  } catch(e) {
+    console.error('[ca2AskAgent] FATAL:', e);
+    const content = document.getElementById('ca2Content');
+    showView('agent');
+    setTimeout(() => {
+      const input = document.getElementById('agentInput');
+      if (input && content) { input.value = 'Przeanalizuj dane ofert:\n\n' + content.innerText.substring(0, 2000); input.focus(); }
+    }, 600);
+  }
 }
 
 function _ca2ButtonBar() {
