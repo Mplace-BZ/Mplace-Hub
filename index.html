@@ -26827,6 +26827,9 @@ function ca2Clear() {
     if (zone) { zone.classList.remove('has-file'); zone.querySelector('.ca2-upload-label').textContent = zone.querySelector('.ca2-upload-label').textContent.split('.')[0] || 'Upload'; }
   });
   document.querySelectorAll('#viewCentrum input[type="file"]').forEach(f => f.value = '');
+  // Reset labels
+  const labelMap = {ca2SlotCatLabel:'Katalog ofert (opcja)',ca2SlotA7Label:'Ads 7 dni',ca2SlotA14Label:'Ads 14 dni',ca2SlotA30Label:'Ads 30 dni',ca2SlotOdwLabel:'Odwiedziny wg ofert',ca2SlotSprLabel:'Sprzedaz wg ofert'};
+  Object.entries(labelMap).forEach(([id,txt]) => { const el = document.getElementById(id); if (el) el.textContent = txt; });
   document.getElementById('ca2Stats').style.display = 'none';
   document.getElementById('ca2Content').innerHTML = '<div style="text-align:center;padding:4rem;color:var(--text3);font-family:var(--mono);font-size:12px">Wybierz konto i wgraj pliki</div>';
   document.getElementById('ca2Konto').value = '';
