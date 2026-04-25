@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v8.48</title>
+<title>MPlace Hub v8.49</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1661,7 +1661,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v8.48</span>
+    <span class="brand-ver">v8.49</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5580,27 +5580,23 @@ function renderDataCenter(k){
 
     <div style="margin-bottom:1.2rem;border:1px solid rgba(255,107,53,.25);border-radius:8px;background:rgba(255,107,53,.03);padding:10px 14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <span style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:600">WKLEJ SCREENY (Ctrl+V) → auto-fill</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:600">WKLEJ 2 SCREENY (Ctrl+V) → auto-fill</span>
         <span id="dataOcrStatus_${k}" style="font-family:var(--mono);font-size:10px;color:var(--text3)"></span>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
-        <div id="dataOcrSlot1_${k}" class="data-ocr-slot" onclick="this.querySelector('div').focus()" style="border:1px dashed rgba(255,107,53,.3);border-radius:6px;padding:8px;min-height:60px;cursor:pointer;position:relative">
-          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">1. ADS</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div id="dataOcrSlot1_${k}" class="data-ocr-slot" onclick="this.querySelector('.data-ocr-paste').focus()" style="border:1px dashed rgba(255,107,53,.3);border-radius:6px;padding:8px;min-height:60px;cursor:pointer;position:relative">
+          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">1. CENTRUM FINANSOW (sprzedaz/prowizja/dostawa/wyroznienia)</div>
           <div contenteditable="true" class="data-ocr-paste" data-slot="1" data-konto="${k}" style="min-height:36px;outline:none;font-size:10px;color:var(--text3)" onpaste="dataOcrPaste(event,'${k}',1)">Ctrl+V tutaj</div>
         </div>
-        <div id="dataOcrSlot2_${k}" class="data-ocr-slot" onclick="this.querySelector('div').focus()" style="border:1px dashed rgba(255,107,53,.3);border-radius:6px;padding:8px;min-height:60px;cursor:pointer;position:relative">
-          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">2. PODSUMOWANIE</div>
+        <div id="dataOcrSlot2_${k}" class="data-ocr-slot" onclick="this.querySelector('.data-ocr-paste').focus()" style="border:1px dashed rgba(255,107,53,.3);border-radius:6px;padding:8px;min-height:60px;cursor:pointer;position:relative">
+          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">2. PANEL ADS (koszt/ROAS/wartosc)</div>
           <div contenteditable="true" class="data-ocr-paste" data-slot="2" data-konto="${k}" style="min-height:36px;outline:none;font-size:10px;color:var(--text3)" onpaste="dataOcrPaste(event,'${k}',2)">Ctrl+V tutaj</div>
-        </div>
-        <div id="dataOcrSlot3_${k}" class="data-ocr-slot" onclick="this.querySelector('div').focus()" style="border:1px dashed rgba(255,107,53,.3);border-radius:6px;padding:8px;min-height:60px;cursor:pointer;position:relative">
-          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:3px">3. WYROZNIENIA</div>
-          <div contenteditable="true" class="data-ocr-paste" data-slot="3" data-konto="${k}" style="min-height:36px;outline:none;font-size:10px;color:var(--text3)" onpaste="dataOcrPaste(event,'${k}',3)">Ctrl+V tutaj</div>
         </div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
         <button onclick="dataOCR('${k}')" id="dataOcrBtn_${k}" style="font-family:var(--mono);font-size:11px;padding:8px 20px;border-radius:6px;border:1px solid rgba(255,107,53,.4);background:rgba(255,107,53,.12);color:#ff6b35;cursor:pointer;font-weight:600">ODCZYTAJ I WYPELNIJ</button>
         <button onclick="dataOcrClear('${k}')" style="font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Wyczysc</button>
-        <span id="dataOcrCount_${k}" style="font-family:var(--mono);font-size:10px;color:var(--text3)">0/3 screenow</span>
+        <span id="dataOcrCount_${k}" style="font-family:var(--mono);font-size:10px;color:var(--text3)">0/2 screenow</span>
       </div>
     </div>
 
@@ -5843,7 +5839,7 @@ function dataOcrPaste(e, k, slot){
         // Update count
         const cnt = Object.keys(window._dataOcrImages[k]||{}).length;
         const cntEl = document.getElementById('dataOcrCount_'+k);
-        if(cntEl) cntEl.textContent = cnt+'/3 screenow';
+        if(cntEl) cntEl.textContent = cnt+'/2 screenow';
       };
       reader.readAsDataURL(file);
       return;
@@ -5853,7 +5849,7 @@ function dataOcrPaste(e, k, slot){
 
 function dataOcrClear(k){
   window._dataOcrImages[k] = {};
-  [1,2,3].forEach(slot => {
+  [1,2].forEach(slot => {
     const slotEl = document.getElementById('dataOcrSlot'+slot+'_'+k);
     if(slotEl){
       slotEl.querySelector('.data-ocr-paste').innerHTML = 'Ctrl+V tutaj';
@@ -5862,7 +5858,7 @@ function dataOcrClear(k){
     }
   });
   const cntEl = document.getElementById('dataOcrCount_'+k);
-  if(cntEl) cntEl.textContent = '0/3 screenow';
+  if(cntEl) cntEl.textContent = '0/2 screenow';
   const statusEl = document.getElementById('dataOcrStatus_'+k);
   if(statusEl) statusEl.textContent = '';
 }
@@ -5871,32 +5867,37 @@ async function dataOCR(k){
   const status = document.getElementById('dataOcrStatus_'+k);
   const btn = document.getElementById('dataOcrBtn_'+k);
   const imgs = window._dataOcrImages[k] || {};
-  if(!imgs[1] && !imgs[2] && !imgs[3]){ status.textContent = 'Wklej min. 1 screen (Ctrl+V)'; status.style.color='var(--red)'; return; }
+  if(!imgs[1] && !imgs[2]){ status.textContent = 'Wklej min. 1 screen (Ctrl+V)'; status.style.color='var(--red)'; return; }
 
   btn.disabled = true;
   status.textContent = 'Odczytuje...';
   status.style.color = 'var(--accent)';
 
   const content = [];
-  const labels = {1:'SCREEN 1 — ADS (Koszt, ROAS, Wartosc sprzedazy)', 2:'SCREEN 2 — PODSUMOWANIE (Wartosc sprzedazy i dostawy = sprzedaz brutto, Obowiazkowe = prowizja %, Dostawa)', 3:'SCREEN 3 — WYROZNIENIA (kwota)'};
-  [1,2,3].forEach(slot => {
+  const labels = {
+    1:'SCREEN 1 — CENTRUM FINANSOW Allegro (tabela z: Wartosc sprzedazy i dostawy, Obowiazkowe/Prowizja od sprzedazy, Dostawa podstawowe + dodatkowe, Opcje promowania/wyroznienia)',
+    2:'SCREEN 2 — PANEL ADS Allegro (Koszt, ROAS, Wartosc sprzedazy z kampanii reklamowych)'
+  };
+  [1,2].forEach(slot => {
     if(!imgs[slot]) return;
     content.push({ type:'text', text: labels[slot] });
     content.push({ type:'image', source:{ type:'base64', media_type:imgs[slot].mediaType, data:imgs[slot].base64 }});
   });
-  content.push({ type:'text', text: `Odczytaj dane z tych screenow Allegro Ads / Podsumowania oplat.
+  content.push({ type:'text', text: `Odczytaj dane z tych screenow Allegro.
 Zwroc TYLKO JSON, zero komentarzy:
 {"adsCost":LICZBA,"roas":LICZBA,"wartoscAds":LICZBA,"sprzedaz":LICZBA,"commission":LICZBA,"delivery":LICZBA,"promoC":LICZBA}
 
 ZASADY:
-- adsCost = Koszt z panelu Ads (zl, grosze zaokraglij do pelnych)
-- roas = ROAS z panelu Ads (np 7.21)
-- wartoscAds = Wartosc sprzedazy z panelu Ads (zl)
-- sprzedaz = "Wartosc sprzedazy i dostawy" z Podsumowania (brutto, zl, zaokraglij)
-- commission = "Obowiazkowe" PROCENT (np 11.1) — NIE kwota!
-- delivery = "Dostawa" kwota zl (zaokraglij, wartosc bezwzgledna)
-- promoC = kwota wyroznie (zl, zaokraglij, wartosc bezwzgledna)
-- Jesli brak screenu — ustaw 0
+- Ze SCREEN 1 (Centrum Finansow):
+  - sprzedaz = "Wartosc sprzedazy i dostawy" (brutto, zl, zaokraglij do pelnych)
+  - commission = "Obowiazkowe" kolumna PROCENT (np 0.11 = 11.0) — czytaj z kolumny procentowej, NIE z kwoty!
+  - delivery = suma "Dostawa" (Oplaty podstawowe + Oplaty dodatkowe, wartosc bezwzgledna, zaokraglij)
+  - promoC = "Opcje promowania" kwota (wartosc bezwzgledna, zaokraglij). UWAGA: to NIE jest Allegro Ads — to wyroznienia ofert.
+- Ze SCREEN 2 (Panel Ads):
+  - adsCost = Koszt (zl, zaokraglij do pelnych)
+  - roas = ROAS (np 5.65)
+  - wartoscAds = Wartosc sprzedazy (zl, zaokraglij)
+- Jesli brak screenu — ustaw 0 dla brakujacych pol
 - TYLKO JSON, nic wiecej` });
 
   try {
@@ -21454,7 +21455,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.48</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v8.49</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
