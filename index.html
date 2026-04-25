@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.10</title>
+<title>MPlace Hub v9.11</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -693,12 +693,13 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .agent-pulse-delta{font-family:var(--mono);font-size:10px;position:absolute;top:.8rem;right:1rem;}
 .agent-pulse-delta.up{color:#2dd4a0;}.agent-pulse-delta.down{color:#ef4444;}
 /* ═══ Agent Dashboard — 3-col grid ═══ */
-.agent-dash-grid{display:grid;grid-template-columns:1fr 1fr 280px;gap:1rem;margin-bottom:1rem;}
+.agent-dash-grid{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:.75rem;margin-bottom:1rem;align-items:stretch;}
+.agent-dash-grid>.agent-panel{display:flex;flex-direction:column;}
 /* ═══ Agent Dashboard — Smart Suggestions ═══ */
-.agent-suggest{list-style:none;padding:0;margin:0;}
-.agent-suggest li{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer;transition:all .15s;border:1px solid transparent;font-size:11px;color:var(--text2);line-height:1.4;}
+.agent-suggest{list-style:none;padding:0;margin:0;flex:1;display:flex;flex-direction:column;gap:2px;}
+.agent-suggest li{display:flex;align-items:flex-start;gap:8px;padding:10px 10px;border-radius:6px;cursor:pointer;transition:all .15s;border:1px solid transparent;font-size:12px;color:var(--text2);line-height:1.5;flex:1;}
 .agent-suggest li:hover{background:var(--bg3);border-color:var(--border2);color:var(--text);}
-.agent-suggest li .sg-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.agent-suggest li .sg-dot{width:7px;height:7px;border-radius:50%;margin-top:6px;flex-shrink:0;}
 .agent-suggest li .sg-dot.red{background:#ef4444;}.agent-suggest li .sg-dot.yellow{background:#f5a623;}.agent-suggest li .sg-dot.green{background:#2dd4a0;}.agent-suggest li .sg-dot.blue{background:#4d9fff;}
 /* ═══ Agent Dashboard — Recent History ═══ */
 .agent-recent{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem;}
@@ -708,8 +709,8 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .agent-recent-title{font-family:var(--sans);font-size:12px;font-weight:500;color:var(--text);line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
 .agent-recent-date{font-family:var(--mono);font-size:10px;color:var(--text3);}
 @media(max-width:1100px){.agent-dash-grid{grid-template-columns:1fr 1fr;}.agent-dash-grid>:nth-child(3){grid-column:1/-1;}}
-@media(max-width:800px){.agent-pulse{grid-template-columns:repeat(2,1fr);}.agent-dash-grid{grid-template-columns:1fr;}.agent-recent{grid-template-columns:1fr;}}
-.agent-chat-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:1rem;display:flex;flex-direction:column;min-height:200px;}
+@media(max-width:800px){.agent-pulse{grid-template-columns:repeat(2,1fr);}.agent-dash-grid{grid-template-columns:1fr;}.agent-recent{grid-template-columns:1fr;}.agent-pb-grid{display:grid;grid-template-columns:repeat(2,1fr);}}
+.agent-chat-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:1rem;display:flex;flex-direction:column;min-height:80px;}
 .agent-chat-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:.06em;}
 .agent-chat-body{flex:1;padding:14px;overflow-y:auto;max-height:60vh;}
 .agent-bubble{margin-bottom:12px;display:flex;gap:8px;}
@@ -726,7 +727,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .agent-bubble-tag{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:4px;border:1px solid var(--border2);color:var(--text3);background:var(--bg3);}
 .agent-bubble-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
 .agent-input-bar{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;flex-direction:column;gap:10px;}
-.agent-input-bar textarea{width:100%;background:transparent;border:none;color:var(--text);font-family:var(--sans);font-size:14px;resize:vertical;outline:none;line-height:1.6;min-height:160px;max-height:400px;}
+.agent-input-bar textarea{width:100%;background:transparent;border:none;color:var(--text);font-family:var(--sans);font-size:14px;resize:vertical;outline:none;line-height:1.6;min-height:80px;max-height:400px;}
 .agent-input-meta{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;color:var(--text3);}
 .agent-live-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:#34d399;}
 .agent-live-dot{width:6px;height:6px;border-radius:50%;background:#34d399;animation:mPulse 1.5s infinite;}
@@ -1634,7 +1635,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.10 — NEW FEATURES CSS ═══ */
+/* ═══ v9.11 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1843,7 +1844,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="login-logo">MPlace <span>Hub</span></div>
     <div class="login-sub">Zaloguj się aby uzyskać dostęp do danych.<br>Synchronizacja między urządzeniami przez Firebase.</div>
     <button class="login-google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.10h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.11h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Zaloguj się przez Google
     </button>
     <div class="login-note">Twoje dane są bezpieczne na Twoim koncie Google.<br>Nikt inny nie ma dostępu.</div>
@@ -1874,7 +1875,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.10</span>
+    <span class="brand-ver">v9.11</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2830,7 +2831,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <button onclick="document.getElementById('agentResponse').innerHTML='';document.getElementById('agentInput').value=''" style="font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(255,107,53,.35);background:rgba(255,107,53,.08);color:#ff6b35;cursor:pointer;transition:all .15s">+ Nowy watek</button>
     </div>
     <div class="agent-chat-body" id="agentResponse" onclick="document.getElementById('agentInput').focus()" style="cursor:text">
-      <div id="agentEmptyState" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:160px;color:var(--text3);font-family:var(--mono);font-size:11px;text-align:center;gap:6px;pointer-events:none">
+      <div id="agentEmptyState" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:60px;color:var(--text3);font-family:var(--mono);font-size:11px;text-align:center;gap:6px;pointer-events:none">
         <div style="font-size:24px;opacity:.3">✦</div>
         <div>Wpisz pytanie ponizej i nacisnij Enter</div>
         <div style="font-size:10px;opacity:.6">Agent analizuje dane 9 kont + baze wiedzy</div>
@@ -2841,7 +2842,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <!-- Input bar -->
   <div class="agent-input-bar">
     <textarea id="agentInput" placeholder="Zapytaj o swoje konta... np. &#8222;Jesli podnose ROAS BOTAVIT do 7x to jaki wynik na koniec miesiaca?&#8221;"
-      rows="8" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();agentSend()}"></textarea>
+      rows="4" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();agentSend()}"></textarea>
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
       <div class="agent-input-meta">
         <span id="agentInputCtx">Kontekst: 9 kont</span>
@@ -11858,10 +11859,14 @@ function renderAgentSuggestions(){
   // Cross-account suggestions
   const lastKb = JSON.parse(localStorage.getItem('kbHistory') || '[]');
   if(lastKb.length){
-    const lastDate = lastKb[lastKb.length-1].date;
-    const daysSince = Math.round((Date.now() - new Date(lastDate).getTime())/(1000*60*60*24));
-    if(daysSince > 14){
+    const lastEntry = lastKb[lastKb.length-1];
+    // id is Date.now() timestamp — use it as reliable date source
+    const lastTs = lastEntry.id || 0;
+    const daysSince = lastTs > 0 ? Math.round((Date.now() - lastTs)/(1000*60*60*24)) : null;
+    if(daysSince !== null && daysSince > 14){
       suggestions.push({pri:2, dot:'yellow', text:`Kanibalizacja: ${daysSince} dni od ostatniego raportu`, q:`Wykonaj analize kanibalizacji miedzy kontami MEBLE. Ostatni raport byl ${daysSince} dni temu. Ktore oferty sie nakladaja i co z tym zrobic?`});
+    } else if(daysSince === null) {
+      suggestions.push({pri:2, dot:'yellow', text:'Kanibalizacja: wykonaj nowy raport', q:'Wykonaj analize kanibalizacji miedzy kontami MEBLE. Ktore oferty sie nakladaja i co z tym zrobic?'});
     }
   }
   // Seasonality hint
@@ -21929,7 +21934,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.10</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.11</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25174,7 +25179,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.10 — ALL NEW FEATURES
+// v9.11 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
@@ -26270,13 +26275,34 @@ function ca2UpdateStats() {
 
 // Agent integration
 function ca2AskAgent() {
+  // Ensure konto is set
   const sel = document.getElementById('ca2Konto');
   if (sel && sel.value) ca2Data.konto = sel.value;
-  const kName = AC_META[ca2Data.konto]?.name || ca2Data.konto;
-  if (!kName) { alert('Wybierz konto'); return; }
+  if (!ca2Data.konto) {
+    // Try to get from any parsed data account
+    const keys = Object.keys(AC_META);
+    if (keys.length) ca2Data.konto = keys[0];
+  }
+  const kName = AC_META[ca2Data.konto]?.name || ca2Data.konto || 'konto';
 
   const offers = _ca2BuildOfferMap();
-  if (!offers.length) { alert('Wgraj pliki i kliknij Analizuj'); return; }
+  if (!offers.length) {
+    // If no offer map but we have content visible, grab it as text
+    const content = document.getElementById('ca2Content');
+    if (content && content.innerText.length > 50) {
+      showView('agent');
+      setTimeout(() => {
+        const input = document.getElementById('agentInput');
+        if (input) {
+          input.value = `Przeanalizuj dane z Przegladu ofert konta ${kName}:\n\n${content.innerText.substring(0, 3000)}\n\nDaj rekomendacje: ktore oferty wylaczyc, skalowac, zostawic.`;
+          input.focus();
+          input.scrollIntoView({behavior:'smooth'});
+        }
+      }, 500);
+      return;
+    }
+    alert('Wgraj pliki i kliknij Analizuj'); return;
+  }
 
   // Build context summary for Agent
   const organic = offers.filter(o => _ca2TrafficType(o) === 'organic');
@@ -26313,8 +26339,12 @@ function ca2AskAgent() {
     if (input) {
       input.value = `Na podstawie przegladu ofert konta ${kName}:\n\n${ctx}\n\nPrzeanalizuj i daj rekomendacje: ktore oferty wylaczyc z Ads, ktore skalowac, ktore zostawic na organice. Format: tabela z akcjami.`;
       input.focus();
+      input.scrollIntoView({behavior:'smooth', block:'center'});
+      console.log('[Przeglad ofert] Agent prompt set:', input.value.substring(0, 100) + '...');
+    } else {
+      console.error('[Przeglad ofert] agentInput not found in DOM');
     }
-  }, 200);
+  }, 500);
 }
 
 function _ca2ButtonBar() {
