@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.23</title>
+<title>MPlace Hub v9.24</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1673,7 +1673,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.23 — NEW FEATURES CSS ═══ */
+/* ═══ v9.24 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1988,7 +1988,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.23</span>
+    <span class="brand-ver">v9.24</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -4913,6 +4913,38 @@ function renderArkusz(){
 // INFO — Ściąga menu & workflow
 // ═══════════════════════════════════════════════════════════
 const INFO_SECTIONS = [
+  { id:'start', label:'Zacznij tutaj', items:[
+    {name:'Pierwszy raz w MPlace Hub', desc:'Witaj w MPlace Hub — narzedziu do zarzadzania portfelem 9 kont Allegro. 3 grupy: MEBLE (MobelKap, PerfektCiecie, MeblenaCzasie), LUXSEN (Luxsen, Semmi, BOTAVIT), ONE (Materazzi, MtzzEU, Ankado24).', steps:['Zaloguj sie kontem Google (prawy gorny rog)','Przejdz do Data — wpisz dane wczorajsze dla kazdego konta','Otworz Dashboard — sprawdz ktore konta sa zielone/czerwone','Otworz Cockpit — kliknij Generuj plan → 10 zadan na dzis','Otworz Agent — zadaj pytanie o swoje konta','Powtarzaj codziennie — buduj streak w Cockpicie']},
+    {name:'Skad brac dane do wpisu?', desc:'<strong>Koszt Ads + ROAS:</strong> Allegro → Ads → Kampanie → eksport 24h<br><strong>Sprzedaz brutto:</strong> Allegro → Sprzedaz → podsumowanie<br><strong>Prowizja:</strong> Allegro → Sprzedaz → kolumna prowizja<br><strong>Wyroznienia:</strong> Allegro → Oferty → wyroznienia → suma<br><strong>Dostawa:</strong> Allegro → Centrum Finansow → koszty dostawy<br><strong>SS / Qlt:</strong> Allegro → Oceny i jakosc → status<br><br>Dane za dzien N wpisujesz w dniu N+1 (rano, przed Cockpitem).'},
+    {name:'Typowy dzien pracy', desc:'<strong>Rano (8:00, 15 min):</strong> Data → Cockpit → Dashboard → Insights → odhaczaj taski<br><strong>Tydzien (pn, 1h):</strong> Analiza XLSX → Kanibalizator → Strategy<br><strong>Wieczor (30 min):</strong> Zmiany w Allegro Ads → eksport CSV/PDF → Kalendarz'},
+    {name:'Mapa narzedzi', desc:'<strong>CODZIENNE:</strong> Cockpit → Dashboard → Data → Insights<br><strong>ANALIZA:</strong> Analiza → Kanibalizator → Screener → Strategy<br><strong>RAPORTY:</strong> Agent → Raport MTD → Prezentacja → PDF<br><strong>NARZEDZIA:</strong> Kalkulator → Symulator → Kalendarz → Wiedza<br><br><strong>Przeplyw:</strong> Data (wpis) → Dashboard (przeglad) → Insights (alerty) → Agent (analiza) → Raport (eksport). Wpisujesz raz, widzisz wszedzie.'},
+  ]},
+  { id:'slownik', label:'Slownik pojec', items:[
+    {name:'ROAS (Return on Ad Spend)', desc:'Ile zl sprzedazy generuje 1 zl w Ads. Wzor: Sprzedaz_Ads / Koszt_Ads.<br><br><strong>Progi:</strong> &lt;3x=wylacz | 3-4x=ostrzezenie 7 dni | 4x-BE=optymalizuj | &gt;BE=skaluj | &gt;10x=skaluj agresywnie'},
+    {name:'BE ROAS (Break-Even)', desc:'Minimalny ROAS zeby reklama sie zwrocila. Wzor: 1/(marza/100).<br><strong>MEBLE:</strong> 65% → BE 2.86x | <strong>LUXSEN:</strong> 60% → BE 2.50x | <strong>ONE:</strong> 55% → BE 2.22x<br>Dashboard liczy pelne BE z prowizja, wyroznieniami i dostawa.'},
+    {name:'ACoS (Ad Cost of Sale)', desc:'Procent sprzedazy pochloniety przez Ads. Wzor: Koszt_Ads/Sprzedaz×100%. Cel: &lt;8% MEBLE, &lt;10% LUXSEN. ROAS 7x = ACoS 14.3%.'},
+    {name:'Marza przed / po Ads', desc:'<strong>Przed:</strong> Przychod minus producent, prowizja, dostawa, wyroznienia (BEZ Ads).<br><strong>Po:</strong> Marza przed minus Ads = REALNA rentownosc.<br>Progi: &lt;5% alarm | 5-10% uwaga | &gt;15% zdrowe.'},
+    {name:'MTD / EOM', desc:'<strong>MTD:</strong> Month-to-Date — wyniki od 1. do dzis.<br><strong>EOM:</strong> End of Month — prognoza = MTD/dzien × dni_w_miesiacu.'},
+    {name:'Wyroznienia flat / elastic', desc:'Platna promocja organiczna (NIE Ads). <strong>Flat:</strong> 19.90 zl/10 dni (1.99/dzien). <strong>Elastic:</strong> 2.90/dzien. Flat -34% tansze przy &gt;7 dni. Max 5% sprzedazy.'},
+    {name:'Smart vs DPD', desc:'<strong>Smart</strong> = darmowa dostawa Allegro. Konwertuje 4-7x lepiej. Must-have dla mebli &gt;50 zl.', caseStudy:'MK A/B 30 dni: Smart 2.10% vs DPD 0.46% konwersji. Koszyk 180 zl: 45 vs 10 zamowien.'},
+    {name:'Kanibalizacja', desc:'2-3 konta sprzedaja to samo i konkuruja ze soba → wyzsze CPC, nizszy ROAS. Rozwiazanie: 1 konto = 1 wariant. Kanibalizator wykrywa nakladki.'},
+    {name:'Dynamic CPC', desc:'Domyslna strategia licytacji Allegro Ads. 7 dni nauki. ±2x stawki. 0.80-1.50 zl CPC. 1 aukcja = 1 grupa.'},
+  ]},
+  { id:'allegro', label:'Wiedza Allegro', items:[
+    {name:'Jak dziala ranking Allegro?', desc:'<strong>1.</strong> Trafnosc tytulu<br><strong>2.</strong> Jakosc oferty (zdjecia, opis, parametry)<br><strong>3.</strong> Cena + Smart (darmowa dostawa = bonus)<br><strong>4.</strong> Super Sprzedawca (badge SS)<br><strong>5.</strong> Wyroznienia (organiczna widocznosc)<br><strong>6.</strong> Historia sprzedazy (wiecej sprzedajesz = wyzej)<br><strong>7.</strong> Ads (nad/obok organiku)<br><br>Allegro premiuje oferty ktore SPRZEDAJA. Pierwsze 7-14 dni nowej oferty sa krytyczne.'},
+    {name:'Sezonowosc e-commerce', desc:'<strong>Sty:</strong> Wyprzedaze, niskie marze<br><strong>Lut-mar:</strong> Cisza — testuj<br><strong>Kwi-maj:</strong> Remonty, Dzien Matki 26.05<br><strong>Cze-sie:</strong> Ogrody, wakacje (-ruch)<br><strong>Wrz:</strong> Restart<br><strong>Paz-lis:</strong> Black Friday (25-30% w 4 dni)<br><strong>Gru:</strong> Gwiazdka peak, po 20.12 spadek<br><br><strong>Tydzien:</strong> Pn-wt peak | Pt-sb -20-30% | Nd -40%'},
+    {name:'Best practices Allegro Ads', desc:'<strong>Struktura:</strong> CORE (60% budzetu, Dynamic CPC) + BOOST (30%, bestsellery WL+) + TEST (10%, nowe 14 dni)<br><strong>Budzety:</strong> Cap nie cel. ROAS&lt;3=wylacz. ROAS&gt;10=skaluj +50%. Nie zmieniaj czesciej niz co 7 dni.<br><strong>Wykluczenia:</strong> Bestseller Automat → wyklucz z CORE. CTR&lt;0.5% po 1000 wyswietlen → wylacz fraze.'},
+    {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
+  ]},
+  { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.24 — Info Wiki redesign', desc:'Przebudowa Info: hero headery, search, nawigacja, slownik, wiedza Allegro, onboarding. (25.04.2026)'},
+    {name:'v9.20 — Cockpit layout fix', desc:'Stats/Tasks w lewej kolumnie grida. Koniec z nachodzeniem. (25.04.2026)'},
+    {name:'v9.17 — Cockpit bigger fonts', desc:'Wieksze fonty i padding w Cockpicie + prawej kolumnie. (25.04.2026)'},
+    {name:'v9.14 — Agent dashboard', desc:'Portfolio Pulse 4 KPI, Smart Suggestions, 3-kolumnowy grid. (25.04.2026)'},
+    {name:'v9.13 — Cockpit 10 tasks', desc:'23→10 zadan. max_tokens 8192. JSON recovery. (25.04.2026)'},
+    {name:'v9.12 — Ads period selector', desc:'Dropdown 7d/14d/30d przy uploadzie Ads. (24.04.2026)'},
+    {name:'v8.31 — Redesign UI', desc:'Nowy design calego UI. (22.04.2026)'},
+  ]},
   { id:'main', label:'Core Tools', items:[
     {name:'Cockpit', icon:'cockpit', goto:'dzis', desc:'Centrum dowodzenia dnia. AI generuje 23 spersonalizowanych zadań na podstawie danych 9 kont, bazy Wiedzy i ostatnich zmian. Gamifikacja: checkboxy, progress bar, streak dzienny, timer, "Did You Know" z losowymi insightami. Cache dzienny — generujesz raz, odhaczasz cały dzień. Priorytety: PILNE (czerwone), WAŻNE (żółte), INFO (niebieskie).', steps:['Kliknij ▶ Play w sidebarze (lub Cockpit)','Jeśli brak cache → kliknij "Generuj plan"','AI analizuje dane 9 kont + bazę Wiedzy + ostatnie analizy','Otrzymujesz 23 karty z zadaniami pogrupowane po priorytetach','Odhaczaj zadania klikając kartę — progress bar rośnie','Cel: 100% dziennie. Buduj streak (seria dni).','Opcja: Odśwież plan jeśli zmieniły się dane w ciągu dnia'], useWhen:'Codziennie rano jako pierwsza czynność. Nie pomijaj — streak motywuje.', caseStudy:'Poniedziałek rano: otwierasz Cockpit. AI widzi że Semmi miała spadek -25% w piątek i generuje zadanie "Sprawdź kampanie Semmi — spadek sprzedaży. Możliwy problem z CPC." Odhaczasz po sprawdzeniu.'},
     {name:'Dashboard', icon:'dashboard', goto:'dashboard', desc:'Przegląd portfela 9 kont. Każde konto = karta z ROAS AKG, marżą, estymacją EOM. Kolor karty: zielona=rentowne, żółta=optymalizuj, czerwona=interwencja. Widgety: heatmap marż 3×3, ranking, traffic light wyróżnień, wykres bąbelkowy ROAS vs Marża. KPI bar: łączna sprzedaż MTD, ROAS ważony, konta w czerwieni, fee agencji.', steps:['Kliknij Dashboard','KPI bar na górze: sprzedaż, ROAS, konta w czerwieni','Karty kont: kolor = status','Kliknij kartę → szczegóły konta','Scrolluj: heatmap, ranking, traffic light'], useWhen:'Szybki przegląd portfela — które konta wymagają uwagi. Codziennie po wpisaniu danych.', caseStudy:'BOTAVIT czerwona karta (marża -9%, ROAS 1.30x poniżej BE 5.34x). Klikasz → Analysis.'},
@@ -5007,10 +5039,14 @@ const INFO_SECTIONS = [
   ]},
 ];
 
-let _infoActiveSection = 'main';
+let _infoActiveSection = 'start';
 
 // Section metadata for nav icons and descriptions
 const INFO_META = {
+  start:{emoji:'→', desc:'Onboarding, mapa narzedzi, typowy dzien'},
+  slownik:{emoji:'Aa', desc:'ROAS, BE, ACoS, MTD, marza, wyroznienia'},
+  allegro:{emoji:'A', desc:'Ranking, sezonowosc, Ads, tytuly'},
+  changelog:{emoji:'△', desc:'Historia wersji i zmian'},
   main:{emoji:'▣', desc:'Cockpit, Dashboard, Agent, Data'},
   ai:{emoji:'✦', desc:'Analiza AI, Screener, Strategy'},
   meble:{emoji:'◧', desc:'MobelKap, PerfektCiecie, MnC'},
@@ -5033,10 +5069,12 @@ function renderInfoView(){
 
   // Group sections by category
   const groups = [
+    {label:'START', ids:['start','changelog']},
     {label:'NARZEDZIA', ids:['main','ai','tools']},
     {label:'PORTFEL', ids:['meble','konta','konwencja']},
     {label:'ANALITYKA', ids:['analiza','reports','dataops']},
     {label:'PRACA', ids:['workflow','team','reguly']},
+    {label:'WIEDZA', ids:['slownik','allegro']},
     {label:'POMOC', ids:['skroty','faq']},
   ];
 
@@ -22184,7 +22222,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.23</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.24</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25437,7 +25475,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.23 — ALL NEW FEATURES
+// v9.24 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
