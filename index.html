@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.05</title>
+<title>MPlace Hub v9.06</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1607,7 +1607,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.05 — NEW FEATURES CSS ═══ */
+/* ═══ v9.06 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1816,7 +1816,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="login-logo">MPlace <span>Hub</span></div>
     <div class="login-sub">Zaloguj się aby uzyskać dostęp do danych.<br>Synchronizacja między urządzeniami przez Firebase.</div>
     <button class="login-google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.05h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.06h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Zaloguj się przez Google
     </button>
     <div class="login-note">Twoje dane są bezpieczne na Twoim koncie Google.<br>Nikt inny nie ma dostępu.</div>
@@ -1847,7 +1847,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.05</span>
+    <span class="brand-ver">v9.06</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2563,10 +2563,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     </div>
     <div>
       <div class="ca2-tab-bar" id="ca2Tabs">
-        <button class="ca2-tab active" onclick="ca2ShowTab('matrix',this)">Macierz ofert</button>
+        <button class="ca2-tab active" onclick="ca2ShowTab('matrix',this)">Przeglad ofert</button>
         <button class="ca2-tab" onclick="ca2ShowTab('organic',this)">Organika vs Ads</button>
         <button class="ca2-tab" onclick="ca2ShowTab('trends',this)">Trendy 7/14/30</button>
-        <button class="ca2-tab" onclick="ca2ShowTab('cannib',this)">Kanibalizacja</button>
       </div>
       <div id="ca2Content" style="min-height:400px">
         <div style="text-align:center;padding:4rem 2rem;color:var(--text3);font-family:var(--mono);font-size:12px">
@@ -21735,7 +21734,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.05</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.06</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -24980,7 +24979,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.05 — ALL NEW FEATURES
+// v9.06 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
@@ -25920,7 +25919,7 @@ async function exportPDFBranded(containerId, filename) {
     pdf.setTextColor(255, 107, 53);
     pdf.text('MPlace Hub', 10, 10);
     pdf.setTextColor(139, 145, 168);
-    pdf.text(new Date().toLocaleDateString('pl-PL') + ' · v9.05', pageW - 10, 10, { align: 'right' });
+    pdf.text(new Date().toLocaleDateString('pl-PL') + ' · v9.06', pageW - 10, 10, { align: 'right' });
 
     // Content
     const imgW = pageW - 20;
@@ -26414,16 +26413,6 @@ function ca2RenderTab(tab) {
     html += '</tbody></table></div>';
     content.innerHTML = html;
 
-  } else if (tab === 'cannib') {
-    content.innerHTML = `<div style="text-align:center;padding:3rem">
-      <div style="font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:1rem">Kanibalizacja cross-account</div>
-      <div style="font-family:var(--sans);font-size:13px;color:var(--text2);line-height:1.8">
-        Upload katalogi dla wszystkich 3 kont MEBLE<br>
-        (MobelKap + PerfektCiecie + MeblenaCzasie)<br>
-        zeby wykryc nakladajace sie oferty.<br><br>
-        <button class="btn" onclick="showView('kanibalizator')">Otworz Kanibalizator</button>
-      </div>
-    </div>`;
   }
 }
 
