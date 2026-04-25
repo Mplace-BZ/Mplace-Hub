@@ -6,9 +6,9 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.18</title>
+<title>MPlace Hub v9.19</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -77,6 +77,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .mp-sidebar-foot .icon-btn{background:none;border:1px solid var(--border);border-radius:6px;width:28px;height:28px;display:grid;place-items:center;cursor:pointer;color:var(--text3);transition:all .15s}
 .mp-sidebar-foot .icon-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
 /* body offset for sidebar (applied via JS on login) */
+#mpSidebarBackdrop{position:fixed;inset:0;z-index:109;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);display:none;transition:opacity .25s}
+#mpSidebarBackdrop.open{display:block}
 /* ── TOPBAR (new: breadcrumb + accounts + right) ── */
 .mp-topbar{position:sticky;top:0;z-index:100;background:rgba(10,10,12,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 20px;height:52px;overflow-x:auto}
 .mp-crumbs{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0;margin-right:12px}
@@ -1644,7 +1646,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.18 — NEW FEATURES CSS ═══ */
+/* ═══ v9.19 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1815,6 +1817,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .mp-sidebar{width:100%!important;transform:translateX(-100%);transition:transform .25s}
   .mp-sidebar.mobile-open{transform:translateX(0)}
   body{padding-left:0!important}
+  body.sidebar-open{overflow:hidden!important}
   .mp-topbar{left:0!important;padding-left:50px!important}
   .mp-accounts{display:none!important}
   .data-layout{grid-template-columns:1fr!important}
@@ -1827,6 +1830,58 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .ch-calendar{grid-template-columns:repeat(7,1fr)}
   .mom-row{flex-wrap:wrap;gap:4px}
   .mp-mobile-toggle{display:flex!important}
+  /* Cockpit / viewDzis */
+  .page-header{flex-direction:column!important;gap:12px!important}
+  .page-header [style*="margin-top:40px"]{margin-top:0!important}
+  #viewDzis [style*="grid-template-columns:1fr 400px"]{grid-template-columns:1fr!important}
+  #viewDzis [style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr!important}
+  #viewDzis [style*="position:sticky"]{position:static!important}
+  #viewDzis [style*="display:flex;gap:6px"]{flex-wrap:wrap!important}
+  /* Dashboard */
+  .dashboard-row-2col{grid-template-columns:1fr!important}
+  /* Agent chat */
+  .agent-chat-body{max-height:50vh;padding:10px}
+  .agent-bubble-user .agent-bubble-content{max-width:90%}
+  .agent-input-bar textarea{min-height:60px;font-size:13px}
+  /* Kanibalizator */
+  #viewKanibalizator [style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr!important}
+  #viewKanibalizator textarea{min-height:100px!important}
+  /* Input fields */
+  .aec-prod input{width:56px!important;font-size:12px!important}
+}
+/* ── 600px: tablet-to-phone ── */
+@media(max-width:600px){
+  .kpi-summary-bar{grid-template-columns:1fr 1fr!important}
+  #viewAnaliza [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+  #viewAnaliza [style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr!important}
+  #viewScreener [style*="grid-template-columns"]{grid-template-columns:1fr!important}
+}
+/* ── 480px: small phone ── */
+@media(max-width:480px){
+  .container{padding:.5rem .5rem 2rem!important}
+  .mp-topbar{padding:0 8px!important;height:44px!important;padding-left:44px!important}
+  .mp-crumbs{font-size:10px}
+  .mp-topbar-right{gap:4px}
+  .mp-topbar-right .icon-btn{width:28px;height:28px}
+  .mp-status-pill{font-size:9px;padding:2px 6px}
+  .agent-pulse{grid-template-columns:1fr!important;gap:.4rem}
+  .agent-pulse-card{display:flex;align-items:center;gap:.75rem;padding:.6rem .8rem}
+  .agent-pulse-val{font-size:18px}
+  .agent-pb-grid{grid-template-columns:1fr!important}
+  .agent-pb-btn{font-size:13px;padding:8px 12px}
+  .kpi-value{font-size:18px}
+  .kpi-tile{padding:10px 14px}
+  #viewDzis [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+  #viewKanibalizator [style*="justify-content:flex-end"]{justify-content:center!important}
+}
+/* ── 375px: iPhone SE/mini ── */
+@media(max-width:375px){
+  .kpi-summary-bar{grid-template-columns:1fr!important}
+  .traffic-grid{grid-template-columns:1fr 1fr!important}
+  .heatmap-grid{grid-template-columns:1fr 1fr!important}
+  .day-wrap input{width:30px!important;font-size:11px!important}
+  .aec-prod input{width:48px!important;font-size:11px!important}
+  .ph-title{font-size:22px!important}
 }
 .mp-mobile-toggle{display:none;position:fixed;top:10px;left:10px;z-index:111;width:36px;height:36px;border-radius:8px;background:var(--bg2);border:1px solid var(--border2);align-items:center;justify-content:center;cursor:pointer;color:var(--text)}
 </style>
@@ -1853,7 +1908,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="login-logo">MPlace <span>Hub</span></div>
     <div class="login-sub">Zaloguj się aby uzyskać dostęp do danych.<br>Synchronizacja między urządzeniami przez Firebase.</div>
     <button class="login-google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.18h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.19h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Zaloguj się przez Google
     </button>
     <div class="login-note">Twoje dane są bezpieczne na Twoim koncie Google.<br>Nikt inny nie ma dostępu.</div>
@@ -1870,6 +1925,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 </div>
 
 <!-- ═══ SIDEBAR (redesign shell) ═══ -->
+<div id="mpSidebarBackdrop" onclick="mpToggleSidebar(true)"></div>
 <aside class="mp-sidebar" id="mpSidebar" style="display:none">
   <div class="mp-sidebar-brand">
     <div class="brand-mark">
@@ -1884,7 +1940,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.18</span>
+    <span class="brand-ver">v9.19</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -4513,6 +4569,8 @@ function calc(d, producent){
 // ═══════════════════════════════════════════════════════════
 let acCharts={};
 function showView(v){
+  // Close mobile sidebar if open
+  if(window.innerWidth<=700 && typeof mpToggleSidebar==='function') mpToggleSidebar(true);
   // Gate: only owner can access views. Worker uses zmWorkerShowView, others see nothing.
   if(userRole !== 'owner'){
     // Hide ALL views defensively
@@ -21988,7 +22046,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.18</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.19</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25233,7 +25291,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.18 — ALL NEW FEATURES
+// v9.19 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
@@ -27140,9 +27198,18 @@ self.addEventListener('fetch', e => e.respondWith(
 
 
 <!-- ═══ MOBILE SIDEBAR TOGGLE ═══ -->
-<button class="mp-mobile-toggle" id="mpMobileToggle" onclick="document.getElementById('mpSidebar').classList.toggle('mobile-open')">
+<button class="mp-mobile-toggle" id="mpMobileToggle" onclick="mpToggleSidebar()">
   <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4H14M2 8H14M2 12H14"/></svg>
 </button>
+<script>
+function mpToggleSidebar(forceClose){
+  var sb=document.getElementById('mpSidebar'),bd=document.getElementById('mpSidebarBackdrop');
+  if(!sb)return;
+  var isOpen=sb.classList.contains('mobile-open');
+  if(forceClose||isOpen){sb.classList.remove('mobile-open');if(bd)bd.classList.remove('open');document.body.classList.remove('sidebar-open')}
+  else{sb.classList.add('mobile-open');if(bd)bd.classList.add('open');document.body.classList.add('sidebar-open')}
+}
+</script>
 
 <!-- ═══ NOTIFICATION PANEL ═══ -->
 <div id="notifBackdrop" onclick="bellClose()"></div>
