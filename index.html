@@ -6,7 +6,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
 <title>MPlace Hub v9.23</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -1862,6 +1862,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .mp-sidebar.show-all .mp-desk{display:flex!important}
   .mp-sidebar.show-all .mp-nav-group.mp-desk{display:block!important}
   .mp-mob-toggle-all{display:flex!important}
+  .mp-bottom-nav{display:flex!important}
+  .container{padding-bottom:80px!important}
+  .voice-hub{bottom:70px!important}
+  .mp-mobile-toggle{left:max(10px,env(safe-area-inset-left,10px))}
+  .mp-topbar{padding-left:max(50px,calc(40px + env(safe-area-inset-left,0px)))!important}
   /* Cockpit / viewDzis */
   .page-header{flex-direction:column!important;gap:12px!important}
   .page-header [style*="margin-top:40px"]{margin-top:0!important}
@@ -1916,6 +1921,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   .ph-title{font-size:22px!important}
 }
 .mp-mobile-toggle{display:none;position:fixed;top:10px;left:10px;z-index:111;width:36px;height:36px;border-radius:8px;background:var(--bg2);border:1px solid var(--border2);align-items:center;justify-content:center;cursor:pointer;color:var(--text)}
+.mp-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:105;background:rgba(10,10,12,.95);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px));justify-content:space-around;align-items:center}
+.mp-bottom-nav button{background:none;border:none;color:var(--text3);font-family:var(--mono);font-size:9px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 8px;cursor:pointer;transition:color .15s}
+.mp-bottom-nav button.active{color:var(--accent)}
+.mp-bottom-nav button svg{width:20px;height:20px}
+.scr-cam-btn{background:none;border:1px solid var(--border);border-radius:6px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;color:var(--text3);flex-shrink:0;transition:all .15s}
+.scr-cam-btn:hover{background:var(--bg3);color:#e879f9;border-color:rgba(232,121,249,.4)}
 .mp-mob-toggle-all{display:none;align-items:center;gap:6px;padding:6px 10px;margin:4px 10px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s}
 .mp-mob-toggle-all:hover{background:var(--bg3);color:var(--text)}
 .mp-mob-toggle-all .ico{font-size:12px;transition:transform .2s}
@@ -3648,7 +3659,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
     <div id="scrImagePreview" style="display:none;padding:8px 12px;border-bottom:1px solid var(--border)"></div>
     <div style="padding:10px 12px;display:flex;gap:8px;align-items:flex-end">
-      <textarea id="scrInput" rows="6" placeholder="Wklej screenshot (Ctrl+V), wgraj XLSX (📂 powyżej) lub napisz pytanie... (Cmd+Enter = wyślij)" style="flex:1;background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;line-height:1.4;min-height:80px"></textarea>
+      <input type="file" id="scrCamInput" accept="image/*" capture="environment" style="display:none" onchange="scrAddCamImage(this)">
+      <button onclick="document.getElementById('scrCamInput').click()" class="scr-cam-btn" title="Zrob zdjecie lub wybierz obraz">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3L4.5 4.5H2.5C1.95 4.5 1.5 4.95 1.5 5.5V12C1.5 12.55 1.95 13 2.5 13H13.5C14.05 13 14.5 12.55 14.5 12V5.5C14.5 4.95 14.05 4.5 13.5 4.5H11.5L10.5 3H5.5Z"/><circle cx="8" cy="8.5" r="2.5"/></svg>
+      </button>
+      <textarea id="scrInput" rows="6" placeholder="Wklej screenshot (Ctrl+V), zrob zdjecie (📷) lub napisz pytanie... (Cmd+Enter = wyślij)" style="flex:1;background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;line-height:1.4;min-height:80px"></textarea>
       <button onclick="scrSend()" style="font-family:var(--mono);font-size:11px;padding:8px 16px;border-radius:6px;border:1px solid rgba(232,121,249,.4);background:rgba(232,121,249,.12);color:#e879f9;cursor:pointer;white-space:nowrap;flex-shrink:0">Wyślij</button>
     </div>
   </div>
@@ -4634,6 +4649,7 @@ function showView(v){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   // Highlight sidebar item + update breadcrumb (AFTER reset)
   mpHighlightSidebar(v);
+  document.querySelectorAll('.mp-bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
   const _navDzis = document.getElementById('navDzis');
   const _navCB = document.getElementById('navCrossBorder');
   if (_navDzis) _navDzis.style.boxShadow='0 0 6px rgba(239,68,68,.4)';
@@ -22809,6 +22825,14 @@ document.addEventListener('paste', async function(e) {
   }
 });
 
+async function scrAddCamImage(input){
+  if(!input.files||!input.files[0])return;
+  const resized = await aaResizeImage(input.files[0], 1024);
+  window._scrImages.push(resized);
+  scrRenderImagePreviews();
+  input.value='';
+}
+
 function scrRenderImagePreviews() {
   const preview = document.getElementById('scrImagePreview');
   if (!preview) return;
@@ -25428,8 +25452,8 @@ function saveNotifications(arr) {
 }
 
 function bellOpen() {
-  generateAlerts();
-  renderNotifications();
+  try { generateAlerts(); } catch(e) { console.error('[bell] generateAlerts', e); }
+  try { renderNotifications(); } catch(e) { console.error('[bell] renderNotifications', e); }
   document.getElementById('notifPanel').classList.add('open');
   document.getElementById('notifBackdrop').classList.add('open');
 }
@@ -25550,7 +25574,7 @@ function renderNotifications() {
   const filtered = _notifFilter === 'all' ? notifs : notifs.filter(n => n.type === _notifFilter);
   const list = document.getElementById('notifList');
   if (!filtered.length) {
-    list.innerHTML = '<div class="notif-empty">Brak powiadomien' + (_notifFilter !== 'all' ? ' w tej kategorii' : '') + '.</div>';
+    list.innerHTML = '<div class="notif-empty">' + (_notifFilter !== 'all' ? 'Brak powiadomien w tej kategorii.' : 'Brak powiadomien.<br><span style="font-size:11px;color:var(--text3);margin-top:6px;display:block">Wpisz dane sprzedazowe w zakladce Data — alerty ROAS, marzy i sprzedazy pojawia sie automatycznie.</span>') + '</div>';
     return;
   }
   list.innerHTML = filtered.map((n, i) => `
@@ -27663,6 +27687,30 @@ function mpToggleSidebar(forceClose){
   </button>
 </div>
 <div class="voice-transcript-preview" id="voiceTranscript"></div>
+<!-- ═══ BOTTOM NAV (mobile only) ═══ -->
+<nav class="mp-bottom-nav" id="mpBottomNav">
+  <button onclick="showView('dzis')" data-v="dzis">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.5"/><path d="M10 6V10L12.5 11.5"/></svg>
+    Cockpit
+  </button>
+  <button onclick="showView('dashboard')" data-v="dashboard">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="5.5" height="6" rx="1"/><rect x="11.5" y="3" width="5.5" height="3.5" rx="1"/><rect x="3" y="11.5" width="5.5" height="3.5" rx="1"/><rect x="11.5" y="9" width="5.5" height="6" rx="1"/></svg>
+    Dashboard
+  </button>
+  <button onclick="showView('agent')" data-v="agent">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14L3 6C3 4.9 3.9 4 5 4H15C16.1 4 17 4.9 17 6V11C17 12.1 16.1 13 15 13H7L3 16Z"/></svg>
+    Agent
+  </button>
+  <button onclick="showView('screener')" data-v="screener">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5L4 5H2.5C1.95 5 1.5 5.45 1.5 6V15C1.5 15.55 1.95 16 2.5 16H17.5C18.05 16 18.5 15.55 18.5 15V6C18.5 5.45 18.05 5 17.5 5H16L15 3.5H5Z"/><circle cx="10" cy="10.5" r="3.5"/></svg>
+    Screener
+  </button>
+  <button onclick="showView('podcasts')" data-v="podcasts">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15V10C7 7.24 8.34 5 10 5S13 7.24 13 10V15"/><path d="M4 11C4 7.69 6.69 5 10 5S16 7.69 16 11"/><circle cx="7" cy="15" r="1.5"/><circle cx="13" cy="15" r="1.5"/></svg>
+    Podcasts
+  </button>
+</nav>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 </body>
 </html>
