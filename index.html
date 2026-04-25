@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.07</title>
+<title>MPlace Hub v9.08</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1607,7 +1607,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.07 — NEW FEATURES CSS ═══ */
+/* ═══ v9.08 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1816,7 +1816,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="login-logo">MPlace <span>Hub</span></div>
     <div class="login-sub">Zaloguj się aby uzyskać dostęp do danych.<br>Synchronizacja między urządzeniami przez Firebase.</div>
     <button class="login-google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.07h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.08h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Zaloguj się przez Google
     </button>
     <div class="login-note">Twoje dane są bezpieczne na Twoim koncie Google.<br>Nikt inny nie ma dostępu.</div>
@@ -1847,7 +1847,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.07</span>
+    <span class="brand-ver">v9.08</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2516,9 +2516,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewCentrum">
 <div class="container" style="max-width:1320px">
   <div class="ph">
-    <div class="ph-eyebrow">▸ Centrum Analityczne v2</div>
-    <div class="ph-title" style="font-size:28px">Katalog + Ads + Ruch</div>
-    <div class="ph-sub" id="ca2Sub">Upload katalogu ofert, 3 cykle Ads, ruch organiczny vs platny</div>
+    <div class="ph-eyebrow">▸ Przeglad ofert</div>
+    <div class="ph-title" style="font-size:28px">Oferty x Ads x Ruch</div>
+    <div class="ph-sub" id="ca2Sub">Wgraj pliki Allegro — system sam rozpozna typ i przeanalizuje</div>
   </div>
   <div class="ca2-layout">
     <div class="ca2-sidebar">
@@ -2526,39 +2526,26 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <select id="ca2Konto" onchange="ca2SelectKonto(this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:8px;color:var(--text);font-family:var(--mono);font-size:12px">
         <option value="">-- wybierz --</option>
       </select>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-top:1rem;margin-bottom:.5rem">2. Upload plikow</div>
-      <div class="ca2-upload-zone" id="ca2CatalogZone" onclick="document.getElementById('ca2CatalogFile').click()">
-        <div class="ca2-upload-icon">&#128196;</div>
-        <div class="ca2-upload-label">Katalog ofert (XLSX)</div>
-        <input type="file" id="ca2CatalogFile" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleCatalog(this)">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-top:1rem;margin-bottom:.5rem">2. Wgraj pliki (auto-detekcja)</div>
+      <div class="ca2-upload-zone" id="ca2Slot1Zone" onclick="document.getElementById('ca2Slot1File').click()">
+        <div class="ca2-upload-icon" style="font-size:16px">1</div>
+        <div class="ca2-upload-label" id="ca2Slot1Label">Ads / Odwiedziny / Sprzedaz</div>
+        <input type="file" id="ca2Slot1File" accept=".xlsx,.xls" style="display:none" onchange="ca2SmartUpload(this,0)">
       </div>
-      <div class="ca2-upload-zone" id="ca2Ads7Zone" onclick="document.getElementById('ca2Ads7File').click()">
-        <div class="ca2-upload-icon">7d</div>
-        <div class="ca2-upload-label">Ads 7 dni</div>
-        <input type="file" id="ca2Ads7File" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleAds(this,'7d')">
+      <div class="ca2-upload-zone" id="ca2Slot2Zone" onclick="document.getElementById('ca2Slot2File').click()">
+        <div class="ca2-upload-icon" style="font-size:16px">2</div>
+        <div class="ca2-upload-label" id="ca2Slot2Label">Ads / Odwiedziny / Sprzedaz</div>
+        <input type="file" id="ca2Slot2File" accept=".xlsx,.xls" style="display:none" onchange="ca2SmartUpload(this,1)">
       </div>
-      <div class="ca2-upload-zone" id="ca2Ads14Zone" onclick="document.getElementById('ca2Ads14File').click()">
-        <div class="ca2-upload-icon">14d</div>
-        <div class="ca2-upload-label">Ads 14 dni</div>
-        <input type="file" id="ca2Ads14File" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleAds(this,'14d')">
+      <div class="ca2-upload-zone" id="ca2Slot3Zone" onclick="document.getElementById('ca2Slot3File').click()">
+        <div class="ca2-upload-icon" style="font-size:16px">3</div>
+        <div class="ca2-upload-label" id="ca2Slot3Label">Ads / Odwiedziny / Sprzedaz</div>
+        <input type="file" id="ca2Slot3File" accept=".xlsx,.xls" style="display:none" onchange="ca2SmartUpload(this,2)">
       </div>
-      <div class="ca2-upload-zone" id="ca2Ads30Zone" onclick="document.getElementById('ca2Ads30File').click()">
-        <div class="ca2-upload-icon">30d</div>
-        <div class="ca2-upload-label">Ads 30 dni</div>
-        <input type="file" id="ca2Ads30File" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleAds(this,'30d')">
-      </div>
-      <div class="ca2-upload-zone" id="ca2SalesZone" onclick="document.getElementById('ca2SalesFile').click()">
-        <div class="ca2-upload-icon">&#9733;</div>
-        <div class="ca2-upload-label">Odwiedziny wg ofert</div>
-        <input type="file" id="ca2SalesFile" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleSales(this)">
-      </div>
-      <div class="ca2-upload-zone" id="ca2KonwZone" onclick="document.getElementById('ca2KonwFile').click()">
-        <div class="ca2-upload-icon">&#9733;</div>
-        <div class="ca2-upload-label">Sprzedaz wg ofert</div>
-        <input type="file" id="ca2KonwFile" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleKonwersja(this)">
-      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.6;margin-top:.35rem">System sam rozpoznaje: Statystyki=Ads, Odwiedziny wg ofert=Ruch, Wg ofert=Sprzedaz. Wgraj od 1 do 3 plikow w dowolnej kolejnosci.</div>
       <div class="ca2-catalog-stats" id="ca2Stats" style="display:none"></div>
       <button class="btn primary" onclick="ca2Analyze()" style="width:100%;margin-top:.75rem">Analizuj</button>
+      <button class="btn" onclick="ca2AskAgent()" style="width:100%;border-color:rgba(52,211,153,.4);color:#34d399">Zapytaj Agenta</button>
       <button class="btn" onclick="ca2Save()" style="width:100%;border-color:rgba(45,212,160,.4);color:var(--green)">Zapisz</button>
       <button class="btn" onclick="ca2Clear()" style="width:100%">Wyczysc</button>
       <div id="ca2SavedList" style="margin-top:.75rem"></div>
@@ -10196,7 +10183,7 @@ const MP_NAV = [
     { k:'arkusz',        id:'navSbSheet',     label:'Sheet',     icon:'sheet' },
   ]},
   { group:'Operacyjne', items:[
-    { k:'centrum',       id:'navSbCentrum',   label:'Centrum v2', icon:'eye' },
+    { k:'centrum',       id:'navSbCentrum',   label:'Przeglad ofert', icon:'eye' },
     { k:'centrumads',    id:'navSbAds',       label:'Ads Hub',   icon:'ads' },
     { k:'analiza',       id:'navSbAnaliza',   label:'Analysis',  icon:'screener' },
     { k:'kanibalizator', id:'navSbPromos',    label:'Promos',    icon:'spark' },
@@ -21736,7 +21723,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.07</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.08</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -24981,7 +24968,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.07 — ALL NEW FEATURES
+// v9.08 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
@@ -25921,7 +25908,7 @@ async function exportPDFBranded(containerId, filename) {
     pdf.setTextColor(255, 107, 53);
     pdf.text('MPlace Hub', 10, 10);
     pdf.setTextColor(139, 145, 168);
-    pdf.text(new Date().toLocaleDateString('pl-PL') + ' · v9.07', pageW - 10, 10, { align: 'right' });
+    pdf.text(new Date().toLocaleDateString('pl-PL') + ' · v9.08', pageW - 10, 10, { align: 'right' });
 
     // Content
     const imgW = pageW - 20;
@@ -26008,83 +25995,148 @@ async function _ca2EnsureXLSX() {
   });
 }
 
-async function ca2HandleCatalog(input) {
-  if (!input.files[0]) return;
-  const zone = document.getElementById('ca2CatalogZone');
-  zone.classList.add('has-file');
-  zone.querySelector('.ca2-upload-label').textContent = input.files[0].name;
-  await _ca2EnsureXLSX();
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      ca2Data.catalog = XLSX.utils.sheet_to_json(ws, { header: 1 });
-      ca2UpdateStats();
-    } catch(err) { alert('Blad parsowania katalogu: ' + err.message); }
-  };
-  reader.readAsArrayBuffer(input.files[0]);
-}
+// Smart upload — auto-detect file type from sheet names
+let _ca2SlotFiles = [null, null, null]; // track what each slot holds
 
-async function ca2HandleAds(input, period) {
+async function ca2SmartUpload(input, slotIdx) {
   if (!input.files[0]) return;
-  const pKey = period.replace('d','');
-  const zoneId = 'ca2Ads' + pKey + 'Zone';
-  const zone = document.getElementById(zoneId);
-  if (zone) { zone.classList.add('has-file'); zone.querySelector('.ca2-upload-label').textContent = input.files[0].name; }
+  const file = input.files[0];
+  const zone = document.getElementById('ca2Slot' + (slotIdx+1) + 'Zone');
+  const label = document.getElementById('ca2Slot' + (slotIdx+1) + 'Label');
+
   await _ca2EnsureXLSX();
-  // Use aaParseFile for structured parsing
+
+  // Peek at sheet names to detect type
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(new Uint8Array(buf), { type: 'array', bookSheets: true });
+  const sheets = wb.SheetNames.map(s => s.toLowerCase());
+
+  let detectedType = 'unknown';
+  if (sheets.some(s => s.includes('statystyki'))) detectedType = 'ads';
+  else if (sheets.some(s => s.includes('odwiedziny wg ofert'))) detectedType = 'sprzedaz';
+  else if (sheets.some(s => s.includes('wg ofert') && !s.includes('odwiedziny'))) detectedType = 'konwersja';
+  else detectedType = 'ads'; // fallback: assume Ads
+
+  const typeLabels = { ads: 'Ads (Statystyki)', sprzedaz: 'Odwiedziny wg ofert', konwersja: 'Sprzedaz wg ofert' };
+  zone.classList.add('has-file');
+  label.textContent = file.name;
+  _ca2SlotFiles[slotIdx] = { type: detectedType, file };
+
+  // Show detected type
+  const iconEl = zone.querySelector('.ca2-upload-icon');
+  if (iconEl) {
+    iconEl.textContent = detectedType === 'ads' ? 'ADS' : detectedType === 'sprzedaz' ? 'ODW' : 'SPR';
+    iconEl.style.color = detectedType === 'ads' ? 'var(--accent)' : detectedType === 'sprzedaz' ? 'var(--blue)' : 'var(--green)';
+    iconEl.style.fontSize = '11px';
+  }
+
+  console.log('[Przeglad ofert] Slot', slotIdx+1, '→ detected:', detectedType, '| sheets:', sheets.join(', '));
+
+  // Parse with aaParseFile
   try {
-    const parsed = await aaParseFile(input.files[0], 'ads');
-    ca2Parsed['ads' + pKey] = parsed;
-    ca2Data['ads' + pKey] = true; // flag for stats
+    const parsed = await aaParseFile(file, detectedType);
+    if (detectedType === 'ads') {
+      // Assign to first empty ads slot
+      if (!ca2Parsed.ads7) { ca2Parsed.ads7 = parsed; ca2Data.ads7 = true; }
+      else if (!ca2Parsed.ads14) { ca2Parsed.ads14 = parsed; ca2Data.ads14 = true; }
+      else { ca2Parsed.ads30 = parsed; ca2Data.ads30 = true; }
+    } else if (detectedType === 'sprzedaz') {
+      ca2Parsed.sales = parsed; ca2Data.sales = true;
+    } else if (detectedType === 'konwersja') {
+      ca2Parsed.konwersja = parsed; ca2Data.konwersja = true;
+    }
     ca2UpdateStats();
-    console.log(`[Centrum v2] Ads ${period} parsed:`, parsed.aggregated?.length, 'offers,', parsed.kampanie?.length, 'campaigns');
-  } catch(err) { alert('Blad parsowania Ads ' + period + ': ' + err.message); }
-}
-
-async function ca2HandleSales(input) {
-  if (!input.files[0]) return;
-  const zone = document.getElementById('ca2SalesZone');
-  zone.classList.add('has-file');
-  zone.querySelector('.ca2-upload-label').textContent = input.files[0].name;
-  await _ca2EnsureXLSX();
-  try {
-    const parsed = await aaParseFile(input.files[0], 'sprzedaz');
-    ca2Parsed.sales = parsed;
-    ca2Data.sales = true;
-    console.log('[Centrum v2] Sales parsed:', parsed.oferty?.length, 'offers');
-  } catch(err) { alert('Blad parsowania sprzedazy: ' + err.message); }
-}
-
-async function ca2HandleKonwersja(input) {
-  if (!input.files[0]) return;
-  const zone = document.getElementById('ca2KonwZone');
-  zone.classList.add('has-file');
-  zone.querySelector('.ca2-upload-label').textContent = input.files[0].name;
-  await _ca2EnsureXLSX();
-  try {
-    const parsed = await aaParseFile(input.files[0], 'konwersja');
-    ca2Parsed.konwersja = parsed;
-    ca2Data.konwersja = true;
-    console.log('[Centrum v2] Konwersja parsed:', parsed.oferty?.length, 'offers');
-  } catch(err) { alert('Blad parsowania sprzedazy wg ofert: ' + err.message); }
+  } catch(err) {
+    console.error('[Przeglad ofert] Parse error:', err);
+    label.textContent = 'Blad: ' + err.message;
+    zone.style.borderColor = 'var(--red)';
+  }
 }
 
 function ca2UpdateStats() {
   const el = document.getElementById('ca2Stats');
   if (!el) return;
-  const hasCat = ca2Data.catalog && ca2Data.catalog.length > 1;
-  const catCount = hasCat ? ca2Data.catalog.length - 1 : 0;
-  const ads7n = ca2Parsed.ads7 ? ca2Parsed.ads7.aggregated.length : 0;
-  const ads14n = ca2Parsed.ads14 ? ca2Parsed.ads14.aggregated.length : 0;
-  const ads30n = ca2Parsed.ads30 ? ca2Parsed.ads30.aggregated.length : 0;
-  el.style.display = 'grid';
-  el.innerHTML = `
-    <div class="ca2-stat"><div class="ca2-stat-val">${catCount}</div><div class="ca2-stat-label">Katalog</div></div>
-    <div class="ca2-stat"><div class="ca2-stat-val">${ads7n||'—'}</div><div class="ca2-stat-label">Ads 7d</div></div>
-    <div class="ca2-stat"><div class="ca2-stat-val">${ads14n||'—'}</div><div class="ca2-stat-label">Ads 14d</div></div>
-    <div class="ca2-stat"><div class="ca2-stat-val">${ads30n||'—'}</div><div class="ca2-stat-label">Ads 30d</div></div>`;
+  const parts = [];
+  if (ca2Parsed.ads7) parts.push('Ads: ' + ca2Parsed.ads7.aggregated.length + ' ofert');
+  if (ca2Parsed.ads14) parts.push('Ads 2: ' + ca2Parsed.ads14.aggregated.length);
+  if (ca2Parsed.ads30) parts.push('Ads 3: ' + ca2Parsed.ads30.aggregated.length);
+  if (ca2Parsed.sales) parts.push('Odwiedziny: ' + (ca2Parsed.sales.totalCount || ca2Parsed.sales.oferty?.length || 0));
+  if (ca2Parsed.konwersja) parts.push('Sprzedaz: ' + (ca2Parsed.konwersja.oferty?.length || 0));
+  if (!parts.length) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.style.gridTemplateColumns = '1fr';
+  el.innerHTML = `<div class="ca2-stat" style="text-align:left;padding:.5rem .75rem"><div class="ca2-stat-label" style="text-align:left;font-size:10px">${parts.join(' · ')}</div></div>`;
+}
+
+// Agent integration
+function ca2AskAgent() {
+  const sel = document.getElementById('ca2Konto');
+  if (sel && sel.value) ca2Data.konto = sel.value;
+  const kName = AC_META[ca2Data.konto]?.name || ca2Data.konto;
+  if (!kName) { alert('Wybierz konto'); return; }
+
+  const offers = _ca2BuildOfferMap();
+  if (!offers.length) { alert('Wgraj pliki i kliknij Analizuj'); return; }
+
+  // Build context summary for Agent
+  const organic = offers.filter(o => _ca2TrafficType(o) === 'organic');
+  const paid = offers.filter(o => _ca2TrafficType(o) === 'paid');
+  const mixed = offers.filter(o => _ca2TrafficType(o) === 'mixed');
+  const dead = offers.filter(o => _ca2TrafficType(o) === 'dead');
+  const adsOffers = offers.filter(o => o.ads7 || o.ads14 || o.ads30);
+  const beRoas = calc({sprzedaz:1}, getProd(ca2Data.konto||'MobelKap')).beRoasAds || 4;
+
+  // Top 10 by ads cost
+  const topCost = [...adsOffers].sort((a,b) => ((b.ads30||b.ads14||b.ads7)?.koszt||0) - ((a.ads30||a.ads14||a.ads7)?.koszt||0)).slice(0,10);
+  // Below BE
+  const belowBE = adsOffers.filter(o => { const ads = o.ads30||o.ads14||o.ads7; return ads && ads.koszt > 5 && ads.roas < beRoas; });
+
+  let ctx = `PRZEGLAD OFERT — ${kName}\n`;
+  ctx += `Oferty total: ${offers.length} | Organika: ${organic.length} | Ads: ${paid.length} | Mix: ${mixed.length} | Martwe: ${dead.length}\n`;
+  ctx += `BE ROAS: ${beRoas.toFixed(2)}\n\n`;
+  ctx += `TOP 10 wg kosztu Ads:\n`;
+  topCost.forEach(o => {
+    const ads = o.ads30||o.ads14||o.ads7;
+    ctx += `  [${o.id}] ${o.title} — koszt ${Math.round(ads.koszt)} zl, sprzedaz ${Math.round(ads.sprzedaz)} zl, ROAS ${ads.roas.toFixed(2)}x\n`;
+  });
+  if (belowBE.length) {
+    ctx += `\nPONIZEJ BE ROAS (${belowBE.length} ofert):\n`;
+    belowBE.slice(0,10).forEach(o => {
+      const ads = o.ads30||o.ads14||o.ads7;
+      ctx += `  [${o.id}] ${o.title} — ROAS ${ads.roas.toFixed(2)}x vs BE ${beRoas.toFixed(2)}x, koszt ${Math.round(ads.koszt)} zl\n`;
+    });
+  }
+
+  showView('agent');
+  setTimeout(() => {
+    const input = document.getElementById('agentInput');
+    if (input) {
+      input.value = `Na podstawie przegladu ofert konta ${kName}:\n\n${ctx}\n\nPrzeanalizuj i daj rekomendacje: ktore oferty wylaczyc z Ads, ktore skalowac, ktore zostawic na organice. Format: tabela z akcjami.`;
+      input.focus();
+    }
+  }, 200);
+}
+
+function _ca2ButtonBar() {
+  return `<div style="display:flex;gap:6px;margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border);flex-wrap:wrap">
+    <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('ca2Content').innerText).then(()=>alert('Skopiowano'))">Kopiuj</button>
+    <button class="btn" onclick="printDiv('ca2Content')">Drukuj</button>
+    <button class="btn" onclick="exportPDFBranded('ca2Content','Przeglad_ofert_'+(AC_META[ca2Data.konto]?.name||''))">PDF</button>
+    <button class="btn" onclick="ca2AskAgent()">Zapytaj Agenta</button>
+    <button class="btn" onclick="ca2ExportHTML()">Pobierz HTML</button>
+  </div>`;
+}
+
+function ca2ExportHTML() {
+  const content = document.getElementById('ca2Content');
+  if (!content) return;
+  const kName = AC_META[ca2Data.konto]?.name || '';
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Przeglad ofert — ' + kName + '</title><style>body{background:#0b0d14;color:#e9ebf2;font-family:sans-serif;padding:2rem}table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}th{color:#8b91a8}</style></head><body>' + content.innerHTML + '</body></html>';
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Przeglad_ofert_' + kName.replace(/\s/g, '_') + '_' + new Date().toLocaleDateString('pl-PL').replace(/\./g, '-') + '.html';
+  a.click();
 }
 
 function ca2ShowTab(tab, btn) {
@@ -26278,6 +26330,7 @@ function ca2RenderTab(tab) {
 
     html += '</tbody></table></div>';
     if (sorted.length > 150) html += `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:.5rem;text-align:center">Pokazano 150 / ${sorted.length}</div>`;
+    html += _ca2ButtonBar();
     content.innerHTML = html;
 
   } else if (tab === 'organic') {
@@ -26340,7 +26393,9 @@ function ca2RenderTab(tab) {
     }
 
     if (!withSales.length && !withAds.length) {
-      html = '<div style="text-align:center;padding:3rem;color:var(--text3);font-family:var(--mono);font-size:12px">Wgraj Ads + Sprzedaz/Odwiedziny zeby zobaczyc podzial</div>';
+      html = '<div style="text-align:center;padding:3rem;color:var(--text3);font-family:var(--mono);font-size:12px">Wgraj Ads + Odwiedziny zeby zobaczyc podzial ruchu</div>';
+    } else {
+      html += _ca2ButtonBar();
     }
     content.innerHTML = html;
 
@@ -26414,6 +26469,7 @@ function ca2RenderTab(tab) {
     });
 
     html += '</tbody></table></div>';
+    html += _ca2ButtonBar();
     content.innerHTML = html;
 
   }
@@ -26612,9 +26668,9 @@ function allegroTestConnection() {
 // Add Centrum Analityczne to SMART_TOOLS
 if (typeof SMART_TOOLS !== 'undefined') {
   SMART_TOOLS.push(
-    { id:'centrum', name:'Centrum Analityczne', icon:'screener', view:'centrum',
-      desc:'Katalog ofert + 3 cykle Ads + organika vs Ads',
-      keys:['centrum','analityczne','katalog','oferty','organika','organic','paid','ads cykle','macierz'] },
+    { id:'centrum', name:'Przeglad ofert', icon:'eye', view:'centrum',
+      desc:'Oferty x Ads x Ruch — auto-detekcja plikow, organika vs Ads',
+      keys:['przeglad','oferty','katalog','organika','organic','paid','ads','ruch','odwiedziny'] },
     { id:'notif', name:'Powiadomienia', icon:'bell', view:'_bell',
       desc:'Alerty ROAS, marza, anomalie D2D',
       keys:['powiadomienia','alerty','alert','bell','dzwonek','notyfikacja','notification','uwaga'] },
