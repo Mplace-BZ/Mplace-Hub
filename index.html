@@ -26204,15 +26204,19 @@ async function exportPDFBranded(containerId, filename, title) {
     const element = document.getElementById(containerId);
     if (!element) throw new Error('Element nie znaleziony: ' + containerId);
 
-    // Render light-themed clone in hidden iframe
+    // Render light-themed clone in hidden iframe — auto-height
     const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:1000px;height:10000px;border:none';
+    iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:1000px;border:none';
     document.body.appendChild(iframe);
     const doc = iframe.contentDocument;
     doc.open();
     doc.write(_printCloneHTML(element, title || filename || 'Raport'));
     doc.close();
     await new Promise(r => setTimeout(r, 600));
+    // Set iframe height to actual content height (prevents blank pages)
+    const contentHeight = doc.body.scrollHeight || doc.documentElement.scrollHeight || 2000;
+    iframe.style.height = contentHeight + 'px';
+    await new Promise(r => setTimeout(r, 100));
 
     const canvas = await html2canvas(doc.body, {
       backgroundColor: '#ffffff',
@@ -26220,6 +26224,7 @@ async function exportPDFBranded(containerId, filename, title) {
       useCORS: true,
       logging: false,
       windowWidth: 1000,
+      height: contentHeight,
     });
     document.body.removeChild(iframe);
 
