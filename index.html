@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.14</title>
+<title>MPlace Hub v9.15</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1635,7 +1635,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.14 — NEW FEATURES CSS ═══ */
+/* ═══ v9.15 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1844,7 +1844,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="login-logo">MPlace <span>Hub</span></div>
     <div class="login-sub">Zaloguj się aby uzyskać dostęp do danych.<br>Synchronizacja między urządzeniami przez Firebase.</div>
     <button class="login-google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.14h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.15h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Zaloguj się przez Google
     </button>
     <div class="login-note">Twoje dane są bezpieczne na Twoim koncie Google.<br>Nikt inny nie ma dostępu.</div>
@@ -1875,7 +1875,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.14</span>
+    <span class="brand-ver">v9.15</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2080,18 +2080,18 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div><!-- LEFT COLUMN: kroki dnia -->
 
   <!-- KROK 0: KATALOG OFERT -->
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px">
     <div style="display:flex;align-items:center;justify-content:space-between">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(167,139,250,.35);color:#a78bfa;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(167,139,250,.35)">1</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:44px;height:44px;border-radius:12px;background:var(--bg);border:1px solid rgba(167,139,250,.35);color:#a78bfa;font-family:var(--mono);font-size:18px;display:grid;place-items:center;font-weight:600;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(167,139,250,.35)">1</div>
         <div>
-          <div style="font-size:15px;font-weight:600;color:var(--text)">Katalog ofert <span style="font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">MIESIECZNE</span></div>
-          <div style="font-family:var(--mono);font-size:11px;color:var(--text2)" id="dzisCatalogStatus">upload raz / miesiac · 1 018 ofert zaladowanych</div>
+          <div style="font-size:20px;font-weight:600;color:var(--text)">Katalog ofert <span style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:4px;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);margin-left:8px;letter-spacing:.06em;font-weight:600">MIESIECZNE</span></div>
+          <div style="font-family:var(--mono);font-size:13px;color:var(--text2);margin-top:2px" id="dzisCatalogStatus">upload raz / miesiac · 1 018 ofert zaladowanych</div>
         </div>
       </div>
-      <button onclick="catClearAll()" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Wyczyść</button>
+      <button onclick="catClearAll()" style="font-family:var(--mono);font-size:11px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Wyczyść</button>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px">
       <div onclick="document.getElementById('catF_MobelKap').click()" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer" id="catSlot_MobelKap">
         <input type="file" id="catF_MobelKap" accept=".xlsx,.csv" style="display:none" onchange="catUpload('MobelKap',this)">
         <div style="font-size:12px;font-weight:600;color:var(--text)" id="catN_MobelKap">MobelKap</div>
@@ -2588,7 +2588,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <div style="font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.6;margin-top:.35rem">Katalog = opcjonalny. 3x Ads = trendy. Odwiedziny + Sprzedaz = organika vs Ads.</div>
       <div class="ca2-catalog-stats" id="ca2Stats" style="display:none"></div>
       <button class="btn primary" onclick="ca2Analyze()" style="width:100%;margin-top:.75rem">Analizuj</button>
-      <button class="btn" onclick="ca2AskAgent()" style="width:100%;border-color:rgba(52,211,153,.4);color:#34d399">Zapytaj Agenta</button>
       <button class="btn" onclick="ca2Save()" style="width:100%;border-color:rgba(45,212,160,.4);color:var(--green)">Zapisz</button>
       <button class="btn" onclick="ca2Clear()" style="width:100%">Wyczysc</button>
       <div id="ca2SavedList" style="margin-top:.75rem"></div>
@@ -21980,7 +21979,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.14</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.15</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25225,7 +25224,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.14 — ALL NEW FEATURES
+// v9.15 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
@@ -26137,14 +26136,58 @@ function renderBEOptimizer() {
 }
 
 
-// ── 11. PDF EXPORT WITH BRANDING (LIGHT PRINT THEME) ────────
-const _PRINT_CSS = `body{background:#fff!important;color:#1a1a1a!important;font-family:'DM Sans',sans-serif;padding:24px;font-size:12px;line-height:1.5}*{border-color:#ddd!important}table{border-collapse:collapse;width:100%;margin:8px 0}th{background:#f5f5f5!important;color:#333!important;font-weight:600;padding:8px 10px;text-align:left;font-size:11px;border-bottom:2px solid #ccc!important}td{padding:6px 10px;border-bottom:1px solid #eee!important;font-size:11px;color:#222!important}.ca2-pill{border:1px solid #999!important;background:#f5f5f5!important;color:#333!important}.btn,.ca2-tab,.notif-filter,.agent-history-btn{display:none!important}.ca2-stat,.drill-metric{background:#f5f5f5!important;border:1px solid #ddd!important}.ca2-stat-val,.drill-metric-val{color:#111!important}.ca2-stat-label,.drill-metric-label{color:#666!important}div[style*="background:rgba"],div[style*="background:var(--bg"]{background:transparent!important}span[style*="color:var(--green)"],td[style*="color:var(--green)"],div[style*="color:var(--green)"]{color:#0a8a5a!important}span[style*="color:var(--red)"],td[style*="color:var(--red)"],div[style*="color:var(--red)"]{color:#cc0000!important}span[style*="color:var(--accent)"],td[style*="color:var(--accent)"],div[style*="color:var(--accent)"]{color:#cc5500!important}span[style*="color:var(--yellow)"],td[style*="color:var(--yellow)"],div[style*="color:var(--yellow)"]{color:#aa8800!important}span[style*="color:var(--blue)"],td[style*="color:var(--blue)"],div[style*="color:var(--blue)"]{color:#2255cc!important}span[style*="color:var(--text3)"],td[style*="color:var(--text3)"],div[style*="color:var(--text3)"]{color:#888!important}`;
-
-function _printCloneHTML(el) {
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>MPlace Hub</title><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"><style>${_PRINT_CSS}</style></head><body><div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #cc5500;padding-bottom:8px;margin-bottom:16px"><div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:#cc5500">MPlace Hub</div><div style="font-family:'DM Mono',monospace;font-size:10px;color:#888">${new Date().toLocaleDateString('pl-PL')} · v9.08</div></div>${el.innerHTML}<div style="margin-top:24px;padding-top:8px;border-top:1px solid #ddd;font-family:'DM Mono',monospace;font-size:9px;color:#aaa;display:flex;justify-content:space-between"><span>MPlace Hub · mplace-bz.github.io/Mplace-Hub/</span><span>${new Date().toLocaleString('pl-PL')}</span></div></body></html>`;
+// ── 11. PDF EXPORT — MATCHING REPORT OVERLAY STYLE ──────────
+function _printCloneHTML(el, title) {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('pl-PL');
+  const timeStr = now.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+  const ver = document.querySelector('.brand-ver')?.textContent || 'v9';
+  const reportTitle = title || 'Raport';
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>MPlace Hub — ${reportTitle}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  body{background:#fff;color:#1f2937;font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;max-width:900px;margin:0 auto;padding:2.5rem 3rem 3rem}
+  .rh{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:.85rem;margin-bottom:1.75rem;border-bottom:3px solid #ff6b35}
+  .rh-logo{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#111}.rh-logo span{color:#ff6b35}
+  .rh-meta{text-align:right;font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;line-height:1.8}
+  .rh-tag{display:inline-block;background:#fff7ed;color:#ff6b35;border:1px solid #fdba74;border-radius:4px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;margin-bottom:4px}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin:.5rem 0 1rem}
+  thead th{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#9ca3af;padding:6px 10px;border-bottom:1px solid #e5e7eb;text-align:left;background:#fafafa}
+  tbody tr{border-bottom:1px solid #f3f4f6}
+  tbody td{padding:8px 10px;vertical-align:middle;color:#374151}
+  .sec-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#ff6b35;padding-bottom:.4rem;border-bottom:1px solid #fde8dc;margin:1.5rem 0 .75rem}
+  .rf{margin-top:2.5rem;padding-top:.75rem;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between}
+  .rf-txt{font-family:'DM Mono',monospace;font-size:10px;color:#9ca3af}
+  .btn,.ca2-tab,.notif-filter,.agent-history-btn{display:none!important}
+  .ca2-stat{background:#fafafa;border:1px solid #e5e7eb;border-radius:6px;padding:10px;text-align:center}
+  .ca2-stat-val{color:#111;font-family:'DM Mono',monospace;font-size:18px;font-weight:700}
+  .ca2-stat-label{color:#9ca3af;font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+  .ca2-pill{font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid #e5e7eb;background:#fafafa;color:#6b7280}
+  .ca2-pill.organic{color:#059669;border-color:#a7f3d0;background:#ecfdf5}
+  .ca2-pill.paid{color:#ea580c;border-color:#fdba74;background:#fff7ed}
+  .ca2-pill.mixed{color:#2563eb;border-color:#93c5fd;background:#eff6ff}
+  .ca2-pill.dead{color:#9ca3af;border-color:#e5e7eb;background:#f9fafb}
+  div[style*="background:rgba"],div[style*="background:var(--bg"]{background:transparent!important}
+  span[style*="color:var(--green)"],td[style*="color:var(--green)"],div[style*="color:var(--green)"]{color:#059669!important}
+  span[style*="color:var(--red)"],td[style*="color:var(--red)"],div[style*="color:var(--red)"]{color:#dc2626!important}
+  span[style*="color:var(--accent)"],td[style*="color:var(--accent)"],div[style*="color:var(--accent)"]{color:#ea580c!important}
+  span[style*="color:var(--yellow)"],td[style*="color:var(--yellow)"],div[style*="color:var(--yellow)"]{color:#d97706!important}
+  span[style*="color:var(--blue)"],td[style*="color:var(--blue)"],div[style*="color:var(--blue)"]{color:#2563eb!important}
+  span[style*="color:var(--text3)"],td[style*="color:var(--text3)"],div[style*="color:var(--text3)"]{color:#9ca3af!important}
+  span[style*="color:var(--text2)"],td[style*="color:var(--text2)"]{color:#6b7280!important}
+  span[style*="color:var(--text)"],td[style*="color:var(--text)"]{color:#1f2937!important}
+  @media print{body{padding:1.5rem 2rem}.btn{display:none!important}}
+</style></head><body>
+<div class="rh">
+  <div><div class="rh-logo">M<span>Place</span> Hub</div><div style="font-size:12px;color:#6b7280;margin-top:3px">Raport wewnetrzny · Poufny</div></div>
+  <div class="rh-meta"><div class="rh-tag">${reportTitle}</div><br>Wygenerowano: ${dateStr}, ${timeStr}</div>
+</div>
+${el.innerHTML}
+<div class="rf"><div class="rf-txt">MPlace Hub · Raport wewnetrzny · Poufny</div><div class="rf-txt">${dateStr} · ${ver}</div></div>
+</body></html>`;
 }
 
-async function exportPDFBranded(containerId, filename) {
+async function exportPDFBranded(containerId, filename, title) {
   const progress = document.getElementById('pdfProgress');
   if (progress) { progress.style.display = 'block'; progress.textContent = 'Generowanie PDF...'; }
 
@@ -26158,7 +26201,7 @@ async function exportPDFBranded(containerId, filename) {
     document.body.appendChild(iframe);
     const doc = iframe.contentDocument;
     doc.open();
-    doc.write(_printCloneHTML(element));
+    doc.write(_printCloneHTML(element, title || filename || 'Raport'));
     doc.close();
     await new Promise(r => setTimeout(r, 600));
 
@@ -26209,11 +26252,11 @@ async function exportPDFBranded(containerId, filename) {
   }
 }
 
-function printDiv(elementId) {
+function printDiv(elementId, title) {
   const el = document.getElementById(elementId);
   if (!el) return;
   const w = window.open('', '_blank');
-  w.document.write(_printCloneHTML(el));
+  w.document.write(_printCloneHTML(el, title || 'Raport'));
   w.document.close();
   w.onload = () => { w.focus(); w.print(); };
 }
@@ -26377,11 +26420,11 @@ function ca2AskAgent() {
 }
 
 function _ca2ButtonBar() {
+  const kName = AC_META[ca2Data.konto]?.name || '';
   return `<div style="display:flex;gap:6px;margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border);flex-wrap:wrap">
-    <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('ca2Content').innerText).then(()=>alert('Skopiowano'))">Kopiuj</button>
-    <button class="btn" onclick="printDiv('ca2Content')">Drukuj</button>
-    <button class="btn" onclick="exportPDFBranded('ca2Content','Przeglad_ofert_'+(AC_META[ca2Data.konto]?.name||''))">PDF</button>
-    <button class="btn" onclick="ca2AskAgent()">Zapytaj Agenta</button>
+    <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('ca2Content').innerText).then(()=>{this.textContent='Skopiowano';setTimeout(()=>this.textContent='Kopiuj',1500)})">Kopiuj</button>
+    <button class="btn" onclick="printDiv('ca2Content','Przeglad ofert — ${kName}')">Drukuj</button>
+    <button class="btn" onclick="exportPDFBranded('ca2Content','Przeglad_ofert_${kName.replace(/\\s/g,'_')}')">PDF</button>
     <button class="btn" onclick="ca2ExportHTML()">Pobierz HTML</button>
   </div>`;
 }
@@ -26390,7 +26433,7 @@ function ca2ExportHTML() {
   const content = document.getElementById('ca2Content');
   if (!content) return;
   const kName = AC_META[ca2Data.konto]?.name || '';
-  const html = _printCloneHTML(content);
+  const html = _printCloneHTML(content, 'Przeglad ofert — ' + kName);
   const blob = new Blob([html], { type: 'text/html' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
