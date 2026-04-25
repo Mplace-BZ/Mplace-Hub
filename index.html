@@ -25996,16 +25996,28 @@ function ca2Init() {
   }
 }
 
-function ca2HandleCatalog(input) {
+async function _ca2EnsureXLSX() {
+  if (window.XLSX) return;
+  if (typeof adsLoadSheetJS === 'function') { await adsLoadSheetJS(); return; }
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function ca2HandleCatalog(input) {
   if (!input.files[0]) return;
   const zone = document.getElementById('ca2CatalogZone');
   zone.classList.add('has-file');
   zone.querySelector('.ca2-upload-label').textContent = input.files[0].name;
 
+  await _ca2EnsureXLSX();
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
-      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
       const ws = wb.Sheets[wb.SheetNames[0]];
       ca2Data.catalog = XLSX.utils.sheet_to_json(ws, { header: 1 });
       ca2UpdateStats();
@@ -26014,16 +26026,17 @@ function ca2HandleCatalog(input) {
   reader.readAsArrayBuffer(input.files[0]);
 }
 
-function ca2HandleAds(input, period) {
+async function ca2HandleAds(input, period) {
   if (!input.files[0]) return;
   const zoneId = 'ca2Ads' + period.replace('d', '') + 'Zone';
   const zone = document.getElementById(zoneId);
   if (zone) { zone.classList.add('has-file'); zone.querySelector('.ca2-upload-label').textContent = input.files[0].name; }
 
+  await _ca2EnsureXLSX();
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
-      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
       const ws = wb.Sheets[wb.SheetNames[0]];
       ca2Data['ads' + period.replace('d', '')] = XLSX.utils.sheet_to_json(ws, { header: 1 });
     } catch(err) { alert('Blad parsowania Ads ' + period + ': ' + err.message); }
@@ -26031,16 +26044,17 @@ function ca2HandleAds(input, period) {
   reader.readAsArrayBuffer(input.files[0]);
 }
 
-function ca2HandleSales(input) {
+async function ca2HandleSales(input) {
   if (!input.files[0]) return;
   const zone = document.getElementById('ca2SalesZone');
   zone.classList.add('has-file');
   zone.querySelector('.ca2-upload-label').textContent = input.files[0].name;
 
+  await _ca2EnsureXLSX();
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
-      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
       const ws = wb.Sheets[wb.SheetNames[0]];
       ca2Data.sales = XLSX.utils.sheet_to_json(ws, { header: 1 });
     } catch(err) { alert('Blad parsowania sprzedazy: ' + err.message); }
