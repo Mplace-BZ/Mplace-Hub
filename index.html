@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.01</title>
+<title>MPlace Hub v9.02</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1607,7 +1607,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.01 — NEW FEATURES CSS ═══ */
+/* ═══ v9.02 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1847,7 +1847,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.01</span>
+    <span class="brand-ver">v9.02</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -21730,7 +21730,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.01</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.02</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -24975,7 +24975,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.01 — ALL NEW FEATURES
+// v9.02 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
@@ -25915,7 +25915,7 @@ async function exportPDFBranded(containerId, filename) {
     pdf.setTextColor(255, 107, 53);
     pdf.text('MPlace Hub', 10, 10);
     pdf.setTextColor(139, 145, 168);
-    pdf.text(new Date().toLocaleDateString('pl-PL') + ' · v9.01', pageW - 10, 10, { align: 'right' });
+    pdf.text(new Date().toLocaleDateString('pl-PL') + ' · v9.02', pageW - 10, 10, { align: 'right' });
 
     // Content
     const imgW = pageW - 20;
@@ -26098,11 +26098,26 @@ function ca2RenderTab(tab) {
   const rows = catalog.slice(1);
 
   if (tab === 'matrix') {
-    // Offer matrix: ID, Title, Price, Status, Ads data if available
-    const titleCol = headers.findIndex(h => /tytu|nazwa|title/i.test(String(h)));
-    const idCol = headers.findIndex(h => /^id$|numer|ofert/i.test(String(h)));
-    const priceCol = headers.findIndex(h => /cena|price/i.test(String(h)));
-    const statusCol = headers.findIndex(h => /status|aktyw/i.test(String(h)));
+    // Offer matrix — detect columns by header name, fallback to Allegro known positions
+    // Allegro catalog: B(1)=ID oferty, D(3)=Status, I(8)=Sygnatura, K(10)=Cena PL, S(18)=Tytuł oferty
+    let titleCol = headers.findIndex(h => /tytu[łl]/i.test(String(h)));
+    let idCol = headers.findIndex(h => /^id$|numer oferty|id oferty/i.test(String(h)));
+    let priceCol = headers.findIndex(h => /cena.*pl|cena sprzeda|^cena$/i.test(String(h)));
+    let statusCol = headers.findIndex(h => /^status$/i.test(String(h)));
+
+    // Fallback: Allegro known column positions (0-indexed)
+    if (idCol < 0) idCol = 1;       // Column B
+    if (statusCol < 0) statusCol = 3; // Column D
+    if (priceCol < 0) priceCol = 10;  // Column K
+    if (titleCol < 0) titleCol = 18;  // Column S
+    // Clamp to actual column count
+    const maxCol = headers.length > 0 ? headers.length - 1 : 0;
+    if (titleCol > maxCol) titleCol = -1;
+    if (priceCol > maxCol) priceCol = -1;
+
+    // Auto-detect: log first row to help debug
+    console.log('[Centrum v2] Headers:', headers.map((h,i) => i+':'+h).join(' | '));
+    console.log('[Centrum v2] Detected cols — ID:', idCol, 'Title:', titleCol, 'Price:', priceCol, 'Status:', statusCol);
 
     let html = `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.5rem">${rows.length} ofert w katalogu · konto: ${AC_META[ca2Data.konto]?.name}</div>`;
     html += `<div style="max-height:500px;overflow-y:auto"><table class="ca2-matrix">
@@ -26110,10 +26125,10 @@ function ca2RenderTab(tab) {
       <tbody>`;
 
     rows.slice(0, 100).forEach((row, i) => {
-      const id = idCol >= 0 ? row[idCol] : '—';
-      const title = titleCol >= 0 ? String(row[titleCol] || '').substring(0, 60) : '—';
-      const price = priceCol >= 0 ? row[priceCol] : '—';
-      const status = statusCol >= 0 ? row[statusCol] : '—';
+      const id = idCol >= 0 && row[idCol] ? row[idCol] : '—';
+      const title = titleCol >= 0 && row[titleCol] ? String(row[titleCol]).substring(0, 60) : '—';
+      const price = priceCol >= 0 && row[priceCol] ? row[priceCol] : '—';
+      const status = statusCol >= 0 && row[statusCol] ? row[statusCol] : '—';
 
       // Determine traffic type from ads data
       const hasAds = ca2Data.ads7 || ca2Data.ads30;
