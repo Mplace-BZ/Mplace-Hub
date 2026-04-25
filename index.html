@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.15</title>
+<title>MPlace Hub v9.16</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1208,22 +1208,31 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .kb-slot{border:1px dashed rgba(239,68,68,.25);border-radius:6px;padding:6px 10px;cursor:pointer;text-align:center;background:rgba(239,68,68,.02);transition:border-color .2s;}
 .kb-slot:hover{border-color:rgba(239,68,68,.5);}
 .kb-slot.done{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.04);}
-.dzis-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;gap:10px;align-items:flex-start;transition:all .2s;cursor:pointer;}
+/* ═══ Cockpit — step cards breathing room ═══ */
+#viewDzis .container>div:first-of-type~div>div>div{/* step cards via CSS override */}
+.dzis-step{background:var(--bg2);border:1px solid var(--border);border-radius:12px !important;padding:22px 26px !important;margin-bottom:18px !important;}
+.dzis-step-num{width:48px !important;height:48px !important;border-radius:14px !important;font-size:20px !important;font-weight:700 !important;}
+.dzis-step-title{font-size:22px !important;font-weight:600 !important;}
+.dzis-step-badge{font-size:12px !important;padding:4px 12px !important;}
+.dzis-step-sub{font-size:14px !important;margin-top:4px !important;}
+.dzis-step-btn{font-size:12px !important;padding:7px 16px !important;}
+.dzis-konto-btn{font-size:12px !important;padding:5px 12px !important;border-radius:5px !important;}
+.dzis-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;transition:all .2s;cursor:pointer;}
 .dzis-card:hover{border-color:var(--border2);}
 .dzis-card.done{opacity:.4;text-decoration:line-through;}
 .dzis-card.done .dzis-check{background:#2dd4a0;border-color:#2dd4a0;}
-.dzis-check{width:18px;height:18px;border-radius:4px;border:2px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
-.dzis-card.done .dzis-check::after{content:'✓';color:#fff;font-size:11px;font-weight:700;}
-.dzis-pilne{border-left:3px solid #ef4444;animation:dzisPulse 2s ease-in-out infinite;}
-.dzis-wazne{border-left:3px solid #f5a623;}
-.dzis-info{border-left:3px solid #4d9fff;}
+.dzis-check{width:22px;height:22px;border-radius:5px;border:2px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.dzis-card.done .dzis-check::after{content:'✓';color:#fff;font-size:13px;font-weight:700;}
+.dzis-pilne{border-left:4px solid #ef4444;animation:dzisPulse 2s ease-in-out infinite;}
+.dzis-wazne{border-left:4px solid #f5a623;}
+.dzis-info{border-left:4px solid #4d9fff;}
 @keyframes dzisPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}50%{box-shadow:0 0 8px 0 rgba(239,68,68,.15)}}
-.dzis-progress{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:1rem;}
-.dzis-progress-bar{height:100%;background:linear-gradient(90deg,#ef4444,#2dd4a0);border-radius:4px;transition:width .5s ease;}
-.dzis-stats{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem;}
-.dzis-stat{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;flex:1;min-width:120px;text-align:center;}
-.dzis-stat-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--text);}
-.dzis-stat-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
+.dzis-progress{height:10px;background:var(--bg3);border-radius:5px;overflow:hidden;margin-bottom:1.25rem;}
+.dzis-progress-bar{height:100%;background:linear-gradient(90deg,#ef4444,#2dd4a0);border-radius:5px;transition:width .5s ease;}
+.dzis-stats{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.dzis-stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;flex:1;min-width:120px;text-align:center;}
+.dzis-stat-val{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--text);}
+.dzis-stat-label{font-family:var(--mono);font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;}
 
 /* ═══ MOBILE RESPONSIVE ═══ */
 @media(max-width:768px){
@@ -1635,7 +1644,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.15 — NEW FEATURES CSS ═══ */
+/* ═══ v9.16 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1844,7 +1853,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="login-logo">MPlace <span>Hub</span></div>
     <div class="login-sub">Zaloguj się aby uzyskać dostęp do danych.<br>Synchronizacja między urządzeniami przez Firebase.</div>
     <button class="login-google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.15h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.16h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Zaloguj się przez Google
     </button>
     <div class="login-note">Twoje dane są bezpieczne na Twoim koncie Google.<br>Nikt inny nie ma dostępu.</div>
@@ -1875,7 +1884,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.15</span>
+    <span class="brand-ver">v9.16</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2094,30 +2103,30 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px">
       <div onclick="document.getElementById('catF_MobelKap').click()" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer" id="catSlot_MobelKap">
         <input type="file" id="catF_MobelKap" accept=".xlsx,.csv" style="display:none" onchange="catUpload('MobelKap',this)">
-        <div style="font-size:12px;font-weight:600;color:var(--text)" id="catN_MobelKap">MobelKap</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">248 ofert · 12.04.2026</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text)" id="catN_MobelKap">MobelKap</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--text3);margin-top:3px">248 ofert · 12.04.2026</div>
       </div>
       <div onclick="document.getElementById('catF_PerfektCiecie').click()" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer" id="catSlot_PerfektCiecie">
         <input type="file" id="catF_PerfektCiecie" accept=".xlsx,.csv" style="display:none" onchange="catUpload('PerfektCiecie',this)">
-        <div style="font-size:12px;font-weight:600;color:var(--text)" id="catN_PerfektCiecie">Perfekt Ciecie</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">417 ofert · 12.04.2026</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text)" id="catN_PerfektCiecie">Perfekt Ciecie</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--text3);margin-top:3px">417 ofert · 12.04.2026</div>
       </div>
       <div onclick="document.getElementById('catF_MeblenaCzasie').click()" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer" id="catSlot_MeblenaCzasie">
         <input type="file" id="catF_MeblenaCzasie" accept=".xlsx,.csv" style="display:none" onchange="catUpload('MeblenaCzasie',this)">
-        <div style="font-size:12px;font-weight:600;color:var(--text)" id="catN_MeblenaCzasie">Meble na Czasie</div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">234 ofert · 11.04.2026</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text)" id="catN_MeblenaCzasie">Meble na Czasie</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--text3);margin-top:3px">234 ofert · 11.04.2026</div>
       </div>
     </div>
   </div>
 
   <!-- KROK 1: DANE -->
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px 28px;margin-bottom:18px">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(255,77,106,.4);color:#ff4d6a;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,77,106,.4)">2</div>
+        <div style="width:48px;height:48px;border-radius:14px;background:var(--bg);border:1px solid rgba(255,77,106,.4);color:#ff4d6a;font-family:var(--mono);font-size:20px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,77,106,.4)">2</div>
         <div>
-          <div style="font-size:15px;font-weight:600;color:var(--text)">Dane sprzedażowe <span style="font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(255,77,106,.12);color:#ff4d6a;border:1px solid rgba(255,77,106,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">BLOKADA</span></div>
-          <div style="font-size:10px;color:var(--text3)" id="dzisStep1Status">Sprawdzam...</div>
+          <div style="font-size:22px;font-weight:600;color:var(--text)">Dane sprzedażowe <span style="font-family:var(--mono);font-size:12px;padding:4px 12px;border-radius:5px;background:rgba(255,77,106,.12);color:#ff4d6a;border:1px solid rgba(255,77,106,.3);margin-left:8px;letter-spacing:.06em;font-weight:600">BLOKADA</span></div>
+          <div style="font-size:14px;color:var(--text3);margin-top:3px" id="dzisStep1Status">Sprawdzam...</div>
         </div>
       </div>
       <button onclick="showView('entry')" style="font-family:var(--mono);font-size:10px;padding:4px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer">Otwórz Data</button>
@@ -2125,12 +2134,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   </div>
 
   <!-- KROK 2: RAPORTY XLSX -->
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(77,159,255,.35);color:#4d9fff;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(77,159,255,.35)">3</div>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px 28px;margin-bottom:18px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+      <div style="width:48px;height:48px;border-radius:14px;background:var(--bg);border:1px solid rgba(77,159,255,.35);color:#4d9fff;font-family:var(--mono);font-size:20px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(77,159,255,.35)">3</div>
       <div>
-        <div style="font-size:15px;font-weight:600;color:var(--text)">Raporty Allegro <span style="font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(77,159,255,.12);color:#4d9fff;border:1px solid rgba(77,159,255,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">OPCJONALNE</span></div>
-        <div style="font-size:10px;color:var(--text3)">Upload Ads + Sprzedaz + Konwersja → glebsza analiza z numerami aukcji</div>
+        <div style="font-size:22px;font-weight:600;color:var(--text)">Raporty Allegro <span style="font-family:var(--mono);font-size:12px;padding:4px 12px;border-radius:5px;background:rgba(77,159,255,.12);color:#4d9fff;border:1px solid rgba(77,159,255,.3);margin-left:8px;letter-spacing:.06em;font-weight:600">OPCJONALNE</span></div>
+        <div style="font-size:14px;color:var(--text3);margin-top:3px">Upload Ads + Sprzedaz + Konwersja → glebsza analiza z numerami aukcji</div>
       </div>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
@@ -2154,10 +2163,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:1.25rem">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:10px;background:var(--bg);border:1px solid rgba(255,107,53,.4);color:#ff6b35;font-family:var(--mono);font-size:15px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,107,53,.4)">4</div>
+        <div style="width:48px;height:48px;border-radius:14px;background:var(--bg);border:1px solid rgba(255,107,53,.4);color:#ff6b35;font-family:var(--mono);font-size:20px;display:grid;place-items:center;font-weight:500;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02),0 0 24px -12px rgba(255,107,53,.4)">4</div>
         <div>
-          <div style="font-size:15px;font-weight:600;color:var(--text)">Generuj 10 zadań na dziś <span style="font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(255,107,53,.12);color:#ff6b35;border:1px solid rgba(255,107,53,.3);margin-left:6px;letter-spacing:.06em;font-weight:600">AKCJA</span></div>
-          <div style="font-size:10px;color:var(--text3)" id="dzisStep3Info">Dane kont + Wiedza + ostatnie analizy</div>
+          <div style="font-size:22px;font-weight:600;color:var(--text)">Generuj 10 zadań na dziś <span style="font-family:var(--mono);font-size:12px;padding:4px 12px;border-radius:5px;background:rgba(255,107,53,.12);color:#ff6b35;border:1px solid rgba(255,107,53,.3);margin-left:8px;letter-spacing:.06em;font-weight:600">AKCJA</span></div>
+          <div style="font-size:14px;color:var(--text3);margin-top:3px" id="dzisStep3Info">Dane kont + Wiedza + ostatnie analizy</div>
         </div>
       </div>
       <div style="display:flex;gap:6px">
@@ -19442,12 +19451,12 @@ function dzisRenderTasks(tasks, summary) {
     return `<div class="dzis-card ${priorityCls[t.priority]||''} ${isDone?'done':''}" onclick="dzisToggle(${i})">
       <div class="dzis-check"></div>
       <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-          <span style="font-family:var(--mono);font-size:10px;padding:1px 5px;border-radius:3px;background:${t.priority==='PILNE'?'rgba(239,68,68,.15);color:#ef4444':t.priority==='WAŻNE'?'rgba(245,166,35,.15);color:#f5a623':'rgba(77,159,255,.15);color:#4d9fff'}">${t.priority}</span>
-          <span style="font-size:12px;font-weight:600;color:var(--text)">${t.title}</span>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:4px;background:${t.priority==='PILNE'?'rgba(239,68,68,.15);color:#ef4444':t.priority==='WAŻNE'?'rgba(245,166,35,.15);color:#f5a623':'rgba(77,159,255,.15);color:#4d9fff'}">${t.priority}</span>
+          <span style="font-size:15px;font-weight:600;color:var(--text)">${t.title}</span>
         </div>
-        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${t.konto||''} ${t.efekt?'→ '+t.efekt:''}</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:3px;line-height:1.4">${t.opis||''}</div>
+        <div style="font-size:13px;color:var(--text3);font-family:var(--mono);margin-top:2px">${t.konto||''} ${t.efekt?'→ '+t.efekt:''}</div>
+        <div style="font-size:14px;color:var(--text2);margin-top:5px;line-height:1.5">${t.opis||''}</div>
       </div>
     </div>`;
   }).join('');
@@ -21979,7 +21988,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.15</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.16</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25224,7 +25233,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.15 — ALL NEW FEATURES
+// v9.16 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
