@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.04</title>
+<title>MPlace Hub v9.05</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1607,7 +1607,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.04 — NEW FEATURES CSS ═══ */
+/* ═══ v9.05 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1816,7 +1816,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="login-logo">MPlace <span>Hub</span></div>
     <div class="login-sub">Zaloguj się aby uzyskać dostęp do danych.<br>Synchronizacja między urządzeniami przez Firebase.</div>
     <button class="login-google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.04h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.05h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Zaloguj się przez Google
     </button>
     <div class="login-note">Twoje dane są bezpieczne na Twoim koncie Google.<br>Nikt inny nie ma dostępu.</div>
@@ -1847,7 +1847,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.04</span>
+    <span class="brand-ver">v9.05</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2549,8 +2549,13 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       </div>
       <div class="ca2-upload-zone" id="ca2SalesZone" onclick="document.getElementById('ca2SalesFile').click()">
         <div class="ca2-upload-icon">&#9733;</div>
-        <div class="ca2-upload-label">Sprzedaz + Odwiedziny</div>
+        <div class="ca2-upload-label">Odwiedziny wg ofert</div>
         <input type="file" id="ca2SalesFile" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleSales(this)">
+      </div>
+      <div class="ca2-upload-zone" id="ca2KonwZone" onclick="document.getElementById('ca2KonwFile').click()">
+        <div class="ca2-upload-icon">&#9733;</div>
+        <div class="ca2-upload-label">Sprzedaz wg ofert</div>
+        <input type="file" id="ca2KonwFile" accept=".xlsx,.xls" style="display:none" onchange="ca2HandleKonwersja(this)">
       </div>
       <div class="ca2-catalog-stats" id="ca2Stats" style="display:none"></div>
       <button class="btn primary" onclick="ca2Analyze()" style="width:100%;margin-top:.75rem">Analizuj</button>
@@ -21730,7 +21735,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.04</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.05</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -24975,7 +24980,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.04 — ALL NEW FEATURES
+// v9.05 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
@@ -25915,7 +25920,7 @@ async function exportPDFBranded(containerId, filename) {
     pdf.setTextColor(255, 107, 53);
     pdf.text('MPlace Hub', 10, 10);
     pdf.setTextColor(139, 145, 168);
-    pdf.text(new Date().toLocaleDateString('pl-PL') + ' · v9.04', pageW - 10, 10, { align: 'right' });
+    pdf.text(new Date().toLocaleDateString('pl-PL') + ' · v9.05', pageW - 10, 10, { align: 'right' });
 
     // Content
     const imgW = pageW - 20;
@@ -25976,9 +25981,9 @@ function printDiv(elementId) {
 
 
 // ── 12. CENTRUM ANALITYCZNE v2 ──────────────────────────────
-let ca2Data = { konto: '', catalog: null, ads7: null, ads14: null, ads30: null, sales: null };
+let ca2Data = { konto: '', catalog: null, ads7: null, ads14: null, ads30: null, sales: null, konwersja: null };
 // Parsed structured data (from aaParseFile-style parsing)
-let ca2Parsed = { ads7: null, ads14: null, ads30: null, sales: null };
+let ca2Parsed = { ads7: null, ads14: null, ads30: null, sales: null, konwersja: null };
 
 function ca2SelectKonto(k) { ca2Data.konto = k; }
 
@@ -26050,6 +26055,20 @@ async function ca2HandleSales(input) {
   } catch(err) { alert('Blad parsowania sprzedazy: ' + err.message); }
 }
 
+async function ca2HandleKonwersja(input) {
+  if (!input.files[0]) return;
+  const zone = document.getElementById('ca2KonwZone');
+  zone.classList.add('has-file');
+  zone.querySelector('.ca2-upload-label').textContent = input.files[0].name;
+  await _ca2EnsureXLSX();
+  try {
+    const parsed = await aaParseFile(input.files[0], 'konwersja');
+    ca2Parsed.konwersja = parsed;
+    ca2Data.konwersja = true;
+    console.log('[Centrum v2] Konwersja parsed:', parsed.oferty?.length, 'offers');
+  } catch(err) { alert('Blad parsowania sprzedazy wg ofert: ' + err.message); }
+}
+
 function ca2UpdateStats() {
   const el = document.getElementById('ca2Stats');
   if (!el) return;
@@ -26076,7 +26095,7 @@ function ca2Analyze() {
   const sel = document.getElementById('ca2Konto');
   if (sel && sel.value) ca2Data.konto = sel.value;
   if (!ca2Data.konto) { alert('Wybierz konto'); return; }
-  const hasAny = ca2Data.catalog || ca2Parsed.ads7 || ca2Parsed.ads14 || ca2Parsed.ads30 || ca2Parsed.sales;
+  const hasAny = ca2Data.catalog || ca2Parsed.ads7 || ca2Parsed.ads14 || ca2Parsed.ads30 || ca2Parsed.sales || ca2Parsed.konwersja;
   if (!hasAny) { alert('Wgraj min. 1 plik (katalog, Ads lub Sprzedaz)'); return; }
   console.log('[Centrum v2] Analyze:', { konto: ca2Data.konto, catalog: !!(ca2Data.catalog), ads7: !!(ca2Parsed.ads7), ads14: !!(ca2Parsed.ads14), ads30: !!(ca2Parsed.ads30), sales: !!(ca2Parsed.sales) });
   ca2RenderTab('matrix');
@@ -26128,14 +26147,26 @@ function _ca2BuildOfferMap() {
     });
   });
 
-  // 3. Sales data
+  // 3. Sales/Odwiedziny data
   if (ca2Parsed.sales && ca2Parsed.sales.oferty) {
     ca2Parsed.sales.oferty.forEach(o => {
       const id = String(o.id).replace(/\s/g,'');
       if (!id) return;
-      if (!map[id]) map[id] = { id, title: o.oferta || '', price: null, status: '', inCatalog: false, ads7: null, ads14: null, ads30: null, sales: null };
+      if (!map[id]) map[id] = { id, title: o.oferta || '', price: null, status: '', inCatalog: false, ads7: null, ads14: null, ads30: null, sales: null, konwersja: null };
       if (!map[id].title && o.oferta) map[id].title = o.oferta;
       map[id].sales = { wizyty: o.wizyty, transakcje: o.transakcje, konwersja: o.konwersja, koszyk: o.koszyk };
+    });
+  }
+
+  // 4. Konwersja/Sprzedaż wg ofert data
+  if (ca2Parsed.konwersja && ca2Parsed.konwersja.oferty) {
+    ca2Parsed.konwersja.oferty.forEach(o => {
+      const id = String(o.id).replace(/\s/g,'');
+      if (!id) return;
+      if (!map[id]) map[id] = { id, title: o.oferta || '', price: o.cena || null, status: '', inCatalog: false, ads7: null, ads14: null, ads30: null, sales: null, konwersja: null };
+      if (!map[id].title && o.oferta) map[id].title = o.oferta;
+      if (!map[id].price && o.cena) map[id].price = o.cena;
+      map[id].konwersja = { transakcje: o.transakcje, sztuki: o.sztuki, wartosc: o.wartosc, cena: o.cena };
     });
   }
 
@@ -26397,9 +26428,9 @@ function ca2RenderTab(tab) {
 }
 
 function ca2Clear() {
-  ca2Data = { konto: '', catalog: null, ads7: null, ads14: null, ads30: null, sales: null };
-  ca2Parsed = { ads7: null, ads14: null, ads30: null, sales: null };
-  ['ca2CatalogZone', 'ca2Ads7Zone', 'ca2Ads14Zone', 'ca2Ads30Zone', 'ca2SalesZone'].forEach(id => {
+  ca2Data = { konto: '', catalog: null, ads7: null, ads14: null, ads30: null, sales: null, konwersja: null };
+  ca2Parsed = { ads7: null, ads14: null, ads30: null, sales: null, konwersja: null };
+  ['ca2CatalogZone', 'ca2Ads7Zone', 'ca2Ads14Zone', 'ca2Ads30Zone', 'ca2SalesZone', 'ca2KonwZone'].forEach(id => {
     const zone = document.getElementById(id);
     if (zone) { zone.classList.remove('has-file'); zone.querySelector('.ca2-upload-label').textContent = zone.querySelector('.ca2-upload-label').textContent.split('.')[0] || 'Upload'; }
   });
