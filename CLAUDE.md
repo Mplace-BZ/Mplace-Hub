@@ -136,6 +136,11 @@
 - Cache dzienny, done state persistent
 - Upload per konto: Ads + Sprzedaż + Konwersja + Ads 30d (kontekst)
 
+## Wersjonowanie
+- KAŻDY commit do index.html = bump wersji (title + topbar + print footer)
+- Szukaj "v9." replace_all=true
+- Odpowiedź po pushu zaczynaj od **vX.XX**
+
 ## Generowanie komend
 - Jedna komenda CC = jedna logiczna zmiana
 - Podawaj zawsze nazwę funkcji lub numer linii — nie każ CC czytać całego pliku
