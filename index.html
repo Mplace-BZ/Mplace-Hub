@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.22</title>
+<title>MPlace Hub v9.23</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -248,6 +248,33 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .data-section-num{font-family:var(--mono);font-size:10px;color:var(--accent);margin-right:6px;}
 .data-section-title{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;display:flex;align-items:center;}
 .data-right-hdr{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+/* ═══ Info Wiki — redesign ═══ */
+.info-sidebar{display:flex;flex-direction:column;}
+.info-nav-group{margin-bottom:4px;}
+.info-nav-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding:10px 10px 4px;user-select:none;}
+.info-nav-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;cursor:pointer;transition:all .12s;border-left:3px solid transparent;margin-bottom:1px;font-size:14px;color:var(--text2);}
+.info-nav-item:hover{background:var(--bg3);color:var(--text);}
+.info-nav-item.active{background:rgba(255,107,53,.08);color:var(--text);font-weight:600;border-left-color:var(--accent);}
+.info-nav-count{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg3);padding:1px 6px;border-radius:4px;}
+.info-hero{background:linear-gradient(135deg,rgba(255,107,53,.08) 0%,rgba(45,212,160,.04) 100%);border:1px solid rgba(255,107,53,.2);border-radius:14px;padding:28px 32px;margin-bottom:1.5rem;}
+.info-hero-title{font-family:var(--sans);font-size:32px;font-weight:800;color:var(--text);line-height:1.2;margin-bottom:6px;}
+.info-hero-sub{font-family:var(--sans);font-size:15px;color:var(--text2);line-height:1.5;}
+.info-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:12px;transition:all .15s;}
+.info-card:hover{border-color:var(--border2);}
+.info-card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;}
+.info-card-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;}
+.info-card-name{font-family:var(--sans);font-size:18px;font-weight:700;color:var(--text);}
+.info-card-desc{font-family:var(--sans);font-size:14px;color:var(--text2);line-height:1.7;}
+.info-card-steps{margin-top:12px;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;}
+.info-card-steps-title{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;font-weight:600;}
+.info-card-step{display:flex;gap:10px;padding:6px 0;font-size:13px;color:var(--text2);line-height:1.5;}
+.info-card-step-num{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;min-width:20px;flex-shrink:0;padding-top:1px;}
+.info-card-use{margin-top:10px;padding:10px 14px;background:rgba(45,212,160,.06);border:1px solid rgba(45,212,160,.15);border-radius:8px;font-size:13px;color:#2dd4a0;line-height:1.5;}
+.info-card-use-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#2dd4a0;margin-bottom:4px;font-weight:600;}
+.info-card-case{margin-top:10px;padding:10px 14px;background:rgba(255,107,53,.04);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:13px;color:var(--text2);line-height:1.5;font-style:italic;}
+.info-card-case-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:600;font-style:normal;}
+.info-card-goto{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(255,107,53,.3);background:rgba(255,107,53,.06);color:#ff6b35;font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .15s;text-decoration:none;}
+.info-card-goto:hover{background:rgba(255,107,53,.15);border-color:rgba(255,107,53,.5);}
 .data-sanity{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;}
 .data-sanity-row{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:12px;line-height:1.5;color:var(--text);}
 .data-sanity-row+.data-sanity-row{border-top:1px solid var(--border);}
@@ -1646,7 +1673,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.22 — NEW FEATURES CSS ═══ */
+/* ═══ v9.23 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1950,7 +1977,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.22</span>
+    <span class="brand-ver">v9.23</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2606,13 +2633,23 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 <!-- ═══ VIEW: INFO ═══ -->
 <div class="view" id="viewInfo">
-<div class="data-layout" style="grid-template-columns:240px 1fr">
-  <div class="data-left" style="padding-top:1.5rem">
-    <div style="font-family:var(--sans);font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px">Info</div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:16px">Sciaga jak uzywac MPlace Hub</div>
-    <div id="infoNavList"></div>
+<div class="data-layout" style="grid-template-columns:280px 1fr">
+  <div class="data-left info-sidebar">
+    <!-- Sidebar header -->
+    <div style="padding:1.2rem 1rem .8rem">
+      <div style="font-family:var(--sans);font-size:22px;font-weight:700;color:var(--text);margin-bottom:2px">MPlace Wiki</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3)">Poradnik · Help · Inspiracja</div>
+    </div>
+    <!-- Search -->
+    <div style="padding:0 1rem .8rem">
+      <input id="infoSearch" type="text" placeholder="Szukaj w wiki..." oninput="infoFilter(this.value)" style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;outline:none;box-sizing:border-box">
+    </div>
+    <!-- Nav -->
+    <div id="infoNavList" style="padding:0 .5rem"></div>
+    <!-- Stats -->
+    <div id="infoNavStats" style="padding:.8rem 1rem;margin-top:auto;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--text3)"></div>
   </div>
-  <div class="data-center" style="padding-top:1.5rem">
+  <div class="data-center" style="padding:1.5rem 2rem 3rem">
     <div id="infoContent"></div>
   </div>
 </div>
@@ -4861,14 +4898,14 @@ function renderArkusz(){
 // ═══════════════════════════════════════════════════════════
 const INFO_SECTIONS = [
   { id:'main', label:'Core Tools', items:[
-    {name:'Cockpit', icon:'cockpit', desc:'Centrum dowodzenia dnia. AI generuje 23 spersonalizowanych zadań na podstawie danych 9 kont, bazy Wiedzy i ostatnich zmian. Gamifikacja: checkboxy, progress bar, streak dzienny, timer, "Did You Know" z losowymi insightami. Cache dzienny — generujesz raz, odhaczasz cały dzień. Priorytety: PILNE (czerwone), WAŻNE (żółte), INFO (niebieskie).', steps:['Kliknij ▶ Play w sidebarze (lub Cockpit)','Jeśli brak cache → kliknij "Generuj plan"','AI analizuje dane 9 kont + bazę Wiedzy + ostatnie analizy','Otrzymujesz 23 karty z zadaniami pogrupowane po priorytetach','Odhaczaj zadania klikając kartę — progress bar rośnie','Cel: 100% dziennie. Buduj streak (seria dni).','Opcja: Odśwież plan jeśli zmieniły się dane w ciągu dnia'], useWhen:'Codziennie rano jako pierwsza czynność. Nie pomijaj — streak motywuje.', caseStudy:'Poniedziałek rano: otwierasz Cockpit. AI widzi że Semmi miała spadek -25% w piątek i generuje zadanie "Sprawdź kampanie Semmi — spadek sprzedaży. Możliwy problem z CPC." Odhaczasz po sprawdzeniu.'},
-    {name:'Dashboard', icon:'dashboard', desc:'Przegląd portfela 9 kont. Każde konto = karta z ROAS AKG, marżą, estymacją EOM. Kolor karty: zielona=rentowne, żółta=optymalizuj, czerwona=interwencja. Widgety: heatmap marż 3×3, ranking, traffic light wyróżnień, wykres bąbelkowy ROAS vs Marża. KPI bar: łączna sprzedaż MTD, ROAS ważony, konta w czerwieni, fee agencji.', steps:['Kliknij Dashboard','KPI bar na górze: sprzedaż, ROAS, konta w czerwieni','Karty kont: kolor = status','Kliknij kartę → szczegóły konta','Scrolluj: heatmap, ranking, traffic light'], useWhen:'Szybki przegląd portfela — które konta wymagają uwagi. Codziennie po wpisaniu danych.', caseStudy:'BOTAVIT czerwona karta (marża -9%, ROAS 1.30x poniżej BE 5.34x). Klikasz → Analysis.'},
-    {name:'Data', icon:'data', desc:'Codzienny wpis danych per konto. 3-kolumnowy layout: LEWA=lista 9 kont z progress, ŚRODEK=formularz (01 Koszty, 02 Sprzedaż, 03 Dostawa + KPI bar z deltami + Dziennik), PRAWA=Sanity Check AI + Wczoraj Referencja.<br><br><strong>Skąd dane:</strong><br>— Koszt Ads, ROAS → Allegro Ads → Kampanie → 24h<br>— Sprzedaż brutto, Prowizja → Allegro → Sprzedaż<br>— Wyróżnienia → Allegro → Oferty → wyróżnienia<br>— Dostawa → Centrum Finansów → koszty dostawy<br><br>Dane za dzień N wpisujesz w dniu N+1.', steps:['Kliknij Data','Lista kont: ✓=ma dane, kliknij konto','Sekcja 01: Koszt Ads, ROAS, Wartość Ads','Sekcja 02: Sprzedaż brutto, Prowizja, SS, Qlt','Sekcja 03: Dostawa, Monety, Wyróżnienia, Dzień','KPI aktualizuje się live + Sanity Check po prawej','Kliknij kolejne konto (auto-save localStorage)','Na końcu: Zapisz wszystkie wpisy → Firebase sync','Opcja: Zapisz do D2D → snapshot dnia'], useWhen:'Codziennie po pobraniu danych z Allegro.', caseStudy:'Wpisujesz PerfektCięcie: sprzedaż 62 491 zł. Sanity Check: "Sprzedaż -8% vs wczoraj (67 900). Sprawdź." Okazuje się: 2 bestsellery straciły Super Sprzedawcę.'},
-    {name:'Agent', icon:'agent', desc:'Główny chat AI (Claude Sonnet 4.6). Kontekst: dane 9 kont + baza Wiedzy (41 wpisów). 9 kategorii Playbook (100 promptów). Eksporty: Raport MTD (PDF), PR (PDF), Prezentacja (PPTX), CSV.<br><br><strong>Playbook — 9 kategorii:</strong> Plan Dnia, Rentowność, ROAS/Ads, Kanibalizacja, D2D/Trend, Symulator, Insights, Mentor, Biznes.', steps:['Kliknij Agent','Playbook (lewa): kliknij prompt — formularz wypełnia się','Lub wpisz własne pytanie','Enter=wyślij, Shift+Enter=nowa linia','Agent analizuje dane i odpowiada','Kopiuj/Drukuj/Email/Czytaj(TTS)/MP3','Eksporty (prawa): Raport MTD, PDF, Prezentacja, CSV'], useWhen:'Gdy potrzebujesz analizy, symulacji, raportu lub porady. Agent widzi wszystkie dane i Wiedzę.', caseStudy:'Pytasz: "Jeśli podniosę ROAS BOTAVIT do 7x — jaki wynik EOM?" Agent: przy budżecie 4327 zł i ROAS 7x → sprzedaż +40%, marża z -9% do +12%.'},
+    {name:'Cockpit', icon:'cockpit', goto:'dzis', desc:'Centrum dowodzenia dnia. AI generuje 23 spersonalizowanych zadań na podstawie danych 9 kont, bazy Wiedzy i ostatnich zmian. Gamifikacja: checkboxy, progress bar, streak dzienny, timer, "Did You Know" z losowymi insightami. Cache dzienny — generujesz raz, odhaczasz cały dzień. Priorytety: PILNE (czerwone), WAŻNE (żółte), INFO (niebieskie).', steps:['Kliknij ▶ Play w sidebarze (lub Cockpit)','Jeśli brak cache → kliknij "Generuj plan"','AI analizuje dane 9 kont + bazę Wiedzy + ostatnie analizy','Otrzymujesz 23 karty z zadaniami pogrupowane po priorytetach','Odhaczaj zadania klikając kartę — progress bar rośnie','Cel: 100% dziennie. Buduj streak (seria dni).','Opcja: Odśwież plan jeśli zmieniły się dane w ciągu dnia'], useWhen:'Codziennie rano jako pierwsza czynność. Nie pomijaj — streak motywuje.', caseStudy:'Poniedziałek rano: otwierasz Cockpit. AI widzi że Semmi miała spadek -25% w piątek i generuje zadanie "Sprawdź kampanie Semmi — spadek sprzedaży. Możliwy problem z CPC." Odhaczasz po sprawdzeniu.'},
+    {name:'Dashboard', icon:'dashboard', goto:'dashboard', desc:'Przegląd portfela 9 kont. Każde konto = karta z ROAS AKG, marżą, estymacją EOM. Kolor karty: zielona=rentowne, żółta=optymalizuj, czerwona=interwencja. Widgety: heatmap marż 3×3, ranking, traffic light wyróżnień, wykres bąbelkowy ROAS vs Marża. KPI bar: łączna sprzedaż MTD, ROAS ważony, konta w czerwieni, fee agencji.', steps:['Kliknij Dashboard','KPI bar na górze: sprzedaż, ROAS, konta w czerwieni','Karty kont: kolor = status','Kliknij kartę → szczegóły konta','Scrolluj: heatmap, ranking, traffic light'], useWhen:'Szybki przegląd portfela — które konta wymagają uwagi. Codziennie po wpisaniu danych.', caseStudy:'BOTAVIT czerwona karta (marża -9%, ROAS 1.30x poniżej BE 5.34x). Klikasz → Analysis.'},
+    {name:'Data', icon:'data', goto:'entry', desc:'Codzienny wpis danych per konto. 3-kolumnowy layout: LEWA=lista 9 kont z progress, ŚRODEK=formularz (01 Koszty, 02 Sprzedaż, 03 Dostawa + KPI bar z deltami + Dziennik), PRAWA=Sanity Check AI + Wczoraj Referencja.<br><br><strong>Skąd dane:</strong><br>— Koszt Ads, ROAS → Allegro Ads → Kampanie → 24h<br>— Sprzedaż brutto, Prowizja → Allegro → Sprzedaż<br>— Wyróżnienia → Allegro → Oferty → wyróżnienia<br>— Dostawa → Centrum Finansów → koszty dostawy<br><br>Dane za dzień N wpisujesz w dniu N+1.', steps:['Kliknij Data','Lista kont: ✓=ma dane, kliknij konto','Sekcja 01: Koszt Ads, ROAS, Wartość Ads','Sekcja 02: Sprzedaż brutto, Prowizja, SS, Qlt','Sekcja 03: Dostawa, Monety, Wyróżnienia, Dzień','KPI aktualizuje się live + Sanity Check po prawej','Kliknij kolejne konto (auto-save localStorage)','Na końcu: Zapisz wszystkie wpisy → Firebase sync','Opcja: Zapisz do D2D → snapshot dnia'], useWhen:'Codziennie po pobraniu danych z Allegro.', caseStudy:'Wpisujesz PerfektCięcie: sprzedaż 62 491 zł. Sanity Check: "Sprzedaż -8% vs wczoraj (67 900). Sprawdź." Okazuje się: 2 bestsellery straciły Super Sprzedawcę.'},
+    {name:'Agent', icon:'agent', goto:'agent', desc:'Główny chat AI (Claude Sonnet 4.6). Kontekst: dane 9 kont + baza Wiedzy (41 wpisów). 9 kategorii Playbook (100 promptów). Eksporty: Raport MTD (PDF), PR (PDF), Prezentacja (PPTX), CSV.<br><br><strong>Playbook — 9 kategorii:</strong> Plan Dnia, Rentowność, ROAS/Ads, Kanibalizacja, D2D/Trend, Symulator, Insights, Mentor, Biznes.', steps:['Kliknij Agent','Playbook (lewa): kliknij prompt — formularz wypełnia się','Lub wpisz własne pytanie','Enter=wyślij, Shift+Enter=nowa linia','Agent analizuje dane i odpowiada','Kopiuj/Drukuj/Email/Czytaj(TTS)/MP3','Eksporty (prawa): Raport MTD, PDF, Prezentacja, CSV'], useWhen:'Gdy potrzebujesz analizy, symulacji, raportu lub porady. Agent widzi wszystkie dane i Wiedzę.', caseStudy:'Pytasz: "Jeśli podniosę ROAS BOTAVIT do 7x — jaki wynik EOM?" Agent: przy budżecie 4327 zł i ROAS 7x → sprzedaż +40%, marża z -9% do +12%.'},
   ]},
   { id:'ai', label:'AI Workflow', items:[
-    {name:'Analysis', icon:'screener', desc:'Główne narzędzie analizy kampanii. Wgraj 3-4 XLSX z Allegro → AI generuje 10-sekcyjny raport z rekomendacjami per aukcja.<br><br><strong>3 wymagane pliki:</strong><br>1. Ads: "statystyki_oferty_*.xlsx" → panel Ads → Statystyki → Eksport<br>2. Odwiedziny: "odwiedziny_wg_ofert_*.xlsx" → Sprzedaż → Odwiedziny wg ofert<br>3. Sprzedaż: "sprzedaz_wg_ofert_*.xlsx" → Sprzedaż → Wg ofert<br><br><strong>Opcja:</strong> Ads 30d (kontekst) — zapobiega false positives z krótkich okresów.<br><br><strong>10 sekcji:</strong> Diagnoza → Zatrzymaj → Tnij → Skaluj → Kanibalizacja → Martwe punkty → Placement → Plan → Wyróżnienia → Podsumowanie', steps:['Wybierz konto z dropdown','Okres: 7d/14d/30d lub custom daty','Wgraj Raport 1 (Ads)','Wgraj Raport 2 (Odwiedziny)','Wgraj Raport 3 (Sprzedaż)','Opcja: Ads 30d kontekst','Wpisz uwagi (święta, problemy)','Opcja: TOTAL RESTART = pełna przebudowa','Kliknij Analizuj z AI (~30-60s)','Raport: Kopiuj/Drukuj/HTML/Email/Zapisz','Historia: ostatnie 20 raportów'], useWhen:'Co tydzień per konto MEBLE. Co 2 tyg. LUXSEN/ONE. Gdy Dashboard pokaże czerwoną kartę.', caseStudy:'MobelKap 14 dni: AI wykrywa 12 kampanii ROAS<3 do wyłączenia (oszczędność ~1200 zł/mies), 5 kampanii ROAS>10 do skalowania, kanibalizacja szafka 62 MK vs PC.'},
-    {name:'Strategy', icon:'pie', desc:'Portfelowe zarządzanie 3 kontami MEBLE. Role: MK=SCALE (wolumen), PC=NICHE (specjalizacja), MnC=PREMIUM (gwiazdy). KPI vs targety, specjalizacje produktowe, AI plan reorganizacji.', steps:['Kliknij Strategy','3 karty kont z rolami','KPI vs target per konto','Lista specjalizacji','AI generuje plan reorganizacji'], useWhen:'Raz w miesiącu lub po dużych zmianach. Po Total Restart.', caseStudy:'PC ROAS 4.82x < BE 6.96x. Strategy: PC skupia się na donicach Craft (nisza), oddaje szafki MK.'},
+    {name:'Analysis', icon:'screener', goto:'analiza', desc:'Główne narzędzie analizy kampanii. Wgraj 3-4 XLSX z Allegro → AI generuje 10-sekcyjny raport z rekomendacjami per aukcja.<br><br><strong>3 wymagane pliki:</strong><br>1. Ads: "statystyki_oferty_*.xlsx" → panel Ads → Statystyki → Eksport<br>2. Odwiedziny: "odwiedziny_wg_ofert_*.xlsx" → Sprzedaż → Odwiedziny wg ofert<br>3. Sprzedaż: "sprzedaz_wg_ofert_*.xlsx" → Sprzedaż → Wg ofert<br><br><strong>Opcja:</strong> Ads 30d (kontekst) — zapobiega false positives z krótkich okresów.<br><br><strong>10 sekcji:</strong> Diagnoza → Zatrzymaj → Tnij → Skaluj → Kanibalizacja → Martwe punkty → Placement → Plan → Wyróżnienia → Podsumowanie', steps:['Wybierz konto z dropdown','Okres: 7d/14d/30d lub custom daty','Wgraj Raport 1 (Ads)','Wgraj Raport 2 (Odwiedziny)','Wgraj Raport 3 (Sprzedaż)','Opcja: Ads 30d kontekst','Wpisz uwagi (święta, problemy)','Opcja: TOTAL RESTART = pełna przebudowa','Kliknij Analizuj z AI (~30-60s)','Raport: Kopiuj/Drukuj/HTML/Email/Zapisz','Historia: ostatnie 20 raportów'], useWhen:'Co tydzień per konto MEBLE. Co 2 tyg. LUXSEN/ONE. Gdy Dashboard pokaże czerwoną kartę.', caseStudy:'MobelKap 14 dni: AI wykrywa 12 kampanii ROAS<3 do wyłączenia (oszczędność ~1200 zł/mies), 5 kampanii ROAS>10 do skalowania, kanibalizacja szafka 62 MK vs PC.'},
+    {name:'Strategy', icon:'pie', goto:'strategia', desc:'Portfelowe zarządzanie 3 kontami MEBLE. Role: MK=SCALE (wolumen), PC=NICHE (specjalizacja), MnC=PREMIUM (gwiazdy). KPI vs targety, specjalizacje produktowe, AI plan reorganizacji.', steps:['Kliknij Strategy','3 karty kont z rolami','KPI vs target per konto','Lista specjalizacji','AI generuje plan reorganizacji'], useWhen:'Raz w miesiącu lub po dużych zmianach. Po Total Restart.', caseStudy:'PC ROAS 4.82x < BE 6.96x. Strategy: PC skupia się na donicach Craft (nisza), oddaje szafki MK.'},
     {name:'Ads Hub', icon:'ads', desc:'Generator nazw kampanii Format A v2. Walidator konwencji. AI Architect — plan reorganizacji 3 kont + CSV.<br><br><strong>Format:</strong> /NNN/ KAT_LINIA_WYMIAR → [KONTO][NNN][WW][RW] LINIA_WYMIAR_KOLOR', steps:['Formularz: konto, kategoria, linia, wymiar','Generuj nazwy → kopiuj','Walidator: wklej nazwy → sprawdza konwencję','AI Architect → plan + CSV eksport'], useWhen:'Nowe kampanie. Reorganizacja po Analysis. CSV import do Allegro.', caseStudy:'Architect: 47 kampanii MK/PC/MnC → 8 błędnych nazw, 5 duplikatów, 12 pustych. CSV z 23 zmianami.'},
     {name:'Screener', icon:'screener', desc:'Multi-turn chat z Vision (screenshoty Ctrl+V). Agent widzi obrazki + kontekst kont. Historia rozmów w Firebase. Idealny do iteracyjnej analizy i Total Restart.', steps:['Wklej screenshot (Ctrl+V) lub wpisz pytanie','Agent widzi obrazek + dane kont','Kontynuuj rozmowę (multi-turn)','Zapisz rozmowę','Wczytaj z historii'], useWhen:'Coś dziwnego w panelu Allegro. Total Restart — iteracyjna budowa kampanii. Analiza konkurencji.', caseStudy:'Total Restart Semmi: screen statystyk → AI widzi CPC 3.20 zł (2x norma) → Dynamic CPC. Kolejny screen → nowa struktura kampanii.'},
     {name:'Import Ads', icon:'import_', desc:'Klasyczny upload Ads XLSX → AI raport. Starsza wersja — w większości używaj Analysis (3 pliki, pełniejszy obraz).', useWhen:'Gdy masz tylko 1 plik Ads XLSX. Szybka wstępna analiza.'},
@@ -4956,74 +4993,147 @@ const INFO_SECTIONS = [
 
 let _infoActiveSection = 'main';
 
+// Section metadata for nav icons and descriptions
+const INFO_META = {
+  main:{emoji:'▣', desc:'Cockpit, Dashboard, Agent, Data'},
+  ai:{emoji:'✦', desc:'Analiza AI, Screener, Strategy'},
+  meble:{emoji:'◧', desc:'MobelKap, PerfektCiecie, MnC'},
+  analiza:{emoji:'△', desc:'Trendy, Insights, D2D, Compare'},
+  reports:{emoji:'◇', desc:'PDF, PPTX, CSV, raporty'},
+  tools:{emoji:'⊞', desc:'Kalkulator, Symulator, Kalendarz'},
+  team:{emoji:'◉', desc:'Panel pracownika'},
+  dataops:{emoji:'⟲', desc:'Backup, sync, historia'},
+  konta:{emoji:'◎', desc:'9 kont, 3 grupy, marze'},
+  workflow:{emoji:'▸', desc:'Rano, tydzien, wieczor'},
+  konwencja:{emoji:'/', desc:'Format A v2, kody, CPC'},
+  reguly:{emoji:'!', desc:'ROAS progi, flat/elastic, Smart'},
+  skroty:{emoji:'⌘', desc:'Ctrl+K, F12, shortcuts'},
+  faq:{emoji:'?', desc:'Troubleshooting, bledy, sync'},
+};
+
 function renderInfoView(){
-  // Left nav
   const navEl = document.getElementById('infoNavList');
-  navEl.innerHTML = INFO_SECTIONS.map(s =>
-    `<div class="data-acc-item ${s.id===_infoActiveSection?'active':''}" onclick="infoSelectSection('${s.id}')" style="padding:7px 10px;font-size:12px">
-      <span>${s.label}</span>
-    </div>`
-  ).join('');
-  // Content
+  const totalItems = INFO_SECTIONS.reduce((s,sec)=>s+sec.items.length,0);
+
+  // Group sections by category
+  const groups = [
+    {label:'NARZEDZIA', ids:['main','ai','tools']},
+    {label:'PORTFEL', ids:['meble','konta','konwencja']},
+    {label:'ANALITYKA', ids:['analiza','reports','dataops']},
+    {label:'PRACA', ids:['workflow','team','reguly']},
+    {label:'POMOC', ids:['skroty','faq']},
+  ];
+
+  let navHtml = '';
+  groups.forEach(g => {
+    navHtml += `<div class="info-nav-group"><div class="info-nav-label">${g.label}</div>`;
+    g.ids.forEach(id => {
+      const sec = INFO_SECTIONS.find(s=>s.id===id);
+      if(!sec) return;
+      const meta = INFO_META[id]||{emoji:'▸',desc:''};
+      navHtml += `<div class="info-nav-item ${id===_infoActiveSection?'active':''}" onclick="infoSelectSection('${id}')">
+        <span style="font-family:var(--mono);font-size:14px;width:20px;text-align:center;flex-shrink:0;color:${id===_infoActiveSection?'var(--accent)':'var(--text3)'}">${meta.emoji}</span>
+        <span>${sec.label}</span>
+        <span class="info-nav-count">${sec.items.length}</span>
+      </div>`;
+    });
+    navHtml += `</div>`;
+  });
+  navEl.innerHTML = navHtml;
+
+  // Stats
+  const statsEl = document.getElementById('infoNavStats');
+  if(statsEl) statsEl.innerHTML = `${INFO_SECTIONS.length} sekcji · ${totalItems} artykulow`;
+
   renderInfoContent(_infoActiveSection);
 }
 
 function infoSelectSection(id){
   _infoActiveSection = id;
   renderInfoView();
+  document.getElementById('infoContent')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function infoFilter(q){
+  if(!q.trim()){
+    renderInfoView();
+    return;
+  }
+  const lower = q.toLowerCase();
+  const el = document.getElementById('infoContent');
+  let html = `<div class="info-hero" style="padding:18px 24px;margin-bottom:1rem">
+    <div class="info-hero-title" style="font-size:22px">Wyniki dla "${q}"</div>
+  </div>`;
+  let count = 0;
+  INFO_SECTIONS.forEach(sec => {
+    sec.items.forEach(item => {
+      const match = item.name.toLowerCase().includes(lower) ||
+        item.desc.toLowerCase().includes(lower) ||
+        (item.caseStudy||'').toLowerCase().includes(lower) ||
+        (item.useWhen||'').toLowerCase().includes(lower);
+      if(match){
+        count++;
+        html += renderInfoCard(item, sec);
+      }
+    });
+  });
+  if(!count) html += `<div style="text-align:center;padding:3rem;color:var(--text3);font-size:15px">Brak wynikow dla "${q}"</div>`;
+  else html += `<div style="font-family:var(--mono);font-size:12px;color:var(--text3);margin-top:1rem">${count} wynikow</div>`;
+  el.innerHTML = html;
+}
+
+function renderInfoCard(item, section){
+  const iconSvg = item.icon ? mpIcon(item.icon, 20, '#ff6b35') : '<span style="color:var(--accent);font-size:18px">▸</span>';
+  const gotoView = item.goto || null;
+
+  let card = `<div class="info-card">
+    <div class="info-card-hdr">
+      <div class="info-card-icon" style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.15)">${iconSvg}</div>
+      <div>
+        <div class="info-card-name">${item.name}</div>
+        ${section ? `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:1px">${section.label}</div>` : ''}
+      </div>
+    </div>
+    <div class="info-card-desc">${item.desc}</div>`;
+
+  if (item.steps && item.steps.length) {
+    card += `<div class="info-card-steps">
+      <div class="info-card-steps-title">STEP BY STEP</div>`;
+    item.steps.forEach((step, i) => {
+      card += `<div class="info-card-step"><span class="info-card-step-num">${i+1}.</span><span>${step}</span></div>`;
+    });
+    card += `</div>`;
+  }
+
+  if (item.useWhen) {
+    card += `<div class="info-card-use"><div class="info-card-use-label">KIEDY UZYWAC</div>${item.useWhen}</div>`;
+  }
+
+  if (item.caseStudy) {
+    card += `<div class="info-card-case"><div class="info-card-case-label">CASE STUDY</div>${item.caseStudy}</div>`;
+  }
+
+  if (gotoView) {
+    card += `<div onclick="showView('${gotoView}')" class="info-card-goto">→ Otworz ${item.name}</div>`;
+  }
+
+  card += `</div>`;
+  return card;
 }
 
 function renderInfoContent(id){
   const section = INFO_SECTIONS.find(s => s.id === id);
   if (!section) return;
   const el = document.getElementById('infoContent');
-  // Color keywords in section label
-  const colorLabel = section.label.replace(/(MEBLE|LUXSEN|ONE|AI|Ads)/g, '<span style="color:var(--accent)">$1</span>');
-  let html = `<div style="font-family:var(--mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">INFO ▸ ${section.label.toUpperCase()}</div>
-    <div style="font-family:var(--sans);font-size:28px;font-weight:800;color:var(--text);margin-bottom:1.2rem">${colorLabel}</div>`;
+  const meta = INFO_META[id]||{emoji:'▸',desc:''};
 
-  section.items.forEach(item => {
-    const iconSvg = item.icon ? mpIcon(item.icon, 18, '#ff6b35') : '<span style="color:var(--accent)">▸</span>';
+  let html = `<div class="info-hero">
+    <div style="font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">WIKI ▸ ${section.label.toUpperCase()}</div>
+    <div class="info-hero-title">${section.label.replace(/(MEBLE|LUXSEN|ONE|AI|Ads)/g, '<span style="color:var(--accent)">$1</span>')}</div>
+    <div class="info-hero-sub">${meta.desc} · ${section.items.length} artykulow</div>
+  </div>`;
 
-    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:14px 18px;margin-bottom:.75rem">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-        ${iconSvg}
-        <span style="font-family:var(--sans);font-size:16px;font-weight:700;color:var(--text)">${item.name}</span>
-      </div>
-      <div style="font-family:var(--sans);font-size:13px;color:var(--text2);line-height:1.7">${item.desc}</div>`;
-
-    // Steps
-    if (item.steps && item.steps.length) {
-      html += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">STEP BY STEP</div>`;
-      item.steps.forEach((step, i) => {
-        html += `<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:12px;color:var(--text2)">
-          <span style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;min-width:20px">${i+1}.</span>
-          <span>${step}</span>
-        </div>`;
-      });
-      html += `</div>`;
-    }
-
-    // When to use
-    if (item.useWhen) {
-      html += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
-        <div style="font-family:var(--mono);font-size:10px;color:#2dd4a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">KIEDY UZYWAC</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.6">${item.useWhen}</div>
-      </div>`;
-    }
-
-    // Case study
-    if (item.caseStudy) {
-      html += `<div style="margin-top:10px;padding:10px 14px;border-left:3px solid var(--accent);background:rgba(255,107,53,.04);border-radius:0 6px 6px 0">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">CASE STUDY</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.6;font-style:italic">${item.caseStudy}</div>
-      </div>`;
-    }
-
-    html += `</div>`;
-  });
-
+  section.items.forEach(item => { html += renderInfoCard(item, null); });
   el.innerHTML = html;
 }
 
@@ -22058,7 +22168,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.22</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.23</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25303,7 +25413,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.22 — ALL NEW FEATURES
+// v9.23 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
