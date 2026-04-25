@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.08</title>
+<title>MPlace Hub v9.09</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -682,6 +682,33 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .agent-exp-row{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:6px;border:1px solid rgba(255,107,53,.25);background:rgba(255,107,53,.04);cursor:pointer;transition:all .15s;margin-bottom:.35rem;font-family:var(--mono);font-size:12px;color:var(--text2);}
 .agent-exp-row:hover{background:rgba(255,107,53,.1);color:var(--text);border-color:rgba(255,107,53,.4);}
 .agent-exp-badge{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px;border:1px solid rgba(255,107,53,.3);color:#ff6b35;letter-spacing:.04em;margin-left:10px;}
+/* ═══ Agent Dashboard — Portfolio Pulse ═══ */
+.agent-pulse{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem;}
+.agent-pulse-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.8rem 1rem;position:relative;overflow:hidden;}
+.agent-pulse-card.alert{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.04);}
+.agent-pulse-card.good{border-color:rgba(52,211,153,.25);}
+.agent-pulse-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;}
+.agent-pulse-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);line-height:1.2;}
+.agent-pulse-sub{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px;}
+.agent-pulse-delta{font-family:var(--mono);font-size:10px;position:absolute;top:.8rem;right:1rem;}
+.agent-pulse-delta.up{color:#2dd4a0;}.agent-pulse-delta.down{color:#ef4444;}
+/* ═══ Agent Dashboard — 3-col grid ═══ */
+.agent-dash-grid{display:grid;grid-template-columns:1fr 1fr 280px;gap:1rem;margin-bottom:1rem;}
+/* ═══ Agent Dashboard — Smart Suggestions ═══ */
+.agent-suggest{list-style:none;padding:0;margin:0;}
+.agent-suggest li{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer;transition:all .15s;border:1px solid transparent;font-size:11px;color:var(--text2);line-height:1.4;}
+.agent-suggest li:hover{background:var(--bg3);border-color:var(--border2);color:var(--text);}
+.agent-suggest li .sg-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.agent-suggest li .sg-dot.red{background:#ef4444;}.agent-suggest li .sg-dot.yellow{background:#f5a623;}.agent-suggest li .sg-dot.green{background:#2dd4a0;}.agent-suggest li .sg-dot.blue{background:#4d9fff;}
+/* ═══ Agent Dashboard — Recent History ═══ */
+.agent-recent{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem;}
+.agent-recent-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.7rem .9rem;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:4px;}
+.agent-recent-card:hover{border-color:var(--accent);background:rgba(255,107,53,.03);}
+.agent-recent-type{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);}
+.agent-recent-title{font-family:var(--sans);font-size:12px;font-weight:500;color:var(--text);line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.agent-recent-date{font-family:var(--mono);font-size:10px;color:var(--text3);}
+@media(max-width:1100px){.agent-dash-grid{grid-template-columns:1fr 1fr;}.agent-dash-grid>:nth-child(3){grid-column:1/-1;}}
+@media(max-width:800px){.agent-pulse{grid-template-columns:repeat(2,1fr);}.agent-dash-grid{grid-template-columns:1fr;}.agent-recent{grid-template-columns:1fr;}}
 .agent-chat-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:1rem;display:flex;flex-direction:column;min-height:200px;}
 .agent-chat-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:.06em;}
 .agent-chat-body{flex:1;padding:14px;overflow-y:auto;max-height:60vh;}
@@ -1607,7 +1634,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.08 — NEW FEATURES CSS ═══ */
+/* ═══ v9.09 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1816,7 +1843,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="login-logo">MPlace <span>Hub</span></div>
     <div class="login-sub">Zaloguj się aby uzyskać dostęp do danych.<br>Synchronizacja między urządzeniami przez Firebase.</div>
     <button class="login-google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.08h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.09h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Zaloguj się przez Google
     </button>
     <div class="login-note">Twoje dane są bezpieczne na Twoim koncie Google.<br>Nikt inny nie ma dostępu.</div>
@@ -1847,7 +1874,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.08</span>
+    <span class="brand-ver">v9.09</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2745,19 +2772,21 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <!-- ═══ VIEW: AGENT ═══ -->
 <div class="view" id="viewAgent">
 <div class="container">
-  <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow">▸ Wewnętrzny asystent</div>
-    <div class="ph-title">Agent <span>✦</span></div>
-    <div class="ph-sub">Zadaj pytanie — agent analizuje Twoje dane i odpowiada</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+    <div>
+      <div class="ph-title" style="margin-bottom:0">Agent <span>✦</span></div>
+    </div>
+    <div class="agent-live-badge"><span class="agent-live-dot"></span> LIVE · <span id="agentPulseMonth"></span></div>
   </div>
 
-  <!-- LIVE badge -->
-  <div class="agent-live-badge" style="margin-bottom:1rem"><span class="agent-live-dot"></span> LIVE · kontekst <span id="agentCtxCount">9</span> kont</div>
+  <!-- Portfolio Pulse — 4 KPIs -->
+  <div class="agent-pulse" id="agentPulse"></div>
 
-  <!-- Playbook + Exports — 2 columns -->
-  <div class="agent-panels">
+  <!-- 3-column dashboard grid: Playbook | Suggestions | Exports -->
+  <div class="agent-dash-grid">
+    <!-- COL 1: Playbook -->
     <div class="agent-panel">
-      <div class="agent-panel-hdr">Playbook · zapytaj w kontekscie</div>
+      <div class="agent-panel-hdr">Playbook · 100 promptow</div>
       <div class="agent-pb-grid">
         <button onclick="openPlaybook('PD')" class="agent-pb-btn" style="--pb-color:#f5a623"><span class="pb-ico" style="color:#f5a623">≡</span> Plan Dnia</button>
         <button onclick="openPlaybook('RM')" class="agent-pb-btn" style="--pb-color:#2dd4a0"><span class="pb-ico" style="color:#2dd4a0">◎</span> Rentownosc</button>
@@ -2769,19 +2798,29 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
         <button onclick="openPlaybook('MC')" class="agent-pb-btn" style="--pb-color:#34d399"><span class="pb-ico" style="color:#34d399">▣</span> Mentor</button>
         <button onclick="openPlaybook('BA')" class="agent-pb-btn" style="--pb-color:#fb923c"><span class="pb-ico" style="color:#fb923c">◇</span> Biznes</button>
       </div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:.6rem">Kliknij → input wypelnia sie gotowa forma pytania z kontekstem.</div>
-      <button onclick="exportCSV()" class="agent-exp-row" style="margin-top:.5rem">Eksport danych <span class="agent-exp-badge">CSV</span></button>
+      <button onclick="exportCSV()" class="agent-exp-row" style="margin-top:.6rem">Eksport danych <span class="agent-exp-badge">CSV</span></button>
     </div>
+    <!-- COL 2: Smart Suggestions — data-driven -->
     <div class="agent-panel">
-      <div class="agent-panel-hdr">Eksporty · wygeneruj artefakt</div>
+      <div class="agent-panel-hdr">Sugerowane pytania</div>
+      <ul class="agent-suggest" id="agentSuggestions"></ul>
+    </div>
+    <!-- COL 3: Exports -->
+    <div class="agent-panel">
+      <div class="agent-panel-hdr">Eksporty</div>
       <button onclick="generateMTDReport()" class="agent-exp-row">Raport MTD <span class="agent-exp-badge">PDF</span></button>
       <button onclick="openPDFsModal()" class="agent-exp-row">PDF <span class="agent-exp-badge">PDF</span></button>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin:.5rem 0 .3rem">Szablon prezentacji:</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin:.4rem 0 .2rem">Szablon prezentacji:</div>
       <div id="presTemplates" class="pres-templates" style="grid-template-columns:1fr"></div>
       <button onclick="generateSlideReport()" class="agent-exp-row">Prezentacja <span class="agent-exp-badge">PPTX</span></button>
       <button onclick="openPDFsPRModal()" class="agent-exp-row">PDF PR <span class="agent-exp-badge">PDF</span></button>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:.4rem">Eksporty pobieraja ostatnie dane + analizy i renderuja plik.</div>
     </div>
+  </div>
+
+  <!-- Recent history -->
+  <div id="agentRecentWrap" style="display:none">
+    <div class="agent-panel-hdr" style="margin-bottom:.5rem">Ostatnie raporty i analizy</div>
+    <div class="agent-recent" id="agentRecent"></div>
   </div>
 
   <!-- Chat container -->
@@ -11701,16 +11740,183 @@ function renderMonths(){
 function initAgent(){
   const inp = document.getElementById('agentInput');
   if(inp && !inp.value) inp.focus();
-  // Populate context badges
   const n = typeof ALL_KEYS!=='undefined' ? ALL_KEYS.length : 9;
-  const ctxEl = document.getElementById('agentCtxCount'); if(ctxEl) ctxEl.textContent = n;
   const mName = MONTHS[new Date().getMonth()];
   const ctxBar = document.getElementById('agentInputCtx');
   if(ctxBar) ctxBar.textContent = 'Kontekst: '+n+' kont · '+(mName[0].toUpperCase()+mName.slice(1))+' '+new Date().getFullYear();
   const chatTime = document.getElementById('agentChatTime');
   if(chatTime) chatTime.textContent = new Date().toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
-  // Render presentation templates
   if(typeof renderPresTemplates === 'function') renderPresTemplates();
+  // Dashboard sections
+  renderAgentPulse();
+  renderAgentSuggestions();
+  renderAgentRecent();
+}
+
+function renderAgentPulse(){
+  const el = document.getElementById('agentPulse'); if(!el) return;
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const pmEl = document.getElementById('agentPulseMonth');
+  if(pmEl) pmEl.textContent = curM[0].toUpperCase()+curM.slice(1)+' '+now.getFullYear();
+  const prevM = MONTHS[(now.getMonth()-1+12)%12];
+  const accs = Object.keys(AC_META);
+  let totalSp=0, totalAds=0, totalPrevSp=0, alerts=0, greenCount=0;
+  const margins=[], roasVals=[];
+  accs.forEach(k => {
+    const D = getData(k); const prod = getProd(k);
+    const cur = D.find(d=>d.m===curM);
+    const prev = D.find(d=>d.m===prevM);
+    if(!cur) return;
+    const sp = parseFloat(cur.sprzedaz)||0;
+    const ads = parseFloat(cur.adsCost)||0;
+    const C = calc(cur, prod);
+    if(!C) return;
+    totalSp += sp; totalAds += ads;
+    if(prev) totalPrevSp += parseFloat(prev.sprzedaz)||0;
+    margins.push({m:C.mAfter, sp});
+    if(cur.roas>0) roasVals.push({r:cur.roas, sp, be:C.beRoasAds||0});
+    if(C.mAfter < 5 || (cur.roas>0 && C.beRoasAds && cur.roas < C.beRoasAds)) alerts++;
+    else greenCount++;
+  });
+  const wMargin = totalSp>0 ? margins.reduce((s,m)=>s+m.m*m.sp,0)/totalSp : 0;
+  const wRoas = roasVals.length ? roasVals.reduce((s,r)=>s+r.r*r.sp,0)/roasVals.reduce((s,r)=>s+r.sp,0) : 0;
+  const spDelta = totalPrevSp>0 ? ((totalSp-totalPrevSp)/totalPrevSp*100) : null;
+  const adsShare = totalSp>0 ? (totalAds/totalSp*100) : 0;
+  const daysInMonth = new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  const dayOfMonth = now.getDate();
+  const eom = dayOfMonth>1 ? Math.round(totalSp/dayOfMonth*daysInMonth) : totalSp;
+
+  const fmtK = v => v>=1e6 ? (v/1e6).toFixed(2)+'M' : Math.round(v/1000)+'k';
+  const deltaHtml = (d,inv) => {
+    if(d===null) return '';
+    const up = inv ? d<0 : d>0;
+    return `<span class="agent-pulse-delta ${up?'up':'down'}">${d>0?'▲':'▼'} ${Math.abs(d).toFixed(1)}%</span>`;
+  };
+
+  el.innerHTML = `
+    <div class="agent-pulse-card ${spDelta!==null&&spDelta<-5?'alert':spDelta>0?'good':''}">
+      <div class="agent-pulse-label">Sprzedaz MTD</div>
+      <div class="agent-pulse-val">${fmtK(totalSp)} zl</div>
+      <div class="agent-pulse-sub">EOM → ${fmtK(eom)} zl · dzien ${dayOfMonth}/${daysInMonth}</div>
+      ${deltaHtml(spDelta)}
+    </div>
+    <div class="agent-pulse-card ${wRoas<5?'alert':'good'}">
+      <div class="agent-pulse-label">ROAS (wazona)</div>
+      <div class="agent-pulse-val">${wRoas.toFixed(2)}x</div>
+      <div class="agent-pulse-sub">Ads% ${adsShare.toFixed(1)}% · koszt ${fmtK(totalAds)} zl</div>
+    </div>
+    <div class="agent-pulse-card ${wMargin<10?'alert':'good'}">
+      <div class="agent-pulse-label">Marza netto</div>
+      <div class="agent-pulse-val">${wMargin.toFixed(1)}%</div>
+      <div class="agent-pulse-sub">${greenCount} kont zdrowych · ${alerts} z alertem</div>
+    </div>
+    <div class="agent-pulse-card ${alerts>0?'alert':'good'}">
+      <div class="agent-pulse-label">Alerty</div>
+      <div class="agent-pulse-val" style="color:${alerts>0?'#ef4444':'#2dd4a0'}">${alerts}</div>
+      <div class="agent-pulse-sub">${alerts>0?'Konta wymagaja interwencji':'Portfel stabilny'}</div>
+      ${alerts>0?'<div style="font-family:var(--mono);font-size:10px;color:#ef4444;margin-top:4px;cursor:pointer" onclick="switchView(\'insights\')">→ Zobacz Insights</div>':''}
+    </div>`;
+}
+
+function renderAgentSuggestions(){
+  const el = document.getElementById('agentSuggestions'); if(!el) return;
+  const now = new Date();
+  const curM = MONTHS[now.getMonth()];
+  const suggestions = [];
+
+  // Scan accounts for data-driven suggestions
+  Object.keys(AC_META).forEach(k => {
+    const D = getData(k); const prod = getProd(k);
+    const cur = D.find(d=>d.m===curM); if(!cur) return;
+    const C = calc(cur, prod); if(!C) return;
+    const name = AC_META[k].name;
+    // ROAS below BE
+    if(cur.roas>0 && C.beRoasAds && cur.roas < C.beRoasAds){
+      suggestions.push({pri:1, dot:'red', text:`${name}: ROAS ${cur.roas.toFixed(2)} < BE ${C.beRoasAds.toFixed(2)} — co ciac?`, q:`Konto ${name} ma ROAS ${cur.roas.toFixed(2)} przy BE ROAS ${C.beRoasAds.toFixed(2)}. Jakie kampanie wylaczyc i jak zredukowac koszty Ads?`});
+    }
+    // Margin critical
+    if(C.mAfter < 3){
+      suggestions.push({pri:0, dot:'red', text:`${name}: marza ${C.mAfter.toFixed(1)}% — plan ratunkowy`, q:`Konto ${name} ma marze netto ${C.mAfter.toFixed(1)}%. Przygotuj plan ratunkowy: co zmienic w cenach, Ads, wyroznieniach zeby wrocic do rentownosci.`});
+    }
+    // High promo spend
+    const promoP = cur.sprzedaz>0 ? (cur.promoC||0)/cur.sprzedaz*100 : 0;
+    if(promoP > 5 && C.mAfter < 15){
+      suggestions.push({pri:3, dot:'yellow', text:`${name}: wyroznienia ${promoP.toFixed(1)}% — za duzo?`, q:`Konto ${name} wydaje ${promoP.toFixed(1)}% na wyroznienia przy marzy ${C.mAfter.toFixed(1)}%. Czy to sie oplaca? Ktore oferty wylaczyc z wyrozen?`});
+    }
+    // ROAS way above BE — scaling opportunity
+    if(cur.roas>0 && C.beRoasAds && cur.roas > C.beRoasAds*2){
+      suggestions.push({pri:5, dot:'green', text:`${name}: ROAS ${cur.roas.toFixed(1)}x — skalowac budzet?`, q:`Konto ${name} ma ROAS ${cur.roas.toFixed(2)} przy BE ${C.beRoasAds.toFixed(2)} — ponad 2x zapas. Ile moge zwiekszyc budzet Ads i jakie kampanie skalowac?`});
+    }
+    // Zero ads spend but decent sales
+    const adsCost = parseFloat(cur.adsCost)||0;
+    if(adsCost===0 && (parseFloat(cur.sprzedaz)||0) > 10000){
+      suggestions.push({pri:4, dot:'blue', text:`${name}: 0 zl w Ads przy ${Math.round(cur.sprzedaz/1000)}k sprzedazy — warto?`, q:`Konto ${name} sprzedaje ${Math.round(cur.sprzedaz)} zl bez Ads. Czy warto wlaczyc reklamy? Jaki budzet startowy?`});
+    }
+  });
+
+  // Cross-account suggestions
+  const lastKb = JSON.parse(localStorage.getItem('kbHistory') || '[]');
+  if(lastKb.length){
+    const lastDate = lastKb[lastKb.length-1].date;
+    const daysSince = Math.round((Date.now() - new Date(lastDate).getTime())/(1000*60*60*24));
+    if(daysSince > 14){
+      suggestions.push({pri:2, dot:'yellow', text:`Kanibalizacja: ${daysSince} dni od ostatniego raportu`, q:`Wykonaj analize kanibalizacji miedzy kontami MEBLE. Ostatni raport byl ${daysSince} dni temu. Ktore oferty sie nakladaja i co z tym zrobic?`});
+    }
+  }
+  // Seasonality hint
+  const dayOfMonth = now.getDate();
+  if(dayOfMonth >= 25){
+    suggestions.push({pri:6, dot:'blue', text:'Koniec miesiaca — prognoza EOM i plan na nastepny', q:'Przygotuj prognozę EOM dla calego portfela i zaplanuj TOP 5 akcji na nastepny miesiac na podstawie aktualnych trendow.'});
+  }
+
+  // Sort by priority, max 7
+  suggestions.sort((a,b)=>a.pri-b.pri);
+  const top = suggestions.slice(0,7);
+
+  if(!top.length){
+    el.innerHTML = '<li style="color:var(--text3);font-size:11px;padding:8px">Brak sugestii — dane wyglądają stabilnie</li>';
+    return;
+  }
+  el.innerHTML = top.map(s =>
+    `<li onclick="agentAsk('${s.q.replace(/'/g,"\\'")}')"><span class="sg-dot ${s.dot}"></span>${s.text}</li>`
+  ).join('');
+}
+
+function renderAgentRecent(){
+  const wrap = document.getElementById('agentRecentWrap');
+  const el = document.getElementById('agentRecent');
+  if(!wrap||!el) return;
+  const reports = JSON.parse(localStorage.getItem('mhSavedReports') || '[]');
+  const analyses = JSON.parse(localStorage.getItem('aaHistory') || '[]');
+  const kanib = JSON.parse(localStorage.getItem('kbHistory') || '[]');
+
+  const items = [];
+  reports.slice(-5).forEach(r => {
+    items.push({type: r.source||'raport', title: r.title||r.konto||'Raport', date: r.date||r.savedAt, ts: new Date(r.date||r.savedAt).getTime(), onclick:`openSavedReport('${(r.id||'').replace(/'/g,"\\'")}')`});
+  });
+  analyses.slice(-5).forEach(a => {
+    items.push({type:'analiza', title:`${a.konto} — ${a.okres}`, date:a.date, ts: new Date(a.date).getTime(), onclick:`agentAsk('Przygotuj analize konta ${(a.konto||'').replace(/'/g,"\\'")} na podstawie ostatnich danych')`});
+  });
+  kanib.slice(-3).forEach(k => {
+    items.push({type:'kanibalizacja', title:'Raport kanibalizacji', date:k.date, ts: new Date(k.date).getTime(), onclick:`agentAsk('Powtorz analize kanibalizacji miedzy kontami MEBLE')`});
+  });
+
+  items.sort((a,b)=>b.ts-a.ts);
+  const recent = items.slice(0,6);
+
+  if(!recent.length){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+
+  el.innerHTML = recent.map(r => {
+    const typeColors = {analiza:'#4d9fff',kanibalizacja:'#f472b6',raport:'#ff6b35',cockpit:'#f5a623',screener:'#34d399',architect:'#b47fff'};
+    const dateStr = r.date ? new Date(r.date).toLocaleDateString('pl-PL',{day:'numeric',month:'short'}) : '';
+    return `<div class="agent-recent-card" onclick="${r.onclick||''}">
+      <div class="agent-recent-type" style="color:${typeColors[r.type]||'var(--text3)'}">${r.type}</div>
+      <div class="agent-recent-title">${r.title}</div>
+      <div class="agent-recent-date">${dateStr}</div>
+    </div>`;
+  }).join('');
 }
 
 function agentAsk(q){
@@ -21723,7 +21929,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.08</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.09</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -24968,7 +25174,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.08 — ALL NEW FEATURES
+// v9.09 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
@@ -25880,7 +26086,13 @@ function renderBEOptimizer() {
 }
 
 
-// ── 11. PDF EXPORT WITH BRANDING ────────────────────────────
+// ── 11. PDF EXPORT WITH BRANDING (LIGHT PRINT THEME) ────────
+const _PRINT_CSS = `body{background:#fff!important;color:#1a1a1a!important;font-family:'DM Sans',sans-serif;padding:24px;font-size:12px;line-height:1.5}*{border-color:#ddd!important}table{border-collapse:collapse;width:100%;margin:8px 0}th{background:#f5f5f5!important;color:#333!important;font-weight:600;padding:8px 10px;text-align:left;font-size:11px;border-bottom:2px solid #ccc!important}td{padding:6px 10px;border-bottom:1px solid #eee!important;font-size:11px;color:#222!important}.ca2-pill{border:1px solid #999!important;background:#f5f5f5!important;color:#333!important}.btn,.ca2-tab,.notif-filter,.agent-history-btn{display:none!important}.ca2-stat,.drill-metric{background:#f5f5f5!important;border:1px solid #ddd!important}.ca2-stat-val,.drill-metric-val{color:#111!important}.ca2-stat-label,.drill-metric-label{color:#666!important}div[style*="background:rgba"],div[style*="background:var(--bg"]{background:transparent!important}span[style*="color:var(--green)"],td[style*="color:var(--green)"],div[style*="color:var(--green)"]{color:#0a8a5a!important}span[style*="color:var(--red)"],td[style*="color:var(--red)"],div[style*="color:var(--red)"]{color:#cc0000!important}span[style*="color:var(--accent)"],td[style*="color:var(--accent)"],div[style*="color:var(--accent)"]{color:#cc5500!important}span[style*="color:var(--yellow)"],td[style*="color:var(--yellow)"],div[style*="color:var(--yellow)"]{color:#aa8800!important}span[style*="color:var(--blue)"],td[style*="color:var(--blue)"],div[style*="color:var(--blue)"]{color:#2255cc!important}span[style*="color:var(--text3)"],td[style*="color:var(--text3)"],div[style*="color:var(--text3)"]{color:#888!important}`;
+
+function _printCloneHTML(el) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>MPlace Hub</title><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"><style>${_PRINT_CSS}</style></head><body><div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #cc5500;padding-bottom:8px;margin-bottom:16px"><div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:#cc5500">MPlace Hub</div><div style="font-family:'DM Mono',monospace;font-size:10px;color:#888">${new Date().toLocaleDateString('pl-PL')} · v9.08</div></div>${el.innerHTML}<div style="margin-top:24px;padding-top:8px;border-top:1px solid #ddd;font-family:'DM Mono',monospace;font-size:9px;color:#aaa;display:flex;justify-content:space-between"><span>MPlace Hub · mplace-bz.github.io/Mplace-Hub/</span><span>${new Date().toLocaleString('pl-PL')}</span></div></body></html>`;
+}
+
 async function exportPDFBranded(containerId, filename) {
   const progress = document.getElementById('pdfProgress');
   if (progress) { progress.style.display = 'block'; progress.textContent = 'Generowanie PDF...'; }
@@ -25889,63 +26101,53 @@ async function exportPDFBranded(containerId, filename) {
     const element = document.getElementById(containerId);
     if (!element) throw new Error('Element nie znaleziony: ' + containerId);
 
-    const canvas = await html2canvas(element, {
-      backgroundColor: '#0b0d14',
+    // Render light-themed clone in hidden iframe
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:1000px;height:10000px;border:none';
+    document.body.appendChild(iframe);
+    const doc = iframe.contentDocument;
+    doc.open();
+    doc.write(_printCloneHTML(element));
+    doc.close();
+    await new Promise(r => setTimeout(r, 600));
+
+    const canvas = await html2canvas(doc.body, {
+      backgroundColor: '#ffffff',
       scale: 2,
       useCORS: true,
       logging: false,
+      windowWidth: 1000,
     });
+    document.body.removeChild(iframe);
 
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
+    const imgW = pageW - 16;
+    const maxContentH = pageH - 10;
 
-    // Header branding
-    pdf.setFillColor(15, 17, 23);
-    pdf.rect(0, 0, pageW, 15, 'F');
-    pdf.setFontSize(10);
-    pdf.setTextColor(255, 107, 53);
-    pdf.text('MPlace Hub', 10, 10);
-    pdf.setTextColor(139, 145, 168);
-    pdf.text(new Date().toLocaleDateString('pl-PL') + ' · v9.08', pageW - 10, 10, { align: 'right' });
-
-    // Content
-    const imgW = pageW - 20;
-    const imgH = (canvas.height * imgW) / canvas.width;
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-
-    let yOffset = 18;
-    const maxContentH = pageH - 25; // Leave room for footer
-
-    if (imgH <= maxContentH) {
-      pdf.addImage(imgData, 'JPEG', 10, yOffset, imgW, imgH);
-    } else {
-      // Multi-page
-      let srcY = 0;
-      const srcPageH = (maxContentH / imgW) * canvas.width;
-      while (srcY < canvas.height) {
-        if (srcY > 0) pdf.addPage();
-        const pageCanvas = document.createElement('canvas');
-        pageCanvas.width = canvas.width;
-        pageCanvas.height = Math.min(srcPageH, canvas.height - srcY);
-        const ctx = pageCanvas.getContext('2d');
-        ctx.drawImage(canvas, 0, srcY, canvas.width, pageCanvas.height, 0, 0, canvas.width, pageCanvas.height);
-        const pageData = pageCanvas.toDataURL('image/jpeg', 0.95);
-        const pH = (pageCanvas.height * imgW) / canvas.width;
-        pdf.addImage(pageData, 'JPEG', 10, yOffset, imgW, pH);
-        srcY += srcPageH;
-      }
+    let srcY = 0;
+    const srcPageH = (maxContentH / imgW) * canvas.width;
+    while (srcY < canvas.height) {
+      if (srcY > 0) pdf.addPage();
+      const pc = document.createElement('canvas');
+      pc.width = canvas.width;
+      pc.height = Math.min(srcPageH, canvas.height - srcY);
+      const ctx = pc.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, pc.width, pc.height);
+      ctx.drawImage(canvas, 0, srcY, canvas.width, pc.height, 0, 0, canvas.width, pc.height);
+      pdf.addImage(pc.toDataURL('image/jpeg', 0.92), 'JPEG', 8, 5, imgW, (pc.height * imgW) / canvas.width);
+      srcY += srcPageH;
     }
 
-    // Footer
     const totalPages = pdf.internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
       pdf.setPage(i);
-      pdf.setFontSize(8);
-      pdf.setTextColor(86, 92, 117);
-      pdf.text('MPlace Hub · mplace-bz.github.io/Mplace-Hub/', 10, pageH - 5);
-      pdf.text('Strona ' + i + '/' + totalPages, pageW - 10, pageH - 5, { align: 'right' });
+      pdf.setFontSize(7);
+      pdf.setTextColor(170);
+      pdf.text('Strona ' + i + '/' + totalPages, pageW - 8, pageH - 3, { align: 'right' });
     }
 
     pdf.save((filename || 'MPlace_Report') + '.pdf');
@@ -25960,11 +26162,9 @@ function printDiv(elementId) {
   const el = document.getElementById(elementId);
   if (!el) return;
   const w = window.open('', '_blank');
-  w.document.write('<html><head><title>MPlace Hub</title><style>body{background:#fff;color:#111;font-family:sans-serif;padding:20px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:6px 10px;text-align:left;font-size:12px}</style></head><body>');
-  w.document.write(el.innerHTML);
-  w.document.write('</body></html>');
+  w.document.write(_printCloneHTML(el));
   w.document.close();
-  w.print();
+  w.onload = () => { w.focus(); w.print(); };
 }
 
 
@@ -26131,7 +26331,7 @@ function ca2ExportHTML() {
   const content = document.getElementById('ca2Content');
   if (!content) return;
   const kName = AC_META[ca2Data.konto]?.name || '';
-  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Przeglad ofert — ' + kName + '</title><style>body{background:#0b0d14;color:#e9ebf2;font-family:sans-serif;padding:2rem}table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}th{color:#8b91a8}</style></head><body>' + content.innerHTML + '</body></html>';
+  const html = _printCloneHTML(content);
   const blob = new Blob([html], { type: 'text/html' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
