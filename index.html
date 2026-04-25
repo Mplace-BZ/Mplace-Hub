@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.11</title>
+<title>MPlace Hub v9.12</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1635,7 +1635,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.11 — NEW FEATURES CSS ═══ */
+/* ═══ v9.12 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -1844,7 +1844,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="login-logo">MPlace <span>Hub</span></div>
     <div class="login-sub">Zaloguj się aby uzyskać dostęp do danych.<br>Synchronizacja między urządzeniami przez Firebase.</div>
     <button class="login-google-btn" onclick="signInWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.11h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.12h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Zaloguj się przez Google
     </button>
     <div class="login-note">Twoje dane są bezpieczne na Twoim koncie Google.<br>Nikt inny nie ma dostępu.</div>
@@ -1875,7 +1875,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.11</span>
+    <span class="brand-ver">v9.12</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -21934,7 +21934,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.11</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.12</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25179,7 +25179,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.11 — ALL NEW FEATURES
+// v9.12 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
@@ -26222,17 +26222,35 @@ async function ca2SmartUpload(input, slotIdx) {
   else if (sheets.some(s => s.includes('wg ofert') && !s.includes('odwiedziny'))) detectedType = 'konwersja';
   else detectedType = 'ads'; // fallback: assume Ads
 
-  const typeLabels = { ads: 'Ads (Statystyki)', sprzedaz: 'Odwiedziny wg ofert', konwersja: 'Sprzedaz wg ofert' };
   zone.classList.add('has-file');
-  label.textContent = file.name;
   _ca2SlotFiles[slotIdx] = { type: detectedType, file };
 
-  // Show detected type
+  // Show detected type + period selector for Ads
   const iconEl = zone.querySelector('.ca2-upload-icon');
-  if (iconEl) {
-    iconEl.textContent = detectedType === 'ads' ? 'ADS' : detectedType === 'sprzedaz' ? 'ODW' : 'SPR';
-    iconEl.style.color = detectedType === 'ads' ? 'var(--accent)' : detectedType === 'sprzedaz' ? 'var(--blue)' : 'var(--green)';
-    iconEl.style.fontSize = '11px';
+  if (detectedType === 'ads') {
+    // Ask which period this Ads file covers
+    if (iconEl) { iconEl.textContent = 'ADS'; iconEl.style.color = 'var(--accent)'; iconEl.style.fontSize = '11px'; }
+    label.innerHTML = `${file.name}<br><select id="ca2AdsPeriod${slotIdx}" style="margin-top:4px;background:var(--bg);border:1px solid var(--accent);border-radius:4px;padding:2px 6px;color:var(--accent);font-family:var(--mono);font-size:10px;cursor:pointer">
+      <option value="7">7 dni</option><option value="14">14 dni</option><option value="30" selected>30 dni</option></select>`;
+    // Try to auto-detect period from filename
+    const fname = file.name.toLowerCase();
+    if (fname.includes('7dni') || fname.includes('7d') || fname.match(/7[_-]?dni/)) {
+      const sel2 = document.getElementById('ca2AdsPeriod' + slotIdx);
+      if (sel2) sel2.value = '7';
+    } else if (fname.includes('14dni') || fname.includes('14d') || fname.match(/14[_-]?dni/)) {
+      const sel2 = document.getElementById('ca2AdsPeriod' + slotIdx);
+      if (sel2) sel2.value = '14';
+    } else if (fname.includes('30dni') || fname.includes('30d') || fname.match(/30[_-]?dni/)) {
+      const sel2 = document.getElementById('ca2AdsPeriod' + slotIdx);
+      if (sel2) sel2.value = '30';
+    }
+  } else {
+    if (iconEl) {
+      iconEl.textContent = detectedType === 'sprzedaz' ? 'ODW' : 'SPR';
+      iconEl.style.color = detectedType === 'sprzedaz' ? 'var(--blue)' : 'var(--green)';
+      iconEl.style.fontSize = '11px';
+    }
+    label.textContent = file.name;
   }
 
   console.log('[Przeglad ofert] Slot', slotIdx+1, '→ detected:', detectedType, '| sheets:', sheets.join(', '));
@@ -26241,10 +26259,24 @@ async function ca2SmartUpload(input, slotIdx) {
   try {
     const parsed = await aaParseFile(file, detectedType);
     if (detectedType === 'ads') {
-      // Assign to first empty ads slot
-      if (!ca2Parsed.ads7) { ca2Parsed.ads7 = parsed; ca2Data.ads7 = true; }
-      else if (!ca2Parsed.ads14) { ca2Parsed.ads14 = parsed; ca2Data.ads14 = true; }
-      else { ca2Parsed.ads30 = parsed; ca2Data.ads30 = true; }
+      // Read selected period from dropdown
+      const periodSel = document.getElementById('ca2AdsPeriod' + slotIdx);
+      const period = periodSel ? periodSel.value : '30';
+      const pKey = 'ads' + period;
+      ca2Parsed[pKey] = parsed;
+      ca2Data[pKey] = true;
+      // Listen for period change — reassign
+      if (periodSel) {
+        periodSel.onchange = function() {
+          // Remove from old slot
+          ['ads7','ads14','ads30'].forEach(k => { if (ca2Parsed[k] === parsed) { ca2Parsed[k] = null; ca2Data[k] = false; } });
+          // Assign to new
+          const nk = 'ads' + this.value;
+          ca2Parsed[nk] = parsed;
+          ca2Data[nk] = true;
+          ca2UpdateStats();
+        };
+      }
     } else if (detectedType === 'sprzedaz') {
       ca2Parsed.sales = parsed; ca2Data.sales = true;
     } else if (detectedType === 'konwersja') {
