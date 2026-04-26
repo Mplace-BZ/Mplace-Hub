@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.27</title>
+<title>MPlace Hub v9.28</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -129,6 +129,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .ph-title span{color:var(--accent)}
 .ph-sub{font:400 14px/1.5 var(--mono);color:var(--text2);margin-top:14px}
 .ph-sub .sep{color:var(--text3)}
+.ph-info-link{display:inline-flex;align-items:center;gap:5px;margin-left:12px;padding:3px 10px;border-radius:5px;border:1px solid rgba(255,107,53,.25);background:rgba(255,107,53,.06);color:#ff6b35;font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;text-decoration:none;vertical-align:middle;letter-spacing:.03em}
+.ph-info-link:hover{background:rgba(255,107,53,.15);border-color:rgba(255,107,53,.4)}
 @media(max-width:1200px){.ph-title{font-size:52px}.ph-sub{font-size:13px}}
 @media(max-width:800px){.ph-title{font-size:40px}}
 .group-badge{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;border-radius:4px;border:1px solid;}
@@ -1673,7 +1675,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.27 — NEW FEATURES CSS ═══ */
+/* ═══ v9.28 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2004,7 +2006,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 <div class="login-wall" id="loginWall">
   <div class="login-box">
-    <div class="login-logo">MPlace <span>Hub</span></div>
+    <div class="login-logo">MPlace <span>Hub</span> <span class="ph-info-link" onclick="openInfoSection('tools')">? Info</span></div>
     <div class="login-sub">Zaloguj się aby uzyskać dostęp do danych.<br>Synchronizacja między urządzeniami przez Firebase.</div>
     <button class="login-google-btn" onclick="signInWithGoogle()">
       <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.20h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
@@ -2039,7 +2041,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.27</span>
+    <span class="brand-ver">v9.28</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2232,7 +2234,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="ph-eyebrow">▸ DZIS</div>
       <div class="ph-title">Cockpit <span id="dzisWeekday"></span></div>
-      <div class="ph-sub" id="dzisDate"></div>
+      <div class="ph-sub" id="dzisDate"> <span class="ph-info-link" onclick="openInfoSection('main')">? Info</span></div>
     </div>
     <div style="display:flex;gap:8px;align-items:center;margin-top:40px">
       <div style="font-family:var(--mono);font-size:13px;color:var(--text3)">START</div>
@@ -2430,7 +2432,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="ph-eyebrow">▸ Przegląd wszystkich kont</div>
       <div class="ph-title">Dashboard <span>Performance</span></div>
-      <div class="ph-sub" id="dashSub">Bieżący miesiąc · wszystkie 9 kont</div>
+      <div class="ph-sub" id="dashSub">Bieżący miesiąc · wszystkie 9 kont <span class="ph-info-link" onclick="openInfoSection('main')">? Info</span></div>
     </div>
     <div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-align:right;line-height:1.8">
       <span style="color:var(--green)">●</span> rentowne &nbsp;
@@ -2513,7 +2515,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="container">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
     <div>
-      <div class="ph-eyebrow">▸ Twój przychód agencyjny</div>
+      <div class="ph-eyebrow">▸ Twój przychód agencyjny <span class="ph-info-link" onclick="openInfoSection('tools')">? Info</span></div>
       <div class="ph-title">Mój <span>Biznes</span></div>
       <div class="ph-sub" id="bizSub">Wszystkie grupy · bieżący miesiąc</div>
     </div>
@@ -2625,7 +2627,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="container">
   <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
     <div>
-      <div class="ph-eyebrow">▸ TWOJE WYNAGRODZENIE AGENCYJNE</div>
+      <div class="ph-eyebrow">▸ TWOJE WYNAGRODZENIE AGENCYJNE <span class="ph-info-link" onclick="openInfoSection('tools')">? Info</span></div>
       <div class="ph-title">Rozliczenie <span>LUXSEN</span></div>
       <div class="ph-sub" id="rozSub">Luxsen · Semmi · BOTAVIT · stawka 20% od marży po reklamie</div>
     </div>
@@ -2681,7 +2683,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewArkusz">
 <div class="container">
   <div class="ph">
-    <div class="ph-eyebrow">▸ Historia wszystkich kont</div>
+    <div class="ph-eyebrow">▸ Historia wszystkich kont <span class="ph-info-link" onclick="openInfoSection('analiza')">? Info</span></div>
     <div class="ph-title">Arkusz <span>Danych</span></div>
     <div class="ph-sub">Zestawienie miesięczne · 9 kont · wszystkie grupy</div>
   </div>
@@ -2928,7 +2930,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="container">
   <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
     <div>
-      <div class="ph-eyebrow">▸ INTELIGENTNA ANALIZA</div>
+      <div class="ph-eyebrow">▸ INTELIGENTNA ANALIZA <span class="ph-info-link" onclick="openInfoSection('analiza')">? Info</span></div>
       <div class="ph-title">Insights <span>& Sygnały</span></div>
       <div class="ph-sub" id="insightsSub">Zagrożenia, szanse i obserwacje per konto</div>
     </div>
@@ -3050,7 +3052,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewImportAds">
 <div class="container">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow">▸ Import danych</div>
+    <div class="ph-eyebrow">▸ Import danych <span class="ph-info-link" onclick="openInfoSection('ai')">? Info</span></div>
     <div class="ph-title">Import Ads <span>✦</span></div>
     <div class="ph-sub">Allegro Ads · xlsx · analiza per kampania</div>
   </div>
@@ -3096,7 +3098,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewWiedza">
 <div class="container">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow">▸ Baza wiedzy Agenta</div>
+    <div class="ph-eyebrow">▸ Baza wiedzy Agenta <span class="ph-info-link" onclick="openInfoSection('tools')">? Info</span></div>
     <div class="ph-title">Wiedza <span>✦</span></div>
     <div class="ph-sub">Dodaj artykuły, słowniki, benchmarki — Agent uczy się z każdego wpisu</div>
   </div>
@@ -3174,7 +3176,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewPodcasts">
 <div class="container">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow">▸ MPlace Briefing</div>
+    <div class="ph-eyebrow">▸ MPlace Briefing <span class="ph-info-link" onclick="openInfoSection('tools')">? Info</span></div>
     <div class="ph-title">Podcasts</div>
     <div class="ph-sub">Głosowe podsumowania raportów — odsłuchaj, udostępnij, pobierz</div>
   </div>
@@ -3189,7 +3191,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewSim">
 <div class="container">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow">▸ Analiza scenariuszy</div>
+    <div class="ph-eyebrow">▸ Analiza scenariuszy <span class="ph-info-link" onclick="openInfoSection('tools')">? Info</span></div>
     <div class="ph-title">Symulator <span>co jeśli</span></div>
     <div class="ph-sub">Zmień parametry i zobacz natychmiastowy wpływ na wyniki</div>
   </div>
@@ -3212,7 +3214,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="container">
   <div style="margin-bottom:1rem">
     <div>
-      <div class="ph-eyebrow">▸ Trend historyczny</div>
+      <div class="ph-eyebrow">▸ Trend historyczny <span class="ph-info-link" onclick="openInfoSection('analiza')">? Info</span></div>
       <div class="ph-title">Miesiące <span>obok siebie</span></div>
       <div style="margin-top:.4rem">
         <div class="ph-sub" style="margin:0 0 .6rem 0">Wszystkie konta · wszystkie miesiące · <strong>estymacja końca miesiąca</strong> uwzględniona dla bieżącego</div>
@@ -3252,7 +3254,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="container">
   <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
     <div>
-      <div class="ph-eyebrow">▸ Analiza dzienna</div>
+      <div class="ph-eyebrow">▸ Analiza dzienna <span class="ph-info-link" onclick="openInfoSection('analiza')">? Info</span></div>
       <div class="ph-title">Day <span>to Day</span></div>
       <div class="ph-sub">Porównaj sprzedaż wybranych kont dzień po dniu</div>
     </div>
@@ -3282,7 +3284,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewCompare">
 <div class="container">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow">▸ Porównanie kont</div>
+    <div class="ph-eyebrow">▸ Porównanie kont <span class="ph-info-link" onclick="openInfoSection('analiza')">? Info</span></div>
     <div class="ph-title">Porównaj <span>konta</span></div>
     <div class="ph-sub">Wybierz 2–3 konta do porównania obok siebie</div>
   </div>
@@ -3303,7 +3305,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewKalendar">
 <div class="container">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow">► KAMPANIE 2026</div>
+    <div class="ph-eyebrow">► KAMPANIE 2026 <span class="ph-info-link" onclick="openInfoSection('tools')">? Info</span></div>
     <div class="ph-title">Kalendarz <span>✦</span></div>
     <div class="ph-sub">Allegro Days · Smart! Weeks · Black Weeks · Xmas · Święta</div>
   </div>
@@ -3323,7 +3325,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewAnaliza">
 <div class="container">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow">► ANALIZA DANYCH ALLEGRO</div>
+    <div class="ph-eyebrow">► ANALIZA DANYCH ALLEGRO <span class="ph-info-link" onclick="openInfoSection('ai')">? Info</span></div>
     <div class="ph-title">Analiza <span>Ofert</span></div>
     <div class="ph-sub">Wgraj 3 raporty Allegro + wpisz uwagi → Agent wskaże co pushować, co ciąć, co poprawić</div>
   </div>
@@ -3576,7 +3578,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewKanibalizator">
 <div class="container">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow">► PLANOWANIE WYRÓŻNIEŃ</div>
+    <div class="ph-eyebrow">► PLANOWANIE WYRÓŻNIEŃ <span class="ph-info-link" onclick="openInfoSection('ai')">? Info</span></div>
     <div class="ph-title">Wyróżnienia <span>◆</span> Manager</div>
     <div class="ph-sub">Lista wyróżnionych aukcji per konto + budżet kontroli (cel ≤ 5% sprzedaży) + historia zmian</div>
   </div>
@@ -3650,7 +3652,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewScreener">
 <div class="container">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow">► ROZMOWA Z AGENTEM</div>
+    <div class="ph-eyebrow">► ROZMOWA Z AGENTEM <span class="ph-info-link" onclick="openInfoSection('ai')">? Info</span></div>
     <div class="ph-title">Screener <span>◆</span></div>
     <div class="ph-sub">Wklej screenshot (Ctrl+V), wgraj XLSX/PDF lub napisz pytanie — Agent widzi dane wszystkich kont i bazę Wiedzy</div>
   </div>
@@ -3734,7 +3736,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewTitleAnalyzer">
 <div class="container">
   <div style="margin-bottom:1rem">
-    <div class="ph-eyebrow">► OPTYMALIZACJA TYTUŁÓW OFERT</div>
+    <div class="ph-eyebrow">► OPTYMALIZACJA TYTUŁÓW OFERT <span class="ph-info-link" onclick="openInfoSection('ai')">? Info</span></div>
     <div class="ph-title">Title <span>Analyzer</span></div>
     <div class="ph-sub">Wklej tytuły ofert z 3 kont MEBLE — Agent zaproponuje zoptymalizowane tytuły per rola konta</div>
   </div>
@@ -3811,7 +3813,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewStrategia">
 <div class="container">
   <div style="margin-bottom:1.5rem">
-    <div class="ph-eyebrow">► STRATEGIA PORTFELOWA</div>
+    <div class="ph-eyebrow">► STRATEGIA PORTFELOWA <span class="ph-info-link" onclick="openInfoSection('meble')">? Info</span></div>
     <div class="ph-title">Strategia <span>◆</span> Grupy</div>
     <div class="ph-sub">Role kont · pricing tier · specjalizacje · aktualne KPI vs cele</div>
   </div>
@@ -3850,7 +3852,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="view" id="viewCentrumAds">
 <div class="container">
   <div style="margin-bottom:1.5rem">
-    <div class="ph-eyebrow">► CENTRUM KAMPANII ALLEGRO ADS</div>
+    <div class="ph-eyebrow">► CENTRUM KAMPANII ALLEGRO ADS <span class="ph-info-link" onclick="openInfoSection('ai')">? Info</span></div>
     <div class="ph-title">Centrum <span>◆</span> Ads</div>
     <div class="ph-sub">Generator nazw · Walidator konwencji · Hierarchia kampanii read-only</div>
   </div>
@@ -4050,7 +4052,7 @@ IDs: 123456 789012 ..."></textarea>
 <div class="container">
   <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
     <div>
-      <div class="ph-eyebrow">► NARZĘDZIA ANALITYCZNE</div>
+      <div class="ph-eyebrow">► NARZĘDZIA ANALITYCZNE <span class="ph-info-link" onclick="openInfoSection('tools')">? Info</span></div>
       <div class="ph-title">Kalkulator <span>✦</span></div>
       <div class="ph-sub">ROAS · ACoS · Marża · Break-even · CPC · CTR · CPA</div>
     </div>
@@ -4237,7 +4239,7 @@ IDs: 123456 789012 ..."></textarea>
 <div class="zm-panel" id="zmPanel">
 <div class="container">
   <div class="page-header">
-    <div class="ph-eyebrow">▸ ZARZADZANIE ZESPOLEM</div>
+    <div class="ph-eyebrow">▸ ZARZADZANIE ZESPOLEM <span class="ph-info-link" onclick="openInfoSection('team')">? Info</span></div>
     <div class="ph-title">Zespol <span>✦</span></div>
     <div class="ph-sub">Acta, non verba — czyny, nie slowa</div>
   </div>
@@ -5152,6 +5154,11 @@ function renderInfoView(){
   if(statsEl) statsEl.innerHTML = `${INFO_SECTIONS.length} sekcji · ${totalItems} artykulow`;
 
   renderInfoContent(_infoActiveSection);
+}
+
+function openInfoSection(sectionId){
+  _infoActiveSection = sectionId;
+  showView('info');
 }
 
 function infoSelectSection(id){
@@ -20768,8 +20775,9 @@ function caInit() {
   if (sel && !document.getElementById('caNNN').value) {
     caUpdateNNN();
   }
-  // Załaduj ostatni plan AI Architect z localStorage (jeśli jest)
-  caLoadLastPlan();
+  // Czyste pole — nie ładuj starego planu automatycznie
+  const planWrap = document.getElementById('caArchPlan');
+  if (planWrap) planWrap.innerHTML = '';
 }
 
 function caLoadLastPlan() {
@@ -22276,7 +22284,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.27</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.28</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25529,7 +25537,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.27 — ALL NEW FEATURES
+// v9.28 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
