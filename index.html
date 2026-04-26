@@ -14506,6 +14506,110 @@ function saveWiedza(entries) {
   if (currentUser) saveWiedzaToFS().catch(e => console.error(e));
 }
 
+// ═══ WIEDZA SEED — zasady, benchmarki, case studies z 15 lat doświadczenia ═══
+function seedWiedzaDefaults() {
+  const SEED_VER = 'wiedza_seed_v1';
+  if (localStorage.getItem(SEED_VER)) return;
+  const now = Date.now();
+  const seed = [
+    // ── ZASADY DECYZYJNE ──
+    { id:now+1, cat:'zasady', title:'Próg 3 transakcji — KAŻDA decyzja oparta na ROAS',
+      content:'Minimum 3 transakcji obowiązuje WSZĘDZIE:\n• SKALOWANIE: ROAS > BE + min 3 szt = gwiazda\n• KANIBALIZACJA: porównanie ROAS między kampaniami WYMAGA min 3 szt łącznie\n• WYŁĄCZANIE: ROAS < 3 z 1 trans = za mało danych. Wyłączaj gdy 3+ trans ALBO koszt ≥30 zł bez ŻADNEJ sprzedaży\n• OPTYMALIZACJA STAWKI: poniżej BE z 1-2 trans = obserwuj, nie tnij\nWyjątek jedyny: aukcje martwe (koszt ≥30 zł, 0 sprzedaży) — wyłączaj nawet bez transakcji.', created:now },
+    { id:now+2, cat:'zasady', title:'Budżet Ads = CAP nie cel wydatków (100/50/30)',
+      content:'Allegro wydaje tylko tyle ile ma kliknięć. Ustawienie 100 zł nie znaczy wydanie 100 zł.\n\nTiery budżetowe per kampania:\n• 100 zł/dzień — gwiazdy (ROAS > BE, potwierdzone 3+ trans)\n• 50 zł/dzień — obserwacja (ROAS 3-6, tuż nad/pod BE)\n• 30 zł/dzień — nowe grupy (brak danych, start)\n\nReguła codzienna:\n• ROAS > 10 → SKALUJ (budżet +50%, CPC +0.20)\n• ROAS > 6 → ZOSTAW\n• ROAS 3-6 → OBSERWUJ 7 dni\n• ROAS < 3 przez 3 dni → WYŁĄCZ\n• 0 kliknięć → CPC za niski, podnieś +0.20', created:now },
+    { id:now+3, cat:'zasady', title:'Wyróżnienie ≠ Ads — dwa osobne kanały, nie mieszaj',
+      content:'Ads = płacisz za klik → sprzedaż z Ads (mierzone ROAS Ads).\nWyróżnienie = płacisz za widoczność organiczną → więcej wizyt → sprzedaż organiczna.\n\nBestseller z 16 sprzedażami organicznie + wyróżnieniem → wyłączysz wyróżnienie → spadnie pozycja → spadną wizyty → spadnie sprzedaż.\n\nPoprawna logika:\n• WYŁĄCZ ADS, TRZYMAJ wyróżnienie = oferta sprzedaje organicznie ale Ads traci\n• NIE PROMOWAĆ (ani Ads ani wyr.) = 0 sprzedaży, <3 trans, specjalizacja innego konta\n\nNIGDY nie rekomenduj wyłączenia wyróżnienia bo ROAS Ads jest niski — to dwa osobne kanały.', created:now },
+    { id:now+4, cat:'zasady', title:'Wyróżnienia: flat vs elastic — próg 7 dni',
+      content:'Flat (stałe): 19.90 zł/10d = 1.99 zł/dzień\nElastic (elastyczne): 2.90 zł/dzień\nRóżnica: -0.91 zł/dzień (-31%) na korzyść flat.\n\nReguła:\n• Aukcja stała CORE (gwiazda 3%+ konwersji) → FLAT\n• Aukcja sezonowa 30+ dni → FLAT\n• Test wyróżnienia (1-7 dni) → ELASTIC\n• BOOST krótki (5 dni) → ELASTIC\n• Nowa aukcja → elastic 7 dni, potem flat\n\nPróg break-even: ~7 dni. Krócej = elastic, dłużej = flat.\nOszczędność grupy MEBLE (37 wyróżnień): ~1000 zł/mies na konwersji elastic→flat.', created:now },
+    { id:now+5, cat:'zasady', title:'Dynamic CPC — default strategia, 7 dni nauki',
+      content:'Dynamic CPC = Allegro automatycznie dobiera stawkę CPC w zakresie.\nZawsze ustawiaj jako default na NOWYCH kampaniach.\n\n• Okres nauki: 7 dni (nie zmieniaj stawek w tym czasie)\n• Zakres CPC: 0.80-1.50 zł (typowe MEBLE)\n• Po 7 dniach: sprawdź ROAS, jeśli < 3 przez 3 dni → wyłącz\n• Ręczne CPC tylko gdy Dynamic nie dowozi po 14 dniach\n\nNie mieszaj Dynamic i Manual w jednej kampanii.', created:now },
+    { id:now+6, cat:'zasady', title:'Bestseller Automat — zasada wykluczeń',
+      content:'[ALL] Bestseller Automat zostaje jako kampania automatyczna Allegro.\nALE: każda aukcja obecna w jakiejkolwiek kampanii CORE musi być WYKLUCZONA z BA.\n\nBrak wykluczeń = wzajemne podbijanie CPC o 20-40%.\n\nPo każdym dodaniu aukcji do kampanii CORE → natychmiast wykluczyć z BA.', created:now },
+    { id:now+7, cat:'zasady', title:'Próg alarmu Ads: 30 zł (10% koszyka 300 zł)',
+      content:'Jeśli kampania wydaje ≥30 zł bez ŻADNEJ sprzedaży = natychmiastowy alarm.\n30 zł = ~10% średniego koszyka meblowego (300 zł).\nTo znaczy że koszt pozyskania klienta przekracza marżę — nawet jeśli klient kupi, nie zarobisz.\n\nAkcja: wyłącz kampanię, sprawdź cennik dostawy i ceny vs konkurencja.', created:now },
+
+    // ── SMART / DOSTAWA ──
+    { id:now+8, cat:'zasady', title:'Smart vs DPD — kluczowa zmienna konwersji MEBLE',
+      content:'Smart konwertuje 4-7x wyżej niż DPD 2/3 paczki.\n\nDane MobelKap kwiecień 2026 (7218 wizyt):\n• Smart (0 zł dostawa): konwersja 2.10%\n• DPD 2pak (40 zł dostawa): konwersja 0.46%\n\nPotwierdzone na 3/3 kontach MEBLE.\nŁączny potencjał Smart migration: +53-65 tys zł/mies.\n\nKandydat do Smart:\n• Aukcja na DPD 2/3 paczki\n• >50 wizyt\n• Konwersja <0.7%\n• ≥10 porzuconych koszyków\n→ przenieść na Smart, podnieść cenę o 33 (2pak) lub 53 zł (3pak)\n\nNIE wyłączaj Ads dla aukcji DPD z dużymi koszykami — najpierw rekomenduj migrację na Smart.', created:now },
+
+    // ── BENCHMARKI ──
+    { id:now+9, cat:'benchmark', title:'BE ROAS per grupa — progi rentowności',
+      content:'Break-Even ROAS = 1 / (marża_przed / 100)\n\nMEBLE (producent 65%): BE ~2.86x (z prowizją/dostawą ~4.0-4.5x)\nLUXSEN (producent 60%): BE ~2.50x\nONE (producent 55%): BE ~2.22x\n\nDashboard liczy pełne BE z prowizją, wyróżnieniami i dostawą — używaj tej wartości, nie uproszczonej.', created:now },
+    { id:now+10, cat:'benchmark', title:'ROAS progi decyzyjne',
+      content:'< 3x = WYŁĄCZ (traci pieniądze)\n3-4x = OSTRZEŻENIE (obserwuj 7 dni, tnij CPC jeśli nie poprawi)\n4x - BE = OPTYMALIZUJ (jest szansa, tnij CPC o 10-20%)\n> BE = SKALUJ (zarabia, zwiększ budżet)\n> 10x = SKALUJ AGRESYWNIE (+50% budżet, +0.20 CPC)\n> 50x przy <50 zł kosztu = NOISE (za mało danych, ignoruj)\n\nZawsze sprawdzaj liczbę transakcji — ROAS z 1 trans to szum statystyczny.', created:now },
+    { id:now+11, cat:'benchmark', title:'Próg wyróżnień: max 5% sprzedaży',
+      content:'Wyróżnienia nie powinny przekraczać 5% sprzedaży miesięcznej konta.\nPowyżej 5% = przepalenie — marża nie wytrzyma.\n\nTargety per konto MEBLE:\n• MobelKap: 5.0%\n• Perfekt Cięcie: 3.0%\n• Meble na Czasie: 4.5%\n\nMonitor w Wyróżnienia Manager pokazuje aktualny % vs target.', created:now },
+    { id:now+12, cat:'benchmark', title:'MeblenaCzasie = benchmark efektywności grupy MEBLE',
+      content:'MnC ma najwyższą marżę (9.1%), najlepszy ROAS (8.23), najniższy Ads%.\nTo konto-referencja — jeśli MK lub PC mają gorsze metryki, porównaj z MnC.\n\nMnC jest na pricing premium (+2.5% vs base) i nadal dominuje → dowód że jakość > cena na Allegro.', created:now },
+
+    // ── ROLE KONT MEBLE ──
+    { id:now+13, cat:'klient', title:'MobelKap (MK) = SCALE & VOLUME',
+      content:'Rola: maszyna wolumenowa grupy MEBLE\nPricing: base (0%)\nSpecjalizacje: szafki pralkowe, nowości, półki wysuwane, szafki łazienkowe, t-box, stoliki KARO 92\nAds% target: 6.5% | Wyr% target: 5.0%\nPriorytet: pełny budżet Ads na kategoriach specjalizacji, skalowanie wolumenu\nNajwiększy ruch organiczny w grupie.\nNIE testuj doniczek/kwietników na MK — to specjalizacja PC.', created:now },
+    { id:now+14, cat:'klient', title:'Perfekt Cięcie (PC) = NICHE & SEASON',
+      content:'Rola: chirurgiczna specjalizacja w niszach\nPricing: base (0%)\nSpecjalizacje: donice Craft, donice Lancelot, kwietniki, szafki lustro niszowe, SLIM, sezonowe\nAds% target: 5.5% | Wyr% target: 3.0%\nSuper Sprzedawca + Qlt 336\nPriorytet: NIE konkurować z MK/MnC w wolumenie. Koncentracja na niszach gdzie PC jest sam.\nHistoryczna gwiazda: Donica Craft 45x22 ROAS 99x.', created:now },
+    { id:now+15, cat:'klient', title:'Meble na Czasie (MnC) = PREMIUM +2.5%',
+      content:'Rola: premium pricing + top performers\nPricing: +2.5% vs base\nSpecjalizacje: TOP92 Wotan, KARO 65 Wotan, stoliki podnoszone, gwiazdy z konwersją 4%+\nAds% target: 6.5% | Wyr% target: 4.5%\nNajwyższa marża grupy (9.1%), najlepszy ROAS (8.23)\nTOP92 Wotan = 53% sprzedaży Ads\nPriorytet: selektywne Ads tylko na potwierdzonych gwiazdach (min 5 trans, konwersja ≥3%)', created:now },
+
+    // ── KANIBALIZACJA ──
+    { id:now+16, cat:'zasady', title:'Kanibalizacja cross-account — wykrywanie i eliminacja',
+      content:'W grupie z tym samym katalogiem (np. MEBLE) systematycznie występuje kanibalizacja.\n\nWzorzec wykrywania:\n• Identyczna nazwa wariantu na 2+ kontach\n• Dramatyczna różnica ROAS (np. MK 1.30 vs MnC 8.96)\n• Konto z niższym ROAS przepala budżet\n\nReguła: konto z najwyższym ROAS + najwyższym wolumenem = WŁAŚCICIEL frazy.\nPozostałe wyłączają Ads (ALE zostawiają listing — organika nadal działa).\n\nWyjątek: różnica ROAS <2x i wolumeny porównywalne → segmentacja wariantów (np. MK=Wotan, PC=Lancelot)\n\nŁączny koszt kanibalizacji MEBLE: ~3265 zł/mies.', created:now },
+
+    // ── KONWENCJA ADS ──
+    { id:now+17, cat:'zasady', title:'Format A v2 — nazewnictwo kampanii Allegro Ads MEBLE',
+      content:'Kampania: /[NNN]/ [KATEGORIA]_[LINIA]_[WYMIAR]\nNp: /010/ LAZIENKA_PRALKA_62\n\nGrupa reklam: [KONTO][NNN][PLACEMENT][TARGETING] LINIA_WYMIAR_KOLOR\nNp: [MK][010][WW][RW] PRALKA_62_WOTAN\n\nKONTO: MK/PC/MC\nPLACEMENT: WW (Wynik Wyszukiwania) lub WL+ (Wyniki+Lewa, agresywny)\nTARGETING: RW (Ręczny Wybór) lub R (Reguły Allegro)\n\nKATEGORIE: LAZIENKA, SALON, KUCHNIA, OGROD, NOWOSCI, SEZON\nLINIE: PRALKA, KARO, TOP, SLUPEK, KWIETNIK, DONICA, TBOX, SLIM, LUSTRO', created:now },
+
+    // ── SEZONOWOŚĆ ──
+    { id:now+18, cat:'sezonowosc', title:'Sezonowość MEBLE — kalendarz roczny',
+      content:'Styczeń-Luty: post-świąteczne wyprzedaże, niski ruch\nMarzec: start sezonu ogrodowego (donice, kwietniki)\nKwiecień-Maj: PEAK donice/kwietniki. PC ma przewagę niszową.\nCzerwiec: spadek (ludzie na dworze, mniej zakupów online)\nLipiec-Sierpień: dolina — sezon urlopowy\nWrzesień: back-to-school, regały, biurka → MK peak\nPaździernik-Listopad: przygotowania świąteczne, szafki łazienkowe ruszają\nGrudzień: Black Friday/Cyber Monday (koniec listopada), potem spadek', created:now },
+    { id:now+19, cat:'sezonowosc', title:'Wielkanoc = restart punkt dla Ads MEBLE',
+      content:'Wielkanoc (kwiecień) to naturalny punkt restartu kampanii Ads:\n• Klienci wracają po świętach\n• Sezon ogrodowy startuje\n• Nowi klienci szukają mebli po remontach wiosennych\n\nIdealny timing na Total Restart: niedziela Wielkanocna (niski ruch = zero strat w trakcie przebudowy).', created:now },
+
+    // ── CASE STUDIES ──
+    { id:now+20, cat:'casestudy', title:'KARO 65 Wotan — wzorcowy case kanibalizacji',
+      content:'Data: 09.04.2026\nMK [17701061220]: ROAS 1.30, koszt 145 zł — PRZEPALENIE\nMnC [18034476023]: ROAS 8.96, 374 zł sprzedaży, 19 transakcji — GWIAZDA\n\nTen sam wariant kolorystyczny na 2 kontach. MK przepala bo klienci klikają MK ale kupują na MnC (lepsza cena/recenzje).\n\nDecyzja: MnC = właściciel frazy. MK wyłącza Ads na KARO 65 Wotan.\nEfekt: MK oszczędza 145 zł/mies, MnC zyskuje więcej impressions.', created:now },
+    { id:now+21, cat:'casestudy', title:'Szafka pralka 62 — Smart migration potencjał',
+      content:'Data: 09.04.2026\nMK [17565030433]: 1443 wizyty, 58 porzuconych koszyków, konwersja 0.46% (DPD 2pak, 40 zł dostawa)\nMnC [18039944752]: konwersja 2.10% (Smart, 0 zł dostawa)\n\nTen sam produkt. Różnica TYLKO w cenniku dostawy.\nPo migracji MK na Smart: szacowane +19 transakcji/mies (+5700 zł sprzedaży) z zerowym dodatkowym budżetem Ads.', created:now },
+    { id:now+22, cat:'casestudy', title:'PC Donica Craft 45x22 — gwiazda niszowa ROAS 99x',
+      content:'Perfekt Cięcie historyczna gwiazda.\nROAS 99x = za każdą złotówkę w Ads, 99 zł sprzedaży.\nTo potwierdza model niszowy PC: specjalizacja w produktach których MK/MnC nie mają.\n\nWniosek: PC nie powinien konkurować wolumenem. Każda aukcja niszowa z ROAS > 10x to potencjalny home run.', created:now },
+    { id:now+23, cat:'casestudy', title:'TOP 92 Wotan — dominacja MnC (53% sprzedaży Ads)',
+      content:'MnC TOP 92 Wotan generuje 53% całej sprzedaży Ads konta MnC.\nROAS 8.36x, 46 transakcji — najsilniejszy SKU w grupie MEBLE.\n\nReguła: NIE eksperymentuj z tym SKU. Budżet max, CPC agresywny (WL+).\nMK i PC mają ten sam produkt ale gorsze ROAS → wyłączyć Ads na ich kontach, zostawić organikę.', created:now },
+
+    // ── FEE AGENCJI ──
+    { id:now+24, cat:'zasady', title:'Model fee agencji MPlace',
+      content:'MEBLE: 7500 zł netto stałe (3 konta)\nLUXSEN: 20% od marży grupy (brutto→netto /1.23)\nMaterazzi + MtzzEU: 3500 zł stałe\nAnkado24: 2900 zł stałe\n\n60% sprzedaży to koszt producenta, nie marża.\nMarża agencji liczy się od tego co zostaje PO producentzie, prowizji, dostawie i Ads.', created:now },
+
+    // ── STRUKTURA PORTFELA ──
+    { id:now+25, cat:'klient', title:'Struktura portfela — 3 grupy × 9 kont',
+      content:'MEBLE (producent 65%): MobelKap, PerfektCięcie, MeblenaCzasie — ten sam katalog, różne role\nLUXSEN (producent 60%): Luxsen, Semmi, BOTAVIT — różne branże (lampy, meble, suplementy)\nONE (producent 55%): Materazzi, MtzzEU (EU), Ankado24 — materace, EU ekspansja\n\nKażda grupa ma inną dynamikę:\n• MEBLE: kanibalizacja wewnętrzna, potrzebna segmentacja ról\n• LUXSEN: niezależne konta, różne rynki\n• ONE: Materazzi+MtzzEU to ten sam biznes (PL+EU)', created:now },
+
+    // ── TOTAL RESTART ──
+    { id:now+26, cat:'zasady', title:'Total Restart — metoda przebudowy kampanii Ads',
+      content:'Total Restart = kompletna przebudowa kampanii od zera.\nKiedy: ROAS grupy < BE przez 30 dni, struktura kampanii chaotyczna, nazwy bez konwencji.\n\nMetoda (preferowana):\n1. Screener iteracyjny — wgraj 3 pliki, pytaj Agenta krok po kroku\n2. LUB ręczna budowa — użyj Format A v2 i zbuduj kampanie manualnie\n3. NIE jednorazowy Agent Analizy — za dużo danych na raz, halucynuje IDs\n\nTiming: najlepiej weekend/święto (niski ruch = zero strat)\nFormat: identyczny per konto (wzór MK → skopiuj dla PC i MnC)', created:now },
+
+    // ── RYNEK ──
+    { id:now+27, cat:'rynek', title:'Allegro — kluczowe fakty platformy',
+      content:'• Dominujący marketplace w Polsce (~80% e-commerce traffic)\n• Prowizja: 8-15% zależnie od kategorii\n• Allegro Ads: CPC model, Dynamic CPC jako default\n• Wyróżnienia: organiczny boost pozycji (nie Ads)\n• Smart! dostawa: 0 zł dla kupującego, 13 zł fee dla sprzedawcy\n• Super Sprzedawca: badge jakości, wymaga min. standardów\n• Quality score (Qlt): 1-1000, wpływa na pozycję w wynikach', created:now },
+    { id:now+28, cat:'rynek', title:'Ekspansja CZ/SK — przeliczniki i specyfika',
+      content:'Allegro.cz (Czechy): ceny w CZK. Przelicznik ~25.5 CZK/PLN\nAllegro.sk (Słowacja): ceny w EUR. Przelicznik ~4.30 EUR/PLN\n\nSpecyfika:\n• Mniejszy ruch niż PL (5-10x mniej)\n• Niższe CPC (mniej konkurencji)\n• Dostawa z PL = 3-5 dni roboczych\n• Buyer expectations różne — buduj recenzje od zera\n• Nie zakładaj że ceny PL = ceny CZ/SK (inne koszty dostawy cross-border)', created:now },
+
+    // ── PRODUKTY ──
+    { id:now+29, cat:'produkt', title:'Linie produktowe MEBLE — co sprzedajemy',
+      content:'SZAFKI ŁAZIENKOWE: pralka (62/48cm), słupek, lustro, SLIM — core biznes MK\nSTOLIKI KAWOWE: KARO (92/65cm), TOP 92 (podnoszony) — dominacja MnC\nDONICE: Craft, Lancelot (45/35/25cm) — specjalizacja PC\nKWIETNIKI: sezonowe (kwiecień-maj) — PC niszowy\nREGAŁY: półki wysuwane — MK\nT-BOX: szafki wisząca — MK\n\nWarianty kolorystyczne: Wotan, Lancelot, Sonoma, Artisan, Biały, Craft Złoty', created:now },
+    { id:now+30, cat:'zasady', title:'Styl raportowania — Chris nie potrzebuje wyjaśnień',
+      content:'Chris = właściciel agencji z 15+ lat doświadczenia e-commerce.\nNIE wyjaśniaj czym jest ROAS, marża, ACoS.\nNIE używaj buzzwordów (synergia, optymalizacja, leverage).\nNIE pisz slajdów tytułowych w prezentacjach.\n\nChris potrzebuje:\n• Gotowe akcje do COPY-PASTE (ID aukcji, nazwy kampanii, stawki CPC)\n• Liczby w tabelach, nie w tekście\n• "Chris DO ZROBIENIA" = top 5 akcji sortowane po zł oszczędności\n• Wyniki w zł/mies nie w procentach\n• Myślenie portfelowe (cała grupa, nie jedno konto)', created:now },
+  ];
+  const existing = getWiedza();
+  const existingTitles = new Set(existing.map(e => e.title));
+  const toAdd = seed.filter(e => !existingTitles.has(e.title));
+  if (toAdd.length) {
+    saveWiedza([...existing, ...toAdd]);
+    console.log('[wiedza] Zasilono bazę wiedzy:', toAdd.length, 'nowych wpisów');
+  }
+  localStorage.setItem(SEED_VER, '1');
+}
+
+seedWiedzaDefaults();
+
 function updateWkAgentStatus() {
   const entries = getWiedza();
   const total = entries.length;
