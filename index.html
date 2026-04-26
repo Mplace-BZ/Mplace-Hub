@@ -20778,6 +20778,11 @@ function caInit() {
   // Czyste pole — nie ładuj starego planu automatycznie
   const planWrap = document.getElementById('caArchPlan');
   if (planWrap) planWrap.innerHTML = '';
+  const status = document.getElementById('caArchRunStatus');
+  if (status) status.textContent = '';
+  ['caArchCsvBtn','caArchGroupsCsvBtn','caArchPrintBtn'].forEach(id => {
+    const b = document.getElementById(id); if (b) b.style.display = 'none';
+  });
 }
 
 function caLoadLastPlan() {
