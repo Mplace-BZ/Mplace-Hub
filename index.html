@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.31</title>
+<title>MPlace Hub v9.32</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1675,7 +1675,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.31 — NEW FEATURES CSS ═══ */
+/* ═══ v9.32 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2041,7 +2041,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.31</span>
+    <span class="brand-ver">v9.32</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -12444,6 +12444,9 @@ DANE HISTORYCZNE PER KONTO:
 - Wyróżnienia >5%: zawsze flaguj jako przepalanie z konkretną kwotą oszczędności
 - Rekomendacje: "zmniejsz wyróżnienia [konto] z Y% do 3% = ~Z zł oszczędności/mies."
 - Używaj nagłówków`;
+  // Inject catalog context (all offers with names, prices, SKU)
+  const catCtx = buildCatalogContext(true);
+  if (catCtx) ctx += `\n\nKATALOG OFERT (załadowany z XLSX):\n${catCtx}`;
   // Inject knowledge base
   ctx += buildWiedzyContext();
   // Inject worker feedback (last 30 verified/done tasks with results)
@@ -19445,11 +19448,11 @@ function buildCatalogContext(detailed) {
     ctx += `\nKATALOG ${AC_META[k]?.name||k}: ${active.length} aktywnych ofert | Śr. cena: ${avgCena.toFixed(0)} zł | Upload: ${cat.uploadDate}\n`;
 
     if (detailed) {
-      // Detailed: top 15 by price
-      active.sort((a,b) => b.cena - a.cena).slice(0, 15).forEach(o => {
-        ctx += `  [${o.id}] ${o.nazwa} | ${o.cena.toFixed(0)} zł | SKU: ${o.sku}\n`;
+      // Detailed: ALL active offers
+      active.sort((a,b) => b.cena - a.cena).forEach(o => {
+        const kat = o.kategoria || o.podkategoria || '';
+        ctx += `  [${o.id}] ${o.nazwa} | ${o.cena.toFixed(0)} zł${kat ? ' | ' + kat : ''}${o.sku ? ' | SKU:' + o.sku : ''}\n`;
       });
-      if (active.length > 15) ctx += `  ... i ${active.length - 15} więcej\n`;
     } else {
       // Summary only — categories + price ranges
       const cats = {};
@@ -22298,7 +22301,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.31</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.32</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25551,7 +25554,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.31 — ALL NEW FEATURES
+// v9.32 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
