@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.52</title>
+<title>MPlace Hub v9.53</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1761,7 +1761,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.52 — NEW FEATURES CSS ═══ */
+/* ═══ v9.53 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.52</span>
+    <span class="brand-ver">v9.53</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5464,6 +5464,53 @@ function renderWyniki(){
 // ═══════════════════════════════════════════════════════════
 let dashBubbleChart = null;
 
+function computeHealthScore(k) {
+  const D = getData(k), prod = getProd(k);
+  if (!D.length) return {score:0,grade:'?',color:'var(--text3)'};
+  const curM = MONTHS[new Date().getMonth()];
+  const cur = D.find(d=>d.m===curM) || D[D.length-1];
+  const C = calc(cur, prod);
+  if (!C) return {score:0,grade:'?',color:'var(--text3)'};
+  let score = 50;
+  // ROAS vs BE (25%)
+  if (C.roasAds && C.beRoasAds && C.beRoasAds > 0) {
+    const spread = (C.roasAds - C.beRoasAds) / C.beRoasAds;
+    score += Math.max(-25, Math.min(25, spread * 50));
+  }
+  // Margin (20%)
+  if (C.mAfter >= 15) score += 20;
+  else if (C.mAfter >= 10) score += 10;
+  else if (C.mAfter >= 5) score += 0;
+  else if (C.mAfter >= 0) score -= 10;
+  else score -= 20;
+  // Ads efficiency (15%)
+  if (C.acosTotal > 0) {
+    if (C.acosTotal < 8) score += 15;
+    else if (C.acosTotal < 15) score += 5;
+    else if (C.acosTotal < 25) score -= 5;
+    else score -= 15;
+  }
+  // Margin trend 3mo (15%)
+  if (D.length >= 3) {
+    const last3 = D.slice(-3).map(d => calc(d, prod)?.mAfter || 0);
+    const trend = last3[2] - last3[0];
+    score += Math.max(-15, Math.min(15, trend * 2));
+  }
+  // Sales trend (10%)
+  if (D.length >= 2) {
+    const prev = estym(D[D.length-2]);
+    const curEst = estym(cur);
+    if (prev > 0) {
+      const growth = (curEst - prev) / prev;
+      score += Math.max(-10, Math.min(10, growth * 20));
+    }
+  }
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  const grade = score >= 80 ? 'A' : score >= 65 ? 'B' : score >= 50 ? 'C' : score >= 35 ? 'D' : 'F';
+  const color = score >= 80 ? '#34d399' : score >= 65 ? '#2dd4a0' : score >= 50 ? '#f5a623' : score >= 35 ? '#ff8c5a' : '#ef4444';
+  return {score, grade, color};
+}
+
 function renderDashboard(){
   const now = new Date();
   const curM = MONTHS[now.getMonth()];
@@ -5501,9 +5548,10 @@ function renderDashboard(){
       const trendBg = dv===null?'':dv>=0?'background:rgba(45,212,160,.12);color:#2dd4a0;border:1px solid rgba(45,212,160,.25)':'background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.25)';
       const trendPill = dv!==null?`<div style="display:flex;align-items:center;gap:5px"><span style="font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px;${trendBg}">${dv>=0?'▲':'▼'} ${Math.abs(dv).toFixed(0)}%</span><div class="ac-card-status-dot ${dotCls}"></div></div>`:`<div class="ac-card-status-dot ${dotCls}"></div>`;
 
+      const hs = computeHealthScore(k);
       return `<div class="${cardCls}" onclick="showView('${k}')" style="padding:.75rem .9rem .65rem">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-          <div style="font-family:var(--sans);font-size:16px;font-weight:700;color:var(--text)">${AC_META[k].name}</div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--sans);font-size:16px;font-weight:700;color:var(--text)">${AC_META[k].name}</span><span style="font-family:var(--mono);font-size:11px;padding:1px 6px;border-radius:4px;background:rgba(${hs.color==='#34d399'||hs.color==='#2dd4a0'?'45,212,160':hs.color==='#f5a623'?'245,166,35':'239,68,68'},.12);color:${hs.color};font-weight:600">${hs.grade}${hs.score}</span></div>
           ${trendPill}
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:.4rem">
@@ -22810,7 +22858,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.52</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.53</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -26059,7 +26107,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.52 — ALL NEW FEATURES
+// v9.53 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
