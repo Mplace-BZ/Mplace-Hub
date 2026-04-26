@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.51</title>
+<title>MPlace Hub v9.52</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1761,7 +1761,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.51 — NEW FEATURES CSS ═══ */
+/* ═══ v9.52 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.51</span>
+    <span class="brand-ver">v9.52</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -10512,6 +10512,17 @@ async function zmSetTaskStatus(id, status) {
     await zmTeamRef().collection('tasks').doc(id).update({
       status, updatedAt: t.updatedAt, history: t.history
     });
+    // Auto-log decision when task completed
+    if (status === 'done' && typeof addDecision === 'function') {
+      const catMap = {zmien_tytul:'Oferta',zmien_cene:'Cena',zmien_opis:'Oferta',wylacz_kampanie:'Ads',skaluj_kampanie:'Ads',copy_paste_ads:'Ads',restart_ads:'Ads',analiza_ads:'Ads',dodaj_wyroznienie:'Wyroznienia',wylacz_wyroznienie:'Wyroznienia',zmien_wyroznienie:'Wyroznienia',zmien_dostawe:'Oferta',wystaw_aukcje:'Oferta',monitoring_konkurencji:'Inne',weryfikuj_roas:'Ads'};
+      addDecision({
+        konto: t.konto || '',
+        category: catMap[t.tfType] || 'Inne',
+        action: t.title,
+        rationale: (t.desc || '').slice(0, 200),
+        sourceTaskId: t.id
+      });
+    }
     zmRenderTasks();
     zmRenderStats();
   } catch(e) { console.error('[zespol] setStatus', e); }
@@ -12557,6 +12568,17 @@ DANE HISTORYCZNE PER KONTO:
   ctx += buildWiedzyContext();
   // Inject worker feedback (last 30 verified/done tasks with results)
   ctx += buildWorkerFeedback();
+  // Inject decision log (last 20 decisions)
+  try {
+    const decisions = typeof getDecisions === 'function' ? getDecisions().slice(0, 20) : [];
+    if (decisions.length) {
+      ctx += '\n\nDZIENNIK DECYZJI (ostatnie ' + decisions.length + '):\n';
+      decisions.forEach(d => {
+        ctx += `  [${d.status}] ${d.action} (${d.konto||'ogolne'}, ${d.category})${d.rationale ? ' — ' + d.rationale.slice(0,80) : ''}\n`;
+        if (d.followUpResult) ctx += `    Wynik: ${d.followUpResult}\n`;
+      });
+    }
+  } catch(e) {}
   return ctx;
 }
 
@@ -20082,6 +20104,7 @@ function dzisRenderTasks(tasks, summary) {
         </div>
         <div style="font-size:13px;color:var(--text3);font-family:var(--mono);margin-top:2px">${t.konto||''} ${t.efekt?'→ '+t.efekt:''}</div>
         <div style="font-size:14px;color:var(--text2);margin-top:5px;line-height:1.5">${t.opis||''}</div>
+        <button onclick="event.stopPropagation();dzisCreateTask(${i})" style="margin-top:8px;font-family:var(--mono);font-size:11px;padding:4px 12px;border-radius:5px;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.08);color:#60a5fa;cursor:pointer">→ Zadanie</button>
       </div>
     </div>`;
   }).join('');
@@ -20118,6 +20141,44 @@ function dzisToggle(idx) {
   // Re-render tasks + calendar
   if (cached.tasks) dzisRenderTasks(cached.tasks, cached.summary);
   if (typeof renderCockpitHistory === 'function') renderCockpitHistory();
+}
+
+const COCKPIT_TO_TF_MAP = {
+  'wyłącz kampanię':'wylacz_kampanie','wylacz kampanie':'wylacz_kampanie','zatrzymaj kampani':'wylacz_kampanie',
+  'skaluj':'skaluj_kampanie','zwiększ budżet':'skaluj_kampanie','podnieś budżet':'skaluj_kampanie',
+  'zmień cenę':'zmien_cene','podnieś cenę':'zmien_cene','obniż cenę':'zmien_cene',
+  'wyróżnieni':'dodaj_wyroznienie','wyłącz wyróżnieni':'wylacz_wyroznienie',
+  'zmień tytuł':'zmien_tytul','optymalizuj tytuł':'zmien_tytul',
+  'zmień opis':'zmien_opis','zmień zdjęci':'zmien_zdjecie',
+  'kanibalizacj':'monitoring_konkurencji','sprawdź konkurencj':'monitoring_konkurencji',
+  'analiz':'analiza_ads','audyt':'analiza_ads','raport':'analiza_ads',
+  'roas':'weryfikuj_roas','break-even':'weryfikuj_roas',
+  'redukcja':'wylacz_kampanie','redukcj budżet':'wylacz_kampanie',
+};
+
+function dzisCreateTask(idx) {
+  const cached = JSON.parse(localStorage.getItem(DZIS_CACHE_KEY) || '{}');
+  if (!cached.tasks || !cached.tasks[idx]) return;
+  const t = cached.tasks[idx];
+  // Find matching TF action
+  const titleLower = (t.title || '').toLowerCase();
+  let tfType = 'inne';
+  for (const [keyword, action] of Object.entries(COCKPIT_TO_TF_MAP)) {
+    if (titleLower.includes(keyword)) { tfType = action; break; }
+  }
+  const actions = typeof tfAllActions === 'function' ? tfAllActions() : {};
+  const actionDef = actions[tfType];
+  const checklist = actionDef?.checklist || ['Wykonaj zadanie', 'Potwierdź wynik'];
+  // Pre-fill Zespol form
+  showView('zespol');
+  setTimeout(() => {
+    zmShowAddTask();
+    document.getElementById('zmTaskTitle').value = t.title || '';
+    document.getElementById('zmTaskDesc').value = t.opis || '';
+    document.getElementById('zmTaskKonto').value = t.konto || '';
+    document.getElementById('zmTaskPriority').value = t.priority === 'PILNE' ? 'PILNE' : t.priority === 'INFO' ? 'INFO' : 'WAŻNE';
+    document.getElementById('zmTaskChecklist').value = checklist.join('\n');
+  }, 200);
 }
 
 function dzisStartTimer() {
@@ -22630,7 +22691,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.51</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.52</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25879,7 +25940,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.51 — ALL NEW FEATURES
+// v9.52 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
