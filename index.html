@@ -14659,6 +14659,28 @@ function seedWiedzaV2() {
 }
 seedWiedzaV2();
 
+// ═══ WIEDZA SEED v3 — TOP92 wycofany, kontekst MnC ═══
+function seedWiedzaV3() {
+  const SEED_VER = 'wiedza_seed_v3';
+  if (localStorage.getItem(SEED_VER)) return;
+  const now = Date.now();
+  const seed = [
+    { id:now+201, cat:'klient', title:'TOP92 Wotan WYCOFANY — wpływ na MnC i grupę (kwiecień 2026)',
+      content:'Allegro wycofało TOP 92 cm PODNOSZONY (wszystkie warianty kolorystyczne) ze WSZYSTKICH 3 kont MEBLE ok. 18-21 kwietnia 2026.\n\nWpływ na MnC: TOP92 generował 53% sprzedaży Ads MnC. Utrata spowodowała spadek marży z 10.8% do 7.3% i ROAS poniżej BE.\nWpływ na MK/PC: mniejszy — miały inne hero produkty.\n\nTOP92 NIE WRÓCI. Produkt trwale wycofany.\n\nNowy kandydat na hero MnC: Stolik kawowy podnoszony rozkładany 92cm (w trakcie rozkręcania).\nRola MnC: PREMIUM utrzymana — spadek wyników to utrata hero, nie błąd strategiczny. Rewizja po odbudowie nowego hero.\n\nUWAGA dla Agenta: NIE rekomenduj TOP92 w żadnych analizach. Produkt nie istnieje. Nie sugeruj skalowania TOP92.', created:now },
+    { id:now+202, cat:'casestudy', title:'Stolik podnoszony rozkładany 92cm — nowy hero kandydat',
+      content:'Nowy produkt zastępujący TOP92 na wszystkich kontach.\n\nWyniki kwiecień 2026 (od ~21.04, ~10 dni danych):\nMK: 50 trans, 14 194 zł, udział 16.84%, cena 278 zł — LIDER\nPC (biały/czarny): 18 trans, 4 820 zł, cena 268 zł\nPC (lancelot/czarny): 14 trans, 4 218 zł, cena 301 zł\nMnC: w trakcie rozkręcania, słabsze wyniki (brak TOP92 = brak motoru)\n\nDecyzja ownership: do ustalenia po FAZA 1 stop-loss. MK naturalny lider (50 trans w 10 dni). MnC potrzebuje exclusive Ads ownership jeśli ma odbudować rolę PREMIUM.', created:now },
+  ];
+  const existing = getWiedza();
+  const existingTitles = new Set(existing.map(e => e.title));
+  const toAdd = seed.filter(e => !existingTitles.has(e.title));
+  if (toAdd.length) {
+    saveWiedza([...existing, ...toAdd]);
+    console.log('[wiedza] Seed v3 — TOP92 wycofany:', toAdd.length, 'nowych wpisów');
+  }
+  localStorage.setItem(SEED_VER, '1');
+}
+seedWiedzaV3();
+
 function updateWkAgentStatus() {
   const entries = getWiedza();
   const total = entries.length;
