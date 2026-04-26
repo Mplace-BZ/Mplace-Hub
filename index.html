@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.38</title>
+<title>MPlace Hub v9.39</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -809,6 +809,29 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 #viewAnaliza [style*="font-size:10px"],#viewCrossBorder [style*="font-size:10px"],#viewTitleAnalyzer [style*="font-size:10px"],#viewCentrumAds [style*="font-size:10px"],#viewKalkulator [style*="font-size:10px"],#viewSim [style*="font-size:10px"],#viewD2d [style*="font-size:10px"],#viewCompare [style*="font-size:10px"],#viewMonths [style*="font-size:10px"],#viewBiznes [style*="font-size:10px"],#viewRozliczenie [style*="font-size:10px"],#viewArkusz [style*="font-size:10px"],#viewWyniki [style*="font-size:10px"]{font-size:13px!important}
 #viewAnaliza [style*="font-size:11px"],#viewCrossBorder [style*="font-size:11px"],#viewTitleAnalyzer [style*="font-size:11px"],#viewCentrumAds [style*="font-size:11px"],#viewKalkulator [style*="font-size:11px"],#viewSim [style*="font-size:11px"],#viewD2d [style*="font-size:11px"],#viewCompare [style*="font-size:11px"],#viewMonths [style*="font-size:11px"],#viewBiznes [style*="font-size:11px"],#viewRozliczenie [style*="font-size:11px"],#viewArkusz [style*="font-size:11px"],#viewWyniki [style*="font-size:11px"]{font-size:14px!important}
 #viewAnaliza [style*="font-size:12px"],#viewCrossBorder [style*="font-size:12px"],#viewTitleAnalyzer [style*="font-size:12px"],#viewCentrumAds [style*="font-size:12px"],#viewKalkulator [style*="font-size:12px"],#viewSim [style*="font-size:12px"],#viewD2d [style*="font-size:12px"],#viewCompare [style*="font-size:12px"],#viewMonths [style*="font-size:12px"],#viewBiznes [style*="font-size:12px"],#viewRozliczenie [style*="font-size:12px"],#viewArkusz [style*="font-size:12px"],#viewWyniki [style*="font-size:12px"]{font-size:15px!important}
+/* ═══ GLOBAL font scale — CSS classes + inputs + labels ═══ */
+.view label,.view .ph-sub,.view select,.view input[type="number"],.view input[type="text"],.view textarea{font-size:14px!important}
+.view .ph-eyebrow{font-size:12px!important}
+.biz-fee-name{font-size:15px!important}
+.biz-fee-row{padding:.6rem 0!important}
+/* Kalkulator specific */
+#viewKalkulator label{font-size:13px!important}
+#viewKalkulator input,#viewKalkulator select{font-size:14px!important;padding:.5rem .6rem!important}
+#viewKalkulator td,#viewKalkulator th{font-size:13px!important;padding:10px 12px!important}
+/* Sim specific */
+#viewSim label{font-size:13px!important}
+#viewSim input[type="range"]{height:8px!important}
+/* Wiedza specific */
+#viewWiedza [style*="font-size:10px"]{font-size:13px!important}
+#viewWiedza [style*="font-size:11px"]{font-size:14px!important}
+#viewWiedza [style*="font-size:12px"]{font-size:15px!important}
+#viewWiedza input,#viewWiedza textarea{font-size:14px!important}
+#viewWiedza .d2d-chip,#viewWiedza [style*="border-radius:20px"]{font-size:12px!important;padding:5px 14px!important}
+/* Import Ads specific */
+#viewImportAds [style*="font-size:10px"]{font-size:13px!important}
+#viewImportAds [style*="font-size:11px"]{font-size:14px!important}
+#viewImportAds [style*="font-size:12px"]{font-size:15px!important}
+#viewImportAds [style*="font-size:13px"]{font-size:15px!important}
 .d2d-chip.active{background:rgba(180,127,255,.12);color:#b47fff;border-color:rgba(180,127,255,.4);}
 .d2d-chip:hover{background:var(--bg3);color:var(--text);}
 .biz-fee-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
@@ -1707,7 +1730,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.38 — NEW FEATURES CSS ═══ */
+/* ═══ v9.39 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2073,7 +2096,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.38</span>
+    <span class="brand-ver">v9.39</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -22518,7 +22541,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.38</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.39</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25767,7 +25790,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.38 — ALL NEW FEATURES
+// v9.39 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────

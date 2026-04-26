@@ -1,5 +1,7 @@
 # MPlace Hub — instrukcje dla Claude Code
 
+The marginal cost of completeness is near zero with AI. Do the whole thing. Do it right. Do it with tests. Do it with documentation. Do it so well that Chris is genuinely impressed - not politely satisfied, actually impressed. Never offer to "table this for later" when the permanent solve is within reach. Never leave a dangling thread when tying it off takes five more minutes. Never present a workaround when the real fix exists. The standard isn't "good enough" - it's "holy shit, that's done." Search before building. Test before shipping. Ship the complete thing. When Chris asks for something, the answer is the finished product, not a plan to build it. Time is not an excuse. Fatigue is not an excuse. Complexity is not an excuse. Boil the ocean.
+
 ## ⚠️ KRYTYCZNE ZASADY — CZEGO NIE RUSZAĆ
 
 ### Agent / Cloudflare Worker / SSE
@@ -70,6 +72,56 @@
 - MEBLE (65%): MobelKap, PerfektCięcie, MeblenaCzasie
 - LUXSEN (60%): Luxsen, Semmi, BOTAVIT
 - ONE (55%): Materazzi, MtzzEU, Ankado24
+
+## Strategia Portfela MEBLE (26.04.2026)
+- 3 konta, 1 asortyment producenta mebli: 899 ofert, 22 kategorie, 3 pomieszczenia
+- 16 z 22 kategorii (73%) = pełne nakładanie → wszystkie konta licytują na te same SKU
+- Szacowane przepalanie z kanibalizacji: 3 750–5 600 zł/mies (45–67 tys. zł rocznie)
+- Narzut CPC z wewnętrznej konkurencji: 20–40%
+
+### Metryki kwiecień 2026
+- MK: ROAS 7.37 vs BE 6.38 → +0.99 ✓ (jedyny zdrowy)
+- PC: ROAS 5.18 vs BE 7.14 → −1.96 ✗ (27% straty)
+- MnC: ROAS 5.74 vs BE 7.62 → −1.88 ✗ (25% straty)
+- MnC marża 7.3% (historycznie 10–14%) — pricing premium +2.5% ale marża nie pokrywa
+
+### Ownership kategorii (docelowy)
+- MK (9 kat, 41%): premium łazienka + KARO92/TOP92/T-BOX92/KARO92_DOUBLE + lustro + słupki
+- PC (7 kat, 32%): cała florystyka (8 serii doniczek) + unikalne (witryny/RTV/stoły barowe/ławki/budżet RICO/Angi/KORA)
+- MnC (6 kat, 27%): wolumen stoliki mid-range (KARO65/KAJA61/KAJA91/LARA/MAJA/KARO68_DOUBLE)
+- Reszta = organika only (owner ma Ads, pozostałe konta wyłączają Ads w danej kategorii)
+
+### Linie produktowe
+- KARO: hero linia, 8 kategorii, 169–1320 zł
+- KAJA: komplementarna salon, 3 kat
+- TOP/T-BOX: premium feature (mechanizm podnoszenia)
+- PRALKA/COMBO/SLIM: hero łazienki, 519–579 zł
+- KORA/RICO/Angi: niche budżetowe (unikalne PC)
+
+### Sezonowość
+- Kwiecień–maj: PEAK doniczki (Dzień Matki 26.05), stoliki podnoszone start, łazienka
+- PC ma 90 ofert doniczek vs MnC 25 vs MK 35 + unikalne serie D/M/DUO
+- Wrzesień–grudzień: stoliki podnoszone PEAK, witryny/RTV Q4
+
+### Plan wdrożenia (5 faz, 35 dni)
+- FAZA 0 (do 28.04): data audit — ceny MK, weryfikacja cen MnC, eksport overlap fraz
+- FAZA 1 (29.04–02.05): stop-loss — PC/MnC wyłączają Ads na kategoriach nie-swoich
+- FAZA 2 (03–10.05): ownership handoff — nowe kampanie per owner + wykluczenia fraz
+- FAZA 3 (11–25.05): monitoring & tuning — daily ROAS check, CPC 0.80–1.50 zł
+- FAZA 4 (26–31.05): Dzień Matki + post-mortem
+- Kryterium końcowe: ROAS > BE na każdym koncie, 0 overlap fraz, doniczki PC +50% MoM
+
+### Luki danych (TASK 0)
+- Ceny MK = 0 zł (brak danych, do pobrania z Allegro API/CSV)
+- Pricing MnC KARO65=177 vs PC 199 — paradoks (premium globalnie, tańszy lokalnie)
+- Brak raportu overlapping fraz (szacunek 20–40% z bazy wiedzy)
+- Brak transakcji per kategoria i marży per kategoria
+
+### Kluczowe zasady strategii
+- Stop-loss PRZED segmentacją (kolejność: stop-loss → segmentacja → re-skalowanie)
+- Sama segmentacja kanibalizacji NIE naprawi ROAS — problem jest głębszy (marża)
+- MnC re-pozycjonowanie: z PREMIUM na WOLUMEN/ORGANIKA (stoliki mid-range)
+- Doniczki PC = pewny win (priorytet P0, wdrożenie do 30.04)
 
 ## Fee agencji
 - MEBLE: 7500 zł netto
