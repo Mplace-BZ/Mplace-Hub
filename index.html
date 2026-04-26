@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.46</title>
+<title>MPlace Hub v9.47</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -29,7 +29,7 @@
   --g-meble:#ff6b35;--g-luxsen:#2dd4a0;--g-one:#b47fff;
   --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
   --display:'DM Mono',monospace;
-  --sidebar-w:320px;--sidebar-w-compact:64px;
+  --sidebar-w:270px;--sidebar-w-compact:64px;
   --grid-opacity:0.022;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -57,7 +57,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .mp-nav-group{padding:0 8px 0 8px;margin-bottom:4px}
 .mp-nav-group-h{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);padding:20px 10px 8px;user-select:none}
 .mp-nav-group-h::after{content:'';flex:1;height:1px;background:var(--border)}
-.mp-nav-item{display:flex;align-items:center;gap:16px;padding:10px 22px;border-radius:8px;cursor:pointer;transition:all .12s;color:var(--text2);font-size:20px!important;font-family:var(--mono)!important;font-weight:500;position:relative;background:transparent;outline:none}
+.mp-nav-item{display:flex;align-items:center;gap:12px;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .12s;color:var(--text2);font-size:17px!important;font-family:var(--mono)!important;font-weight:500;position:relative;background:transparent;outline:none}
 .mp-nav-item:not(.active):hover{background:rgba(255,255,255,.04);color:#e9ebf2}
 .mp-nav-item:not(.active):hover .ico{color:var(--text)}
 .mp-nav-item:focus-visible{outline:2px solid rgba(255,107,53,.5);outline-offset:-2px;border-radius:6px}
@@ -1761,7 +1761,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.46 — NEW FEATURES CSS ═══ */
+/* ═══ v9.47 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.46</span>
+    <span class="brand-ver">v9.47</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -22572,7 +22572,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.46</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.47</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25821,7 +25821,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.46 — ALL NEW FEATURES
+// v9.47 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
