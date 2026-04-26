@@ -3849,7 +3849,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div style="margin-bottom:1rem;padding:10px 14px;background:rgba(255,107,53,.04);border:1px solid rgba(255,107,53,.15);border-radius:8px">
     <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#ff6b35;font-family:var(--mono);margin-bottom:6px;font-weight:600">► GRUPA MEBLE — STRATEGIA PORTFELOWA</div>
     <div style="font-size:11px;color:var(--text2);line-height:1.5">
-      3 konta, 22 kategorie, ownership plan (26.04.2026). <strong style="color:#ff6b35">MK = scale</strong> (9 kat: premium łazienka + KARO92/TOP/T-BOX) · <strong style="color:#34d399">PC = nisze + florystyka</strong> (7 kat: donice, witryny, stoły barowe, budżetowe) · <strong style="color:#f5a623">MnC = mid-range wolumen</strong> (6 kat: KARO65, KAJA, LARA, MAJA — tryb odbudowy po utracie TOP92).
+      3 konta, 22 kategorie, ownership plan (26.04.2026). <strong style="color:#38bdf8">MK = scale</strong> (8 kat: premium łazienka + KARO92/T-BOX92 + stoliki podnoszone) · <strong style="color:#34d399">PC = nisze + florystyka</strong> (7 kat: donice, witryny, stoły barowe, budżetowe) · <strong style="color:#fb923c">MnC = wolumen</strong> (6 kat: KARO65, KAJA, LARA, MAJA — po utracie TOP92).
       Każda kategoria ma <em>jednego ownera Ads</em> — reszta = tylko organika. Stop-loss → segmentacja → skalowanie.
     </div>
   </div>
@@ -3861,9 +3861,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div style="border:1px solid var(--border);border-radius:10px;padding:14px 18px;background:var(--bg2);margin-bottom:1rem">
     <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;font-family:var(--mono)">Reguły strategiczne — jak Agent interpretuje role</div>
     <div style="font-size:11px;color:var(--text2);line-height:1.7">
-      <strong style="color:#38bdf8">SCALE (MobelKap):</strong> Owner 9 kategorii (premium łazienka + KARO92 + TOP/T-BOX). Pełny budżet na owned kategoriach. Lider grupy — ROAS 7.37 > BE 6.38.<br>
-      <strong style="color:#34d399">NICHE (Perfekt Cięcie):</strong> Owner 7 kategorii (cała florystyka + unikalne). NIE wchodzi w łazienkę ani stoliki mid-range. Priorytet: Dzień Matki 26.05 — agresywne skalowanie doniczek.<br>
-      <strong style="color:#f5a623">PREMIUM (Meble na Czasie):</strong> Tryb odbudowy — TOP92 wycofany (18-21.04). Tymczasowy ownership: stoliki mid-range (KARO65, KAJA61, LARA, MAJA). Nowy hero: stolik podnoszony 92cm. Pricing +2.5% utrzymany. Rewizja roli po FAZA 1 stop-loss (02.05).<br>
+      <strong style="color:#38bdf8">SCALE (MobelKap):</strong> Owner 8 kategorii (premium łazienka + KARO92/T-BOX92/DOUBLE KARO92 + stoliki podnoszone). Pełny budżet na owned. Lider grupy — ROAS 7.37 > BE 6.38.<br>
+      <strong style="color:#34d399">NICHE (Perfekt Cięcie):</strong> Owner 7 kategorii (cała florystyka + witryny/RTV + stoły barowe + budżetowe). NIE wchodzi w łazienkę ani stoliki mid-range. Priorytet: Dzień Matki 26.05.<br>
+      <strong style="color:#fb923c">WOLUMEN (Meble na Czasie):</strong> Owner 6 kategorii stoliki mid-range (KARO65, KAJA61, KAJA91, LARA, MAJA, DOUBLE KARO68). TOP92 wycofany. Nowy hero: stolik podnoszony 92cm. ROAS 5.74 < BE 7.62. Pricing +2.5% utrzymany.<br>
       <strong style="color:#ef4444">OWNERSHIP:</strong> każda z 22 kategorii ma jednego ownera Ads. Reszta kont = tylko organika. Stop-loss PRZED segmentacją. Przepalanie kanibalizacji: 3750-5600 zł/mies.
     </div>
   </div>
@@ -4519,9 +4519,9 @@ const GROUPS={
 const AC_META={
   MobelKap:{name:'MobelKap',group:'MEBLE',
     role:'scale', pricingTier:'base', pricingDelta:0,
-    specjalizacje:['szafki_pralkowe','szafki_lustro','slupki_lazienkowe','KARO92','DOUBLE_KARO92','TOP92','T-BOX92','stoliki_podnoszone'],
+    specjalizacje:['szafki_pralkowe','szafki_lustro','slupki_lazienkowe','KARO92','DOUBLE_KARO92','T-BOX92','stoliki_podnoszone'],
     adsTarget:6.5, wyrTarget:5.0,
-    strategiaOpis:'Lider grupy MEBLE — najwyższy ROAS (7.37 vs BE 6.38). Owner 9 kategorii (41% portfela): cała premium łazienka (szafki pralkowe, lustro, słupki) + stoliki premium (KARO92, TOP92, T-BOX92). Priorytet: skalowanie wolumenu na owned kategoriach.',
+    strategiaOpis:'Lider grupy MEBLE — najwyższy ROAS (7.37 vs BE 6.38). Owner 8 kategorii: cała premium łazienka (szafki pralkowe, lustro, słupki) + stoliki premium (KARO92, T-BOX92, DOUBLE KARO92) + stoliki podnoszone. Priorytet: skalowanie wolumenu na owned kategoriach.',
     badge:'🏆 SCALE'
   },
   PerfektCiecie:{name:'Perfekt Cięcie',group:'MEBLE',
@@ -4532,11 +4532,11 @@ const AC_META={
     badge:'🎯 NICHE'
   },
   MeblenaCzasie:{name:'Meble na Czasie',group:'MEBLE',
-    role:'premium', pricingTier:'premium', pricingDelta:2.5,
+    role:'volume', pricingTier:'premium', pricingDelta:2.5,
     specjalizacje:['KARO65','KAJA61','KAJA91','LARA','MAJA','DOUBLE_KARO68','stoliki_podnoszone_92'],
     adsTarget:6.5, wyrTarget:4.5,
-    strategiaOpis:'Tryb odbudowy (kwiecień 2026). Hero TOP92 Wotan wycofany przez Allegro — był 53% Ads. Marża spadła z 10.8% do 7.3%. Pricing +2.5% utrzymany. Tymczasowy ownership: stoliki mid-range (KARO65, KAJA61, LARA, MAJA). Nowy hero: stolik podnoszony rozkładany 92cm. 6 kategorii (27% portfela). Rewizja roli po stop-loss FAZA 1.',
-    badge:'💎 PREMIUM +2.5%'
+    strategiaOpis:'Wolumen mid-range (kwiecień 2026). Hero TOP92 wycofany przez Allegro. Marża spadła z 10.8% do 7.3%, ROAS 5.74 poniżej BE 7.62. Ownership: stoliki mid-range (KARO65, KAJA61, KAJA91, LARA, MAJA, DOUBLE KARO68). Nowy hero: stolik podnoszony rozkładany 92cm. 6 kategorii (27%). Pricing +2.5% utrzymany.',
+    badge:'📦 WOLUMEN +2.5%'
   },
   Luxsen:{name:'Luxsen',group:'LUXSEN'},Semmi:{name:'Semmi',group:'LUXSEN'},BOTAVIT:{name:'BOTAVIT',group:'LUXSEN'},
   Materazzi:{name:'Materazzi',group:'ONE'},MtzzEU:{name:'MtzzEU',group:'ONE'},Ankado24:{name:'Ankado24',group:'ONE'},
@@ -20830,11 +20830,13 @@ function stratRenderMeble() {
     scale: '#38bdf8',
     niche: '#34d399',
     premium: '#f5a623',
+    volume: '#fb923c',
   };
   const roleBg = {
     scale: 'rgba(56,189,248,.08)',
     niche: 'rgba(52,211,153,.08)',
     premium: 'rgba(245,166,35,.08)',
+    volume: 'rgba(251,146,60,.08)',
   };
 
   let html = '';
