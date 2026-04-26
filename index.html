@@ -14610,6 +14610,55 @@ function seedWiedzaDefaults() {
 
 seedWiedzaDefaults();
 
+// ═══ WIEDZA SEED v2 — Strategia Portfela MEBLE 26.04.2026 ═══
+function seedWiedzaV2() {
+  const SEED_VER = 'wiedza_seed_v2';
+  if (localStorage.getItem(SEED_VER)) return;
+  const now = Date.now();
+  const seed = [
+    // ── AKTUALIZACJA ROLI MnC ──
+    { id:now+101, cat:'klient', title:'MnC AKTUALIZACJA ROLI — WOLUMEN/ORGANIKA (kwiecień 2026)',
+      content:'UWAGA: rola MnC zmieniona z PREMIUM na WOLUMEN/ORGANIKA (26.04.2026).\n\nPricing +2.5% utrzymany ale marża 7.3% (historycznie 10-14%). Premium marża nie pokrywa się z danymi — kanibalizujące Ads podbijają CPC. Qlt 282 (spadek).\n\nNowa rola: wolumen stoliki mid-range.\nOwnership Ads: KARO65, KAJA61, KAJA91, LARA53/96, MAJA, DOUBLE KARO68\nPC i MK = tylko organika na tych kategoriach.\n\nJeśli ROAS wróci > BE po stop-loss, premium marża odzyska się sama.', created:now },
+
+    // ── OWNERSHIP 22 KATEGORII ──
+    { id:now+102, cat:'zasady', title:'Ownership Ads — 22 kategorie MEBLE (plan 26.04.2026)',
+      content:'KAŻDA kategoria ma JEDNEGO ownera Ads. Reszta = tylko organika.\n\nMK (9 kat, 41%): Szafki pralka slot+słupek+poziom, Lustro, Słupki łazienkowe, KARO92, DOUBLE KARO92, TOP92, T-BOX92\nPC (7 kat, 32%): Doniczki KARO (A,C,K), Doniczki niszowe (D,M,DUO), Witryny/RTV/komody, Stoły barowe, RICO/Angi/KORA, Ławki, Komody przewijak\nMnC (6 kat, 27%): KARO65, KAJA61, KAJA91, LARA53/96, MAJA, DOUBLE KARO68\n\nPriorytety: P0 (natychmiast) = szafki MK + doniczki PC + TOP/T-BOX MK. P1 (tydzień). P2 (2 tyg).', created:now },
+
+    // ── STOP-LOSS PRZED SEGMENTACJĄ ──
+    { id:now+103, cat:'zasady', title:'Stop-loss PRZED segmentacją — kolejność działań',
+      content:'Przy ROAS poniżej BE na wielu kontach NIE zaczynaj od segmentacji kanibalizacji.\n\nKolejność:\n1. STOP-LOSS: wyłącz Ads na kategoriach gdzie konto NIE jest ownerem → ROAS odbije bo zostają tylko efektywne frazy\n2. SEGMENTACJA: przekaż ownership → nowe kampanie na ownerach\n3. SKALOWANIE: dopiero gdy ROAS > BE na każdym koncie\n\nDlaczego: sama segmentacja nie naprawi marży 7.2% na PC. Nawet jeśli PC przestanie konkurować z MK, wewnętrzny ROAS pozostanie poniżej BE.', created:now },
+
+    // ── ROAS vs BE KWIECIEŃ 2026 ──
+    { id:now+104, cat:'benchmark', title:'ROAS vs BE MEBLE — stan kwiecień 2026',
+      content:'MK: ROAS 7.37 vs BE 6.38 → +0.99 ZDROWY\nPC: ROAS 5.18 vs BE 7.14 → -1.96 TRACI 27% na każdej zł w Ads\nMnC: ROAS 5.74 vs BE 7.62 → -1.88 TRACI 25%\n\nMarże: MK 10.9%, PC 7.2%, MnC 7.3%\nAds%: MK 9.8%, PC 8.3%, MnC 5.9%\n\nKanibalizacja 16 z 22 kategorii (73%) = przepalanie 3750-5600 zł/mies.\nRoczna oszczędność potencjalna: 45-67 tys zł.', created:now },
+
+    // ── TIERY AOV ──
+    { id:now+105, cat:'zasady', title:'Tiery AOV MEBLE — segmentacja cenowa',
+      content:'BUDŻET (<200 zł): RICO, Angi, KORA, KARO65, KAJA61 → Owner: PC (niche) + MnC (wolumen)\nMID (200-400 zł): KARO92, KAJA91, LARA96, MAJA, TOP92, T-BOX92, doniczki → Owner: MnC + MK\nPREMIUM (400-700 zł): Szafki pralkowe, PRALKO_SUSZARKA, słupki, komody → Owner: MK\nHIGH-END (>700 zł): Witryny/RTV/Komody, stoły barowe → Owner: PC (unikalne)\n\nPodział naturalny — MK bierze premium AOV (lepsza marża), MnC bierze mid-range wolumen, PC bierze nisze i high-end.', created:now },
+
+    // ── SEZONOWOŚĆ ZAKTUALIZOWANA ──
+    { id:now+106, cat:'sezonowosc', title:'Sezonowość MEBLE z kategoriami (zaktualizowana 04.2026)',
+      content:'Sty-Mar: ŁAZIENKA peak (remonty pozimowe)\nKwi-Maj: DONICZKI PEAK (Dzień Matki 26.05!) + Stoliki podnoszone start + Łazienka\nCze-Sie: Stoliki (sezon dom) + Łazienka steady\nWrz-Lis: Stoliki podnoszone Q4 PEAK + Łazienka przedzimowe + Witryny/RTV Q4\nGru: Stoliki podnoszone pre-Christmas + Witryny/RTV\n\nKRYTYCZNE: Dzień Matki 26.05 = agresywne skalowanie PC doniczki. PC ma 90 ofert vs MnC 25 vs MK 35 + unikalne serie D/M/DUO. Każdy dzień opóźnienia = utracony przychód.', created:now },
+
+    // ── LINIE PRODUKTOWE SZCZEGÓŁOWE ──
+    { id:now+107, cat:'produkt', title:'8 linii produktowych MEBLE — drzewo kategorii',
+      content:'KARO: Hero linia flagowa, 8 kategorii, 169-1320 zł (stoliki+doniczki+double)\nKAJA: Komplementarna salon, 3 kat, 177-600 zł\nLARA: Wąska linia stolików, 1 kat, 177-235 zł\nMAJA: Wąska linia stolików, 1 kat, 205-230 zł\nTOP/T-BOX: Premium feature mechanizm podnoszenia, 2 kat, 299-344 zł\nKORA/RICO/Angi: Niche budżetowe PC only, 1 kat, 120-205 zł\nPRALKA/COMBO/SLIM: Hero łazienki, 3 kat, 519-579 zł\nKWIETNIK_KARO: Sezonowy hit wiosenny, 1 kat, 169-255 zł\n\n3 światy: ŁAZIENKA (5 kat, 412 ofert) · SALON (15 kat, 447 ofert) · FLORYSTYKA (2 kat, 150 ofert)', created:now },
+
+    // ── PLAN WDROŻENIA ──
+    { id:now+108, cat:'projekt', title:'Plan wdrożenia Strategia MEBLE — 5 faz, 35 dni (od 26.04.2026)',
+      content:'FAZA 0 Data audit (do 28.04): ceny MK [DONE], weryfikacja cen MnC, eksport fraz overlap\nFAZA 1 Stop-loss (29.04-02.05): PC/MnC wyłączają Ads na nie-swoich kategoriach. Monitor ROAS 48h.\nFAZA 2 Ownership handoff (03-10.05): nowe kampanie na ownerach, wykluczenia fraz krzyżowe\nFAZA 3 Monitoring (11-25.05): daily ROAS check, tuning CPC 0.80-1.50, review 14d\nFAZA 4 Dzień Matki + post-mortem (26-31.05): agresywne skalowanie PC doniczki, MoM porównanie\n\nKryterium: ROAS > BE na każdym koncie. Brak overlap fraz. Dzień Matki PC doniczki +50% MoM.', created:now },
+  ];
+  const existing = getWiedza();
+  const existingTitles = new Set(existing.map(e => e.title));
+  const toAdd = seed.filter(e => !existingTitles.has(e.title));
+  if (toAdd.length) {
+    saveWiedza([...existing, ...toAdd]);
+    console.log('[wiedza] Seed v2 — strategia MEBLE:', toAdd.length, 'nowych wpisów');
+  }
+  localStorage.setItem(SEED_VER, '1');
+}
+seedWiedzaV2();
+
 function updateWkAgentStatus() {
   const entries = getWiedza();
   const total = entries.length;
