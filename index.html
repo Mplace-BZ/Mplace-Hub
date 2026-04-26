@@ -412,9 +412,9 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .kpi-label{font-size:10px;font-family:var(--mono);letter-spacing:.08em;color:var(--text3);margin-bottom:6px;text-transform:uppercase;}
 .kpi-value{font-size:24px;font-family:var(--mono);font-weight:600;line-height:1;margin-bottom:4px;}
 .kpi-sub{font-size:11px;color:var(--text3);font-family:var(--mono);}
-.dashboard-row-2col{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px;align-items:stretch;}
-.panel-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;display:flex;flex-direction:column;}
-.panel-title{font-size:10px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;}
+.dashboard-row-2col{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:24px;align-items:stretch;}
+.panel-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;display:flex;flex-direction:column;}
+.panel-title{font-size:11px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;}
 .panel-sub{font-size:11px;color:var(--text3);margin-bottom:12px;}
 .chart-fill-wrap{flex:1;position:relative;min-height:0;}
 .chart-fill-wrap canvas{position:absolute;inset:0;width:100%!important;height:100%!important;}
@@ -16542,14 +16542,14 @@ function openPlaybook(section) {
   const list = document.getElementById('pbList');
   list.innerHTML = sec.prompts.map((p,i) => `
     <div data-section="${section}" data-idx="${i}" class="pb-item"
-      style="padding:.65rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s">
-      <div style="display:flex;align-items:center;gap:.75rem">
-        <span style="font-family:var(--mono);font-size:10px;color:${sec.color};flex-shrink:0;letter-spacing:.04em;min-width:40px">${p.id}</span>
-        <span style="font-size:11px;color:var(--text);flex:1">${p.name}</span>
-        ${p.needsKonto ? '<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">+ konto</span>' : ''}
+      style="padding:1rem 1.25rem;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .15s">
+      <div style="display:flex;align-items:center;gap:1rem">
+        <span style="font-family:var(--mono);font-size:15px;font-weight:600;color:${sec.color};flex-shrink:0;letter-spacing:.04em;min-width:52px">${p.id}</span>
+        <span style="font-size:17px;font-weight:500;color:var(--text);flex:1">${p.name}</span>
+        ${p.needsKonto ? '<span style="font-family:var(--mono);font-size:13px;color:var(--text3)">+ konto</span>' : ''}
       </div>
-      ${p.cel ? `<div style="margin-top:3px;padding-left:52px;font-size:10px;color:#6ee7b7;font-style:italic;line-height:1.4">${p.cel}</div>` : ''}
-      <div style="margin-top:4px;padding-left:52px;font-family:var(--mono);font-size:10px;color:var(--text3)">${p.tags.join(' ')}</div>
+      ${p.cel ? `<div style="margin-top:6px;padding-left:68px;font-size:14px;color:#6ee7b7;font-style:italic;line-height:1.5">${p.cel}</div>` : ''}
+      <div style="margin-top:6px;padding-left:68px;font-family:var(--mono);font-size:13px;color:var(--text3)">${p.tags.join(' ')}</div>
     </div>
   `).join('');
   pbAttachListeners(list);
@@ -27667,17 +27667,17 @@ function mpToggleSidebar(forceClose){
   <div onclick="event.stopPropagation()" style="background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:860px;max-height:85vh;overflow-y:auto;padding:1.5rem">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem">
       <div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--yellow);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px" id="pbSectionLabel">Sekcja 1 — Plan Dnia</div>
-        <div style="font-size:1rem;font-weight:600;color:var(--text)">Wybierz prompt</div>
+        <div style="font-family:var(--mono);font-size:14px;color:var(--yellow);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px" id="pbSectionLabel">Sekcja 1 — Plan Dnia</div>
+        <div style="font-size:1.4rem;font-weight:600;color:var(--text)">Wybierz prompt</div>
       </div>
       <button onclick="closePlaybook()" style="background:transparent;border:none;color:var(--text3);font-size:16px;cursor:pointer">✕</button>
     </div>
     <input id="pbSearch" type="text" placeholder="Szukaj po nazwie, tagu lub ID..."
       oninput="pbSearchFilter()"
-      style="width:100%;font-family:var(--mono);font-size:11px;padding:7px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);outline:none;margin-bottom:.85rem;transition:border-color .15s;box-sizing:border-box"
+      style="width:100%;font-family:var(--mono);font-size:15px;padding:12px 14px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);outline:none;margin-bottom:1rem;transition:border-color .15s;box-sizing:border-box"
       onfocus="this.style.borderColor='var(--accent)'"
       onblur="this.style.borderColor='var(--border2)'">
-    <div id="pbList" style="display:flex;flex-direction:column;gap:.5rem"></div>
+    <div id="pbList" style="display:flex;flex-direction:column;gap:.75rem"></div>
     <!-- Action bar -->
     <div id="pbKontoWrap" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
       <div id="pbKontoLabel" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.5rem;display:none">Wybierz konto:</div>
