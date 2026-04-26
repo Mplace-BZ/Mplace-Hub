@@ -1,0 +1,13 @@
+{
+  "name": "mplace-hub-tests",
+  "private": true,
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "serve": "npx serve -s . -p 3333 --no-clipboard"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "serve": "^14.2.0"
+  }
+}
