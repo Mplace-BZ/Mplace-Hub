@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.32</title>
+<title>MPlace Hub v9.33</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1675,7 +1675,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.32 — NEW FEATURES CSS ═══ */
+/* ═══ v9.33 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2041,7 +2041,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.32</span>
+    <span class="brand-ver">v9.33</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2239,8 +2239,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div style="display:flex;gap:8px;align-items:center;margin-top:40px">
       <div style="font-family:var(--mono);font-size:13px;color:var(--text3)">START</div>
       <div id="dzisTimer" style="font-family:var(--mono);font-size:18px;color:var(--text);font-weight:600"></div>
-      <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;margin-left:8px">→ Kopiuj dzien</button>
+      <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;margin-left:8px">Kopiuj</button>
       <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer">Drukuj</button>
+      <button onclick="mhEmail('cockpit')" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.06);color:#f5a623;cursor:pointer">Email</button>
+      <button onclick="mhDownloadHtml('cockpit')" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.06);color:#38bdf8;cursor:pointer">HTML</button>
     </div>
   </div>
 
@@ -2343,10 +2345,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <div>
         <div style="font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#d4c6ff;margin-bottom:8px;font-weight:600">DID YOU KNOW?</div>
         <div id="dzisDYKText" style="font-size:15px;line-height:1.6;color:var(--text)"></div>
-        <div style="margin-top:10px;display:flex;gap:6px">
-          <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Kopiuj</button>
-          <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Drukuj</button>
-          <button onclick="if(typeof wkQuickAdd==='function'){const t=document.getElementById('dzisDYKText');wkQuickAdd(t?t.textContent:'')}" style="font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Zapisz w Wiedzy</button>
+        <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Kopiuj</button>
+          <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Drukuj</button>
+          <button onclick="mhEmail('cockpit')" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.06);color:#f5a623;cursor:pointer">Email</button>
+          <button onclick="if(typeof wkQuickAdd==='function'){const t=document.getElementById('dzisDYKText');wkQuickAdd(t?t.textContent:'')}" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.06);color:#34d399;cursor:pointer">Zapisz w Wiedzy</button>
         </div>
       </div>
     </div>
@@ -18559,6 +18562,8 @@ function mhClearReport(source) {
     analiza: 'aaResult',
     crossborder: 'cbResult',
     titleanalyzer: 'taResult',
+    kanibalizator: 'kbResult',
+    ca2: 'ca2Content',
   };
   const id = containers[source];
   if (id) { const el = document.getElementById(id); if (el) el.innerHTML = ''; }
@@ -22301,7 +22306,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.32</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.33</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -22599,11 +22604,7 @@ async function kbRun() {
       </div>
       <div class="agent-md">${html}</div>
     </div>
-    <div style="display:flex;gap:.5rem;margin-top:.75rem">
-      <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Kopiuj tekst</button>
-      <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer">Drukuj / PDF</button>
-      <button onclick="aaDownloadHtml()" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:5px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.06);color:#ef4444;cursor:pointer">Pobierz .html</button>
-    </div>`;
+    ${mhReportButtonsHTML('kanibalizator')}`;
 
     // Save to history
     const entry = { id: Date.now(), date: now.toLocaleString('pl-PL', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}), aiHtml: html, tableHtml: document.getElementById('kbTable').innerHTML };
@@ -25554,7 +25555,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.32 — ALL NEW FEATURES
+// v9.33 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
@@ -26261,10 +26262,7 @@ Odpowiedz TYLKO JSON.`;
         <div style="font-family:var(--mono);font-size:11px"><span style="color:var(--text3)">Oczekiwana marza:</span> <span style="color:var(--green)">${plan.expected_margin}</span></div>
       </div>
       <div style="font-family:var(--mono);font-size:10px;color:var(--red);margin-top:.5rem">Ryzyko: ${plan.risk}</div>
-      <div style="display:flex;gap:8px;margin-top:1rem">
-        <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('architectResult').innerText)">Kopiuj</button>
-        <button class="btn" onclick="printDiv('architectResult')">Drukuj</button>
-      </div>`;
+      ${mhReportButtonsHTML('architect')}`;
   } catch(e) {
     resultEl.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:11px">Blad: ${e.message}</div>`;
   }
@@ -26740,13 +26738,7 @@ function ca2AskAgent() {
 }
 
 function _ca2ButtonBar() {
-  const kName = AC_META[ca2Data.konto]?.name || '';
-  return `<div style="display:flex;gap:6px;margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border);flex-wrap:wrap">
-    <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('ca2Content').innerText).then(()=>{this.textContent='Skopiowano';setTimeout(()=>this.textContent='Kopiuj',1500)})">Kopiuj</button>
-    <button class="btn" onclick="printDiv('ca2Content','Przeglad ofert — ${kName}')">Drukuj</button>
-    <button class="btn" onclick="exportPDFBranded('ca2Content','Przeglad_ofert_${kName.replace(/\\s/g,'_')}')">PDF</button>
-    <button class="btn" onclick="ca2ExportHTML()">Pobierz HTML</button>
-  </div>`;
+  return mhReportButtonsHTML('ca2');
 }
 
 function ca2ExportHTML() {
