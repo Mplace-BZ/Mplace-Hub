@@ -3843,8 +3843,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div style="margin-bottom:1rem;padding:10px 14px;background:rgba(255,107,53,.04);border:1px solid rgba(255,107,53,.15);border-radius:8px">
     <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#ff6b35;font-family:var(--mono);margin-bottom:6px;font-weight:600">► GRUPA MEBLE — STRATEGIA PORTFELOWA</div>
     <div style="font-size:11px;color:var(--text2);line-height:1.5">
-      3 konta, 3 role komplementarne. <strong style="color:#ff6b35">MK = wolumen</strong> (szafki pralkowe, nowości) · <strong style="color:#ff6b35">PC = nisze</strong> (donice, kwietniki, sezonowe) · <strong style="color:#ff6b35">MnC = premium</strong> (+2.5% cena, gwiazdy TOP92/KARO65).
-      Kanibalizacja wewnątrz grupy eliminowana przez segmentację — konto z najwyższym ROAS na danej frazie jest jej <em>właścicielem</em>.
+      3 konta, 22 kategorie, ownership plan (26.04.2026). <strong style="color:#ff6b35">MK = scale</strong> (9 kat: premium łazienka + KARO92/TOP/T-BOX) · <strong style="color:#34d399">PC = nisze + florystyka</strong> (7 kat: donice, witryny, stoły barowe, budżetowe) · <strong style="color:#f5a623">MnC = mid-range wolumen</strong> (6 kat: KARO65, KAJA, LARA, MAJA — tryb odbudowy po utracie TOP92).
+      Każda kategoria ma <em>jednego ownera Ads</em> — reszta = tylko organika. Stop-loss → segmentacja → skalowanie.
     </div>
   </div>
 
@@ -3855,10 +3855,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div style="border:1px solid var(--border);border-radius:10px;padding:14px 18px;background:var(--bg2);margin-bottom:1rem">
     <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;font-family:var(--mono)">Reguły strategiczne — jak Agent interpretuje role</div>
     <div style="font-size:11px;color:var(--text2);line-height:1.7">
-      <strong style="color:#ff6b35">SCALE (MobelKap):</strong> pełny budżet Ads na kategoriach specjalizacji. Unikaj eksperymentów. Maksymalizuj zasięg na stałych CORE.<br>
-      <strong style="color:#ff6b35">NICHE (Perfekt Cięcie):</strong> NIE rekomenduj szerokich kampanii. Kategoria poza specjalizacją → "wyłącz Ads, zostaw organikę". Priorytet: donice, kwietniki, sezonowe.<br>
-      <strong style="color:#ff6b35">PREMIUM (Meble na Czasie):</strong> tylko aukcje z potwierdzoną konwersją ≥3% i min 5 transakcjami. Niższa konwersja → "nie skaluj, obserwuj". Pricing +2.5%.<br>
-      <strong style="color:#ef4444">KANIBALIZACJA CROSS-ACCOUNT:</strong> jeśli aukcja występuje w specjalizacji innego konta MEBLE → wyłącz Ads na tym koncie. Przykład: KARO 65 Wotan należy do MnC (ROAS 8.96), MK wyłącza (ROAS 1.30).
+      <strong style="color:#38bdf8">SCALE (MobelKap):</strong> Owner 9 kategorii (premium łazienka + KARO92 + TOP/T-BOX). Pełny budżet na owned kategoriach. Lider grupy — ROAS 7.37 > BE 6.38.<br>
+      <strong style="color:#34d399">NICHE (Perfekt Cięcie):</strong> Owner 7 kategorii (cała florystyka + unikalne). NIE wchodzi w łazienkę ani stoliki mid-range. Priorytet: Dzień Matki 26.05 — agresywne skalowanie doniczek.<br>
+      <strong style="color:#f5a623">PREMIUM (Meble na Czasie):</strong> Tryb odbudowy — TOP92 wycofany (18-21.04). Tymczasowy ownership: stoliki mid-range (KARO65, KAJA61, LARA, MAJA). Nowy hero: stolik podnoszony 92cm. Pricing +2.5% utrzymany. Rewizja roli po FAZA 1 stop-loss (02.05).<br>
+      <strong style="color:#ef4444">OWNERSHIP:</strong> każda z 22 kategorii ma jednego ownera Ads. Reszta kont = tylko organika. Stop-loss PRZED segmentacją. Przepalanie kanibalizacji: 3750-5600 zł/mies.
     </div>
   </div>
 
@@ -4513,23 +4513,23 @@ const GROUPS={
 const AC_META={
   MobelKap:{name:'MobelKap',group:'MEBLE',
     role:'scale', pricingTier:'base', pricingDelta:0,
-    specjalizacje:['szafki_pralkowe','nowosci','polki_wysuwane','szafki_lazienkowe','t-box','stoliki_KARO_92'],
+    specjalizacje:['szafki_pralkowe','szafki_lustro','slupki_lazienkowe','KARO92','DOUBLE_KARO92','TOP92','T-BOX92','stoliki_podnoszone'],
     adsTarget:6.5, wyrTarget:5.0,
-    strategiaOpis:'Maszyna wolumenowa grupy MEBLE. Największy ruch organiczny (1443 wizyt na top SKU). Pełny budżet Ads na szafkach pralkowych (po migracji Smart) + nowości + półki wysuwane. Priorytet: skalowanie wolumenu.',
+    strategiaOpis:'Lider grupy MEBLE — najwyższy ROAS (7.37 vs BE 6.38). Owner 9 kategorii (41% portfela): cała premium łazienka (szafki pralkowe, lustro, słupki) + stoliki premium (KARO92, TOP92, T-BOX92). Priorytet: skalowanie wolumenu na owned kategoriach.',
     badge:'🏆 SCALE'
   },
   PerfektCiecie:{name:'Perfekt Cięcie',group:'MEBLE',
     role:'niche', pricingTier:'base', pricingDelta:0,
-    specjalizacje:['donice_Craft','donice_Lancelot','kwietniki','szafki_lustro_niszowe','slim','sezonowe'],
+    specjalizacje:['donice_KARO_ACK','donice_DMDuo','kwietniki','witryny_RTV','stoly_barowe','RICO_Angi_KORA','lawki','komody_przewijak'],
     adsTarget:5.5, wyrTarget:3.0,
-    strategiaOpis:'Chirurgiczna specjalizacja w niszach gdzie MK/MnC nie konkurują. Super Sprzedawca + Qlt 336. Donica Craft 45x22 = ROAS 99×. Ads% redukcja z 10.1% → 5.5%, wyróżnienia 6.4% → 3.0%. NIE wchodzi w stoliki/szafki wolumenowe — zostawia MK i MnC.',
+    strategiaOpis:'Owner całej florystyki (90 ofert, 3x więcej niż konkurencja) + 6 unikalnych kategorii (witryny, stoły barowe, ławki, budżetowe). Super Sprzedawca + Qlt 336. PEAK: Dzień Matki 26.05 — agresywne skalowanie doniczek. 7 kategorii (32% portfela).',
     badge:'🎯 NICHE'
   },
   MeblenaCzasie:{name:'Meble na Czasie',group:'MEBLE',
     role:'premium', pricingTier:'premium', pricingDelta:2.5,
-    specjalizacje:['TOP92_Wotan','KARO65_Wotan','stoliki_podnoszone','gwiazdy_4pct_konw'],
+    specjalizacje:['KARO65','KAJA61','KAJA91','LARA','MAJA','DOUBLE_KARO68','stoliki_podnoszone_92'],
     adsTarget:6.5, wyrTarget:4.5,
-    strategiaOpis:'Premium tier grupy MEBLE. Najwyższa marża (9.1%) i ROAS (8.23). TOP92 Wotan = 53% sprzedaży. Pricing +2.5% vs MK/PC (efektywna marża +0.75%). Selektywne Ads tylko na gwiazdach z ROAS > BE i konwersją 3%+. Nie skaluje eksperymentów — tylko potwierdzone top performery.',
+    strategiaOpis:'Tryb odbudowy (kwiecień 2026). Hero TOP92 Wotan wycofany przez Allegro — był 53% Ads. Marża spadła z 10.8% do 7.3%. Pricing +2.5% utrzymany. Tymczasowy ownership: stoliki mid-range (KARO65, KAJA61, LARA, MAJA). Nowy hero: stolik podnoszony rozkładany 92cm. 6 kategorii (27% portfela). Rewizja roli po stop-loss FAZA 1.',
     badge:'💎 PREMIUM +2.5%'
   },
   Luxsen:{name:'Luxsen',group:'LUXSEN'},Semmi:{name:'Semmi',group:'LUXSEN'},BOTAVIT:{name:'BOTAVIT',group:'LUXSEN'},
