@@ -2322,14 +2322,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <div class="ph-title">Cockpit <span id="dzisWeekday"></span></div>
       <div class="ph-sub" id="dzisDate"> <span class="ph-info-link" onclick="openInfoSection('main')">? Info</span></div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center;margin-top:40px">
-      <div style="font-family:var(--mono);font-size:13px;color:var(--text3)">START</div>
-      <div id="dzisTimer" style="font-family:var(--mono);font-size:18px;color:var(--text);font-weight:600"></div>
-      <button onclick="aaCopyResult(this)" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;margin-left:8px">Kopiuj</button>
-      <button onclick="aaPrintResult()" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer">Drukuj</button>
-      <button onclick="mhEmail('cockpit')" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(245,166,35,.3);background:rgba(245,166,35,.06);color:#f5a623;cursor:pointer">Email</button>
-      <button onclick="mhDownloadHtml('cockpit')" style="font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:6px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.06);color:#38bdf8;cursor:pointer">HTML</button>
-    </div>
+    <div id="dzisTimer" style="display:none"></div>
   </div>
 
   <!-- 2-COL LAYOUT -->
@@ -2808,6 +2801,48 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <div class="data-center" style="padding:1.5rem 2rem 3rem">
     <div id="infoContent"></div>
   </div>
+</div>
+</div>
+
+<!-- ═══ VIEW: DECYZJE ═══ -->
+<div class="view" id="viewDecisions">
+<div class="container">
+  <div style="margin-bottom:1.2rem">
+    <div class="ph-eyebrow">▸ DZIENNIK DECYZJI <span class="ph-info-link" onclick="openInfoSection('workflow')">? Info</span></div>
+    <div class="ph-title">Decyzje <span>Log</span></div>
+    <div class="ph-sub">Co zmieniłeś, dlaczego, i jaki był wynik — śledź każdą decyzję</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;align-items:center">
+    <select id="decFilterKonto" onchange="renderDecisions()" style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-family:var(--mono);font-size:13px">
+      <option value="">Wszystkie konta</option>
+    </select>
+    <select id="decFilterCat" onchange="renderDecisions()" style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-family:var(--mono);font-size:13px">
+      <option value="">Wszystkie kategorie</option>
+      <option value="Ads">Ads</option><option value="Wyroznienia">Wyroznienia</option>
+      <option value="Cena">Cena</option><option value="Oferta">Oferta</option><option value="Inne">Inne</option>
+    </select>
+    <select id="decFilterStatus" onchange="renderDecisions()" style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-family:var(--mono);font-size:13px">
+      <option value="">Wszystkie statusy</option>
+      <option value="pending">Oczekujace</option><option value="verified">Potwierdzone</option><option value="failed">Nie zadziałało</option>
+    </select>
+    <button onclick="decShowAddForm()" style="margin-left:auto;font-family:var(--mono);font-size:12px;padding:6px 16px;border-radius:6px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.08);color:#34d399;cursor:pointer">+ Dodaj decyzje</button>
+  </div>
+  <div id="decAddForm" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px 22px;margin-bottom:1rem">
+    <div style="font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">NOWA DECYZJA</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:3px">Konto</label><select id="decFormKonto" style="width:100%;padding:6px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px"></select></div>
+      <div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:3px">Kategoria</label><select id="decFormCat" style="width:100%;padding:6px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px"><option>Ads</option><option>Wyroznienia</option><option>Cena</option><option>Oferta</option><option>Inne</option></select></div>
+    </div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:3px">Co zrobiłeś?</label><input id="decFormAction" style="width:100%;padding:6px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;box-sizing:border-box" placeholder="np. Wyłączyłem kampanię szafka lustro na PC"></div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:3px">Dlaczego?</label><input id="decFormRationale" style="width:100%;padding:6px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;box-sizing:border-box" placeholder="np. ROAS 2.1 poniżej BE 6.38"></div>
+    <div style="margin-bottom:10px"><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:3px">Oczekiwany efekt</label><input id="decFormExpected" style="width:100%;padding:6px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;box-sizing:border-box" placeholder="np. Oszczędność ~200 zł/mies"></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button onclick="decSaveNew()" style="font-family:var(--mono);font-size:12px;padding:6px 16px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer">Zapisz</button>
+      <button onclick="document.getElementById('decAddForm').style.display='none'" style="font-family:var(--mono);font-size:12px;padding:6px 16px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Anuluj</button>
+    </div>
+  </div>
+  <div id="decContent"></div>
+  <div id="decStats" style="font-family:var(--mono);font-size:12px;color:var(--text3);margin-top:1rem"></div>
 </div>
 </div>
 
@@ -4880,6 +4915,10 @@ function showView(v){
     document.getElementById('viewImportAds').classList.add('active');
     document.getElementById('navImportAds').classList.add('active');
     renderImportAdsList();
+  } else if(v==='decisions'){
+    document.getElementById('viewDecisions').classList.add('active');
+    document.getElementById('navSbDecisions')?.classList.add('active');
+    renderDecisions();
   } else if(v==='kalendarz'){
     document.getElementById('viewKalendar').classList.add('active');
     document.getElementById('navKalendarz').classList.add('active');
@@ -10673,6 +10712,7 @@ const MP_NAV = [
   ]},
   { group:'Zespol', items:[
     { k:'zespol',        id:'navSbTeam',      label:'Zespol',    icon:'team', badge:'mpTeamBadge', badgeCls:'alert' },
+    { k:'decisions',     id:'navSbDecisions', label:'Decyzje',   icon:'knowledge' },
     { k:'kalendarz',     id:'navSbCalendar',  label:'Kalendarz', icon:'calendar' },
     { k:'biznes',        id:'navSbBiz',       label:'Biznes',    icon:'biz' },
     { k:'rozliczenie',   id:'navSbSettle',    label:'Rozliczenie', icon:'settle' },
@@ -11476,6 +11516,25 @@ function renderInsights(){
       ${voiceHtml}
     </div>`;
   }).join('');
+
+  // Decision follow-up reminders
+  try {
+    const now2 = new Date();
+    const overdue = typeof getDecisions === 'function' ? getDecisions().filter(d => d.status === 'pending' && d.followUpDate && new Date(d.followUpDate) <= now2) : [];
+    if (overdue.length) {
+      content.innerHTML = `<div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-left:3px solid #f5a623;border-radius:10px;padding:1.2rem 1.5rem;margin-bottom:1rem">
+        <div style="font-family:var(--mono);font-size:12px;color:#f5a623;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">FOLLOW-UP DECYZJI · ${overdue.length} do sprawdzenia</div>
+        ${overdue.map(d => `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(245,166,35,.1);flex-wrap:wrap">
+          <span style="font-size:15px;color:var(--text)">${d.action}</span>
+          <span style="font-family:var(--mono);font-size:12px;color:var(--text3)">${d.konto ? (AC_META[d.konto]?.name||d.konto) : ''} · ${d.followUpDate}</span>
+          <div style="margin-left:auto;display:flex;gap:4px">
+            <button onclick="decVerify(${d.id},'verified');renderInsights()" style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.08);color:#34d399;cursor:pointer">Zadziałało</button>
+            <button onclick="decVerify(${d.id},'failed');renderInsights()" style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#ef4444;cursor:pointer">Nie zadziałało</button>
+          </div>
+        </div>`).join('')}
+      </div>` + content.innerHTML;
+    }
+  } catch(e) {}
 }
 
 
@@ -15682,6 +15741,66 @@ function updateDecision(id, updates) {
 // ═══════════════════════════════════════════════════════════
 // IMPORT ADS
 // ═══════════════════════════════════════════════════════════
+
+// Decision Log — UI functions
+function decShowAddForm(){
+  const form=document.getElementById('decAddForm'); form.style.display='';
+  const sel=document.getElementById('decFormKonto');
+  sel.innerHTML='<option value="">— ogolne —</option>'+Object.keys(AC_META).map(k=>`<option value="${k}">${AC_META[k].name}</option>`).join('');
+  ['decFormAction','decFormRationale','decFormExpected'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('decFormAction').focus();
+}
+function decSaveNew(){
+  const action=document.getElementById('decFormAction').value.trim(); if(!action) return;
+  addDecision({konto:document.getElementById('decFormKonto').value,category:document.getElementById('decFormCat').value,action,rationale:document.getElementById('decFormRationale').value.trim(),expectedResult:document.getElementById('decFormExpected').value.trim()});
+  document.getElementById('decAddForm').style.display='none'; renderDecisions();
+}
+function renderDecisions(){
+  const el=document.getElementById('decContent'); if(!el) return;
+  let decisions=getDecisions();
+  const fK=document.getElementById('decFilterKonto')?.value||'';
+  const fC=document.getElementById('decFilterCat')?.value||'';
+  const fS=document.getElementById('decFilterStatus')?.value||'';
+  if(fK) decisions=decisions.filter(d=>d.konto===fK);
+  if(fC) decisions=decisions.filter(d=>d.category===fC);
+  if(fS) decisions=decisions.filter(d=>d.status===fS);
+  const kontoSel=document.getElementById('decFilterKonto');
+  if(kontoSel&&kontoSel.options.length<=1) Object.keys(AC_META).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=AC_META[k].name;kontoSel.appendChild(o);});
+  if(!decisions.length){el.innerHTML='<div style="text-align:center;padding:3rem;color:var(--text3);font-size:15px">Brak decyzji'+(fK||fC||fS?' z tym filtrem':' — dodaj pierwsza lub zamknij task w Zespole')+'</div>';return;}
+  const sC={pending:'#f5a623',verified:'#34d399',failed:'#ef4444'};
+  const sL={pending:'Oczekuje',verified:'Zadziałało',failed:'Nie zadziałało'};
+  const cC={Ads:'#4d9fff',Wyroznienia:'#e879f9',Cena:'#f5a623',Oferta:'#ff6b35',Inne:'var(--text3)'};
+  const now=new Date();
+  el.innerHTML=decisions.map(d=>{
+    const fuD=d.followUpDate?new Date(d.followUpDate):null;
+    const overdue=d.status==='pending'&&fuD&&fuD<=now;
+    const dateStr=d.timestamp?new Date(d.timestamp).toLocaleDateString('pl-PL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+    const kName=d.konto?(AC_META[d.konto]?.name||d.konto):'ogolne';
+    return `<div style="background:var(--bg2);border:1px solid ${overdue?'rgba(239,68,68,.4)':'var(--border)'};border-left:3px solid ${sC[d.status]||'var(--border)'};border-radius:10px;padding:16px 20px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+        <span style="font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:4px;background:rgba(${d.status==='pending'?'245,166,35':d.status==='verified'?'52,211,153':'239,68,68'},.12);color:${sC[d.status]}">${sL[d.status]||d.status}</span>
+        <span style="font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:4px;background:var(--bg3);color:${cC[d.category]||'var(--text3)'}">${d.category}</span>
+        <span style="font-size:14px;color:var(--text2)">${kName}</span>
+        <span style="margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--text3)">${dateStr}</span>
+      </div>
+      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px">${d.action}</div>
+      ${d.rationale?`<div style="font-size:14px;color:var(--text2);margin-bottom:4px">${d.rationale}</div>`:''}
+      ${d.expectedResult?`<div style="font-size:13px;color:var(--text3);font-style:italic">Oczekiwany efekt: ${d.expectedResult}</div>`:''}
+      ${d.followUpResult?`<div style="margin-top:6px;padding:8px 12px;background:rgba(${d.status==='verified'?'52,211,153':'239,68,68'},.06);border-radius:6px;font-size:14px;color:${sC[d.status]}">Wynik: ${d.followUpResult}</div>`:''}
+      ${overdue?`<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        <span style="font-family:var(--mono);font-size:11px;color:#ef4444">Follow-up: ${d.followUpDate}</span>
+        <button onclick="decVerify(${d.id},'verified')" style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.08);color:#34d399;cursor:pointer">Zadziałało</button>
+        <button onclick="decVerify(${d.id},'failed')" style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#ef4444;cursor:pointer">Nie zadziałało</button>
+      </div>`:''}</div>`;
+  }).join('');
+  const stats=document.getElementById('decStats');
+  if(stats){const a=getDecisions();stats.textContent=`${a.length} decyzji · ${a.filter(d=>d.status==='pending').length} oczekuje · ${a.filter(d=>d.status==='verified').length} potwierdzonych · ${a.filter(d=>d.status==='failed').length} nieudanych`;}
+}
+function decVerify(id,status){
+  const result=prompt(status==='verified'?'Co zadziałało? (opcjonalnie)':'Co nie zadziałało? (opcjonalnie)');
+  updateDecision(id,{status,followUpResult:result||(status==='verified'?'Potwierdzone':'Nie zadziałało')});
+  renderDecisions();
+}
 
 const SK_ADS_HISTORY = 'mplace_ads_history_v1';
 const ADS_ACCOUNT_KEYS = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
