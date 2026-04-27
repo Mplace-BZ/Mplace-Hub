@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.59</title>
+<title>MPlace Hub v9.60</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1761,7 +1761,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.59 — NEW FEATURES CSS ═══ */
+/* ═══ v9.60 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.59</span>
+    <span class="brand-ver">v9.60</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -9203,20 +9203,28 @@ ZASADY:
 4. **Max 10 zadań.** Jakość > ilość. Lepiej 5 konkretnych niż 10 ogólników.
 5. Jeśli raport ma IDs/nazwy — użyj w desc dokładnie.
 6. Brak konta w raporcie → "".
-7. desc: **max 2 zdania** (krótko, konkretnie, z uzasadnieniem).
+7. desc: **max 3 zdania** (krótko, konkretnie, z uzasadnieniem).
 8. customChecklist TYLKO jeśli standardowy typu nie pasuje (zostaw null lub pomiń).
 9. Tytuł: max 60 znaków.
+10. **HIERARCHIA ADS — OBOWIĄZKOWA:** Dla KAŻDEGO taska dot. kampanii Ads (wyłącz/skaluj/zmień budżet/pauza), desc MUSI zawierać pełną ścieżkę nawigacji:
+    - Kampania: dokładna nazwa (np. "/011/M/ CORE MATERACE 140x200")
+    - Grupa Reklam: dokładna nazwa (np. "[010][RW][WW] 140x200 Bonellowy VALUE")
+    - Numer Aukcji: ID oferty (np. "17146780655")
+    Format w desc: 'Kampania "/011/M/ CORE MATERACE 140x200" → Grupa "[010][RW][WW] 140x200 Bonellowy VALUE" → Aukcja [17146780655]'
+    Jeśli akcja dotyczy CAŁEJ kampanii — podaj nazwę kampanii i wymień WSZYSTKIE grupy reklam w niej.
+    Jeśli akcja dotyczy CAŁEJ grupy — podaj kampanię + grupę + wymień numery aukcji w niej.
+    BEZ tych danych task jest bezużyteczny — pracownik nie wie CO kliknąć w panelu Allegro Ads.
 
 FORMAT ODPOWIEDZI:
 {
   "tasks": [
     {
-      "type": "zmien_tytul",
-      "title": "Krótki tytuł (max 80 znaków)",
-      "priority": "PILNE|WAŻNE|INFO",
-      "konto": "MobelKap",
-      "desc": "Konkret z IDs/nazwami + uzasadnienie",
-      "customChecklist": null
+      "type": "wylacz_kampanie",
+      "title": "Wyłącz /011/M/ CORE MATERACE 140x200",
+      "priority": "PILNE",
+      "konto": "Luxsen",
+      "desc": "Kampania \\"/011/M/ CORE MATERACE 140x200\\" → Grupy: \\"[010][RW][WW] 140x200 Bonellowy VALUE\\", \\"[010][RW][WW] 140x200 Kontynentalny MID\\", \\"[010][RW][WW] 140x200 Pocket MID\\" → Aukcje: [17146780655], [12009571594], [12029537217]. 6 zł/7d, 0 sprzedaży w obu okresach.",
+      "customChecklist": ["Panel Allegro Ads → Kampanie", "Znajdź kampanię /011/M/ CORE MATERACE 140x200", "Zmień status na PAUZA", "Screenshot statusu do komentarza"]
     }
   ]
 }`;
@@ -16090,7 +16098,7 @@ async function adsRunAnalysis() {
     });
     if(r.zgnile&&r.zgnile.length){
       prompt += `ZGNIŁE JAJA TOP (${r.zgnile.length} aukcji, ${(r.kosztZgnile||0).toFixed(0)}zł przepalone):\n`;
-      r.zgnile.slice(0,10).forEach(a=>{ prompt+=`  [${a.nr}] ${a.oferta.substring(0,45)} | ${a.koszt.toFixed(0)}zł | CTR:${a.ctr.toFixed(2)}%\n`; });
+      r.zgnile.slice(0,10).forEach(a=>{ prompt+=`  [${a.nr}]${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta.substring(0,45)} | ${a.koszt.toFixed(0)}zł | CTR:${a.ctr.toFixed(2)}%\n`; });
       prompt+='\n';
     }
   });
@@ -17517,11 +17525,11 @@ async function aaParseFile(file, type) {
           const totKoszt = kampanie.reduce((s, k) => s + k.koszt, 0);
           const totSprzedaz = kampanie.reduce((s, k) => s + k.sprzedaz, 0);
           // ── AGREGACJA PER AUKCJA (suma across ALL campaigns) ──
-          const allAukcjeFlat = kampanie.flatMap(k => k.aukcje);
+          const allAukcjeFlat = kampanie.flatMap(k => k.aukcje.map(a => ({...a, kampNazwa: k.kampania})));
           const agg = {};
           allAukcjeFlat.forEach(a => {
             if (!a.nr) return;
-            if (!agg[a.nr]) agg[a.nr] = { nr: a.nr, oferta: a.oferta, koszt: 0, sprzedaz: 0, wysw: 0, klik: 0, sztuki: 0, kampanie: 0 };
+            if (!agg[a.nr]) agg[a.nr] = { nr: a.nr, oferta: a.oferta, grupa: a.grupa || '', kampNazwa: a.kampNazwa || '', koszt: 0, sprzedaz: 0, wysw: 0, klik: 0, sztuki: 0, kampanie: 0 };
             agg[a.nr].koszt += a.koszt;
             agg[a.nr].sprzedaz += a.sprzedaz;
             agg[a.nr].wysw += a.wysw;
@@ -17808,25 +17816,37 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   }
   p += `\n`;
 
-  p += `Kampanie (sortowane po koszcie malejąco):\n`;
+  p += `Kampanie (hierarchia: Kampania → Grupa Reklam → Aukcja, sortowane po koszcie malejąco):\n`;
   ads.kampanie.sort((a,b) => b.koszt - a.koszt).forEach(k => {
     const flag = k.roas === 0 && k.koszt > 0 ? 'WYŁĄCZ' : k.roas < 3 ? 'WYŁĄCZ' : k.roas < 4 ? 'OSTRZEŻENIE' : k.roas < be ? 'OPTYMALIZUJ' : 'OK';
     const parsedKamp = parseCampaignName(k.kampania);
     const kampHierarchy = parsedKamp.matched
       ? ` → [NNN:${parsedKamp.nnn}, KAT:${parsedKamp.kategoria}, LINIA:${parsedKamp.linia}${parsedKamp.wymiar?', WYM:'+parsedKamp.wymiar:''}]`
       : ' [POZA KONWENCJĄ]';
-    p += `  [${flag}] ${k.kampania}${kampHierarchy} | Koszt:${k.koszt.toFixed(0)}zł Sprzedaż:${k.sprzedaz.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}%\n`;
-    k.aukcje.sort((a,b) => b.koszt - a.koszt).slice(0, 8).forEach(a => {
-      p += `    [${a.nr}]${dostTag(a.nr)} ${a.oferta} | Koszt:${a.koszt.toFixed(1)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki||0} CTR:${a.ctr.toFixed(2)}%${a.miejsce?' ['+a.miejsce+']':''}\n`;
-    });
+    p += `  [${flag}] KAMPANIA: "${k.kampania}"${kampHierarchy} | Koszt:${k.koszt.toFixed(0)}zł Sprzedaż:${k.sprzedaz.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}%\n`;
+    if (k.grupy?.length) {
+      k.grupy.sort((a,b) => b.koszt - a.koszt).forEach(g => {
+        const gFlag = g.roas === 0 && g.koszt > 0 ? 'WYŁĄCZ' : g.roas < be && g.roas > 0 ? 'PONIŻEJ BE' : g.roas >= be ? 'OK' : '';
+        p += `    [${gFlag}] GRUPA: "${g.grupa}" | Koszt:${g.koszt.toFixed(0)}zł Sprzedaż:${g.sprzedaz.toFixed(0)}zł ROAS:${g.roas.toFixed(2)} (${g.aukcje?.length||0} aukcji)\n`;
+        if (g.aukcje?.length) {
+          g.aukcje.sort((a,b) => b.koszt - a.koszt).slice(0, 5).forEach(a => {
+            p += `      [${a.nr}]${dostTag(a.nr)} ${a.oferta} | Koszt:${a.koszt.toFixed(1)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki||0} CTR:${a.ctr.toFixed(2)}%${a.miejsce?' ['+a.miejsce+']':''}\n`;
+          });
+        }
+      });
+    } else {
+      k.aukcje.sort((a,b) => b.koszt - a.koszt).slice(0, 8).forEach(a => {
+        p += `    [${a.nr}]${dostTag(a.nr)}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | Koszt:${a.koszt.toFixed(1)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki||0} CTR:${a.ctr.toFixed(2)}%${a.miejsce?' ['+a.miejsce+']':''}\n`;
+      });
+    }
   });
-  if (ads.zgnile.length) { p += `\nMARTWE AUKCJE (koszt>=30zł, 0 sprzedaży, ROAS=0):\n`; ads.zgnile.slice(0,15).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)} ${a.oferta} | Przepalono: ${a.koszt.toFixed(0)} zł\n`; }); }
+  if (ads.zgnile.length) { p += `\nMARTWE AUKCJE (koszt>=30zł, 0 sprzedaży, ROAS=0):\n`; ads.zgnile.slice(0,15).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)}${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | Przepalono: ${a.koszt.toFixed(0)} zł\n`; }); }
   // Aukcje poniżej BE ROAS — mają sprzedaż ale generują stratę
   const allAukcje = ads.kampanie.flatMap(k => k.aukcje);
   const podBe = allAukcje.filter(a => a.roas > 0 && a.roas < be && a.koszt >= 30).sort((a, b) => b.koszt - a.koszt);
-  if (podBe.length) { p += `\nPONIŻEJ BE ROAS ${be.toFixed(2)} (ROAS>0 ale poniżej progu rentowności, koszt>=30zł):\n`; podBe.slice(0,10).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)} ${a.oferta} | Koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} (BE:${be.toFixed(2)}) → TNIJ\n`; }); }
-  if (ads.gwiazdy.length) { p += `\nGWIAZDY POTWIERDZONE (ROAS>=${be.toFixed(0)}, min 3 szt. lub koszt>50zł — SKALUJ):\n`; ads.gwiazdy.slice(0,10).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)} ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł Szt:${a.sztuki||0}${a.miejsce?' ['+a.miejsce+']':''}\n`; }); }
-  if (ads.potencjalne && ads.potencjalne.length) { p += `\nPOTENCJALNE GWIAZDY (ROAS wysoki ale 1-2 transakcje — za mało danych, OBSERWUJ 14 dni, NIE skaluj):\n`; ads.potencjalne.slice(0,8).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)} ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł Szt:${a.sztuki||0} — ZA MAŁO DANYCH\n`; }); }
+  if (podBe.length) { p += `\nPONIŻEJ BE ROAS ${be.toFixed(2)} (ROAS>0 ale poniżej progu rentowności, koszt>=30zł):\n`; podBe.slice(0,10).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | Koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} (BE:${be.toFixed(2)}) → TNIJ\n`; }); }
+  if (ads.gwiazdy.length) { p += `\nGWIAZDY POTWIERDZONE (ROAS>=${be.toFixed(0)}, min 3 szt. lub koszt>50zł — SKALUJ):\n`; ads.gwiazdy.slice(0,10).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)}${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł Szt:${a.sztuki||0}${a.miejsce?' ['+a.miejsce+']':''}\n`; }); }
+  if (ads.potencjalne && ads.potencjalne.length) { p += `\nPOTENCJALNE GWIAZDY (ROAS wysoki ale 1-2 transakcje — za mało danych, OBSERWUJ 14 dni, NIE skaluj):\n`; ads.potencjalne.slice(0,8).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)}${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł Szt:${a.sztuki||0} — ZA MAŁO DANYCH\n`; }); }
 
   // AGREGACJA PER AUKCJA — łączny wynik across all campaigns
   if (ads.aggregated && ads.aggregated.length) {
@@ -17835,7 +17855,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += `Używaj TYCH danych do decyzji, nie per-kampania (ta sama aukcja może mieć ROAS 0 w jednej kampanii i 15 w drugiej).\n\n`;
     ads.aggregated.slice(0, 20).forEach(a => {
       const flag = a.roas === 0 && a.koszt >= 30 ? 'MARTWA' : a.roas < be && a.roas > 0 && a.koszt >= 30 ? 'PONIŻEJ BE' : a.roas >= be && a.sztuki >= 3 ? 'GWIAZDA' : a.roas >= be ? 'POTENCJALNA' : '';
-      p += `  [${flag}] [${a.nr}]${dostTag(a.nr)} ${a.oferta} | Łączny koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki} W kampaniach:${a.kampanie}\n`;
+      p += `  [${flag}] [${a.nr}]${dostTag(a.nr)}${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | Łączny koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki} W kampaniach:${a.kampanie}\n`;
     });
   }
 
@@ -20171,8 +20191,8 @@ async function generateDzis() {
             prompt += `\n${kontoName} — Ads: Koszt ${data.totKoszt.toFixed(0)}zł | Sprzedaż ${data.totSprzedaz.toFixed(0)}zł | ROAS ${data.totRoas.toFixed(2)}\n`;
             prompt += `  Martwe aukcje (>=30zł, 0 sprzedaży): ${data.zgnile.length} = ${data.kosztZgnile.toFixed(0)}zł\n`;
             prompt += `  Gwiazdy (ROAS>=7): ${data.gwiazdy.length}\n`;
-            data.zgnile.slice(0,5).forEach(a => { prompt += `  ZATRZYMAJ [${a.nr}] ${a.oferta} | ${a.koszt.toFixed(0)}zł przepalone\n`; });
-            data.gwiazdy.slice(0,5).forEach(a => { prompt += `  SKALUJ [${a.nr}] ${a.oferta} | ROAS:${a.roas.toFixed(2)}\n`; });
+            data.zgnile.slice(0,5).forEach(a => { prompt += `  ZATRZYMAJ [${a.nr}]${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | ${a.koszt.toFixed(0)}zł przepalone\n`; });
+            data.gwiazdy.slice(0,5).forEach(a => { prompt += `  SKALUJ [${a.nr}]${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | ROAS:${a.roas.toFixed(2)}\n`; });
           } else if (type === 'sprzedaz' && data.oferty) {
             prompt += `\n${kontoName} — Sprzedaż: ${data.totWizyty} wizyt | ${data.totTransakcje} transakcji | Konwersja ${(data.srKonwersja*100).toFixed(2)}%\n`;
             if (data.martwePunkty.length) { prompt += `  Martwe punkty (dużo wizyt, 0 trans): ${data.martwePunkty.length}\n`; }
@@ -22872,7 +22892,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.59</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.60</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -23915,15 +23935,25 @@ function scrBuildFilesContext() {
         ctx += `\n[${label}] ${f.fileName} (waluta: ${cur})\n`;
         ctx += `Łącznie: ${(p.totKoszt||0).toFixed(0)} ${cur} koszt | ${(p.totSprzedaz||0).toFixed(0)} ${cur} sprzedaż | ROAS ${(p.totRoas||0).toFixed(2)} | ${p.kampanie?.length || 0} kampanii\n`;
         if (p.kampanie?.length) {
-          ctx += `Top 10 kampanii po koszcie:\n`;
-          p.kampanie.slice().sort((a,b) => b.koszt - a.koszt).slice(0,10).forEach(k => {
-            ctx += `  "${k.kampania}" | Koszt:${k.koszt.toFixed(0)} ${cur} Sprzedaż:${k.sprzedaz.toFixed(0)} ${cur} ROAS:${k.roas.toFixed(2)} (${k.aukcje?.length||0} aukcji)\n`;
+          ctx += `Kampanie (hierarchia: Kampania → Grupa Reklam → Aukcja):\n`;
+          p.kampanie.slice().sort((a,b) => b.koszt - a.koszt).slice(0,15).forEach(k => {
+            ctx += `  KAMPANIA: "${k.kampania}" | Koszt:${k.koszt.toFixed(0)} ${cur} Sprzedaż:${k.sprzedaz.toFixed(0)} ${cur} ROAS:${k.roas.toFixed(2)} (${k.aukcje?.length||0} aukcji)\n`;
+            if (k.grupy?.length) {
+              k.grupy.slice().sort((a,b) => b.koszt - a.koszt).forEach(g => {
+                ctx += `    GRUPA: "${g.grupa}" | Koszt:${g.koszt.toFixed(0)} ${cur} Sprzedaż:${g.sprzedaz.toFixed(0)} ${cur} ROAS:${g.roas.toFixed(2)} (${g.aukcje?.length||0} aukcji)\n`;
+                if (g.aukcje?.length) {
+                  g.aukcje.slice().sort((a,b) => b.koszt - a.koszt).slice(0,5).forEach(a => {
+                    ctx += `      [${a.nr}] ${(a.oferta||'').substring(0,50)} | Koszt:${a.koszt.toFixed(0)} ${cur} ROAS:${a.roas.toFixed(2)} Trans:${a.sztuki||0}\n`;
+                  });
+                }
+              });
+            }
           });
         }
         if (p.aggregated?.length) {
-          ctx += `Top 10 aukcji po sprzedaży (agregat across kampanii):\n`;
-          p.aggregated.slice(0,10).forEach(a => {
-            ctx += `  [${a.nr}] ${(a.oferta||'').substring(0,50)} | Koszt:${a.koszt.toFixed(0)} ${cur} ROAS:${a.roas.toFixed(2)} Trans:${a.sztuki||0}\n`;
+          ctx += `Top 15 aukcji po sprzedaży (agregat across kampanii):\n`;
+          p.aggregated.slice(0,15).forEach(a => {
+            ctx += `  [${a.nr}] ${(a.oferta||'').substring(0,50)}${a.grupa?' | Grupa:"'+a.grupa+'"':''} | Koszt:${a.koszt.toFixed(0)} ${cur} ROAS:${a.roas.toFixed(2)} Trans:${a.sztuki||0}\n`;
           });
         }
       } else if (f.type === 'sprzedaz') {
@@ -26160,7 +26190,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.59 — ALL NEW FEATURES
+// v9.60 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
