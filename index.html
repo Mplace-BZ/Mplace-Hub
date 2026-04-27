@@ -7466,14 +7466,22 @@ async function loadFromFS(){
       if(AC_META[doc.id] && doc.data().rows){
         const fsRows = doc.data().rows;
         const localRows = getData(doc.id);
-        // Compare newest savedAt — keep whichever is newer
-        const fsMax = Math.max(...fsRows.map(r => r.savedAt || 0));
-        const localMax = Math.max(...localRows.map(r => r.savedAt || 0));
-        if(fsMax >= localMax){
-          localStorage.setItem(SK + doc.id, JSON.stringify(fsRows));
-        } else {
-          console.log('[sync] Lokalne dane nowsze dla', doc.id, '— pomijam Firebase');
+        // Merge per-month: keep newer savedAt for each month, add missing months from both
+        const merged = {};
+        localRows.forEach(r => { if(r.m) merged[r.m] = r; });
+        fsRows.forEach(r => {
+          if(!r.m) return;
+          const existing = merged[r.m];
+          if(!existing || (r.savedAt||0) > (existing.savedAt||0)){
+            merged[r.m] = r;
+          }
+        });
+        const result = Object.values(merged);
+        const localCount = localRows.length, fsCount = fsRows.length, mergedCount = result.length;
+        if(mergedCount !== localCount){
+          console.log('[sync]', doc.id, ': merged', localCount, 'local +', fsCount, 'firebase →', mergedCount, 'records');
         }
+        localStorage.setItem(SK + doc.id, JSON.stringify(result));
       }
     });
     // Load producers
