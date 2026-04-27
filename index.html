@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.60</title>
+<title>MPlace Hub v9.61</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1761,7 +1761,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.60 — NEW FEATURES CSS ═══ */
+/* ═══ v9.61 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.60</span>
+    <span class="brand-ver">v9.61</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -9214,6 +9214,7 @@ ZASADY:
     Jeśli akcja dotyczy CAŁEJ kampanii — podaj nazwę kampanii i wymień WSZYSTKIE grupy reklam w niej.
     Jeśli akcja dotyczy CAŁEJ grupy — podaj kampanię + grupę + wymień numery aukcji w niej.
     BEZ tych danych task jest bezużyteczny — pracownik nie wie CO kliknąć w panelu Allegro Ads.
+11. **PEŁNE NAZWY — BEZ SKRACANIA:** Nazwy kampanii i grup reklam podawaj DOKŁADNIE tak jak w danych — pełna nazwa, bez skrótów, bez obcinania. Np. "[010][RW][WW] 140x200 Multipocket MID" a NIE "[010] Multipocket" czy "grupa Multipocket". Pracownik szuka tej nazwy w panelu Allegro — musi być identyczna.
 
 FORMAT ODPOWIEDZI:
 {
@@ -12637,6 +12638,11 @@ BENCHMARK — ZASADY:
 - Jeśli w wybranych kontach jest więcej niż jedno konto z tej samej grupy, konto z najwyższą marżą i najniższym % kosztów Ads staje się benchmarkiem grupy.
 - Opisuj dystans pozostałych kont do benchmarku — nigdy odwrotnie.
 - Jeśli wybrano tylko jedno konto — nie stosuj benchmarku, analizuj konto względem jego własnej historii.
+
+PRECYZJA DANYCH:
+- Nazwy kampanii i grup reklam podawaj ZAWSZE w pełnej formie — nigdy nie skracaj. Pracownik szuka ich w panelu Allegro Ads.
+- Przy rekomendacjach Ads podaj ścieżkę: Kampania → Grupa Reklam → Numer Aukcji.
+- "DodaniaDoKoszyka(szt)" = LICZBA kliknięć "Dodaj do koszyka" (COUNT), NIE wartość w PLN. Nie interpretuj jako cenę.
 
 FILOZOFIA ANALIZY:
 - Konta w tej samej grupie mogą sprzedawać ten sam asortyment → kanibalizacja to realny koszt
@@ -17902,9 +17908,9 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += `${sprzedaz.totWizyty || 0} wizyt | ${sprzedaz.totTransakcje || 0} transakcji | Konwersja: ${((sprzedaz.srKonwersja || 0) * 100).toFixed(2)}%\n\n`;
     p += `Top oferty:\n`;
     if (sprzedaz.totalCount) p += `(${sprzedaz.totalCount} ofert w pliku, poniżej top ${Math.min(30, sprzedaz.oferty.length)})\n`;
-    sprzedaz.oferty.slice(0,30).forEach(o => { p += `  ${o.id?'['+o.id+'] ':''}${o.oferta} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% Koszyk:${o.koszyk||0} Ulubione:${o.ulubione||0} Polubienia:${o.polubienia||0}\n`; });
+    sprzedaz.oferty.slice(0,30).forEach(o => { p += `  ${o.id?'['+o.id+'] ':''}${o.oferta} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% DodaniaDoKoszyka(szt):${o.koszyk||0} Ulubione:${o.ulubione||0} Polubienia:${o.polubienia||0}\n`; });
     if (sprzedaz.martwePunkty && sprzedaz.martwePunkty.length) { p += `\nMARTWE PUNKTY (>=10 wizyt, 0 transakcji):\n`; sprzedaz.martwePunkty.forEach(o => { p += `  ${o.oferta} | ${o.wizyty||0} wizyt\n`; }); }
-    if (sprzedaz.porzuconeKoszyki && sprzedaz.porzuconeKoszyki.length) { p += `\nPORZUCONE KOSZYKI:\n`; sprzedaz.porzuconeKoszyki.forEach(o => { p += `  ${o.oferta} | Koszyk:${o.koszyk||0} Wizyty:${o.wizyty||0}\n`; }); }
+    if (sprzedaz.porzuconeKoszyki && sprzedaz.porzuconeKoszyki.length) { p += `\nPORZUCONE KOSZYKI:\n`; sprzedaz.porzuconeKoszyki.forEach(o => { p += `  ${o.oferta} | DodaniaDoKoszyka(szt):${o.koszyk||0} Wizyty:${o.wizyty||0}\n`; }); }
   }
 
   if (konwersja && konwersja.oferty) {
@@ -18240,7 +18246,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
         const suggestedGroupName = skuParts.slice(0, 3).join('_') || 'NOWY_PRODUKT';
 
         p += `  #${i+1} [${o.id}] ${(o.nazwa || o.sku || '').substring(0, 50)} | ${o.cena.toFixed(0)} zł ${dost}${wyr}\n`;
-        p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | Koszyk: ${o.koszyk} | Polubienia: ${o.polubienia}\n`;
+        p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | DodaniaDoKoszyka(szt): ${o.koszyk} | Polubienia: ${o.polubienia}\n`;
         p += `     → GOTOWA AKCJA DLA CHRISA:\n`;
         p += `       Kampania: dodaj do istniejącej lub utwórz nową wg kategorii produktu\n`;
         p += `       Grupa reklam: [${kontoSkrotForGroups}][NNN][WW][RW] ${suggestedGroupName}\n`;
@@ -18311,7 +18317,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
         }
 
         p += `  #${i+1} [${o.id}] ${(o.nazwa || o.sku || '').substring(0, 50)} | ${(o.cena||0).toFixed(0)} zł ${dost}${adsFlag}\n`;
-        p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | Koszyk: ${o.koszyk} porzuconych\n`;
+        p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | DodaniaDoKoszyka(szt): ${o.koszyk} porzuconych\n`;
         if (migratedToSmart) {
           p += `     → DIAGNOZA: Aukcja WŁAŚNIE przeniesiona na Smart! Historyczne dane (konwersja ${konw}%, ${o.koszyk} koszyków) dotyczą STAREGO cennika DPD.\n`;
           p += `     → AKCJA: CZEKAJ 14 DNI. Oczekiwana nowa konwersja: ~2% (benchmark Smart). NIE wyłączaj Ads — właśnie naprawiłeś przyczynę porzuceń. Mierz od ${new Date(Date.now() + 14*86400000).toLocaleDateString('pl-PL')}.\n\n`;
@@ -22892,7 +22898,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.60</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.61</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -23963,7 +23969,7 @@ function scrBuildFilesContext() {
           if (p.totalCount) ctx += `(${p.totalCount} ofert w pliku, poniżej top ${Math.min(30, p.oferty.length)})\n`;
           ctx += `Top ofert po wizytach:\n`;
           p.oferty.slice(0,30).forEach(o => {
-            ctx += `  ${o.id?'['+o.id+'] ':''}${(o.oferta||'').substring(0,50)} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% Koszyk:${o.koszyk||0}\n`;
+            ctx += `  ${o.id?'['+o.id+'] ':''}${(o.oferta||'').substring(0,50)} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% DodaniaDoKoszyka(szt):${o.koszyk||0}\n`;
           });
         }
         if (p.martwePunkty?.length) {
@@ -24011,9 +24017,11 @@ function scrBuildFilesContext() {
   if (compFiles.length) {
     ctx += `\n\n=== DANE KONKURENCJI (BENCHMARK — to NIE SĄ nasze aukcje!) ===\n`;
     ctx += `UWAGA: Poniższe dane to oferty KONKURENCJI z Allegro. NIE są to nasze aukcje.\n`;
-    ctx += `Użyj ich jako benchmark: jakie produkty się sprzedają na rynku, jakie ceny, jakie tytuły, jakie konwersje.\n`;
+    ctx += `Użyj ich jako benchmark: jakie produkty się sprzedają na rynku, jakie tytuły, jakie konwersje.\n`;
     ctx += `NIE rekomenduj wyłączania ani modyfikacji tych aukcji — to nie nasze oferty.\n`;
-    ctx += `PORÓWNUJ nasze dane (powyżej) z konkurencją (poniżej) — szukaj luk, inspiracji, przewag.\n\n`;
+    ctx += `PORÓWNUJ nasze dane (powyżej) z konkurencją (poniżej) — szukaj luk, inspiracji, przewag.\n`;
+    ctx += `WAŻNE — KOSZYK: Kolumna "DodaniaDoKoszyka(szt)" to LICZBA DODAŃ do koszyka (ile razy kliknięto "Dodaj do koszyka"), NIE wartość koszyka w PLN. Nie interpretuj tego jako cenę produktu.\n`;
+    ctx += `Ten raport NIE zawiera cen konkurencji — tylko wizyty, transakcje, konwersję i dodania do koszyka.\n\n`;
 
     compFiles.forEach(f => {
       const p = f.parsed || {};
@@ -24023,7 +24031,7 @@ function scrBuildFilesContext() {
         if (p.totalCount) ctx += `(${p.totalCount} ofert w pliku, poniżej top ${Math.min(50, p.oferty.length)})\n`;
         ctx += `Top ofert konkurencji po wizytach:\n`;
         p.oferty.slice(0,50).forEach(o => {
-          ctx += `  ${o.id?'['+o.id+'] ':''}${(o.oferta||'').substring(0,60)} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% Koszyk:${o.koszyk||0}\n`;
+          ctx += `  ${o.id?'['+o.id+'] ':''}${(o.oferta||'').substring(0,60)} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% DodaniaDoKoszyka(szt):${o.koszyk||0}\n`;
         });
       }
     });
@@ -24037,7 +24045,15 @@ function scrBuildFilesContext() {
   ctx += `- IDs z sekcji [ADS] i [ODWIEDZINY] powyżej SĄ PRAWDZIWE 11-cyfrowe IDs Allegro — UŻYWAJ ICH.\n`;
   ctx += `- IDs z sekcji [SPRZEDAŻ] mogą mieć inny format — matchuj oferty po nazwie z sekcją [ODWIEDZINY] żeby znaleźć prawdziwy 11-cyfrowy ID.\n`;
   ctx += `- NIGDY nie wymyślaj numerów. Jeśli oferta nie ma 11-cyfrowego ID w żadnej sekcji → "(ID: sprawdź w panelu)".\n`;
-  ctx += `- W tabeli IDs: TYLKO 11-cyfrowe liczby oddzielone spacjami. BEZ nazw, opisów, nawiasów.\n\n`;
+  ctx += `- W tabeli IDs: TYLKO 11-cyfrowe liczby oddzielone spacjami. BEZ nazw, opisów, nawiasów.\n`;
+  ctx += `ZASADA PEŁNYCH NAZW ADS:\n`;
+  ctx += `- Nazwy kampanii i grup reklam podawaj DOKŁADNIE tak jak w danych — pełna nazwa, bez skrótów, bez obcinania.\n`;
+  ctx += `- Np. "[010][RW][WW] 140x200 Multipocket MID" a NIE "[010] Multipocket" czy "grupa Multipocket".\n`;
+  ctx += `- Pracownik szuka tej nazwy w panelu Allegro Ads — musi być identyczna z danymi.\n`;
+  ctx += `- Przy każdej rekomendacji dot. Ads podaj PEŁNĄ ścieżkę: Kampania → Grupa Reklam → Numer Aukcji.\n`;
+  ctx += `ZASADA KOSZYK:\n`;
+  ctx += `- "DodaniaDoKoszyka(szt)" to LICZBA kliknięć "Dodaj do koszyka" (COUNT), NIE wartość w PLN.\n`;
+  ctx += `- NIE interpretuj tej kolumny jako cenę produktu ani wartość koszyka.\n\n`;
 
   // Detekcja TOTAL RESTART — wstrzyknij szablon formatu
   if (window._scrTotalRestartMode) {
@@ -26190,7 +26206,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.60 — ALL NEW FEATURES
+// v9.61 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
