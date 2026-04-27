@@ -1800,9 +1800,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .drill-metric-val{font-family:var(--mono);font-size:20px;font-weight:600}
 .drill-section{margin-bottom:1rem}
 .drill-section-title{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:6px}
-.drill-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px}
-.drill-table th{padding:6px 10px;text-align:left;color:var(--text3);font-weight:400;border-bottom:1px solid var(--border2)}
-.drill-table td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.03)}
+.drill-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:14px}
+.drill-table th{padding:10px 12px;text-align:left;color:var(--text3);font-weight:500;border-bottom:1px solid var(--border2);font-size:12px}
+.drill-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03)}
 .drill-table tr:hover{background:var(--bg3)}
 
 /* ── D2D ANOMALY BADGES ── */
@@ -1864,16 +1864,16 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .wk-diff-del{color:var(--red);background:rgba(255,77,106,.06);text-decoration:line-through}
 
 /* ── BREAKEVEN OPTIMIZER ── */
-.be-optimizer{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-top:1rem}
-.be-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.be-optimizer{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-top:1rem}
+.be-item{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.03)}
 .be-item:last-child{border:none}
-.be-icon{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;flex-shrink:0}
+.be-icon{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:14px;flex-shrink:0}
 .be-icon.below{background:rgba(255,77,106,.15);color:var(--red)}
 .be-icon.above{background:rgba(45,212,160,.12);color:var(--green)}
 .be-info{flex:1}
-.be-name{font-family:var(--sans);font-size:12px;color:var(--text)}
-.be-detail{font-family:var(--mono);font-size:10px;color:var(--text3)}
-.be-action{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid;cursor:pointer}
+.be-name{font-family:var(--sans);font-size:16px;font-weight:500;color:var(--text)}
+.be-detail{font-family:var(--mono);font-size:13px;color:var(--text3);margin-top:2px}
+.be-action{font-family:var(--mono);font-size:13px;padding:6px 14px;border-radius:6px;border:1px solid;cursor:pointer;font-weight:500}
 .be-action.cut{border-color:rgba(255,77,106,.4);color:var(--red);background:rgba(255,77,106,.08)}
 .be-action.scale{border-color:rgba(45,212,160,.4);color:var(--green);background:rgba(45,212,160,.08)}
 
@@ -1918,12 +1918,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .api-field input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text);font-family:var(--mono);font-size:12px}
 
 /* ── M/M AUTO COMPARISON ── */
-.mom-summary{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem}
-.mom-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.mom-summary{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:1rem}
+.mom-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.03)}
 .mom-row:last-child{border:none}
-.mom-acc{font-family:var(--sans);font-size:12px;color:var(--text);width:120px;flex-shrink:0}
-.mom-val{font-family:var(--mono);font-size:12px;flex:1;text-align:right}
-.mom-delta{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:4px;text-align:right;min-width:60px}
+.mom-acc{font-family:var(--sans);font-size:15px;font-weight:500;color:var(--text);width:140px;flex-shrink:0}
+.mom-val{font-family:var(--mono);font-size:15px;flex:1;text-align:right}
+.mom-delta{font-family:var(--mono);font-size:14px;font-weight:600;padding:3px 10px;border-radius:5px;text-align:right;min-width:60px}
 .mom-delta.up{background:rgba(45,212,160,.1);color:var(--green)}
 .mom-delta.down{background:rgba(255,77,106,.08);color:var(--red)}
 
@@ -26658,8 +26658,8 @@ function renderMoMSummary() {
 
   el.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
-      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)">Automatyczne porownanie M/M</div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">${data.curM} EST vs ${data.prevM} real</div>
+      <div style="font-family:var(--mono);font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:600">Automatyczne porownanie M/M</div>
+      <div style="font-family:var(--mono);font-size:13px;color:var(--text3)">${data.curM} EST vs ${data.prevM} real</div>
     </div>
     <table class="drill-table" style="width:100%">
       <thead><tr>
@@ -26965,7 +26965,7 @@ function renderBEOptimizer() {
 
   let html = '';
   if (data.below.length) {
-    html += '<div style="font-family:var(--mono);font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">&#9679; Ponizej breakeven — INTERWENCJA</div>';
+    html += '<div style="font-family:var(--mono);font-size:14px;color:var(--red);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;font-weight:600">&#9679; Ponizej breakeven — INTERWENCJA</div>';
     data.below.forEach(item => {
       html += `<div class="be-item">
         <div class="be-icon below">&#9660;</div>
@@ -26978,7 +26978,7 @@ function renderBEOptimizer() {
     });
   }
   if (data.above.length) {
-    html += '<div style="font-family:var(--mono);font-size:10px;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin:1rem 0 .5rem">&#9650; Powyzej 2x BE — SKALOWANIE</div>';
+    html += '<div style="font-family:var(--mono);font-size:14px;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin:1.25rem 0 .75rem;font-weight:600">&#9650; Powyzej 2x BE — SKALOWANIE</div>';
     data.above.forEach(item => {
       html += `<div class="be-item">
         <div class="be-icon above">&#9650;</div>
@@ -26991,7 +26991,7 @@ function renderBEOptimizer() {
     });
   }
   if (data.ok.length) {
-    html += '<div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:1rem 0 .5rem">&#9632; W normie</div>';
+    html += '<div style="font-family:var(--mono);font-size:14px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:1.25rem 0 .75rem;font-weight:600">&#9632; W normie</div>';
     data.ok.forEach(item => {
       html += `<div class="be-item" style="opacity:.6">
         <div class="be-icon" style="background:var(--bg3);color:var(--text3)">&#8226;</div>
