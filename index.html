@@ -2578,9 +2578,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <!-- ACCOUNT CARDS -->
   <div id="dashGroups"></div>
 
-  <!-- BE OPTIMIZER (interwencja + skalowanie) -->
-  <div id="beOptimizerContent" class="be-optimizer"></div>
-
   <!-- BUBBLE CHART (Mapa Pozycji — na samym dole) -->
   <div class="bubble-wrap">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;flex-wrap:wrap;gap:.5rem">
@@ -27900,7 +27897,16 @@ if (_origRenderDashboard) {
     }
     renderMoMSummary();
 
-    // BE optimizer section is now in HTML (between account cards and bubble chart)
+    // Add BE optimizer section (before bubble chart)
+    if (!document.getElementById('beOptimizerContent')) {
+      const bubbleWrap = document.querySelector('#viewDashboard .bubble-wrap');
+      if (bubbleWrap) {
+        const beDiv = document.createElement('div');
+        beDiv.className = 'be-optimizer';
+        beDiv.id = 'beOptimizerContent';
+        bubbleWrap.parentNode.insertBefore(beDiv, bubbleWrap);
+      }
+    }
     renderBEOptimizer();
   };
 }
