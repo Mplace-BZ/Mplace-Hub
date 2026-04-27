@@ -11869,15 +11869,12 @@ function saveGlobal(){
     });
     saved++;
   });
-  ['globalMsg','globalMsgInline'].forEach(id => {
-    const msg = document.getElementById(id);
-    if(msg){
-      msg.textContent = saved ? `✓ Zapisano ${saved} kont · ${curM}` : '✗ Brak danych do zapisania';
-      msg.style.color = saved ? '#34d399' : '#ef4444';
-      msg.classList.add('show');
-      setTimeout(()=>msg.classList.remove('show'), 4000);
-    }
-  });
+  const msg = document.getElementById('globalMsg');
+  if(msg){
+    msg.textContent = saved ? `✓ Zapisano ${saved} kont · ${curM}` : '✗ Brak danych do zapisania';
+    msg.classList.add('show');
+    setTimeout(()=>msg.classList.remove('show'), 4000);
+  }
   renderGlobalMonthsTable();
   renderGlobalEntryForm(); // refresh to show savedDay
 }
