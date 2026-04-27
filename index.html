@@ -7739,13 +7739,15 @@ async function _syncPull(docName) {
       const fsTime = snap.data().updatedAt || 0;
       // Both have data — compare timestamps, keep newer
       const localTime = parseInt(localStorage.getItem(key + '_updatedAt') || '0');
-      if (fsTime >= localTime && fsRaw && fsRaw !== '[]' && fsRaw !== '{}') {
+      if (fsTime > localTime && fsRaw && fsRaw !== '[]' && fsRaw !== '{}') {
         localStorage.setItem(key, fsRaw);
         localStorage.setItem(key + '_updatedAt', String(fsTime));
-        console.log('[sync]', docName, '← synced from Firebase');
-      } else {
-        console.log('[sync]', docName, '— local newer, pushing to Firebase');
+        console.log('[sync]', docName, '← synced from Firebase (fs:', fsTime, '> local:', localTime, ')');
+      } else if (localTime > fsTime) {
+        console.log('[sync]', docName, '— local newer, pushing to Firebase (local:', localTime, '> fs:', fsTime, ')');
         await _syncPush(docName);
+      } else {
+        console.log('[sync]', docName, '— equal timestamps, keeping local');
       }
     }
   } catch(e) { console.error('[sync] pull', docName, e); }
