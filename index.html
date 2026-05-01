@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.63</title>
+<title>MPlace Hub v9.64</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1761,7 +1761,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.63 — NEW FEATURES CSS ═══ */
+/* ═══ v9.64 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.63</span>
+    <span class="brand-ver">v9.64</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -6296,7 +6296,7 @@ function dataSaveCurrentToLocal(k){
   const adsC = gN(`e_${k}_adsC`);
   if(!sp && !adsC) return; // nothing to save
   const dzienGlobal = parseInt(document.getElementById('globalDay').value) || new Date().getDate();
-  const {m:curM} = getSaveMonth(dzienGlobal);
+  const {m:curM, isClosing} = getSaveMonth(dzienGlobal);
   const dzienLocal = gN(`e_${k}_dzien`);
   const entry = {
     m: curM,
@@ -6311,7 +6311,7 @@ function dataSaveCurrentToLocal(k){
     promoC: gN(`e_${k}_promoC`) || 0,
     elasticC: 0,
     coinsC: gN(`e_${k}_coinsC`) || 0,
-    dzien: dzienLocal || dzienGlobal,
+    dzien: isClosing ? null : (dzienLocal || dzienGlobal),
     note: (document.getElementById(`e_${k}_note`)?.value || '').trim(),
     estOver: null,
     savedAt: Date.now(),
@@ -6458,6 +6458,7 @@ function renderDataCenter(k){
     </div>`;
 
   document.getElementById('dataCenterContent').innerHTML = html;
+  _updateClosingUI(); // Auto-close: pokaż stan zamknięcia na widocznym przycisku
   updateAuto(k);
   // Load notes
   if(typeof renderNoteLog==='function') renderNoteLog(k);
@@ -6808,23 +6809,32 @@ document.getElementById('globalDay').addEventListener('input',()=>{
 // ═══════════════════════════════════════════════════════════
 // SAVE
 // ═══════════════════════════════════════════════════════════
-let _closingMode = false;
+// Dzień 1 miesiąca = dane za ostatni dzień poprzedniego miesiąca → auto-close
+let _closingMode = new Date().getDate() === 1;
 function toggleClosingMode(){
   _closingMode = !_closingMode;
-  const btn = document.getElementById('closingToggle');
+  _updateClosingUI();
+  // Re-render form z nowym miesiącem
+  if(typeof renderDataLeft==='function') renderDataLeft();
+}
+function _updateClosingUI(){
+  // Aktualizuj WIDOCZNY przycisk w save bar (nie hidden closingToggle)
+  const btns = document.querySelectorAll('[onclick="toggleClosingMode()"]');
   const now = new Date();
   const prevM = MONTHS[(now.getMonth()+11)%12];
-  if(_closingMode){
-    btn.style.color = 'var(--yellow)';
-    btn.style.borderColor = 'var(--yellow-bd)';
-    btn.style.background = 'var(--yellow-bg)';
-    btn.textContent = '↩ Zamknięcie: ' + prevM;
-  } else {
-    btn.style.color = 'var(--text3)';
-    btn.style.borderColor = 'var(--border)';
-    btn.style.background = '';
-    btn.textContent = '↩ Zamknięcie';
-  }
+  btns.forEach(btn => {
+    if(_closingMode){
+      btn.style.color = 'var(--yellow)';
+      btn.style.borderColor = 'var(--yellow-bd)';
+      btn.style.background = 'var(--yellow-bg)';
+      btn.textContent = '↩ Zamknięcie: ' + prevM;
+    } else {
+      btn.style.color = 'var(--text3)';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.background = '';
+      btn.textContent = '↩ Zamknięcie';
+    }
+  });
 }
 function getSaveMonth(dzienGlobal){
   const now=new Date();
@@ -6872,7 +6882,7 @@ function saveAll(){
       promoC:gN(`e_${k}_promoC`)||0,
       elasticC:0,
       coinsC:gN(`e_${k}_coinsC`)||0,
-      dzien:dzienLocal||dzienEff,
+      dzien:isClosing?null:(dzienLocal||dzienEff),
       note:(document.getElementById(`e_${k}_note`)?.value||''). trim(),
       estOver:null,
       savedAt:Date.now(),
@@ -22914,7 +22924,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.63</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.64</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -26222,7 +26232,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.63 — ALL NEW FEATURES
+// v9.64 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
