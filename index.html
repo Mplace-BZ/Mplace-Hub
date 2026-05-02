@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.66</title>
+<title>MPlace Hub v9.67</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1761,7 +1761,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.66 — NEW FEATURES CSS ═══ */
+/* ═══ v9.67 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.66</span>
+    <span class="brand-ver">v9.67</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5128,6 +5128,16 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.67 — Pasek daty globalny', desc:'Biezacy miesiac / dzien / postep / historia — dodany do Cockpit, Dashboard, Agent, Trend, Results, Sheets. Jedna funkcja renderDateBars() dla wszystkich. (02.05.2026)'},
+    {name:'v9.65 — Fix cleanup dzien=1', desc:'Naprawa czyszczenia artefaktow z dzien=1 — usuwane we wszystkich miesiacach (v9.64 auto-close zapobiega tworzeniu nowych). (01.05.2026)'},
+    {name:'v9.64 — Auto-close przejscie miesiaca', desc:'Dzien 1 = dane za ostatni dzien poprzedniego miesiaca. Auto-wlaczenie trybu Zamkniecia. Przycisk zolty "Zamkniecie: Kwiecien". dzien=null dla zamknietych miesiecy. (01.05.2026)'},
+    {name:'v9.63 — Fix dzien=1 ochrona danych', desc:'cleanupDzien1() nie kasuje biezacego miesiaca. estym() zwraca sprzedaz zamiast 31x mnoznika przy dzien<=1. (01.05.2026)'},
+    {name:'v9.62 — RYNKI GLOBALNE auto-fill', desc:'Pola % (Obowiazkowe, Dostawa, Reklama, Suma oplat) pre-fill z ostatniego miesiaca. Sprzedaz pusta. Nota "wartosci % z: Kwiecien". (30.04.2026)'},
+    {name:'v9.61 — Fix Koszyk + pelne nazwy grup', desc:'Label Koszyk zmieniony na DodaniaDoKoszyka(szt) — Agent nie myli z cena PLN. Regula pelnych nazw kampanii/grup w promptach AI. (27.04.2026)'},
+    {name:'v9.60 — Hierarchia Ads 3-poziomowa', desc:'Kampania → Grupa Reklam → Aukcja we wszystkich promptach AI (Screener, Analiza, Cockpit, Task Extractor). Pełne nazwy bez skracania. (27.04.2026)'},
+    {name:'v9.59 — Screener: Konkurencja upload', desc:'Nowy typ pliku Konkurencja (benchmark) w Screenerze. Parsowany jako sprzedaz, nazwa konta z filename. (27.04.2026)'},
+    {name:'v9.54 — Sync fixes + data protection', desc:'Naprawa sync: zmiana porownania _syncPull z >= na > (rowne timestamps = zachowaj lokalne). Zapobiega utracie danych Cockpit/kalendarz. (26.04.2026)'},
+    {name:'v9.49 — Agent dashboard + Cockpit', desc:'Agent: Portfolio Pulse 4 KPI, Playbook 100 promptow, Smart Suggestions. Cockpit: 10 zadan AI, gamifikacja. Info Wiki redesign. (26.04.2026)'},
     {name:'v9.24 — Info Wiki redesign', desc:'Przebudowa Info: hero headery, search, nawigacja, slownik, wiedza Allegro, onboarding. (25.04.2026)'},
     {name:'v9.20 — Cockpit layout fix', desc:'Stats/Tasks w lewej kolumnie grida. Koniec z nachodzeniem. (25.04.2026)'},
     {name:'v9.17 — Cockpit bigger fonts', desc:'Wieksze fonty i padding w Cockpicie + prawej kolumnie. (25.04.2026)'},
@@ -7909,7 +7919,7 @@ async function cleanupDzien1(){
   Object.keys(AC_META).forEach(k=>{
     const D=getData(k);
     // Kasuj artefakty z dzien=1 — te wpisy to błędy z przejścia miesiąca
-    // Od v9.66 auto-close zapobiega tworzeniu nowych, ale stare trzeba wyczyścić
+    // Od v9.67 auto-close zapobiega tworzeniu nowych, ale stare trzeba wyczyścić
     const filtered=D.filter(e=>e.dzien!==1);
     if(filtered.length<D.length){
       setData(k,filtered);
@@ -22930,7 +22940,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.66</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.67</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -26263,7 +26273,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.66 — ALL NEW FEATURES
+// v9.67 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
