@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.65</title>
+<title>MPlace Hub v9.66</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1761,7 +1761,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.65 — NEW FEATURES CSS ═══ */
+/* ═══ v9.66 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.65</span>
+    <span class="brand-ver">v9.66</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2324,6 +2324,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     </div>
     <div id="dzisTimer" style="display:none"></div>
   </div>
+  <div class="entry-date-bar mb dateBarGlobal"></div>
 
   <!-- 2-COL LAYOUT -->
   <div style="display:grid;grid-template-columns:1fr 400px;gap:28px;align-items:start">
@@ -2522,6 +2523,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <span style="color:var(--red)">●</span> interwencja
     </div>
   </div>
+  <div class="entry-date-bar mb dateBarGlobal"></div>
 
   <!-- KPI SUMMARY BAR -->
   <div class="kpi-summary-bar">
@@ -2772,6 +2774,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="ph-title">Arkusz <span>Danych</span></div>
     <div class="ph-sub">Zestawienie miesięczne · 9 kont · wszystkie grupy</div>
   </div>
+  <div class="entry-date-bar mb dateBarGlobal"></div>
   <div class="tbl-wrap" style="overflow-x:auto;border-radius:10px">
     <table class="arkusz-tbl" id="arkuszTable">
       <tbody id="arkuszTbody"></tbody>
@@ -2923,6 +2926,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="ph-title">Wyniki <span>Finansowe</span></div>
     <div class="ph-sub">Przychód · Zysk · Marża · Reklama · ROAS · ACOS · 9 kont</div>
   </div>
+  <div class="entry-date-bar mb dateBarGlobal"></div>
   <div class="tbl-wrap" style="overflow-x:auto;border-radius:10px">
     <table class="arkusz-tbl" id="wynikTable">
       <tbody id="wynikTbody"></tbody>
@@ -3099,6 +3103,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     </div>
     <div class="agent-live-badge"><span class="agent-live-dot"></span> LIVE · <span id="agentPulseMonth"></span></div>
   </div>
+  <div class="entry-date-bar mb dateBarGlobal"></div>
 
   <!-- Portfolio Pulse — 4 KPIs -->
   <div class="agent-pulse" id="agentPulse"></div>
@@ -3345,6 +3350,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <div class="ph-title">Miesiące <span>obok siebie</span></div>
       <div style="margin-top:.4rem">
         <div class="ph-sub" style="margin:0 0 .6rem 0">Wszystkie konta · wszystkie miesiące · <strong>estymacja końca miesiąca</strong> uwzględniona dla bieżącego</div>
+        <div class="entry-date-bar mb dateBarGlobal" style="margin-top:.6rem"></div>
         <div id="monthsMetricBar" style="display:inline-flex;align-items:center;gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden">
           <button onclick="monthsSetMetric('est',this)" class="months-pill active" data-v="est">SPRZEDAŻ<br>EST.</button>
           <button onclick="monthsSetMetric('marza',this)" class="months-pill" data-v="marza">MARŻA<br>%</button>
@@ -7903,7 +7909,7 @@ async function cleanupDzien1(){
   Object.keys(AC_META).forEach(k=>{
     const D=getData(k);
     // Kasuj artefakty z dzien=1 — te wpisy to błędy z przejścia miesiąca
-    // Od v9.65 auto-close zapobiega tworzeniu nowych, ale stare trzeba wyczyścić
+    // Od v9.66 auto-close zapobiega tworzeniu nowych, ale stare trzeba wyczyścić
     const filtered=D.filter(e=>e.dzien!==1);
     if(filtered.length<D.length){
       setData(k,filtered);
@@ -22924,7 +22930,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.65</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.66</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25225,6 +25231,31 @@ function renderBiznes(){
 renderEntry();
 updateWkAgentStatus();
 
+// ═══ GLOBAL DATE BAR (shared across Cockpit/Dashboard/Agent/Trend/Results/Sheets) ═══
+function renderDateBars(){
+  const now=new Date();
+  const curM=MONTHS[now.getMonth()];
+  const daysInM=DAYS_IN[curM]||31;
+  const todayD=now.getDate();
+  const pct=Math.round(todayD/daysInM*100);
+  const monthLabel=curM[0].toUpperCase()+curM.slice(1)+' '+now.getFullYear();
+  // Timeline dots
+  const allM=new Set();
+  Object.keys(AC_META).forEach(k=>getData(k).forEach(d=>allM.add(d.m)));
+  allM.add(curM);
+  const ci=MONTHS.indexOf(curM);
+  const sorted=[...allM].sort((a,b)=>((ci-MONTHS.indexOf(a)+12)%12)-((ci-MONTHS.indexOf(b)+12)%12));
+  const tlHTML=sorted.map((m,i)=>{
+    const has=Object.keys(AC_META).some(k=>getData(k).some(d=>d.m===m));
+    const isCur=m===curM;
+    const dc=isCur?'tl-dot cur':has?'tl-dot has':'tl-dot none';
+    return'<div class="tl-m"><div class="'+dc+'"></div><div>'+m.substring(0,3).toUpperCase()+'</div></div>'+(i<sorted.length-1?'<div class="tl-line"></div>':'');
+  }).join('');
+  const barHTML=`<div><div class="edb-lbl">Bieżący miesiąc</div><div style="display:flex;align-items:center;gap:.55rem;margin-top:2px"><div class="edb-val">${monthLabel}</div><span class="month-status ms-active"><span class="ms-pulse"></span>w toku</span></div></div><div class="nav-sep" style="height:26px"></div><div><div class="edb-lbl">Dzień miesiąca</div><div class="day-wrap"><label>dzień</label><span style="color:var(--accent);font-family:var(--mono);font-size:14px;font-weight:500;padding:3px 8px">${todayD}</span><label>/${daysInM}</label></div></div><div class="nav-sep" style="height:26px"></div><div><div class="edb-lbl">Postęp</div><div style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent)">${pct}% (dzień ${todayD}/${daysInM})</div></div><div class="nav-sep" style="height:26px"></div><div><div class="edb-lbl">Historia</div><div class="tl-bar">${tlHTML}</div></div>`;
+  document.querySelectorAll('.dateBarGlobal').forEach(el=>{el.innerHTML=barHTML;});
+}
+renderDateBars();
+
 // ═══════════════════════════════════════════════════════════
 // TITLE ANALYZER
 // ═══════════════════════════════════════════════════════════
@@ -26232,7 +26263,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.65 — ALL NEW FEATURES
+// v9.66 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
