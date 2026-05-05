@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.67</title>
+<title>MPlace Hub v9.68</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.67</span>
+    <span class="brand-ver">v9.68</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5128,6 +5128,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.68 — Zapisz Globalne synchronizuje D2D + widoczny toast', desc:'Klik "Zapisz Globalne" merguje sprzedaz/dzien do per-month entries, snapshotuje do D2D i syncuje do Firebase. Modal potwierdzenia (jak Zapisz wszystkie wpisy) zamiast niewidocznego komunikatu. Naprawia rozbieznosc miedzy form Globalnym a tabela D2D dla MEBLE. (05.05.2026)'},
     {name:'v9.67 — Pasek daty globalny', desc:'Biezacy miesiac / dzien / postep / historia — dodany do Cockpit, Dashboard, Agent, Trend, Results, Sheets. Jedna funkcja renderDateBars() dla wszystkich. (02.05.2026)'},
     {name:'v9.65 — Fix cleanup dzien=1', desc:'Naprawa czyszczenia artefaktow z dzien=1 — usuwane we wszystkich miesiacach (v9.64 auto-close zapobiega tworzeniu nowych). (01.05.2026)'},
     {name:'v9.64 — Auto-close przejscie miesiaca', desc:'Dzien 1 = dane za ostatni dzien poprzedniego miesiaca. Auto-wlaczenie trybu Zamkniecia. Przycisk zolty "Zamkniecie: Kwiecien". dzien=null dla zamknietych miesiecy. (01.05.2026)'},
@@ -11887,11 +11888,12 @@ function calcGlobalAuto(k){
   else if(el) el.textContent = '—';
 }
 
-function saveGlobal(){
+async function saveGlobal(){
   const now = new Date();
   const curM = document.getElementById('globalMonthSel')?.value || MONTHS[now.getMonth()];
   const gN = id => { const e=document.getElementById(id); return e&&e.value!==''?parseFloat(e.value):null; };
   let saved = 0;
+  const savedKeys = [];
   GLOBAL_ACCS.forEach(k => {
     const sprzedaz = gN('g_'+k+'_sprzedaz');
     if(!sprzedaz) return;
@@ -11915,14 +11917,45 @@ function saveGlobal(){
       savedAt:  Date.now(),
       savedDay: now.toLocaleDateString('pl-PL'),
     });
+
+    // Merge sprzedaz/dzien do per-month entry — dzieki temu D2D snapshot widzi aktualna wartosc
+    const D = getData(k);
+    const idx = D.findIndex(x => x.m === curM);
+    if(idx >= 0){
+      D[idx] = { ...D[idx], sprzedaz, dzien };
+    } else {
+      D.push({ m: curM, sprzedaz, dzien });
+    }
+    setData(k, D);
+    savedKeys.push(k);
     saved++;
   });
-  const msg = document.getElementById('globalMsg');
-  if(msg){
-    msg.textContent = saved ? `✓ Zapisano ${saved} kont · ${curM}` : '✗ Brak danych do zapisania';
-    msg.classList.add('show');
-    setTimeout(()=>msg.classList.remove('show'), 4000);
+
+  // Snapshot do D2D + sync per-month entries do Firebase
+  if(saved){
+    if(typeof saveSnapshotD2D === 'function') saveSnapshotD2D();
+    if(currentUser){
+      try { await Promise.all(savedKeys.map(k => saveAccToFS(k))); }
+      catch(e){ console.error('saveGlobal Firebase sync error:', e); }
+    }
   }
+
+  // Inline visible message (smsg in form area)
+  const inline = document.getElementById('globalMsgInline');
+  if(inline){
+    inline.textContent = saved ? `✓ Zapisano ${saved} kont · ${curM} · D2D zaktualizowane` : '✗ Brak danych do zapisania';
+    inline.style.color = saved ? 'var(--green)' : 'var(--red)';
+    inline.classList.add('show');
+    setTimeout(()=>inline.classList.remove('show'), 4000);
+  }
+
+  // Modal confirmation (sam UX co Zapisz wszystkie wpisy)
+  if(saved && typeof showSaveConfirm === 'function'){
+    showSaveConfirm(savedKeys, 0, saved, curM, !!currentUser);
+  } else if(!saved){
+    alert('Brak danych do zapisania — wypelnij pole Sprzedaz dla minimum jednego konta.');
+  }
+
   renderGlobalMonthsTable();
   renderGlobalEntryForm(); // refresh to show savedDay
 }
@@ -22940,7 +22973,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.67</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.68</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
