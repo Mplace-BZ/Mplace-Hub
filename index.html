@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.58</title>
+<title>MPlace Hub v9.68</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1761,7 +1761,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .zm-worker-view #wkAddForm,.zm-worker-view .wk-entry-actions,.zm-worker-view .wk-edit-btn,.zm-worker-view .wk-del-btn{display:none!important}
 .zm-worker-nav{display:none;align-items:center;gap:5px;padding:0 16px;height:44px;overflow-x:auto;position:sticky;top:0;z-index:100;background:rgba(15,17,23,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 
-/* ═══ v9.58 — NEW FEATURES CSS ═══ */
+/* ═══ v9.67 — NEW FEATURES CSS ═══ */
 
 /* ── NOTIFICATION PANEL ── */
 #notifPanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:#0e1119;border-left:1px solid var(--border2);z-index:9999;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.58</span>
+    <span class="brand-ver">v9.68</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2324,6 +2324,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     </div>
     <div id="dzisTimer" style="display:none"></div>
   </div>
+  <div class="entry-date-bar mb dateBarGlobal"></div>
 
   <!-- 2-COL LAYOUT -->
   <div style="display:grid;grid-template-columns:1fr 400px;gap:28px;align-items:start">
@@ -2522,6 +2523,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <span style="color:var(--red)">●</span> interwencja
     </div>
   </div>
+  <div class="entry-date-bar mb dateBarGlobal"></div>
 
   <!-- KPI SUMMARY BAR -->
   <div class="kpi-summary-bar">
@@ -2772,6 +2774,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="ph-title">Arkusz <span>Danych</span></div>
     <div class="ph-sub">Zestawienie miesięczne · 9 kont · wszystkie grupy</div>
   </div>
+  <div class="entry-date-bar mb dateBarGlobal"></div>
   <div class="tbl-wrap" style="overflow-x:auto;border-radius:10px">
     <table class="arkusz-tbl" id="arkuszTable">
       <tbody id="arkuszTbody"></tbody>
@@ -2923,6 +2926,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="ph-title">Wyniki <span>Finansowe</span></div>
     <div class="ph-sub">Przychód · Zysk · Marża · Reklama · ROAS · ACOS · 9 kont</div>
   </div>
+  <div class="entry-date-bar mb dateBarGlobal"></div>
   <div class="tbl-wrap" style="overflow-x:auto;border-radius:10px">
     <table class="arkusz-tbl" id="wynikTable">
       <tbody id="wynikTbody"></tbody>
@@ -3099,6 +3103,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     </div>
     <div class="agent-live-badge"><span class="agent-live-dot"></span> LIVE · <span id="agentPulseMonth"></span></div>
   </div>
+  <div class="entry-date-bar mb dateBarGlobal"></div>
 
   <!-- Portfolio Pulse — 4 KPIs -->
   <div class="agent-pulse" id="agentPulse"></div>
@@ -3345,6 +3350,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <div class="ph-title">Miesiące <span>obok siebie</span></div>
       <div style="margin-top:.4rem">
         <div class="ph-sub" style="margin:0 0 .6rem 0">Wszystkie konta · wszystkie miesiące · <strong>estymacja końca miesiąca</strong> uwzględniona dla bieżącego</div>
+        <div class="entry-date-bar mb dateBarGlobal" style="margin-top:.6rem"></div>
         <div id="monthsMetricBar" style="display:inline-flex;align-items:center;gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden">
           <button onclick="monthsSetMetric('est',this)" class="months-pill active" data-v="est">SPRZEDAŻ<br>EST.</button>
           <button onclick="monthsSetMetric('marza',this)" class="months-pill" data-v="marza">MARŻA<br>%</button>
@@ -3789,7 +3795,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <!-- ═══ Sekcja UPLOAD plików XLSX (collapsible) ═══ -->
   <details id="scrFilesSection" style="margin-bottom:1rem;border:1px solid rgba(232,121,249,.25);border-radius:8px;background:rgba(232,121,249,.03)">
     <summary style="padding:10px 14px;cursor:pointer;font-family:var(--mono);font-size:11px;color:#e879f9;display:flex;justify-content:space-between;align-items:center">
-      <span>📂 Wgraj pliki XLSX / PDF (Ads / Odwiedziny / Sprzedaż / PDF) — <span id="scrFilesCount">0 plików</span></span>
+      <span>📂 Wgraj pliki XLSX / PDF (Ads / Odwiedziny / Sprzedaż / Konkurencja / PDF) — <span id="scrFilesCount">0 plików</span></span>
       <span style="font-size:10px;color:var(--text3)">rozwiń ▼</span>
     </summary>
     <div style="padding:10px 14px;border-top:1px solid rgba(232,121,249,.15)">
@@ -3821,6 +3827,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
             <option value="konwersja">Sprzedaż wg ofert</option>
             <option value="ads30d">Ads 30 dni (kontekst)</option>
             <option value="oferta">Aktywne oferty (lista)</option>
+            <option value="konkurencja">Konkurencja (benchmark)</option>
             <option value="pdf">PDF (dokument tekstowy)</option>
           </select>
         </div>
@@ -4754,7 +4761,7 @@ const xf=v=>isFinite(v)&&v!=null&&!isNaN(v)&&v>0?v.toFixed(2).replace('.',',')+'
 // WAŻNE: dzien wpisany = dzień w którym wpisujesz dane (np. 20)
 // dane są ZA poprzedni dzień (19), więc estymacja = sprzedaz * daysInMonth / (dzien-1)
 function effectiveDzien(dzien){return dzien&&dzien>1?dzien-1:dzien;}
-function estym(d){if(d.estOver)return d.estOver;if(!d.dzien)return d.sprzedaz;const ed=effectiveDzien(d.dzien);return Math.round(d.sprzedaz*(DAYS_IN[d.m]||30)/ed);}
+function estym(d){if(d.estOver)return d.estOver;if(!d.dzien||d.dzien<=1)return d.sprzedaz;const ed=effectiveDzien(d.dzien);return Math.round(d.sprzedaz*(DAYS_IN[d.m]||30)/ed);}
 function mmDelta(D,i){
   if(i===0)return null;
   // Use estimation for partial months so m/m is apples-to-apples
@@ -5121,6 +5128,17 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.68 — Zapisz Globalne synchronizuje D2D + widoczny toast', desc:'Klik "Zapisz Globalne" merguje sprzedaz/dzien do per-month entries, snapshotuje do D2D i syncuje do Firebase. Modal potwierdzenia (jak Zapisz wszystkie wpisy) zamiast niewidocznego komunikatu. Naprawia rozbieznosc miedzy form Globalnym a tabela D2D dla MEBLE. (05.05.2026)'},
+    {name:'v9.67 — Pasek daty globalny', desc:'Biezacy miesiac / dzien / postep / historia — dodany do Cockpit, Dashboard, Agent, Trend, Results, Sheets. Jedna funkcja renderDateBars() dla wszystkich. (02.05.2026)'},
+    {name:'v9.65 — Fix cleanup dzien=1', desc:'Naprawa czyszczenia artefaktow z dzien=1 — usuwane we wszystkich miesiacach (v9.64 auto-close zapobiega tworzeniu nowych). (01.05.2026)'},
+    {name:'v9.64 — Auto-close przejscie miesiaca', desc:'Dzien 1 = dane za ostatni dzien poprzedniego miesiaca. Auto-wlaczenie trybu Zamkniecia. Przycisk zolty "Zamkniecie: Kwiecien". dzien=null dla zamknietych miesiecy. (01.05.2026)'},
+    {name:'v9.63 — Fix dzien=1 ochrona danych', desc:'cleanupDzien1() nie kasuje biezacego miesiaca. estym() zwraca sprzedaz zamiast 31x mnoznika przy dzien<=1. (01.05.2026)'},
+    {name:'v9.62 — RYNKI GLOBALNE auto-fill', desc:'Pola % (Obowiazkowe, Dostawa, Reklama, Suma oplat) pre-fill z ostatniego miesiaca. Sprzedaz pusta. Nota "wartosci % z: Kwiecien". (30.04.2026)'},
+    {name:'v9.61 — Fix Koszyk + pelne nazwy grup', desc:'Label Koszyk zmieniony na DodaniaDoKoszyka(szt) — Agent nie myli z cena PLN. Regula pelnych nazw kampanii/grup w promptach AI. (27.04.2026)'},
+    {name:'v9.60 — Hierarchia Ads 3-poziomowa', desc:'Kampania → Grupa Reklam → Aukcja we wszystkich promptach AI (Screener, Analiza, Cockpit, Task Extractor). Pełne nazwy bez skracania. (27.04.2026)'},
+    {name:'v9.59 — Screener: Konkurencja upload', desc:'Nowy typ pliku Konkurencja (benchmark) w Screenerze. Parsowany jako sprzedaz, nazwa konta z filename. (27.04.2026)'},
+    {name:'v9.54 — Sync fixes + data protection', desc:'Naprawa sync: zmiana porownania _syncPull z >= na > (rowne timestamps = zachowaj lokalne). Zapobiega utracie danych Cockpit/kalendarz. (26.04.2026)'},
+    {name:'v9.49 — Agent dashboard + Cockpit', desc:'Agent: Portfolio Pulse 4 KPI, Playbook 100 promptow, Smart Suggestions. Cockpit: 10 zadan AI, gamifikacja. Info Wiki redesign. (26.04.2026)'},
     {name:'v9.24 — Info Wiki redesign', desc:'Przebudowa Info: hero headery, search, nawigacja, slownik, wiedza Allegro, onboarding. (25.04.2026)'},
     {name:'v9.20 — Cockpit layout fix', desc:'Stats/Tasks w lewej kolumnie grida. Koniec z nachodzeniem. (25.04.2026)'},
     {name:'v9.17 — Cockpit bigger fonts', desc:'Wieksze fonty i padding w Cockpicie + prawej kolumnie. (25.04.2026)'},
@@ -6295,7 +6313,7 @@ function dataSaveCurrentToLocal(k){
   const adsC = gN(`e_${k}_adsC`);
   if(!sp && !adsC) return; // nothing to save
   const dzienGlobal = parseInt(document.getElementById('globalDay').value) || new Date().getDate();
-  const {m:curM} = getSaveMonth(dzienGlobal);
+  const {m:curM, isClosing} = getSaveMonth(dzienGlobal);
   const dzienLocal = gN(`e_${k}_dzien`);
   const entry = {
     m: curM,
@@ -6310,7 +6328,7 @@ function dataSaveCurrentToLocal(k){
     promoC: gN(`e_${k}_promoC`) || 0,
     elasticC: 0,
     coinsC: gN(`e_${k}_coinsC`) || 0,
-    dzien: dzienLocal || dzienGlobal,
+    dzien: isClosing ? null : (dzienLocal || dzienGlobal),
     note: (document.getElementById(`e_${k}_note`)?.value || '').trim(),
     estOver: null,
     savedAt: Date.now(),
@@ -6457,6 +6475,7 @@ function renderDataCenter(k){
     </div>`;
 
   document.getElementById('dataCenterContent').innerHTML = html;
+  _updateClosingUI(); // Auto-close: pokaż stan zamknięcia na widocznym przycisku
   updateAuto(k);
   // Load notes
   if(typeof renderNoteLog==='function') renderNoteLog(k);
@@ -6807,23 +6826,32 @@ document.getElementById('globalDay').addEventListener('input',()=>{
 // ═══════════════════════════════════════════════════════════
 // SAVE
 // ═══════════════════════════════════════════════════════════
-let _closingMode = false;
+// Dzień 1 miesiąca = dane za ostatni dzień poprzedniego miesiąca → auto-close
+let _closingMode = new Date().getDate() === 1;
 function toggleClosingMode(){
   _closingMode = !_closingMode;
-  const btn = document.getElementById('closingToggle');
+  _updateClosingUI();
+  // Re-render form z nowym miesiącem
+  if(typeof renderDataLeft==='function') renderDataLeft();
+}
+function _updateClosingUI(){
+  // Aktualizuj WIDOCZNY przycisk w save bar (nie hidden closingToggle)
+  const btns = document.querySelectorAll('[onclick="toggleClosingMode()"]');
   const now = new Date();
   const prevM = MONTHS[(now.getMonth()+11)%12];
-  if(_closingMode){
-    btn.style.color = 'var(--yellow)';
-    btn.style.borderColor = 'var(--yellow-bd)';
-    btn.style.background = 'var(--yellow-bg)';
-    btn.textContent = '↩ Zamknięcie: ' + prevM;
-  } else {
-    btn.style.color = 'var(--text3)';
-    btn.style.borderColor = 'var(--border)';
-    btn.style.background = '';
-    btn.textContent = '↩ Zamknięcie';
-  }
+  btns.forEach(btn => {
+    if(_closingMode){
+      btn.style.color = 'var(--yellow)';
+      btn.style.borderColor = 'var(--yellow-bd)';
+      btn.style.background = 'var(--yellow-bg)';
+      btn.textContent = '↩ Zamknięcie: ' + prevM;
+    } else {
+      btn.style.color = 'var(--text3)';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.background = '';
+      btn.textContent = '↩ Zamknięcie';
+    }
+  });
 }
 function getSaveMonth(dzienGlobal){
   const now=new Date();
@@ -6871,7 +6899,7 @@ function saveAll(){
       promoC:gN(`e_${k}_promoC`)||0,
       elasticC:0,
       coinsC:gN(`e_${k}_coinsC`)||0,
-      dzien:dzienLocal||dzienEff,
+      dzien:isClosing?null:(dzienLocal||dzienEff),
       note:(document.getElementById(`e_${k}_note`)?.value||''). trim(),
       estOver:null,
       savedAt:Date.now(),
@@ -7891,6 +7919,8 @@ async function cleanupDzien1(){
   const promises=[];
   Object.keys(AC_META).forEach(k=>{
     const D=getData(k);
+    // Kasuj artefakty z dzien=1 — te wpisy to błędy z przejścia miesiąca
+    // Od v9.67 auto-close zapobiega tworzeniu nowych, ale stare trzeba wyczyścić
     const filtered=D.filter(e=>e.dzien!==1);
     if(filtered.length<D.length){
       setData(k,filtered);
@@ -9202,20 +9232,29 @@ ZASADY:
 4. **Max 10 zadań.** Jakość > ilość. Lepiej 5 konkretnych niż 10 ogólników.
 5. Jeśli raport ma IDs/nazwy — użyj w desc dokładnie.
 6. Brak konta w raporcie → "".
-7. desc: **max 2 zdania** (krótko, konkretnie, z uzasadnieniem).
+7. desc: **max 3 zdania** (krótko, konkretnie, z uzasadnieniem).
 8. customChecklist TYLKO jeśli standardowy typu nie pasuje (zostaw null lub pomiń).
 9. Tytuł: max 60 znaków.
+10. **HIERARCHIA ADS — OBOWIĄZKOWA:** Dla KAŻDEGO taska dot. kampanii Ads (wyłącz/skaluj/zmień budżet/pauza), desc MUSI zawierać pełną ścieżkę nawigacji:
+    - Kampania: dokładna nazwa (np. "/011/M/ CORE MATERACE 140x200")
+    - Grupa Reklam: dokładna nazwa (np. "[010][RW][WW] 140x200 Bonellowy VALUE")
+    - Numer Aukcji: ID oferty (np. "17146780655")
+    Format w desc: 'Kampania "/011/M/ CORE MATERACE 140x200" → Grupa "[010][RW][WW] 140x200 Bonellowy VALUE" → Aukcja [17146780655]'
+    Jeśli akcja dotyczy CAŁEJ kampanii — podaj nazwę kampanii i wymień WSZYSTKIE grupy reklam w niej.
+    Jeśli akcja dotyczy CAŁEJ grupy — podaj kampanię + grupę + wymień numery aukcji w niej.
+    BEZ tych danych task jest bezużyteczny — pracownik nie wie CO kliknąć w panelu Allegro Ads.
+11. **PEŁNE NAZWY — BEZ SKRACANIA:** Nazwy kampanii i grup reklam podawaj DOKŁADNIE tak jak w danych — pełna nazwa, bez skrótów, bez obcinania. Np. "[010][RW][WW] 140x200 Multipocket MID" a NIE "[010] Multipocket" czy "grupa Multipocket". Pracownik szuka tej nazwy w panelu Allegro — musi być identyczna.
 
 FORMAT ODPOWIEDZI:
 {
   "tasks": [
     {
-      "type": "zmien_tytul",
-      "title": "Krótki tytuł (max 80 znaków)",
-      "priority": "PILNE|WAŻNE|INFO",
-      "konto": "MobelKap",
-      "desc": "Konkret z IDs/nazwami + uzasadnienie",
-      "customChecklist": null
+      "type": "wylacz_kampanie",
+      "title": "Wyłącz /011/M/ CORE MATERACE 140x200",
+      "priority": "PILNE",
+      "konto": "Luxsen",
+      "desc": "Kampania \\"/011/M/ CORE MATERACE 140x200\\" → Grupy: \\"[010][RW][WW] 140x200 Bonellowy VALUE\\", \\"[010][RW][WW] 140x200 Kontynentalny MID\\", \\"[010][RW][WW] 140x200 Pocket MID\\" → Aukcje: [17146780655], [12009571594], [12029537217]. 6 zł/7d, 0 sprzedaży w obu okresach.",
+      "customChecklist": ["Panel Allegro Ads → Kampanie", "Znajdź kampanię /011/M/ CORE MATERACE 140x200", "Zmień status na PAUZA", "Screenshot statusu do komentarza"]
     }
   ]
 }`;
@@ -11849,11 +11888,12 @@ function calcGlobalAuto(k){
   else if(el) el.textContent = '—';
 }
 
-function saveGlobal(){
+async function saveGlobal(){
   const now = new Date();
   const curM = document.getElementById('globalMonthSel')?.value || MONTHS[now.getMonth()];
   const gN = id => { const e=document.getElementById(id); return e&&e.value!==''?parseFloat(e.value):null; };
   let saved = 0;
+  const savedKeys = [];
   GLOBAL_ACCS.forEach(k => {
     const sprzedaz = gN('g_'+k+'_sprzedaz');
     if(!sprzedaz) return;
@@ -11877,14 +11917,45 @@ function saveGlobal(){
       savedAt:  Date.now(),
       savedDay: now.toLocaleDateString('pl-PL'),
     });
+
+    // Merge sprzedaz/dzien do per-month entry — dzieki temu D2D snapshot widzi aktualna wartosc
+    const D = getData(k);
+    const idx = D.findIndex(x => x.m === curM);
+    if(idx >= 0){
+      D[idx] = { ...D[idx], sprzedaz, dzien };
+    } else {
+      D.push({ m: curM, sprzedaz, dzien });
+    }
+    setData(k, D);
+    savedKeys.push(k);
     saved++;
   });
-  const msg = document.getElementById('globalMsg');
-  if(msg){
-    msg.textContent = saved ? `✓ Zapisano ${saved} kont · ${curM}` : '✗ Brak danych do zapisania';
-    msg.classList.add('show');
-    setTimeout(()=>msg.classList.remove('show'), 4000);
+
+  // Snapshot do D2D + sync per-month entries do Firebase
+  if(saved){
+    if(typeof saveSnapshotD2D === 'function') saveSnapshotD2D();
+    if(currentUser){
+      try { await Promise.all(savedKeys.map(k => saveAccToFS(k))); }
+      catch(e){ console.error('saveGlobal Firebase sync error:', e); }
+    }
   }
+
+  // Inline visible message (smsg in form area)
+  const inline = document.getElementById('globalMsgInline');
+  if(inline){
+    inline.textContent = saved ? `✓ Zapisano ${saved} kont · ${curM} · D2D zaktualizowane` : '✗ Brak danych do zapisania';
+    inline.style.color = saved ? 'var(--green)' : 'var(--red)';
+    inline.classList.add('show');
+    setTimeout(()=>inline.classList.remove('show'), 4000);
+  }
+
+  // Modal confirmation (sam UX co Zapisz wszystkie wpisy)
+  if(saved && typeof showSaveConfirm === 'function'){
+    showSaveConfirm(savedKeys, 0, saved, curM, !!currentUser);
+  } else if(!saved){
+    alert('Brak danych do zapisania — wypelnij pole Sprzedaz dla minimum jednego konta.');
+  }
+
   renderGlobalMonthsTable();
   renderGlobalEntryForm(); // refresh to show savedDay
 }
@@ -11910,12 +11981,26 @@ function renderGlobalEntryForm(){
   const cardsHTML = GLOBAL_ACCS.map(k => {
     const meta = AC_META[k];
     const prev = getGlobalEntry(k, selM) || {};
-    const pf = f => prev[f] != null ? prev[f] : '';
+    // Carry-over: jeśli brak danych dla wybranego miesiąca, szukaj ostatniego wpisu wstecz
+    let carry = {};
+    if (!prev.sprzedaz) {
+      const selIdx = MONTHS.indexOf(selM);
+      for (let i = 1; i <= 12; i++) {
+        const checkIdx = (selIdx - i + 12) % 12;
+        const found = getGlobalEntry(k, MONTHS[checkIdx]);
+        if (found && found.sprzedaz) { carry = found; break; }
+      }
+    }
+    const carryFields = ['prow', 'dostawa', 'reklama', 'sumaP'];
+    const pf = f => prev[f] != null ? prev[f] : (carryFields.includes(f) && carry[f] != null ? carry[f] : '');
+    const isCarry = !prev.sprzedaz && carry.sprzedaz;
+    const carryLabel = isCarry ? (carry.m ? carry.m[0].toUpperCase() + carry.m.slice(1) : carry.savedDay) : '';
     return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;margin-bottom:.5rem">
       <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem">
         <span style="width:6px;height:6px;border-radius:50%;background:var(--g-meble);display:inline-block"></span>
         <span style="font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text)">${meta.name}</span>
         ${prev.savedDay ? `<span style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:auto">ostatni wpis: ${prev.savedDay}</span>` : ''}
+        ${isCarry ? `<span style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:${prev.savedDay?'0':'auto'}">wartości % z: ${carryLabel}</span>` : ''}
       </div>
       <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:.5rem">
         <div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Sprzedaż (zł)</div>
@@ -12628,6 +12713,11 @@ BENCHMARK — ZASADY:
 - Jeśli w wybranych kontach jest więcej niż jedno konto z tej samej grupy, konto z najwyższą marżą i najniższym % kosztów Ads staje się benchmarkiem grupy.
 - Opisuj dystans pozostałych kont do benchmarku — nigdy odwrotnie.
 - Jeśli wybrano tylko jedno konto — nie stosuj benchmarku, analizuj konto względem jego własnej historii.
+
+PRECYZJA DANYCH:
+- Nazwy kampanii i grup reklam podawaj ZAWSZE w pełnej formie — nigdy nie skracaj. Pracownik szuka ich w panelu Allegro Ads.
+- Przy rekomendacjach Ads podaj ścieżkę: Kampania → Grupa Reklam → Numer Aukcji.
+- "DodaniaDoKoszyka(szt)" = LICZBA kliknięć "Dodaj do koszyka" (COUNT), NIE wartość w PLN. Nie interpretuj jako cenę.
 
 FILOZOFIA ANALIZY:
 - Konta w tej samej grupie mogą sprzedawać ten sam asortyment → kanibalizacja to realny koszt
@@ -16089,7 +16179,7 @@ async function adsRunAnalysis() {
     });
     if(r.zgnile&&r.zgnile.length){
       prompt += `ZGNIŁE JAJA TOP (${r.zgnile.length} aukcji, ${(r.kosztZgnile||0).toFixed(0)}zł przepalone):\n`;
-      r.zgnile.slice(0,10).forEach(a=>{ prompt+=`  [${a.nr}] ${a.oferta.substring(0,45)} | ${a.koszt.toFixed(0)}zł | CTR:${a.ctr.toFixed(2)}%\n`; });
+      r.zgnile.slice(0,10).forEach(a=>{ prompt+=`  [${a.nr}]${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta.substring(0,45)} | ${a.koszt.toFixed(0)}zł | CTR:${a.ctr.toFixed(2)}%\n`; });
       prompt+='\n';
     }
   });
@@ -17516,11 +17606,11 @@ async function aaParseFile(file, type) {
           const totKoszt = kampanie.reduce((s, k) => s + k.koszt, 0);
           const totSprzedaz = kampanie.reduce((s, k) => s + k.sprzedaz, 0);
           // ── AGREGACJA PER AUKCJA (suma across ALL campaigns) ──
-          const allAukcjeFlat = kampanie.flatMap(k => k.aukcje);
+          const allAukcjeFlat = kampanie.flatMap(k => k.aukcje.map(a => ({...a, kampNazwa: k.kampania})));
           const agg = {};
           allAukcjeFlat.forEach(a => {
             if (!a.nr) return;
-            if (!agg[a.nr]) agg[a.nr] = { nr: a.nr, oferta: a.oferta, koszt: 0, sprzedaz: 0, wysw: 0, klik: 0, sztuki: 0, kampanie: 0 };
+            if (!agg[a.nr]) agg[a.nr] = { nr: a.nr, oferta: a.oferta, grupa: a.grupa || '', kampNazwa: a.kampNazwa || '', koszt: 0, sprzedaz: 0, wysw: 0, klik: 0, sztuki: 0, kampanie: 0 };
             agg[a.nr].koszt += a.koszt;
             agg[a.nr].sprzedaz += a.sprzedaz;
             agg[a.nr].wysw += a.wysw;
@@ -17807,25 +17897,37 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
   }
   p += `\n`;
 
-  p += `Kampanie (sortowane po koszcie malejąco):\n`;
+  p += `Kampanie (hierarchia: Kampania → Grupa Reklam → Aukcja, sortowane po koszcie malejąco):\n`;
   ads.kampanie.sort((a,b) => b.koszt - a.koszt).forEach(k => {
     const flag = k.roas === 0 && k.koszt > 0 ? 'WYŁĄCZ' : k.roas < 3 ? 'WYŁĄCZ' : k.roas < 4 ? 'OSTRZEŻENIE' : k.roas < be ? 'OPTYMALIZUJ' : 'OK';
     const parsedKamp = parseCampaignName(k.kampania);
     const kampHierarchy = parsedKamp.matched
       ? ` → [NNN:${parsedKamp.nnn}, KAT:${parsedKamp.kategoria}, LINIA:${parsedKamp.linia}${parsedKamp.wymiar?', WYM:'+parsedKamp.wymiar:''}]`
       : ' [POZA KONWENCJĄ]';
-    p += `  [${flag}] ${k.kampania}${kampHierarchy} | Koszt:${k.koszt.toFixed(0)}zł Sprzedaż:${k.sprzedaz.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}%\n`;
-    k.aukcje.sort((a,b) => b.koszt - a.koszt).slice(0, 8).forEach(a => {
-      p += `    [${a.nr}]${dostTag(a.nr)} ${a.oferta} | Koszt:${a.koszt.toFixed(1)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki||0} CTR:${a.ctr.toFixed(2)}%${a.miejsce?' ['+a.miejsce+']':''}\n`;
-    });
+    p += `  [${flag}] KAMPANIA: "${k.kampania}"${kampHierarchy} | Koszt:${k.koszt.toFixed(0)}zł Sprzedaż:${k.sprzedaz.toFixed(0)}zł ROAS:${k.roas.toFixed(2)} CTR:${k.ctr.toFixed(2)}%\n`;
+    if (k.grupy?.length) {
+      k.grupy.sort((a,b) => b.koszt - a.koszt).forEach(g => {
+        const gFlag = g.roas === 0 && g.koszt > 0 ? 'WYŁĄCZ' : g.roas < be && g.roas > 0 ? 'PONIŻEJ BE' : g.roas >= be ? 'OK' : '';
+        p += `    [${gFlag}] GRUPA: "${g.grupa}" | Koszt:${g.koszt.toFixed(0)}zł Sprzedaż:${g.sprzedaz.toFixed(0)}zł ROAS:${g.roas.toFixed(2)} (${g.aukcje?.length||0} aukcji)\n`;
+        if (g.aukcje?.length) {
+          g.aukcje.sort((a,b) => b.koszt - a.koszt).slice(0, 5).forEach(a => {
+            p += `      [${a.nr}]${dostTag(a.nr)} ${a.oferta} | Koszt:${a.koszt.toFixed(1)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki||0} CTR:${a.ctr.toFixed(2)}%${a.miejsce?' ['+a.miejsce+']':''}\n`;
+          });
+        }
+      });
+    } else {
+      k.aukcje.sort((a,b) => b.koszt - a.koszt).slice(0, 8).forEach(a => {
+        p += `    [${a.nr}]${dostTag(a.nr)}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | Koszt:${a.koszt.toFixed(1)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki||0} CTR:${a.ctr.toFixed(2)}%${a.miejsce?' ['+a.miejsce+']':''}\n`;
+      });
+    }
   });
-  if (ads.zgnile.length) { p += `\nMARTWE AUKCJE (koszt>=30zł, 0 sprzedaży, ROAS=0):\n`; ads.zgnile.slice(0,15).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)} ${a.oferta} | Przepalono: ${a.koszt.toFixed(0)} zł\n`; }); }
+  if (ads.zgnile.length) { p += `\nMARTWE AUKCJE (koszt>=30zł, 0 sprzedaży, ROAS=0):\n`; ads.zgnile.slice(0,15).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)}${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | Przepalono: ${a.koszt.toFixed(0)} zł\n`; }); }
   // Aukcje poniżej BE ROAS — mają sprzedaż ale generują stratę
   const allAukcje = ads.kampanie.flatMap(k => k.aukcje);
   const podBe = allAukcje.filter(a => a.roas > 0 && a.roas < be && a.koszt >= 30).sort((a, b) => b.koszt - a.koszt);
-  if (podBe.length) { p += `\nPONIŻEJ BE ROAS ${be.toFixed(2)} (ROAS>0 ale poniżej progu rentowności, koszt>=30zł):\n`; podBe.slice(0,10).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)} ${a.oferta} | Koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} (BE:${be.toFixed(2)}) → TNIJ\n`; }); }
-  if (ads.gwiazdy.length) { p += `\nGWIAZDY POTWIERDZONE (ROAS>=${be.toFixed(0)}, min 3 szt. lub koszt>50zł — SKALUJ):\n`; ads.gwiazdy.slice(0,10).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)} ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł Szt:${a.sztuki||0}${a.miejsce?' ['+a.miejsce+']':''}\n`; }); }
-  if (ads.potencjalne && ads.potencjalne.length) { p += `\nPOTENCJALNE GWIAZDY (ROAS wysoki ale 1-2 transakcje — za mało danych, OBSERWUJ 14 dni, NIE skaluj):\n`; ads.potencjalne.slice(0,8).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)} ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł Szt:${a.sztuki||0} — ZA MAŁO DANYCH\n`; }); }
+  if (podBe.length) { p += `\nPONIŻEJ BE ROAS ${be.toFixed(2)} (ROAS>0 ale poniżej progu rentowności, koszt>=30zł):\n`; podBe.slice(0,10).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | Koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} (BE:${be.toFixed(2)}) → TNIJ\n`; }); }
+  if (ads.gwiazdy.length) { p += `\nGWIAZDY POTWIERDZONE (ROAS>=${be.toFixed(0)}, min 3 szt. lub koszt>50zł — SKALUJ):\n`; ads.gwiazdy.slice(0,10).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)}${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł Szt:${a.sztuki||0}${a.miejsce?' ['+a.miejsce+']':''}\n`; }); }
+  if (ads.potencjalne && ads.potencjalne.length) { p += `\nPOTENCJALNE GWIAZDY (ROAS wysoki ale 1-2 transakcje — za mało danych, OBSERWUJ 14 dni, NIE skaluj):\n`; ads.potencjalne.slice(0,8).forEach(a => { p += `  [${a.nr}]${dostTag(a.nr)}${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | ROAS:${a.roas.toFixed(2)} Sprzedaż:${a.sprzedaz.toFixed(0)}zł Szt:${a.sztuki||0} — ZA MAŁO DANYCH\n`; }); }
 
   // AGREGACJA PER AUKCJA — łączny wynik across all campaigns
   if (ads.aggregated && ads.aggregated.length) {
@@ -17834,7 +17936,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += `Używaj TYCH danych do decyzji, nie per-kampania (ta sama aukcja może mieć ROAS 0 w jednej kampanii i 15 w drugiej).\n\n`;
     ads.aggregated.slice(0, 20).forEach(a => {
       const flag = a.roas === 0 && a.koszt >= 30 ? 'MARTWA' : a.roas < be && a.roas > 0 && a.koszt >= 30 ? 'PONIŻEJ BE' : a.roas >= be && a.sztuki >= 3 ? 'GWIAZDA' : a.roas >= be ? 'POTENCJALNA' : '';
-      p += `  [${flag}] [${a.nr}]${dostTag(a.nr)} ${a.oferta} | Łączny koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki} W kampaniach:${a.kampanie}\n`;
+      p += `  [${flag}] [${a.nr}]${dostTag(a.nr)}${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | Łączny koszt:${a.koszt.toFixed(0)}zł Sprzedaż:${a.sprzedaz.toFixed(0)}zł ROAS:${a.roas.toFixed(2)} Szt:${a.sztuki} W kampaniach:${a.kampanie}\n`;
     });
   }
 
@@ -17881,9 +17983,9 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
     p += `${sprzedaz.totWizyty || 0} wizyt | ${sprzedaz.totTransakcje || 0} transakcji | Konwersja: ${((sprzedaz.srKonwersja || 0) * 100).toFixed(2)}%\n\n`;
     p += `Top oferty:\n`;
     if (sprzedaz.totalCount) p += `(${sprzedaz.totalCount} ofert w pliku, poniżej top ${Math.min(30, sprzedaz.oferty.length)})\n`;
-    sprzedaz.oferty.slice(0,30).forEach(o => { p += `  ${o.id?'['+o.id+'] ':''}${o.oferta} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% Koszyk:${o.koszyk||0} Ulubione:${o.ulubione||0} Polubienia:${o.polubienia||0}\n`; });
+    sprzedaz.oferty.slice(0,30).forEach(o => { p += `  ${o.id?'['+o.id+'] ':''}${o.oferta} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% DodaniaDoKoszyka(szt):${o.koszyk||0} Ulubione:${o.ulubione||0} Polubienia:${o.polubienia||0}\n`; });
     if (sprzedaz.martwePunkty && sprzedaz.martwePunkty.length) { p += `\nMARTWE PUNKTY (>=10 wizyt, 0 transakcji):\n`; sprzedaz.martwePunkty.forEach(o => { p += `  ${o.oferta} | ${o.wizyty||0} wizyt\n`; }); }
-    if (sprzedaz.porzuconeKoszyki && sprzedaz.porzuconeKoszyki.length) { p += `\nPORZUCONE KOSZYKI:\n`; sprzedaz.porzuconeKoszyki.forEach(o => { p += `  ${o.oferta} | Koszyk:${o.koszyk||0} Wizyty:${o.wizyty||0}\n`; }); }
+    if (sprzedaz.porzuconeKoszyki && sprzedaz.porzuconeKoszyki.length) { p += `\nPORZUCONE KOSZYKI:\n`; sprzedaz.porzuconeKoszyki.forEach(o => { p += `  ${o.oferta} | DodaniaDoKoszyka(szt):${o.koszyk||0} Wizyty:${o.wizyty||0}\n`; }); }
   }
 
   if (konwersja && konwersja.oferty) {
@@ -18219,7 +18321,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
         const suggestedGroupName = skuParts.slice(0, 3).join('_') || 'NOWY_PRODUKT';
 
         p += `  #${i+1} [${o.id}] ${(o.nazwa || o.sku || '').substring(0, 50)} | ${o.cena.toFixed(0)} zł ${dost}${wyr}\n`;
-        p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | Koszyk: ${o.koszyk} | Polubienia: ${o.polubienia}\n`;
+        p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | DodaniaDoKoszyka(szt): ${o.koszyk} | Polubienia: ${o.polubienia}\n`;
         p += `     → GOTOWA AKCJA DLA CHRISA:\n`;
         p += `       Kampania: dodaj do istniejącej lub utwórz nową wg kategorii produktu\n`;
         p += `       Grupa reklam: [${kontoSkrotForGroups}][NNN][WW][RW] ${suggestedGroupName}\n`;
@@ -18290,7 +18392,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
         }
 
         p += `  #${i+1} [${o.id}] ${(o.nazwa || o.sku || '').substring(0, 50)} | ${(o.cena||0).toFixed(0)} zł ${dost}${adsFlag}\n`;
-        p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | Koszyk: ${o.koszyk} porzuconych\n`;
+        p += `     Wizyty: ${o.wizyty} | Trans: ${o.transakcje} | Konwersja: ${konw}% | DodaniaDoKoszyka(szt): ${o.koszyk} porzuconych\n`;
         if (migratedToSmart) {
           p += `     → DIAGNOZA: Aukcja WŁAŚNIE przeniesiona na Smart! Historyczne dane (konwersja ${konw}%, ${o.koszyk} koszyków) dotyczą STAREGO cennika DPD.\n`;
           p += `     → AKCJA: CZEKAJ 14 DNI. Oczekiwana nowa konwersja: ~2% (benchmark Smart). NIE wyłączaj Ads — właśnie naprawiłeś przyczynę porzuceń. Mierz od ${new Date(Date.now() + 14*86400000).toLocaleDateString('pl-PL')}.\n\n`;
@@ -20170,8 +20272,8 @@ async function generateDzis() {
             prompt += `\n${kontoName} — Ads: Koszt ${data.totKoszt.toFixed(0)}zł | Sprzedaż ${data.totSprzedaz.toFixed(0)}zł | ROAS ${data.totRoas.toFixed(2)}\n`;
             prompt += `  Martwe aukcje (>=30zł, 0 sprzedaży): ${data.zgnile.length} = ${data.kosztZgnile.toFixed(0)}zł\n`;
             prompt += `  Gwiazdy (ROAS>=7): ${data.gwiazdy.length}\n`;
-            data.zgnile.slice(0,5).forEach(a => { prompt += `  ZATRZYMAJ [${a.nr}] ${a.oferta} | ${a.koszt.toFixed(0)}zł przepalone\n`; });
-            data.gwiazdy.slice(0,5).forEach(a => { prompt += `  SKALUJ [${a.nr}] ${a.oferta} | ROAS:${a.roas.toFixed(2)}\n`; });
+            data.zgnile.slice(0,5).forEach(a => { prompt += `  ZATRZYMAJ [${a.nr}]${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | ${a.koszt.toFixed(0)}zł przepalone\n`; });
+            data.gwiazdy.slice(0,5).forEach(a => { prompt += `  SKALUJ [${a.nr}]${a.kampNazwa?' Kampania:"'+a.kampNazwa+'"':''}${a.grupa?' Grupa:"'+a.grupa+'"':''} ${a.oferta} | ROAS:${a.roas.toFixed(2)}\n`; });
           } else if (type === 'sprzedaz' && data.oferty) {
             prompt += `\n${kontoName} — Sprzedaż: ${data.totWizyty} wizyt | ${data.totTransakcje} transakcji | Konwersja ${(data.srKonwersja*100).toFixed(2)}%\n`;
             if (data.martwePunkty.length) { prompt += `  Martwe punkty (dużo wizyt, 0 trans): ${data.martwePunkty.length}\n`; }
@@ -22871,7 +22973,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.58</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.68</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -23710,6 +23812,7 @@ async function scrAddFile(input) {
       }
 
       // 2. Detekcja TYPU: dropdown manual > zawartość workbook > nazwa pliku
+      // Konkurencja: wymuś konto = nazwa pliku (żeby nie mylić z własnymi kontami)
       let type;
       if (!useAutoType) {
         type = dropdownType;
@@ -23724,7 +23827,13 @@ async function scrAddFile(input) {
         continue;
       }
 
-      const realType = type === 'ads30d' ? 'ads' : type;
+      // Konkurencja: wymuś konto = nazwa pliku (nie nasze konto)
+      if (type === 'konkurencja') {
+        konto = file.name.replace(/\.(xlsx|csv|xls|xlsm)$/i, '').replace(/[_\-]/g, ' ').substring(0, 40);
+        kontoSource = 'filename';
+      }
+
+      const realType = type === 'ads30d' ? 'ads' : type === 'konkurencja' ? 'sprzedaz' : type;
       const parsed = await aaParseFile(file, realType);
 
       window._scrFiles.push({
@@ -23813,8 +23922,8 @@ function scrRenderFilesList() {
   }
 
   const kontoSkrot = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC', Luxsen: 'Lux', Semmi: 'Sem', BOTAVIT: 'BoV', Materazzi: 'Mtz', MtzzEU: 'mEU', Ankado24: 'a24' };
-  const typeLabels = { ads: 'Ads', sprzedaz: 'Odwiedziny', konwersja: 'Sprzedaż', ads30d: 'Ads 30d', pdf: 'PDF' };
-  const typeColors = { ads: '#38bdf8', sprzedaz: '#34d399', konwersja: '#f5a623', ads30d: '#a78bfa', pdf: '#4d9fff' };
+  const typeLabels = { ads: 'Ads', sprzedaz: 'Odwiedziny', konwersja: 'Sprzedaż', ads30d: 'Ads 30d', konkurencja: 'Konkurencja', pdf: 'PDF' };
+  const typeColors = { ads: '#38bdf8', sprzedaz: '#34d399', konwersja: '#f5a623', ads30d: '#a78bfa', konkurencja: '#ef4444', pdf: '#4d9fff' };
   const sourceIcon = { name: '📁', file: '📄', manual: '✋' };
   const sourceTitle = { name: 'wykryto z nazwy pliku', file: 'wykryto z zawartości XLSX', manual: 'ręcznie z dropdownu' };
 
@@ -23841,6 +23950,10 @@ function scrRenderFilesList() {
         const ofertN = (p.oferty && Array.isArray(p.oferty)) ? p.oferty.length : 0;
         const wartosc = typeof p.totWartosc === 'number' ? p.totWartosc : 0;
         stats = `${ofertN} ofert · ${wartosc.toFixed(0)} zł`;
+      } else if (f.type === 'konkurencja') {
+        const ofertN = (p.oferty && Array.isArray(p.oferty)) ? p.oferty.length : 0;
+        const wizyty = typeof p.totWizyty === 'number' ? p.totWizyty : 0;
+        stats = `${ofertN} ofert · ${wizyty} wizyt`;
       } else if (f.type === 'pdf') {
         stats = `${p.pages || '?'} stron · ${Math.round((p.size||0)/1024)}KB`;
       }
@@ -23882,9 +23995,13 @@ function scrBuildFilesContext() {
     }
   }
 
-  // Group per konto
+  // Split own files vs competitor files
+  const ownFiles = window._scrFiles.filter(f => f.type !== 'konkurencja');
+  const compFiles = window._scrFiles.filter(f => f.type === 'konkurencja');
+
+  // Group own files per konto
   const perKonto = {};
-  window._scrFiles.forEach(f => {
+  ownFiles.forEach(f => {
     if (!perKonto[f.konto]) perKonto[f.konto] = [];
     perKonto[f.konto].push(f);
   });
@@ -23899,15 +24016,25 @@ function scrBuildFilesContext() {
         ctx += `\n[${label}] ${f.fileName} (waluta: ${cur})\n`;
         ctx += `Łącznie: ${(p.totKoszt||0).toFixed(0)} ${cur} koszt | ${(p.totSprzedaz||0).toFixed(0)} ${cur} sprzedaż | ROAS ${(p.totRoas||0).toFixed(2)} | ${p.kampanie?.length || 0} kampanii\n`;
         if (p.kampanie?.length) {
-          ctx += `Top 10 kampanii po koszcie:\n`;
-          p.kampanie.slice().sort((a,b) => b.koszt - a.koszt).slice(0,10).forEach(k => {
-            ctx += `  "${k.kampania}" | Koszt:${k.koszt.toFixed(0)} ${cur} Sprzedaż:${k.sprzedaz.toFixed(0)} ${cur} ROAS:${k.roas.toFixed(2)} (${k.aukcje?.length||0} aukcji)\n`;
+          ctx += `Kampanie (hierarchia: Kampania → Grupa Reklam → Aukcja):\n`;
+          p.kampanie.slice().sort((a,b) => b.koszt - a.koszt).slice(0,15).forEach(k => {
+            ctx += `  KAMPANIA: "${k.kampania}" | Koszt:${k.koszt.toFixed(0)} ${cur} Sprzedaż:${k.sprzedaz.toFixed(0)} ${cur} ROAS:${k.roas.toFixed(2)} (${k.aukcje?.length||0} aukcji)\n`;
+            if (k.grupy?.length) {
+              k.grupy.slice().sort((a,b) => b.koszt - a.koszt).forEach(g => {
+                ctx += `    GRUPA: "${g.grupa}" | Koszt:${g.koszt.toFixed(0)} ${cur} Sprzedaż:${g.sprzedaz.toFixed(0)} ${cur} ROAS:${g.roas.toFixed(2)} (${g.aukcje?.length||0} aukcji)\n`;
+                if (g.aukcje?.length) {
+                  g.aukcje.slice().sort((a,b) => b.koszt - a.koszt).slice(0,5).forEach(a => {
+                    ctx += `      [${a.nr}] ${(a.oferta||'').substring(0,50)} | Koszt:${a.koszt.toFixed(0)} ${cur} ROAS:${a.roas.toFixed(2)} Trans:${a.sztuki||0}\n`;
+                  });
+                }
+              });
+            }
           });
         }
         if (p.aggregated?.length) {
-          ctx += `Top 10 aukcji po sprzedaży (agregat across kampanii):\n`;
-          p.aggregated.slice(0,10).forEach(a => {
-            ctx += `  [${a.nr}] ${(a.oferta||'').substring(0,50)} | Koszt:${a.koszt.toFixed(0)} ${cur} ROAS:${a.roas.toFixed(2)} Trans:${a.sztuki||0}\n`;
+          ctx += `Top 15 aukcji po sprzedaży (agregat across kampanii):\n`;
+          p.aggregated.slice(0,15).forEach(a => {
+            ctx += `  [${a.nr}] ${(a.oferta||'').substring(0,50)}${a.grupa?' | Grupa:"'+a.grupa+'"':''} | Koszt:${a.koszt.toFixed(0)} ${cur} ROAS:${a.roas.toFixed(2)} Trans:${a.sztuki||0}\n`;
           });
         }
       } else if (f.type === 'sprzedaz') {
@@ -23917,7 +24044,7 @@ function scrBuildFilesContext() {
           if (p.totalCount) ctx += `(${p.totalCount} ofert w pliku, poniżej top ${Math.min(30, p.oferty.length)})\n`;
           ctx += `Top ofert po wizytach:\n`;
           p.oferty.slice(0,30).forEach(o => {
-            ctx += `  ${o.id?'['+o.id+'] ':''}${(o.oferta||'').substring(0,50)} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% Koszyk:${o.koszyk||0}\n`;
+            ctx += `  ${o.id?'['+o.id+'] ':''}${(o.oferta||'').substring(0,50)} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% DodaniaDoKoszyka(szt):${o.koszyk||0}\n`;
           });
         }
         if (p.martwePunkty?.length) {
@@ -23961,13 +24088,47 @@ function scrBuildFilesContext() {
     });
   });
 
+  // === DANE KONKURENCJI — osobna sekcja z jasnym labelingiem ===
+  if (compFiles.length) {
+    ctx += `\n\n=== DANE KONKURENCJI (BENCHMARK — to NIE SĄ nasze aukcje!) ===\n`;
+    ctx += `UWAGA: Poniższe dane to oferty KONKURENCJI z Allegro. NIE są to nasze aukcje.\n`;
+    ctx += `Użyj ich jako benchmark: jakie produkty się sprzedają na rynku, jakie tytuły, jakie konwersje.\n`;
+    ctx += `NIE rekomenduj wyłączania ani modyfikacji tych aukcji — to nie nasze oferty.\n`;
+    ctx += `PORÓWNUJ nasze dane (powyżej) z konkurencją (poniżej) — szukaj luk, inspiracji, przewag.\n`;
+    ctx += `WAŻNE — KOSZYK: Kolumna "DodaniaDoKoszyka(szt)" to LICZBA DODAŃ do koszyka (ile razy kliknięto "Dodaj do koszyka"), NIE wartość koszyka w PLN. Nie interpretuj tego jako cenę produktu.\n`;
+    ctx += `Ten raport NIE zawiera cen konkurencji — tylko wizyty, transakcje, konwersję i dodania do koszyka.\n\n`;
+
+    compFiles.forEach(f => {
+      const p = f.parsed || {};
+      ctx += `[KONKURENCJA] ${f.fileName}\n`;
+      ctx += `Łącznie: ${p.totWizyty||0} wizyt | ${p.totTransakcje||0} transakcji | konwersja: ${((p.srKonwersja||0)*100).toFixed(2)}%\n`;
+      if (p.oferty?.length) {
+        if (p.totalCount) ctx += `(${p.totalCount} ofert w pliku, poniżej top ${Math.min(50, p.oferty.length)})\n`;
+        ctx += `Top ofert konkurencji po wizytach:\n`;
+        p.oferty.slice(0,50).forEach(o => {
+          ctx += `  ${o.id?'['+o.id+'] ':''}${(o.oferta||'').substring(0,60)} | Wizyty:${o.wizyty||0} Trans:${o.transakcje||0} Konw:${(o.konwersja||0).toFixed(1)}% DodaniaDoKoszyka(szt):${o.koszyk||0}\n`;
+        });
+      }
+    });
+
+    ctx += `\n=== KONIEC DANYCH KONKURENCJI ===\n`;
+  }
+
   ctx += `\n=== KONIEC DANYCH PLIKÓW ===\n`;
   ctx += `Powyższe dane są dostępne dla całej rozmowy. Odpowiadaj na pytania użytkownika opierając się na nich. Możesz cytować konkretne kampanie, aukcje, ID, wartości. Dla pytań o AOV: AOV = łączna sprzedaż / łączna liczba transakcji.\n`;
   ctx += `ZASADA IDs:\n`;
   ctx += `- IDs z sekcji [ADS] i [ODWIEDZINY] powyżej SĄ PRAWDZIWE 11-cyfrowe IDs Allegro — UŻYWAJ ICH.\n`;
   ctx += `- IDs z sekcji [SPRZEDAŻ] mogą mieć inny format — matchuj oferty po nazwie z sekcją [ODWIEDZINY] żeby znaleźć prawdziwy 11-cyfrowy ID.\n`;
   ctx += `- NIGDY nie wymyślaj numerów. Jeśli oferta nie ma 11-cyfrowego ID w żadnej sekcji → "(ID: sprawdź w panelu)".\n`;
-  ctx += `- W tabeli IDs: TYLKO 11-cyfrowe liczby oddzielone spacjami. BEZ nazw, opisów, nawiasów.\n\n`;
+  ctx += `- W tabeli IDs: TYLKO 11-cyfrowe liczby oddzielone spacjami. BEZ nazw, opisów, nawiasów.\n`;
+  ctx += `ZASADA PEŁNYCH NAZW ADS:\n`;
+  ctx += `- Nazwy kampanii i grup reklam podawaj DOKŁADNIE tak jak w danych — pełna nazwa, bez skrótów, bez obcinania.\n`;
+  ctx += `- Np. "[010][RW][WW] 140x200 Multipocket MID" a NIE "[010] Multipocket" czy "grupa Multipocket".\n`;
+  ctx += `- Pracownik szuka tej nazwy w panelu Allegro Ads — musi być identyczna z danymi.\n`;
+  ctx += `- Przy każdej rekomendacji dot. Ads podaj PEŁNĄ ścieżkę: Kampania → Grupa Reklam → Numer Aukcji.\n`;
+  ctx += `ZASADA KOSZYK:\n`;
+  ctx += `- "DodaniaDoKoszyka(szt)" to LICZBA kliknięć "Dodaj do koszyka" (COUNT), NIE wartość w PLN.\n`;
+  ctx += `- NIE interpretuj tej kolumny jako cenę produktu ani wartość koszyka.\n\n`;
 
   // Detekcja TOTAL RESTART — wstrzyknij szablon formatu
   if (window._scrTotalRestartMode) {
@@ -25113,6 +25274,31 @@ function renderBiznes(){
 renderEntry();
 updateWkAgentStatus();
 
+// ═══ GLOBAL DATE BAR (shared across Cockpit/Dashboard/Agent/Trend/Results/Sheets) ═══
+function renderDateBars(){
+  const now=new Date();
+  const curM=MONTHS[now.getMonth()];
+  const daysInM=DAYS_IN[curM]||31;
+  const todayD=now.getDate();
+  const pct=Math.round(todayD/daysInM*100);
+  const monthLabel=curM[0].toUpperCase()+curM.slice(1)+' '+now.getFullYear();
+  // Timeline dots
+  const allM=new Set();
+  Object.keys(AC_META).forEach(k=>getData(k).forEach(d=>allM.add(d.m)));
+  allM.add(curM);
+  const ci=MONTHS.indexOf(curM);
+  const sorted=[...allM].sort((a,b)=>((ci-MONTHS.indexOf(a)+12)%12)-((ci-MONTHS.indexOf(b)+12)%12));
+  const tlHTML=sorted.map((m,i)=>{
+    const has=Object.keys(AC_META).some(k=>getData(k).some(d=>d.m===m));
+    const isCur=m===curM;
+    const dc=isCur?'tl-dot cur':has?'tl-dot has':'tl-dot none';
+    return'<div class="tl-m"><div class="'+dc+'"></div><div>'+m.substring(0,3).toUpperCase()+'</div></div>'+(i<sorted.length-1?'<div class="tl-line"></div>':'');
+  }).join('');
+  const barHTML=`<div><div class="edb-lbl">Bieżący miesiąc</div><div style="display:flex;align-items:center;gap:.55rem;margin-top:2px"><div class="edb-val">${monthLabel}</div><span class="month-status ms-active"><span class="ms-pulse"></span>w toku</span></div></div><div class="nav-sep" style="height:26px"></div><div><div class="edb-lbl">Dzień miesiąca</div><div class="day-wrap"><label>dzień</label><span style="color:var(--accent);font-family:var(--mono);font-size:14px;font-weight:500;padding:3px 8px">${todayD}</span><label>/${daysInM}</label></div></div><div class="nav-sep" style="height:26px"></div><div><div class="edb-lbl">Postęp</div><div style="font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent)">${pct}% (dzień ${todayD}/${daysInM})</div></div><div class="nav-sep" style="height:26px"></div><div><div class="edb-lbl">Historia</div><div class="tl-bar">${tlHTML}</div></div>`;
+  document.querySelectorAll('.dateBarGlobal').forEach(el=>{el.innerHTML=barHTML;});
+}
+renderDateBars();
+
 // ═══════════════════════════════════════════════════════════
 // TITLE ANALYZER
 // ═══════════════════════════════════════════════════════════
@@ -26120,7 +26306,7 @@ function taRenderHistory(){
 
   <script>
 // ═══════════════════════════════════════════════════════════
-// v9.58 — ALL NEW FEATURES
+// v9.67 — ALL NEW FEATURES
 // ═══════════════════════════════════════════════════════════
 
 // ── 1. NOTIFICATION / ALERT SYSTEM ──────────────────────────
