@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.71</title>
+<title>MPlace Hub v9.72</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.71</span>
+    <span class="brand-ver">v9.72</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -4781,6 +4781,23 @@ function mmDelta(D,i){
   return(a-b)/b*100;
 }
 
+// v9.72: m/m delta respecting current view mode (PL vs GLOBAL).
+// W trybie GLOBAL dla MEBLE: oba miesiace musza miec SK_GLOBAL, inaczej brak porownania (apples-to-apples).
+function mmDeltaForView(D, i, k){
+  if(i===0) return null;
+  if(typeof getViewMode==='function' && getViewMode()==='GLOBAL'
+     && typeof isGlobalAcc==='function' && isGlobalAcc(k)
+     && typeof getGlobalEntry==='function'){
+    const ga = getGlobalEntry(k, D[i].m);
+    const gb = getGlobalEntry(k, D[i-1].m);
+    if(!ga || !ga.sprzedaz || !gb || !gb.sprzedaz) return null;
+  }
+  const a = typeof estymForView==='function' ? estymForView(D[i], k) : estym(D[i]);
+  const b = typeof estymForView==='function' ? estymForView(D[i-1], k) : estym(D[i-1]);
+  if(!a || !b) return null;
+  return (a-b)/b*100;
+}
+
 // ═══════════════════════════════════════════════════════════
 // CALCULATOR CORE (from allegro_v2 formulas)
 // ═══════════════════════════════════════════════════════════
@@ -5163,7 +5180,7 @@ function renderArkusz(){
         const earlyEntry=d.dzien===1;
         const est=earlyEntry?sp:estymForView(d,k);
         const origIdx=D.indexOf(d);
-        const dv=earlyEntry?null:mmDelta(D,origIdx);
+        const dv=earlyEntry?null:mmDeltaForView(D,origIdx,k);
         const dostawaPct=sp>0?(C.delivery||0)/sp*100:0;
         const reklamaPct=C.acosTotal!=null?C.acosTotal:0;
         const kosztPct=sp>0?((C.commission||0)+dostawaPct+reklamaPct):0;
@@ -5237,6 +5254,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.72 — m/m delta respektuje toggle PL/Global w Arkuszu/Analityce', desc:'Kolumna m/m w Arkuszu i Analityce konta liczy delta z wartosci aktualnego widoku (PL lub Global), nie z raw d.sprzedaz. W trybie Global dla MEBLE: jesli ktorys z porownywanych miesiecy nie ma SK_GLOBAL danych → delta ukryta (apples-to-apples, jak v9.69 fix dla Trend/Sheets). Poprzednio: przelaczenie PL↔Global zmienialo Udzial Adsow i Estymacje ale m/m bylo identyczne. (11.05.2026)'},
     {name:'v9.71 — Globalne vs Polska only: split storage + toggle PL/Global', desc:'Forma "Rynki globalne" (multi-market PL+CZ+SK+HU) PRZESTAJE nadpisywac sprzedaz w Arkuszu/Wynikach. Dodano druga forme "MEBLE — Polska only (Centrum Finansow PL)" — to driver KPI canonical. Toggle PL/Global w Arkuszu, Wynikach, Analityce konta dla 3 kont MEBLE. Auto-migracja flaguje stare wpisy badge "M" jako legacy multi-market do korekty. SK_GLOBAL + SK_LOCAL syncuja sie do Firebase (multi-device). Naprawia mismatch: sprzedaz multi-market vs koszty Ads/wyroznienia PL-only. (11.05.2026)'},
     {name:'v9.70 — Analityka kont: mini tabela ROAS odwrocona (najnowszy m-c na gorze)', desc:'W zakladce Analityka kont mini tabela pod wykresem ROAS Trend pokazuje teraz biezacy miesiac na gorze a najstarszy na dole — spojnie z glowna tabela wpisow ktora juz ma ten porzadek. Wykres ROAS Trend pozostaje bez zmian (PAZ→MAJ od lewej do prawej). (11.05.2026)'},
     {name:'v9.69 — Trend/Sheets: fix apples-to-oranges delty Σ grup', desc:'Σ MEBLE/LUXSEN/ONE pokazywaly artefakty (▲942% gdy Listopad mial 1 konto a Grudzien 3). Teraz delta liczona tylko gdy ten sam zestaw kont ma dane w obu miesiacach — inaczej delta ukryta (jak na wierszach indywidualnych). Audyt potwierdzil ze calc() / estym() / sumy sa poprawne. (05.05.2026)'},
@@ -7120,7 +7138,7 @@ function renderAccount(k){
 
   if(prev){
     const prevC=calcForView(prev,prod,k);
-    const dvSp=mmDelta(D,D.length-1);
+    const dvSp=mmDeltaForView(D,D.length-1,k);
     if(dvSp&&dvSp<-15) alerts.push({c:'a-red',i:'📉',t:`<strong>Sprzedaż −${Math.abs(dvSp).toFixed(1)}% m/m</strong> · ${pln(revForView(prev,k))} → ${pln(revForView(last,k))}`});
     if(C.mAfter<prevC.mAfter-3) alerts.push({c:'a-yellow',i:'📉',t:`<strong>Marża po reklamie spadła</strong> o ${(prevC.mAfter-C.mAfter).toFixed(1)} pp m/m (${pct(prevC.mAfter)} → ${pct(C.mAfter)})`});
   }
@@ -7132,7 +7150,7 @@ function renderAccount(k){
   document.getElementById('acAlerts').innerHTML=alerts.map(a=>`<div class="alert-item ${a.c}"><span>${a.i}</span><span class="alert-text">${a.t}</span></div>`).join('');
 
   // KPI
-  const dv=mmDelta(D,D.length-1);
+  const dv=mmDeltaForView(D,D.length-1,k);
   const dH=(dv,inv=false)=>{if(dv===null)return`<div class="mdelta neu">—</div>`;const g=inv?dv<=0:dv>=0;return`<div class="mdelta ${g?'up':'dn'}">${dv>=0?'▲':'▼'} ${Math.abs(dv).toFixed(1)}% m/m</div>`;};
   const kpis=[
     {l:'ROAS Ads',v:xf(C.roasAds),raw:C.roasAds!=null?+C.roasAds.toFixed(2):null,vc:C.roasAds>=6?'green':C.roasAds>=4?'yellow':'red',cc:C.roasAds>=6?'c-green':C.roasAds>=4?'c-yellow':'c-red',s:'kampania Ads',d:dH(prev?((C.roasAds-(calcForView(prev,prod,k).roasAds||0))/(calcForView(prev,prod,k).roasAds||1)*100):null)},
@@ -7256,7 +7274,7 @@ function renderAccount(k){
   document.getElementById('acTblBody').innerHTML=Drev.map((d,i)=>{
     const c=calcForView(d,prod,k),est=estymForView(d,k),sp=revForView(d,k);
     const origIdx=D.indexOf(d);
-    const dv=mmDelta(D,origIdx);
+    const dv=mmDeltaForView(D,origIdx,k);
     const dvH=dv===null?`<span class="tm">—</span>`:`<span class="${dv>=0?'tg':'tr'}">${dv>=0?'▲':'▼'} ${Math.abs(dv).toFixed(1)}%</span>`;
     const ss=d.ss==='T'?`<span class="tbadge tbadge-on">T</span>`:d.ss==='N'?`<span class="tbadge tbadge-off">N</span>`:`<span class="tm">—</span>`;
     const noteWords=d.note?d.note.split(' ').slice(0,2).join(' ')+(d.note.split(' ').length>2?'…':'')+'':'';
@@ -23406,7 +23424,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.71</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.72</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
