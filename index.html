@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.73</title>
+<title>MPlace Hub v9.74</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -459,9 +459,12 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .dashboard-card .metric-big,.dashboard-card .metric-row{color:#111 !important;}
   .dashboard-card .progress-bar-wrap{background:#e5e7eb !important;}
   .topbar,.save-bar,.btn,.nav-btn,#acAlerts,.sec-num,.tip{display:none!important;}
-  body{background:#fff;color:#000;}
-  .view{display:block!important;}
-  #viewEntry,#viewDashboard,#viewCompare{display:none!important;}
+  /* v9.74: ukryj nowy sidebar/topbar i zresetuj body padding (inaczej content jest wciśnięty na ~63mm) */
+  #mpSidebar,#mpTopbar,.mp-sidebar,.mp-topbar,#zmTopbar,#zmAnnounceBar,.zm-topbar,.mp-search-bar{display:none!important;}
+  html,body{padding:0!important;margin:0!important;background:#fff;color:#000;}
+  /* Pokazuj tylko aktywny widok (nie wszystkie) */
+  .view{display:none!important;}
+  .view.active{display:block!important;}
   .container{padding:.5rem;max-width:100%;}
   .card,.metric,.bk-card,.roas-bar-card,.chart-card,.tbl-wrap{
     break-inside:avoid;border:1px solid #ddd;background:#fff;
@@ -2127,7 +2130,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.73</span>
+    <span class="brand-ver">v9.74</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5249,7 +5252,8 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
-    {name:'v9.73 — Fix m/m delta w Global: zdjety za rygorystyczny guard', desc:'v9.72 ukrywal m/m delta dla wszystkich par miesiecy w trybie Global jesli ktorykolwiek nie mial SK_GLOBAL (a tylko Maj+Kwiecien miali) → wszystkie wpisy MEBLE pokazywaly "—". Teraz delta zawsze liczy sie z estymForView (= ta sama wartosc co kolumna Estymacja m-c w widoku) z fallback do d.sprzedaz. Skutek: delta widoczna dla wszystkich par. (11.05.2026)'},
+    {name:'v9.74 — Fix print/PDF Analityki konta: ukryty sidebar/topbar, tylko aktywny widok', desc:'Print CSS nie ukrywal nowego #mpSidebar/#mpTopbar (sidebar zajmowal ~63mm na A4) i body mial padding-left:240px → content byl wciśnięty na resztę i pusty. Plus ".view{display:block!important}" pokazywal wszystkie widoki — tylko aktywny ma content, reszta rozpychala strone. Naprawione: ukryty sidebar, body padding 0, tylko .view.active widoczna. (11.05.2026)'},
+    {name:'v9.73 — Fix m/m delta w Global: zdjety za rygorystyczny guard', desc:'v9.72 ukrywal m/m delta dla wszystkich par miesiecy w trybie Global jesli ktorykolwiek nie mial SK_GLOBAL. Teraz delta zawsze liczy sie z estymForView (= ta sama wartosc co kolumna Estymacja m-c w widoku). (11.05.2026)'},
     {name:'v9.72 — m/m delta respektuje toggle PL/Global w Arkuszu/Analityce', desc:'Kolumna m/m w Arkuszu i Analityce konta liczy delta z wartosci aktualnego widoku (PL lub Global), nie z raw d.sprzedaz. (11.05.2026)'},
     {name:'v9.71 — Globalne vs Polska only: split storage + toggle PL/Global', desc:'Forma "Rynki globalne" (multi-market PL+CZ+SK+HU) PRZESTAJE nadpisywac sprzedaz w Arkuszu/Wynikach. Dodano druga forme "MEBLE — Polska only (Centrum Finansow PL)" — to driver KPI canonical. Toggle PL/Global w Arkuszu, Wynikach, Analityce konta dla 3 kont MEBLE. Auto-migracja flaguje stare wpisy badge "M" jako legacy multi-market do korekty. SK_GLOBAL + SK_LOCAL syncuja sie do Firebase (multi-device). Naprawia mismatch: sprzedaz multi-market vs koszty Ads/wyroznienia PL-only. (11.05.2026)'},
     {name:'v9.70 — Analityka kont: mini tabela ROAS odwrocona (najnowszy m-c na gorze)', desc:'W zakladce Analityka kont mini tabela pod wykresem ROAS Trend pokazuje teraz biezacy miesiac na gorze a najstarszy na dole — spojnie z glowna tabela wpisow ktora juz ma ten porzadek. Wykres ROAS Trend pozostaje bez zmian (PAZ→MAJ od lewej do prawej). (11.05.2026)'},
@@ -23420,7 +23424,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.73</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.74</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
