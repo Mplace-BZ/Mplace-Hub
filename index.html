@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.70</title>
+<title>MPlace Hub v9.71</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.70</span>
+    <span class="brand-ver">v9.71</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2291,9 +2291,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   </div>
 </div>
 
-<!-- Hidden: MEBLE Global + Save bar moved into data-center via JS -->
+<!-- Hidden: MEBLE Global + Local forms (rendered then copied into data-center inline) -->
 <div style="display:none" id="entryGlobal"></div>
+<div style="display:none" id="entryLocal"></div>
 <span style="display:none" id="globalMsg"></span>
+<span style="display:none" id="localMsg"></span>
 <span style="display:none" id="saveMsg"></span>
 <input type="file" id="importFileInput" accept=".json" onchange="importJSON(event)" style="display:none">
 <button style="display:none" id="closingToggle"></button>
@@ -2775,6 +2777,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="ph-sub">Zestawienie miesięczne · 9 kont · wszystkie grupy</div>
   </div>
   <div class="entry-date-bar mb dateBarGlobal"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:.75rem;margin:0 0 .5rem">
+    <div id="arkuszViewModeNote" style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.05em"></div>
+    <div id="arkuszViewModeToggle"></div>
+  </div>
   <div class="tbl-wrap" style="overflow-x:auto;border-radius:10px">
     <table class="arkusz-tbl" id="arkuszTable">
       <tbody id="arkuszTbody"></tbody>
@@ -2927,6 +2933,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="ph-sub">Przychód · Zysk · Marża · Reklama · ROAS · ACOS · 9 kont</div>
   </div>
   <div class="entry-date-bar mb dateBarGlobal"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:.75rem;margin:0 0 .5rem">
+    <div id="wynikiViewModeNote" style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.05em"></div>
+    <div id="wynikiViewModeToggle"></div>
+  </div>
   <div class="tbl-wrap" style="overflow-x:auto;border-radius:10px">
     <table class="arkusz-tbl" id="wynikTable">
       <tbody id="wynikTbody"></tbody>
@@ -4816,6 +4826,95 @@ function calc(d, producent){
     zysk:netBase-totalAds};
 }
 
+// v9.71: calc dla view "Global" (multi-market) — używa SK_GLOBAL.sprzedaz + % z Centrum Finansów.
+// Koszty Ads/wyróżnień z entry PL (one są wpisywane tylko per PL panel Allegro Ads).
+function calcGlobal(entryPL, entryGlobal, producent){
+  if(!entryGlobal || !entryGlobal.sprzedaz) return null;
+  const rev = entryGlobal.sprzedaz || 0;
+  const commission = entryGlobal.prow || 0;
+  const dostawaPct = entryGlobal.dostawa || 0;
+  const reklamaPct = entryGlobal.reklama || 0;
+  const delivery = rev * dostawaPct / 100;
+  const myRev = rev * (1 - producent/100);
+  const commAmt = rev * commission / 100;
+  const netBase = myRev - commAmt - delivery;
+  const totalAds = rev * reklamaPct / 100;
+  const mBefore = rev>0 ? netBase/rev*100 : 0;
+  const mAfter = rev>0 ? (netBase - totalAds)/rev*100 : 0;
+  const acosTotal = reklamaPct;
+  const roasGlob = reklamaPct>0 ? 100/reklamaPct : null;
+  // Ads granularny tylko z PL entry (Allegro Ads ma osobne panele per rynek)
+  const adsC = entryPL ? (entryPL.adsCost||0) : 0;
+  const adsSales = entryPL ? (entryPL.wartoscAds||0) : 0;
+  const promoC = entryPL ? (entryPL.promoC||0) : 0;
+  const elasticC = entryPL ? (entryPL.elasticC||0) : 0;
+  const coinsC = entryPL ? (entryPL.coinsC||0) : 0;
+  const roasAds = adsC>0 ? adsSales/adsC : null;
+  const beAcos = rev>0 ? netBase/rev*100 : null;
+  const beRoasGlob = beAcos && beAcos>0 ? 1/(beAcos/100) : null;
+  const promoTot = promoC + elasticC + coinsC;
+  const mWyrPct = rev>0 ? (netBase - promoTot)/rev : 0;
+  const beRoasAds = mWyrPct>0 ? 1/mWyrPct : null;
+  const udzialAds = rev>0 ? adsSales/rev*100 : 0;
+  const acosAds = rev>0 ? adsC/rev*100 : null;
+  const acosPromo = rev>0 ? promoTot/rev*100 : null;
+  return {rev, delivery, commission, adsC, adsSales, promoC, elasticC, coinsC,
+    myRev, commAmt, netBase, promoTot, totalAds,
+    mBefore, mAfterPromo:mBefore, mAfter,
+    acosAds, acosPromo, acosTotal, beAcos,
+    roasAds, roasGlob, beRoasAds, beRoasGlob, udzialAds,
+    zysk: netBase - totalAds, isGlobal: true};
+}
+
+function getViewMode(){ return localStorage.getItem('mp_viewMode') || 'PL'; }
+function setViewMode(m){ localStorage.setItem('mp_viewMode', m); }
+function isGlobalAcc(k){ return ['MobelKap','PerfektCiecie','MeblenaCzasie'].includes(k); }
+
+// Wybiera między calc() (PL) a calcGlobal() (multi) w zależności od trybu i dostępności SK_GLOBAL.
+// Dla kont LUXSEN/ONE zawsze fallback do calc() (brak SK_GLOBAL).
+function calcForView(entry, prod, k){
+  if(getViewMode() === 'GLOBAL' && isGlobalAcc(k) && typeof getGlobalEntry === 'function'){
+    const ge = getGlobalEntry(k, entry.m);
+    if(ge && ge.sprzedaz){
+      const cg = calcGlobal(entry, ge, prod);
+      if(cg) return cg;
+    }
+  }
+  return calc(entry, prod);
+}
+function revForView(entry, k){
+  if(getViewMode() === 'GLOBAL' && isGlobalAcc(k) && typeof getGlobalEntry === 'function'){
+    const ge = getGlobalEntry(k, entry.m);
+    if(ge && ge.sprzedaz) return ge.sprzedaz;
+  }
+  return entry.sprzedaz || 0;
+}
+function estymForView(entry, k){
+  if(getViewMode() === 'GLOBAL' && isGlobalAcc(k) && typeof getGlobalEntry === 'function'){
+    const ge = getGlobalEntry(k, entry.m);
+    if(ge && ge.est) return ge.est;
+  }
+  return typeof estym === 'function' ? estym(entry) : (entry.sprzedaz || 0);
+}
+
+function toggleViewModeUI(targetMode, rerenderFns){
+  setViewMode(targetMode);
+  (rerenderFns||[]).forEach(fn => { try{ if(typeof fn==='function') fn(); else if(typeof window[fn]==='function') window[fn](); }catch(e){console.error('toggleViewMode',e);} });
+}
+
+function viewModeToggleHTML(rerenderFnsCSV){
+  const m = getViewMode();
+  const fns = rerenderFnsCSV || 'renderArkusz,renderWyniki';
+  const btnBase = 'font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border:none;cursor:pointer;background:transparent;transition:.15s';
+  const active = 'color:#0f1117;background:linear-gradient(180deg,#2dd4a0,#22b888);font-weight:600';
+  const activeG = 'color:#0f1117;background:linear-gradient(180deg,#ff6b35,#e25420);font-weight:600';
+  const inactive = 'color:var(--text3)';
+  return `<div style="display:inline-flex;border:1px solid var(--border2);border-radius:6px;overflow:hidden;background:var(--bg3)">
+    <button onclick="toggleViewModeUI('PL', '${fns}'.split(','))" style="${btnBase};${m==='PL'?active:inactive}">PL</button>
+    <button onclick="toggleViewModeUI('GLOBAL', '${fns}'.split(','))" style="${btnBase};${m==='GLOBAL'?activeG:inactive}">Global</button>
+  </div>`;
+}
+
 // ═══════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════
@@ -5020,6 +5119,16 @@ function renderArkusz(){
     {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160',accs:['Luxsen','Semmi','BOTAVIT']},
     {key:'ONE',  color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU','Ankado24']},
   ];
+  // v9.71: render toggle PL/Global + note above table
+  const tg = document.getElementById('arkuszViewModeToggle');
+  const note = document.getElementById('arkuszViewModeNote');
+  if(tg) tg.innerHTML = viewModeToggleHTML('renderArkusz');
+  if(note){
+    const m = getViewMode();
+    note.innerHTML = m==='GLOBAL'
+      ? '<span style="color:var(--g-meble)">●</span> Tryb GLOBAL — MEBLE: sprzedaż z Centrum Finansów (PL+CZ+SK+HU). LUXSEN/ONE: fallback PL (brak danych multi).'
+      : '<span style="color:#2dd4a0">●</span> Tryb PL — canonical, driver KPI. Wpisy oznaczone <strong style="color:var(--yellow)">M</strong> = legacy multi-market do korekty przez formularz "Polska only".';
+  }
   const bt=(g)=>`border-top:2px solid rgba(${g.rgb},.45)`;
   const mkHdr=(g)=>`
     <tr class="arkusz-group-hdr">
@@ -5049,41 +5158,41 @@ function renderArkusz(){
       const name=AC_META[k]?.name||k;
       // newest→oldest
       [...D].reverse().forEach((d,i)=>{
-        const C=calc(d,prod);
-        // dzien=1 → za mało danych do estymacji (dzień 1 miesiąca, effectiveDzien=0→1)
+        const C=calcForView(d,prod,k);
+        const sp=revForView(d,k);
         const earlyEntry=d.dzien===1;
-        const est=earlyEntry?d.sprzedaz:estym(d);
+        const est=earlyEntry?sp:estymForView(d,k);
         const origIdx=D.indexOf(d);
         const dv=earlyEntry?null:mmDelta(D,origIdx);
-        const sp=d.sprzedaz||0;
-        const dostawaPct=sp>0?(d.delivery||0)/sp*100:0;
+        const dostawaPct=sp>0?(C.delivery||0)/sp*100:0;
         const reklamaPct=C.acosTotal!=null?C.acosTotal:0;
-        const kosztPct=sp>0?((d.commission||0)+dostawaPct+reklamaPct):0;
-        const udzialAdsPct=sp>0?(d.wartoscAds||0)/sp*100:0;
-        // ROAS vs prev month direction
+        const kosztPct=sp>0?((C.commission||0)+dostawaPct+reklamaPct):0;
+        const udzialAdsPct=sp>0?(C.adsSales||0)/sp*100:0;
         const prevD=i>0?D[i-1]:null;
         const prevRoas=prevD?prevD.roas||0:null;
         const roasVal=d.roas||0;
         const roasColor=prevRoas===null?'var(--text)':(roasVal>=prevRoas?'var(--green)':'var(--red)');
-        // Reklama vs prev
-        const prevRek=prevD&&sp>0?(()=>{const pC=calc(prevD,prod);return pC.acosTotal||0;})():null;
+        const prevRek=prevD&&sp>0?(()=>{const pC=calcForView(prevD,prod,k);return pC.acosTotal||0;})():null;
         const rekColor=prevRek===null?'var(--text)':(reklamaPct<=prevRek?'var(--green)':'var(--red)');
         const dvColor=dv===null?'var(--text3)':(dv>=0?'var(--green)':'var(--red)');
         const ssHtml=d.ss==='T'?`<span class="tbadge tbadge-on">T</span>`:d.ss==='N'?`<span class="tbadge tbadge-off">N</span>`:`<span class="tm">—</span>`;
         const kontoCell=i===0?`<td rowspan="${D.length}" class="arkusz-konto" style="border-left:3px solid ${g.color};color:${g.color}">${name}</td>`:'';
-        // Estymacja: pokaż tylko gdy jest sensowna (nie dzien=1 i różna od sprzedazy)
         const showEst=!earlyEntry&&d.dzien&&est!==sp;
+        // Legacy multi badge (only in PL mode for MEBLE accounts)
+        const legacyBadge = (getViewMode()==='PL' && d._legacyMulti)
+          ? ` <span title="Sprzedaz pochodzi z formy Globalne (multi-market) — popraw przez formularz Polska only" style="display:inline-block;padding:1px 5px;border:1px solid rgba(245,166,35,.5);border-radius:3px;font-size:9px;color:var(--yellow);font-family:var(--mono);margin-left:3px;cursor:help">M</span>`
+          : '';
         html+=`<tr${earlyEntry?' style="opacity:.55"':''}>
           <td>${d.m[0].toUpperCase()+d.m.slice(1)}</td>
           ${kontoCell}
-          <td>${sp&&d.adsCost?pln(d.adsCost):'—'}</td>
+          <td>${sp&&C.adsC?pln(C.adsC):'—'}</td>
           <td style="color:${roasColor}">${roasVal?xf(roasVal):'—'}</td>
-          <td>${d.wartoscAds?pln(d.wartoscAds):'—'}</td>
+          <td>${C.adsSales?pln(C.adsSales):'—'}</td>
           <td style="text-align:center">${ssHtml}</td>
           <td style="color:var(--text3)">${d.qlt??'—'}</td>
-          <td style="color:var(--green)">${pln(sp)}</td>
+          <td style="color:var(--green)">${pln(sp)}${legacyBadge}</td>
           <td style="color:var(--text2)">${sp?kosztPct.toFixed(2)+'%':'—'}</td>
-          <td style="color:var(--text3)">${pct(d.commission||0)}</td>
+          <td style="color:var(--text3)">${pct(C.commission||0)}</td>
           <td style="color:var(--text3)">${dostawaPct.toFixed(2)}%</td>
           <td style="color:${rekColor}">${reklamaPct.toFixed(2)}%</td>
           <td style="color:var(--text3)">${udzialAdsPct.toFixed(2)}%</td>
@@ -5128,6 +5237,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.71 — Globalne vs Polska only: split storage + toggle PL/Global', desc:'Forma "Rynki globalne" (multi-market PL+CZ+SK+HU) PRZESTAJE nadpisywac sprzedaz w Arkuszu/Wynikach. Dodano druga forme "MEBLE — Polska only (Centrum Finansow PL)" — to driver KPI canonical. Toggle PL/Global w Arkuszu, Wynikach, Analityce konta dla 3 kont MEBLE. Auto-migracja flaguje stare wpisy badge "M" jako legacy multi-market do korekty. SK_GLOBAL + SK_LOCAL syncuja sie do Firebase (multi-device). Naprawia mismatch: sprzedaz multi-market vs koszty Ads/wyroznienia PL-only. (11.05.2026)'},
     {name:'v9.70 — Analityka kont: mini tabela ROAS odwrocona (najnowszy m-c na gorze)', desc:'W zakladce Analityka kont mini tabela pod wykresem ROAS Trend pokazuje teraz biezacy miesiac na gorze a najstarszy na dole — spojnie z glowna tabela wpisow ktora juz ma ten porzadek. Wykres ROAS Trend pozostaje bez zmian (PAZ→MAJ od lewej do prawej). (11.05.2026)'},
     {name:'v9.69 — Trend/Sheets: fix apples-to-oranges delty Σ grup', desc:'Σ MEBLE/LUXSEN/ONE pokazywaly artefakty (▲942% gdy Listopad mial 1 konto a Grudzien 3). Teraz delta liczona tylko gdy ten sam zestaw kont ma dane w obu miesiacach — inaczej delta ukryta (jak na wierszach indywidualnych). Audyt potwierdzil ze calc() / estym() / sumy sa poprawne. (05.05.2026)'},
     {name:'v9.68 — Zapisz Globalne synchronizuje D2D + widoczny toast', desc:'Klik "Zapisz Globalne" merguje sprzedaz/dzien do per-month entries, snapshotuje do D2D i syncuje do Firebase. Modal potwierdzenia (jak Zapisz wszystkie wpisy) zamiast niewidocznego komunikatu. Naprawia rozbieznosc miedzy form Globalnym a tabela D2D dla MEBLE. (05.05.2026)'},
@@ -5409,6 +5519,16 @@ function renderWyniki(){
     {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160', accs:['Luxsen','Semmi','BOTAVIT']},
     {key:'ONE',   color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU','Ankado24']},
   ];
+  // v9.71: render toggle + note
+  const tg = document.getElementById('wynikiViewModeToggle');
+  const note = document.getElementById('wynikiViewModeNote');
+  if(tg) tg.innerHTML = viewModeToggleHTML('renderWyniki');
+  if(note){
+    const m = getViewMode();
+    note.innerHTML = m==='GLOBAL'
+      ? '<span style="color:var(--g-meble)">●</span> Tryb GLOBAL — MEBLE: KPI z Centrum Finansów (multi-market %). Budżet Ads / Wyróżnienia z PL panelu Allegro Ads. LUXSEN/ONE: fallback PL.'
+      : '<span style="color:#2dd4a0">●</span> Tryb PL — canonical. Wpisy z badge <strong style="color:var(--yellow)">M</strong> = legacy multi-market (popraw przez "Polska only" w Data).';
+  }
   const NC=13; // total columns
   const bt=(g)=>`border-top:2px solid rgba(${g.rgb},.45)`;
   const mkHdr=(g)=>`
@@ -5443,29 +5563,31 @@ function renderWyniki(){
       const prod=getProd(k);
       const name=AC_META[k]?.name||k;
       [...D].reverse().forEach((d,i)=>{
-        const C=calc(d,prod);
-        const est=estym(d);
-        const sp=d.sprzedaz||0;
+        const C=calcForView(d,prod,k);
+        const sp=revForView(d,k);
+        const est=estymForView(d,k);
         const isEst=d.dzien&&est!==sp;
         // Colors
         const mColor=clr(C.mAfter,10,5);
         const zykColor=C.zysk>=0?'var(--green)':'var(--red)';
         const roasColor=C.roasAds&&C.beRoasAds?(C.roasAds>=C.beRoasAds?'var(--green)':C.roasAds>=C.beRoasAds*.85?'var(--yellow)':'var(--red)'):'var(--text)';
-        const acosColor=C.acosTotal!=null?clr(100-C.acosTotal,80,70):'var(--text3)'; // lower acos = better
+        const acosColor=C.acosTotal!=null?clr(100-C.acosTotal,80,70):'var(--text3)';
         const roasGColor=C.roasGlob>=5?'var(--green)':C.roasGlob>=3?'var(--yellow)':'var(--red)';
         const estColor=isEst?'var(--yellow)':'var(--text)';
-        // Platform costs %
-        const platfPct=sp>0?(((d.commission||0)+(d.delivery||0)/sp*100)):0;
+        const platfPct=sp>0?(((C.commission||0)+(C.delivery||0)/sp*100)):0;
         const kontoCell=i===0?`<td rowspan="${D.filter(e=>e.dzien!==1).length}" class="arkusz-konto" style="border-left:3px solid ${g.color};color:${g.color}">${name}</td>`:'';
+        const legacyBadge = (getViewMode()==='PL' && d._legacyMulti)
+          ? ` <span title="Sprzedaz pochodzi z formy Globalne (multi-market) — popraw przez Polska only" style="display:inline-block;padding:1px 5px;border:1px solid rgba(245,166,35,.5);border-radius:3px;font-size:9px;color:var(--yellow);font-family:var(--mono);margin-left:3px;cursor:help">M</span>`
+          : '';
         html+=`<tr>
           <td>${d.m[0].toUpperCase()+d.m.slice(1)}</td>
           ${kontoCell}
-          <td style="color:var(--green)">${pln(sp)}</td>
+          <td style="color:var(--green)">${pln(sp)}${legacyBadge}</td>
           <td style="color:${zykColor}">${pln(C.zysk)}</td>
           <td style="color:${mColor};font-weight:500">${pct(C.mAfter)}</td>
           <td style="color:var(--text3)">${platfPct.toFixed(2)}%</td>
-          <td style="color:var(--text2)">${d.adsCost?pln(d.adsCost):'—'}</td>
-          <td style="color:var(--text3)">${d.promoC?pln(d.promoC):'—'}</td>
+          <td style="color:var(--text2)">${C.adsC?pln(C.adsC):'—'}</td>
+          <td style="color:var(--text3)">${C.promoC?pln(C.promoC):'—'}</td>
           <td style="color:var(--text2)">${sp>0?pln(C.totalAds):'—'}</td>
           <td style="color:${acosColor}">${C.acosTotal!=null?C.acosTotal.toFixed(2)+'%':'—'}</td>
           <td style="color:${roasColor};font-weight:500">${C.roasAds!=null?xf(C.roasAds):'—'}</td>
@@ -6454,10 +6576,21 @@ function renderDataCenter(k){
       </div>
     </div>
 
-    <!-- MEBLE GLOBAL (inline) -->
-    <div id="dataGlobalWrap" style="border:1px solid rgba(255,107,53,.22);border-radius:10px;padding:.85rem 1rem;margin-top:1.5rem;background:rgba(255,107,53,.03)">
-      <div class="entry-group-hdr egh-m" style="margin-top:0">MEBLE — Rynki globalne (Centrum Finansow)</div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.75rem;letter-spacing:.05em">Wpisz dane per konto z zakladki Centrum Finansow → Podsumowanie oplat (wszystkie rynki lacznie)</div>
+    <!-- MEBLE POLSKA ONLY (canonical PL — driver KPI w Arkuszu/Wynikach) -->
+    <div id="dataLocalWrap" style="border:1px solid rgba(45,212,160,.28);border-radius:10px;padding:.85rem 1rem;margin-top:1.5rem;background:rgba(45,212,160,.03)">
+      <div class="entry-group-hdr" style="margin-top:0;color:#2dd4a0;border-bottom-color:rgba(45,212,160,.22)">MEBLE — Polska only (Centrum Finansow PL)</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.75rem;letter-spacing:.05em">Centrum Finansow → przelacz na <strong style="color:#2dd4a0">Polska</strong> → Podsumowanie oplat (tylko PL). <strong style="color:var(--accent)">→ to driver KPI w Arkuszu i Wynikach</strong></div>
+      <div id="entryLocalInline"></div>
+      <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem">
+        <button class="btn" onclick="saveLocal()" style="color:#2dd4a0;border-color:rgba(45,212,160,.3)">▸ Zapisz Polska only</button>
+        <span class="smsg" id="localMsgInline"></span>
+      </div>
+    </div>
+
+    <!-- MEBLE GLOBAL (multi-market sidecar) -->
+    <div id="dataGlobalWrap" style="border:1px solid rgba(255,107,53,.22);border-radius:10px;padding:.85rem 1rem;margin-top:1rem;background:rgba(255,107,53,.03)">
+      <div class="entry-group-hdr egh-m" style="margin-top:0">MEBLE — Rynki globalne (wszystkie rynki PL+CZ+SK+HU)</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.75rem;letter-spacing:.05em">Centrum Finansow → Podsumowanie oplat <strong style="color:var(--g-meble)">wszystkie rynki lacznie</strong>. <strong style="color:var(--text2)">→ tylko widok Global w Arkuszu/Wynikach (toggle)</strong></div>
       <div id="entryGlobalInline"></div>
       <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem">
         <button class="btn" onclick="saveGlobal()" style="color:var(--g-meble);border-color:rgba(255,107,53,.3)">▸ Zapisz globalne</button>
@@ -6481,13 +6614,18 @@ function renderDataCenter(k){
   updateAuto(k);
   // Load notes
   if(typeof renderNoteLog==='function') renderNoteLog(k);
-  // Render global entry form into inline container
+  // Render Polska only + Global entry forms into inline containers
+  if(typeof renderLocalEntryForm==='function'){
+    renderLocalEntryForm();
+    const lOrig = document.getElementById('entryLocal');
+    const lInline = document.getElementById('entryLocalInline');
+    if(lOrig && lInline) lInline.innerHTML = lOrig.innerHTML || '';
+  }
   if(typeof renderGlobalEntryForm==='function'){
     const origEl = document.getElementById('entryGlobal');
     const inlineEl = document.getElementById('entryGlobalInline');
     if(origEl && inlineEl) inlineEl.innerHTML = origEl.innerHTML || '';
     renderGlobalEntryForm();
-    // Copy rendered content
     setTimeout(()=>{ if(origEl&&inlineEl&&origEl.innerHTML) inlineEl.innerHTML=origEl.innerHTML; },50);
   }
 }
@@ -6943,7 +7081,7 @@ function renderAccount(k){
   const g=GROUPS[meta.group];
   const last=D[D.length-1];
   const prev=D.length>1?D[D.length-2]:null;
-  const C=calc(last,prod);
+  const C=calcForView(last,prod,k);
 
   // Header
   document.getElementById('acEyebrow').textContent='▸ '+meta.group+' · Analityka konta';
@@ -6958,7 +7096,15 @@ function renderAccount(k){
       Marża brutto: <strong style="color:var(--green)">${pct(100-prod)}</strong>
     </span>
     <button class="btn" onclick="promptChangeProd('${k}')" style="font-size:10px;padding:4px 10px">⚙ Zmień producenta %</button>
-    <button class="btn" onclick="printReport('${k}')" style="font-size:10px;padding:4px 10px;color:var(--accent);border-color:rgba(255,107,53,.3)">⬇ PDF / Drukuj</button>`;
+    <button class="btn" onclick="printReport('${k}')" style="font-size:10px;padding:4px 10px;color:var(--accent);border-color:rgba(255,107,53,.3)">⬇ PDF / Drukuj</button>
+    ${isGlobalAcc(k)?(()=>{const m=getViewMode();const bb='font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border:none;cursor:pointer;background:transparent';const a='color:#0f1117;background:linear-gradient(180deg,#2dd4a0,#22b888);font-weight:600';const aG='color:#0f1117;background:linear-gradient(180deg,#ff6b35,#e25420);font-weight:600';const ina='color:var(--text3)';return `<span style="display:inline-flex;border:1px solid var(--border2);border-radius:6px;overflow:hidden;background:var(--bg3);margin-left:.3rem"><button onclick="setViewMode('PL');renderAccount('${k}')" style="${bb};${m==='PL'?a:ina}">PL</button><button onclick="setViewMode('GLOBAL');renderAccount('${k}')" style="${bb};${m==='GLOBAL'?aG:ina}">Global</button></span>`;})():''}`;
+  // v9.71: warning banner gdy wpisy maja _legacyMulti w trybie PL
+  const legacyCount = D.filter(d=>d._legacyMulti).length;
+  if(getViewMode()==='PL' && legacyCount>0 && isGlobalAcc(k)){
+    const acSBody = document.getElementById('acSBody');
+    const acSubEl = document.getElementById('acSub');
+    if(acSubEl) acSubEl.innerHTML = D.length+' miesięcy historii · producent '+prod+'% · <span style="color:var(--yellow);font-family:var(--mono);font-size:11px">⚠ '+legacyCount+' wpis(ów) z multi-market sprzedażą — popraw przez Polska only</span>';
+  }
 
   // Alerts
   const alerts=[];
@@ -6973,14 +7119,14 @@ function renderAccount(k){
   if(C.acosTotal&&C.acosTotal>25) alerts.push({c:'a-yellow',i:'📊',t:`<strong>ACOS łączny ${pct(C.acosTotal)}</strong> — łączne koszty reklamy to ${pct(C.acosTotal)} obrotu.`});
 
   if(prev){
-    const prevC=calc(prev,prod);
+    const prevC=calcForView(prev,prod,k);
     const dvSp=mmDelta(D,D.length-1);
-    if(dvSp&&dvSp<-15) alerts.push({c:'a-red',i:'📉',t:`<strong>Sprzedaż −${Math.abs(dvSp).toFixed(1)}% m/m</strong> · ${pln(prev.sprzedaz)} → ${pln(last.sprzedaz)}`});
+    if(dvSp&&dvSp<-15) alerts.push({c:'a-red',i:'📉',t:`<strong>Sprzedaż −${Math.abs(dvSp).toFixed(1)}% m/m</strong> · ${pln(revForView(prev,k))} → ${pln(revForView(last,k))}`});
     if(C.mAfter<prevC.mAfter-3) alerts.push({c:'a-yellow',i:'📉',t:`<strong>Marża po reklamie spadła</strong> o ${(prevC.mAfter-C.mAfter).toFixed(1)} pp m/m (${pct(prevC.mAfter)} → ${pct(C.mAfter)})`});
   }
   if(D.length>=3){
     const t3=D.slice(-3);
-    const r3=t3.map(d=>calc(d,prod).roasAds).filter(Boolean);
+    const r3=t3.map(d=>calcForView(d,prod,k).roasAds).filter(Boolean);
     if(r3.length===3&&r3[2]<r3[1]&&r3[1]<r3[0]) alerts.push({c:'a-red',i:'📉',t:`<strong>ROAS Ads spada 3 miesiące z rzędu:</strong> ${xf(r3[0])} → ${xf(r3[1])} → ${xf(r3[2])}`});
   }
   document.getElementById('acAlerts').innerHTML=alerts.map(a=>`<div class="alert-item ${a.c}"><span>${a.i}</span><span class="alert-text">${a.t}</span></div>`).join('');
@@ -6989,11 +7135,11 @@ function renderAccount(k){
   const dv=mmDelta(D,D.length-1);
   const dH=(dv,inv=false)=>{if(dv===null)return`<div class="mdelta neu">—</div>`;const g=inv?dv<=0:dv>=0;return`<div class="mdelta ${g?'up':'dn'}">${dv>=0?'▲':'▼'} ${Math.abs(dv).toFixed(1)}% m/m</div>`;};
   const kpis=[
-    {l:'ROAS Ads',v:xf(C.roasAds),raw:C.roasAds!=null?+C.roasAds.toFixed(2):null,vc:C.roasAds>=6?'green':C.roasAds>=4?'yellow':'red',cc:C.roasAds>=6?'c-green':C.roasAds>=4?'c-yellow':'c-red',s:'kampania Ads',d:dH(prev?((C.roasAds-(calc(prev,prod).roasAds||0))/(calc(prev,prod).roasAds||1)*100):null)},
+    {l:'ROAS Ads',v:xf(C.roasAds),raw:C.roasAds!=null?+C.roasAds.toFixed(2):null,vc:C.roasAds>=6?'green':C.roasAds>=4?'yellow':'red',cc:C.roasAds>=6?'c-green':C.roasAds>=4?'c-yellow':'c-red',s:'kampania Ads',d:dH(prev?((C.roasAds-(calcForView(prev,prod,k).roasAds||0))/(calcForView(prev,prod,k).roasAds||1)*100):null)},
     {l:'ROAS Globalny',v:xf(C.roasGlob),raw:C.roasGlob!=null?+C.roasGlob.toFixed(2):null,vc:C.roasGlob>=4?'green':C.roasGlob>=2.5?'yellow':'red',cc:C.roasGlob>=4?'c-green':C.roasGlob>=2.5?'c-yellow':'c-red',s:'cały budżet reklamy',d:`<div class="mdelta ${C.roasGlob>=C.beRoasGlob?'up':'dn'}">break-even ${xf(C.beRoasGlob)}</div>`},
     {l:'ACOS łączny',v:C.acosTotal!=null?pct(C.acosTotal):'—',raw:C.acosTotal!=null?+C.acosTotal.toFixed(2):null,vc:C.acosTotal<15?'green':C.acosTotal<25?'yellow':'red',cc:C.acosTotal<15?'c-green':C.acosTotal<25?'c-yellow':'c-red',s:'cały koszt reklamy / obrót',d:`<div class="mdelta ${C.acosTotal<20?'up':'dn'}">${C.acosTotal<20?'ok':'powyżej 20%'}</div>`},
     {l:'Marża po reklamie',v:pct(C.mAfter),raw:+C.mAfter.toFixed(2),vc:C.mAfter>=10?'green':C.mAfter>=5?'yellow':'red',cc:C.mAfter>=10?'c-green':C.mAfter>=5?'c-yellow':'c-red',s:`po wszystkich kosztach`,d:`<div class="mdelta ${C.mAfter>=10?'up':C.mAfter>=5?'neu':'dn'}">${C.mAfter>=10?'dobra':C.mAfter>=5?'do optymalizacji':'niebezpieczna'}</div>`},
-    {l:'Sprzedaż',v:pln(last.sprzedaz),raw:Math.round(last.sprzedaz),vc:'',cc:'',s:last.dzien?`dzień ${last.dzien}/${DAYS_IN[last.m]||30} · est.za ${effectiveDzien(last.dzien)}`:'pełny mies.',d:dH(dv)},
+    {l:'Sprzedaż',v:pln(revForView(last,k)),raw:Math.round(revForView(last,k)),vc:'',cc:'',s:last.dzien?`dzień ${last.dzien}/${DAYS_IN[last.m]||30} · est.za ${effectiveDzien(last.dzien)}`:'pełny mies.',d:dH(dv)},
   ];
   document.getElementById('acKPI').innerHTML=kpis.map(ki=>`<div class="metric ${ki.cc}"><div class="ml">${ki.l}</div><div class="mv ${ki.vc} cp-wrap">${ki.v}${ki.raw!=null?`<button class="cp-btn" onclick="cpCopy(this,${ki.raw})">⧉</button>`:''}</div><div class="ms">${ki.s}</div>${ki.d}</div>`).join('');
 
@@ -7006,11 +7152,11 @@ function renderAccount(k){
   else document.getElementById('acSBody').textContent=`ROAS Ads ${xf(C.roasAds)} (BE: ${xf(C.beRoasAds)}) · ROAS Glob ${xf(C.roasGlob)} · ACOS ${C.acosTotal!=null?pct(C.acosTotal):'—'} · Marża ${pct(C.mAfter)}`;
 
   // Estymacja
-  const est=estym(last);
+  const est=estymForView(last,k);
   document.getElementById('acEstVal').textContent=pln(est);
   const ed=last.dzien?effectiveDzien(last.dzien):null;
   document.getElementById('acEstSub').textContent=ed?`prognoza za dzień ${ed}/${DAYS_IN[last.m]||30} (wpis: ${last.dzien})`:'dane za pełny miesiąc';
-  document.getElementById('acEstProg').textContent=ed?`tempo: ${pln(Math.round(last.sprzedaz/ed))}/dzień`:'';
+  document.getElementById('acEstProg').textContent=ed?`tempo: ${pln(Math.round(revForView(last,k)/ed))}/dzień`:'';
 
   // Full breakdown table
   document.getElementById('acBkTbl').innerHTML=`
@@ -7108,7 +7254,7 @@ function renderAccount(k){
   // Reverse for display: newest first
   const Drev=[...D].reverse();
   document.getElementById('acTblBody').innerHTML=Drev.map((d,i)=>{
-    const c=calc(d,prod),est=estym(d);
+    const c=calcForView(d,prod,k),est=estymForView(d,k),sp=revForView(d,k);
     const origIdx=D.indexOf(d);
     const dv=mmDelta(D,origIdx);
     const dvH=dv===null?`<span class="tm">—</span>`:`<span class="${dv>=0?'tg':'tr'}">${dv>=0?'▲':'▼'} ${Math.abs(dv).toFixed(1)}%</span>`;
@@ -7119,13 +7265,13 @@ function renderAccount(k){
     return`<tr>
       <td class="tc" style="font-weight:500">${d.m[0].toUpperCase()+d.m.slice(1)}</td>
       <td>${ss}</td><td class="tm">${d.qlt??'—'}</td><td>${noteHtml}</td>
-      <td class="tg">${pln(d.sprzedaz)}</td>
+      <td class="tg">${pln(sp)}${(getViewMode()==='PL' && d._legacyMulti) ? ` <span title="legacy multi-market — popraw przez Polska only" style="display:inline-block;padding:0 4px;border:1px solid rgba(245,166,35,.5);border-radius:3px;font-size:9px;color:var(--yellow);font-family:var(--mono);cursor:help">M</span>` : ''}</td>
       <td class="ty">${pln(est)}${d.dzien?'<span class="tm" style="font-size:10px"> e</span>':''}</td>
-      <td class="tm">${pct(d.commission||0)}</td>
-      <td class="tm">${pln(d.delivery||0)}</td>
-      <td class="ta">${pln(d.adsCost||0)}</td>
-      <td class="tb">${d.promoC?pln(d.promoC):'—'}</td>
-      <td class="tm">${d.coinsC?pln(d.coinsC):'—'}</td>
+      <td class="tm">${pct(c.commission||0)}</td>
+      <td class="tm">${pln(c.delivery||0)}</td>
+      <td class="ta">${pln(c.adsC||0)}</td>
+      <td class="tb">${c.promoC?pln(c.promoC):'—'}</td>
+      <td class="tm">${c.coinsC?pln(c.coinsC):'—'}</td>
       <td class="${c.roasAds>=6?'tg':c.roasAds>=4?'ty':'tr'}">${xf(c.roasAds)}</td>
       <td class="${c.roasGlob>=4?'tg':c.roasGlob>=2.5?'ty':'tr'}">${xf(c.roasGlob)}</td>
       <td class="${c.acosTotal<15?'tg':c.acosTotal<25?'ty':'tr'}">${c.acosTotal!=null?pct(c.acosTotal):'—'}</td>
@@ -7146,11 +7292,11 @@ function renderAcCharts(k,D,prod){
   acCharts.acChartSp=new Chart(document.getElementById('acChartSp'),{
     plugins:dlP,
     data:{labels:lb,datasets:[
-      {type:'bar',label:'Sprzedaż',data:D.map(d=>d.sprzedaz),backgroundColor:'rgba(45,212,160,.14)',borderColor:'#2dd4a0',borderWidth:1.5,borderRadius:2,order:2,
+      {type:'bar',label:'Sprzedaż',data:D.map(d=>revForView(d,k)),backgroundColor:'rgba(45,212,160,.14)',borderColor:'#2dd4a0',borderWidth:1.5,borderRadius:2,order:2,
         datalabels:{anchor:'end',align:'top',color:'#f5a623',font:{size:10,weight:'500'},formatter:(v,ctx)=>{
             const idx=ctx.dataIndex;
             if(idx===D.length-1&&D[idx].dzien){
-              const est=estym(D[idx]);
+              const est=estymForView(D[idx],k);
               return [plnK(v), '→ est: '+plnK(est)];
             }
             return plnK(v);
@@ -7161,13 +7307,13 @@ function renderAcCharts(k,D,prod){
             if(idx===D.length-1&&D[idx].dzien) return {size:10,weight:'500',family:"'DM Mono',monospace"};
             return {size:10,weight:'500',family:"'DM Mono',monospace"};
           }}},
-      {type:'line',label:'Estymacja',data:D.map(estym),borderColor:'#f5a623',borderWidth:1.5,borderDash:[4,3],pointBackgroundColor:'#f5a623',pointRadius:3,tension:.3,fill:false,order:1,datalabels:{display:false}},
+      {type:'line',label:'Estymacja',data:D.map(d=>estymForView(d,k)),borderColor:'#f5a623',borderWidth:1.5,borderDash:[4,3],pointBackgroundColor:'#f5a623',pointRadius:3,tension:.3,fill:false,order:1,datalabels:{display:false}},
     ]},
     options:{responsive:true,layout:{padding:{top:22}},plugins:{datalabels:dlP.length?{}:undefined,legend:{labels:{color:'#8b91a8',boxWidth:9,padding:12}},tooltip:{...tO}},scales:{x:{grid:gO,ticks:{color:'#4a5068'}},y:{grid:gO,ticks:{color:'#4a5068',callback:v=>(v/1000).toFixed(0)+'k'}}}}
   });
 
-  const roasData=D.map(d=>calc(d,prod).roasAds);
-  const roasGlobData=D.map(d=>calc(d,prod).roasGlob);
+  const roasData=D.map(d=>calcForView(d,prod,k).roasAds);
+  const roasGlobData=D.map(d=>calcForView(d,prod,k).roasGlob);
   acCharts.acChartR=new Chart(document.getElementById('acChartR'),{
     data:{labels:lb,datasets:[
       {type:'line',label:'ROAS Ads',data:roasData,borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,.07)',borderWidth:2,pointBackgroundColor:roasData.map(v=>v>=6?'#2dd4a0':v>=4?'#f5a623':'#ff4d6a'),pointRadius:4,tension:.3,fill:false,yAxisID:'y'},
@@ -7180,9 +7326,10 @@ function renderAcCharts(k,D,prod){
   document.getElementById('acRoasTable').innerHTML=`<table style="width:100%;border-collapse:collapse;border-top:1px solid rgba(255,255,255,.06)">
     <thead><tr>${['Mies.','ROAS Ads','ROAS Glob','ACOS','Marża'].map((h,i)=>`<th style="padding:4px 8px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);text-align:center;font-weight:400">${h}</th>`).join('')}</tr></thead>
     <tbody>${[...D].reverse().map(d=>{
-      const c=calc(d,prod);
+      const c=calcForView(d,prod,k);
+      const legacy = (getViewMode()==='PL' && d._legacyMulti) ? ` <span title="legacy multi" style="display:inline-block;padding:0 3px;border:1px solid rgba(245,166,35,.5);border-radius:2px;font-size:8px;color:var(--yellow);cursor:help">M</span>` : '';
       return`<tr style="border-top:1px solid rgba(255,255,255,.03)">
-        <td style="padding:4px 8px;font-size:10px;color:var(--text3);text-align:center">${d.m.substring(0,3).toUpperCase()}</td>
+        <td style="padding:4px 8px;font-size:10px;color:var(--text3);text-align:center">${d.m.substring(0,3).toUpperCase()}${legacy}</td>
         <td style="padding:4px 8px;font-family:var(--mono);font-size:10px;text-align:center;color:${c.roasAds>=6?'var(--green)':c.roasAds>=4?'var(--yellow)':'var(--red)'}">${xf(c.roasAds)}</td>
         <td style="padding:4px 8px;font-family:var(--mono);font-size:10px;text-align:center;color:var(--blue)">${xf(c.roasGlob)}</td>
         <td style="padding:4px 8px;font-family:var(--mono);font-size:10px;text-align:center;color:${c.acosTotal<15?'var(--green)':c.acosTotal<25?'var(--yellow)':'var(--red)'}">${c.acosTotal!=null?pct(c.acosTotal):'—'}</td>
@@ -7485,6 +7632,45 @@ async function saveProdsToFS(){
   } catch(e){ console.error('saveProdsToFS', e); }
 }
 
+// ── Save/Load SK_GLOBAL (MEBLE Rynki Globalne multi-market) to/from Firestore ──
+async function saveGlobalToFS(){
+  if(!currentUser) return false;
+  try{
+    await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc('mebleGlobal')
+      .set({ data: (typeof getGlobalData==='function'?getGlobalData():{}), updatedAt: Date.now() });
+    return true;
+  } catch(e){ console.error('saveGlobalToFS', e); return false; }
+}
+
+async function loadGlobalFromFS(){
+  if(!currentUser || typeof setGlobalData!=='function') return;
+  try{
+    const snap = await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc('mebleGlobal').get();
+    const localData = (typeof getGlobalData==='function'?getGlobalData():{});
+    if(!snap.exists || !snap.data().data){
+      if(Object.keys(localData).length){ await saveGlobalToFS(); console.log('[sync] mebleGlobal: initial sync → Firebase ('+Object.keys(localData).length+')'); }
+      return;
+    }
+    const fsData = snap.data().data || {};
+    const fsTime = snap.data().updatedAt || 0;
+    const localTime = Object.values(localData).reduce((m,e) => Math.max(m, e.savedAt||0), 0);
+    if(fsTime >= localTime || !Object.keys(localData).length){
+      const merged = { ...localData };
+      Object.entries(fsData).forEach(([key,entry]) => {
+        const existing = merged[key];
+        if(!existing || (entry.savedAt||0) > (existing.savedAt||0)) merged[key] = entry;
+      });
+      setGlobalData(merged);
+      console.log('[sync] mebleGlobal: loaded '+Object.keys(merged).length+' entries from Firebase');
+    } else {
+      await saveGlobalToFS();
+      console.log('[sync] mebleGlobal: pushed newer local → Firebase');
+    }
+  } catch(e){ console.error('loadGlobalFromFS', e); }
+}
+
 // ── Load all data from Firestore → localStorage ──
 async function loadFromFS(){
   if(!currentUser) return;
@@ -7522,10 +7708,12 @@ async function loadFromFS(){
         localStorage.setItem(SK_PROD + k, v);
       });
     }
-    // Load synced modules: wiedza, notelog, podcasts
+    // Load synced modules: wiedza, notelog, podcasts, MEBLE global+local
     await loadWiedzaFromFS();
     await loadNotelogFromFS();
     await loadPodcastsMetaFromFS();
+    await loadGlobalFromFS();
+    await loadLocalFromFS();
     // Load all other synced localStorage keys
     await _syncPullAll();
     await _syncCatalogs();
@@ -7916,6 +8104,46 @@ async function saveAllWithSync(){
 let _fsLoaded = false; // Load from Firebase only once per session
 
 // Usuwa wpisy z dzien=1 z localStorage I Firebase — artefakty zapisu w dniu 1 miesiąca
+// v9.71: Auto-detect legacy multi-market entries — getData entries MEBLE gdzie sprzedaz === SK_GLOBAL.sprzedaz
+// Stary saveGlobal() (do v9.70) mergował multi-market sprzedaz do getData → te wpisy są zafałszowane.
+// Flagujemy je `_legacyMulti:true` żeby widoki pokazywały badge "M" do korekty przez formularz Polska only.
+async function migrateLegacyMulti(){
+  if(typeof getGlobalData !== 'function') return;
+  const globalData = getGlobalData();
+  if(!Object.keys(globalData).length) return;
+  let flagged = 0;
+  const MEBLE = ['MobelKap','PerfektCiecie','MeblenaCzasie'];
+  const promises = [];
+  MEBLE.forEach(k => {
+    const D = getData(k);
+    let changed = false;
+    D.forEach(entry => {
+      if(!entry.m || entry._legacyMulti) return;
+      const ge = globalData[k+'_'+entry.m];
+      if(!ge || !ge.sprzedaz) return;
+      // Match within 0.5 zł tolerance (rounding from old saves)
+      if(Math.abs((entry.sprzedaz||0) - ge.sprzedaz) < 0.5){
+        entry._legacyMulti = true;
+        changed = true;
+        flagged++;
+      }
+    });
+    if(changed){
+      setData(k, D);
+      if(currentUser && typeof db !== 'undefined'){
+        promises.push(
+          db.collection('users').doc(currentUser.uid)
+            .collection('accounts').doc(k)
+            .set({rows:D, updatedAt:Date.now()}, {merge:true})
+            .catch(e=>console.warn('[migrate] FS sync err',k,e))
+        );
+      }
+    }
+  });
+  if(promises.length) await Promise.all(promises);
+  if(flagged > 0) console.log(`[migrate] Wykryto ${flagged} wpis(ów) MEBLE z multi-market sprzedazą — flaga _legacyMulti dodana`);
+}
+
 async function cleanupDzien1(){
   let removed=0;
   const promises=[];
@@ -7975,6 +8203,7 @@ auth.onAuthStateChanged(async user => {
       if(typeof renderPodcastList==='function') renderPodcastList();
     }
     await cleanupDzien1();
+    await migrateLegacyMulti();
     renderEntry();
     updateAlertBadge();
     // Load tasks for nav badge + announcements
@@ -11865,6 +12094,208 @@ function resetSim(k){
 
 
 // ═══════════════════════════════════════════════════════════
+// MEBLE LOCAL — Polska only (canonical PL — driver getData)
+// ═══════════════════════════════════════════════════════════
+const SK_LOCAL = 'adshub3_local_v1';
+
+function getLocalData(){ try{ return JSON.parse(localStorage.getItem(SK_LOCAL)||'{}'); }catch(e){ return {}; } }
+function setLocalData(d){ localStorage.setItem(SK_LOCAL, JSON.stringify(d)); }
+function getLocalEntry(k, m){ return getLocalData()[k+'_'+m] || null; }
+function setLocalEntry(k, m, entry){
+  const d = getLocalData();
+  d[k+'_'+m] = entry;
+  setLocalData(d);
+}
+
+function calcLocalAuto(k){
+  const sp = parseFloat(document.getElementById('l_'+k+'_sprzedaz')?.value)||0;
+  const sP = parseFloat(document.getElementById('l_'+k+'_sumaP')?.value)||0;
+  const el = document.getElementById('l_'+k+'_sumaZl');
+  if(el && sp && sP) el.textContent = Math.round(sp*sP/100).toLocaleString('pl-PL')+' zł';
+  else if(el) el.textContent = '—';
+}
+
+async function saveLocal(){
+  const now = new Date();
+  const curM = document.getElementById('localMonthSel')?.value || MONTHS[now.getMonth()];
+  const gN = id => { const e=document.getElementById(id); return e&&e.value!==''?parseFloat(e.value):null; };
+  let saved = 0;
+  const savedKeys = [];
+  GLOBAL_ACCS.forEach(k => {
+    const sprzedaz = gN('l_'+k+'_sprzedaz');
+    if(!sprzedaz) return;
+    const dzien   = gN('l_'+k+'_dzien') || now.getDate();
+    const daysInM = DAYS_IN[curM] || 30;
+    const effD    = dzien > 1 ? dzien - 1 : 1;
+    const isCurMonth = curM === MONTHS[now.getMonth()];
+    const est = isCurMonth ? Math.round(sprzedaz * daysInM / effD) : sprzedaz;
+    const sumaP   = gN('l_'+k+'_sumaP');
+    const sumaZl  = sumaP ? Math.round(sprzedaz * sumaP / 100) : null;
+    setLocalEntry(k, curM, {
+      m:        curM,
+      sprzedaz: sprzedaz,
+      sumaP:    sumaP,
+      sumaZl:   sumaZl,
+      prow:     gN('l_'+k+'_prow'),
+      dostawa:  gN('l_'+k+'_dostawa'),
+      reklama:  gN('l_'+k+'_reklama'),
+      dzien:    dzien,
+      est:      est,
+      savedAt:  Date.now(),
+      savedDay: now.toLocaleDateString('pl-PL'),
+    });
+
+    // Canonical PL → merge sprzedaz/dzien do getData (driver KPI w Arkuszu/Wynikach).
+    const D = getData(k);
+    const idx = D.findIndex(x => x.m === curM);
+    if(idx >= 0){
+      D[idx] = { ...D[idx], sprzedaz, dzien };
+      delete D[idx]._legacyMulti;
+    } else {
+      D.push({ m: curM, sprzedaz, dzien });
+    }
+    setData(k, D);
+    savedKeys.push(k);
+    saved++;
+  });
+
+  if(saved){
+    if(typeof saveSnapshotD2D === 'function') saveSnapshotD2D();
+    if(currentUser){
+      try {
+        await Promise.all(savedKeys.map(k => saveAccToFS(k)));
+        await saveLocalToFS();
+      } catch(e){ console.error('saveLocal Firebase sync error:', e); }
+    }
+  }
+
+  const inline = document.getElementById('localMsgInline');
+  if(inline){
+    inline.textContent = saved ? `✓ Zapisano ${saved} kont (Polska only) · ${curM} · KPI w Arkuszu/Wynikach zaktualizowane` : '✗ Brak danych do zapisania';
+    inline.style.color = saved ? 'var(--green)' : 'var(--red)';
+    inline.classList.add('show');
+    setTimeout(()=>inline.classList.remove('show'), 5000);
+  }
+
+  if(saved && typeof showSaveConfirm === 'function'){
+    showSaveConfirm(savedKeys, 0, saved, curM, !!currentUser);
+  } else if(!saved){
+    alert('Brak danych do zapisania — wypelnij pole Sprzedaz dla minimum jednego konta.');
+  }
+
+  renderLocalEntryForm();
+  if(typeof renderArkusz === 'function') renderArkusz();
+  if(typeof renderWyniki === 'function') renderWyniki();
+}
+
+async function saveLocalToFS(){
+  if(!currentUser) return false;
+  try{
+    await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc('mebleLocal')
+      .set({ data: getLocalData(), updatedAt: Date.now() });
+    return true;
+  } catch(e){ console.error('saveLocalToFS', e); return false; }
+}
+
+async function loadLocalFromFS(){
+  if(!currentUser) return;
+  try{
+    const snap = await db.collection('users').doc(currentUser.uid)
+      .collection('sync').doc('mebleLocal').get();
+    const localData = getLocalData();
+    if(!snap.exists || !snap.data().data){
+      if(Object.keys(localData).length){ await saveLocalToFS(); console.log('[sync] mebleLocal: initial sync → Firebase ('+Object.keys(localData).length+')'); }
+      return;
+    }
+    const fsData = snap.data().data || {};
+    const fsTime = snap.data().updatedAt || 0;
+    const localTime = Object.values(localData).reduce((m,e) => Math.max(m, e.savedAt||0), 0);
+    if(fsTime >= localTime || !Object.keys(localData).length){
+      const merged = { ...localData };
+      Object.entries(fsData).forEach(([key,entry]) => {
+        const existing = merged[key];
+        if(!existing || (entry.savedAt||0) > (existing.savedAt||0)) merged[key] = entry;
+      });
+      setLocalData(merged);
+      console.log('[sync] mebleLocal: loaded '+Object.keys(merged).length+' entries from Firebase');
+    } else {
+      await saveLocalToFS();
+      console.log('[sync] mebleLocal: pushed newer local → Firebase');
+    }
+  } catch(e){ console.error('loadLocalFromFS', e); }
+}
+
+function renderLocalEntryForm(){
+  const el = document.getElementById('entryLocal');
+  if(!el) return;
+  const now = new Date();
+  const prevSel = document.getElementById('localMonthSel');
+  const selM = prevSel ? prevSel.value : MONTHS[now.getMonth()];
+
+  const selHTML = `<div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap">
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Miesiąc:</span>
+    <select id="localMonthSel" onchange="renderLocalEntryForm()"
+      style="background:var(--bg3);border:1px solid var(--border2);color:#2dd4a0;font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:5px;outline:none">
+      ${MONTHS.map(m=>`<option value="${m}" ${m===selM?'selected':''}>${m[0].toUpperCase()+m.slice(1)}</option>`).join('')}
+    </select>
+  </div>`;
+
+  const cardsHTML = GLOBAL_ACCS.map(k => {
+    const meta = AC_META[k];
+    const prev = getLocalEntry(k, selM) || {};
+    let carry = {};
+    if(!prev.sprzedaz){
+      const selIdx = MONTHS.indexOf(selM);
+      for(let i = 1; i <= 12; i++){
+        const checkIdx = (selIdx - i + 12) % 12;
+        const found = getLocalEntry(k, MONTHS[checkIdx]);
+        if(found && found.sprzedaz){ carry = found; break; }
+      }
+    }
+    const carryFields = ['prow','dostawa','reklama','sumaP'];
+    const pf = f => prev[f] != null ? prev[f] : (carryFields.includes(f) && carry[f] != null ? carry[f] : '');
+    const isCarry = !prev.sprzedaz && carry.sprzedaz;
+    const carryLabel = isCarry ? (carry.m ? carry.m[0].toUpperCase() + carry.m.slice(1) : carry.savedDay) : '';
+    return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;margin-bottom:.5rem">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem">
+        <span style="width:6px;height:6px;border-radius:50%;background:#2dd4a0;display:inline-block"></span>
+        <span style="font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text)">${meta.name}</span>
+        ${prev.savedDay ? `<span style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:auto">ostatni wpis: ${prev.savedDay}</span>` : ''}
+        ${isCarry ? `<span style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:${prev.savedDay?'0':'auto'}">wartości % z: ${carryLabel}</span>` : ''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:.5rem">
+        <div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Sprzedaż PL (zł)</div>
+          <input type="number" id="l_${k}_sprzedaz" placeholder="30767" value="${pf('sprzedaz')}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"
+            oninput="calcLocalAuto('${k}')"></div>
+        <div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Suma opłat (%)</div>
+          <input type="number" id="l_${k}_sumaP" placeholder="25.2" step="0.1" value="${pf('sumaP')}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--red);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"
+            oninput="calcLocalAuto('${k}')"></div>
+        <div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Obowiązkowe (%)</div>
+          <input type="number" id="l_${k}_prow" placeholder="10.9" step="0.1" value="${pf('prow')}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"></div>
+        <div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Dostawa (%)</div>
+          <input type="number" id="l_${k}_dostawa" placeholder="2.5" step="0.1" value="${pf('dostawa')}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"></div>
+        <div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Reklama i prom. (%)</div>
+          <input type="number" id="l_${k}_reklama" placeholder="12.0" step="0.1" value="${pf('reklama')}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"></div>
+        <div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Dzień wpisu</div>
+          <input type="number" id="l_${k}_dzien" placeholder="11" min="1" max="31" value="${pf('dzien')||new Date().getDate()}"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:#2dd4a0;font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:5px;outline:none"></div>
+      </div>
+      <div style="margin-top:.4rem;font-family:var(--mono);font-size:10px;color:var(--text3)">
+        Suma opłat (zł): <span id="l_${k}_sumaZl" style="color:var(--red)">${prev.sumaZl ? Math.round(prev.sumaZl).toLocaleString('pl-PL')+' zł' : '—'}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = selHTML + cardsHTML;
+}
+
+// ═══════════════════════════════════════════════════════════
 // MEBLE GLOBAL — Rynki globalne
 // ═══════════════════════════════════════════════════════════
 const SK_GLOBAL = 'adshub3_global_v1';
@@ -11919,47 +12350,37 @@ async function saveGlobal(){
       savedAt:  Date.now(),
       savedDay: now.toLocaleDateString('pl-PL'),
     });
-
-    // Merge sprzedaz/dzien do per-month entry — dzieki temu D2D snapshot widzi aktualna wartosc
-    const D = getData(k);
-    const idx = D.findIndex(x => x.m === curM);
-    if(idx >= 0){
-      D[idx] = { ...D[idx], sprzedaz, dzien };
-    } else {
-      D.push({ m: curM, sprzedaz, dzien });
-    }
-    setData(k, D);
+    // v9.71: NIE mergujemy do getData (multi-market != PL canonical) — KPI w widokach lokalnych pozostają nietknięte.
+    // Aby zaktualizować Arkusz/Wyniki/Analityka, użyj formularza "MEBLE — Polska only" (saveLocal).
     savedKeys.push(k);
     saved++;
   });
 
-  // Snapshot do D2D + sync per-month entries do Firebase
-  if(saved){
-    if(typeof saveSnapshotD2D === 'function') saveSnapshotD2D();
-    if(currentUser){
-      try { await Promise.all(savedKeys.map(k => saveAccToFS(k))); }
-      catch(e){ console.error('saveGlobal Firebase sync error:', e); }
-    }
+  // Sync SK_GLOBAL do Firebase (multi-device); D2D snapshot pozostaje powiązany z getData (PL canonical).
+  if(saved && currentUser){
+    try { await saveGlobalToFS(); }
+    catch(e){ console.error('saveGlobal Firebase sync error:', e); }
   }
 
-  // Inline visible message (smsg in form area)
   const inline = document.getElementById('globalMsgInline');
   if(inline){
-    inline.textContent = saved ? `✓ Zapisano ${saved} kont · ${curM} · D2D zaktualizowane` : '✗ Brak danych do zapisania';
+    inline.innerHTML = saved
+      ? `✓ Zapisano ${saved} kont (multi-market) · ${curM} · <span style="color:var(--text3)">→ KPI w Arkuszu wymagają wpisu w formularzu "Polska only" niżej</span>`
+      : '✗ Brak danych do zapisania';
     inline.style.color = saved ? 'var(--green)' : 'var(--red)';
     inline.classList.add('show');
-    setTimeout(()=>inline.classList.remove('show'), 4000);
+    setTimeout(()=>inline.classList.remove('show'), 6000);
   }
 
-  // Modal confirmation (sam UX co Zapisz wszystkie wpisy)
-  if(saved && typeof showSaveConfirm === 'function'){
-    showSaveConfirm(savedKeys, 0, saved, curM, !!currentUser);
-  } else if(!saved){
+  if(!saved){
     alert('Brak danych do zapisania — wypelnij pole Sprzedaz dla minimum jednego konta.');
   }
 
   renderGlobalMonthsTable();
-  renderGlobalEntryForm(); // refresh to show savedDay
+  renderGlobalEntryForm();
+  // Re-render dependent views (toggle PL/Global może być aktywny)
+  if(typeof renderArkusz === 'function') renderArkusz();
+  if(typeof renderWyniki === 'function') renderWyniki();
 }
 
 function renderGlobalEntryForm(){
@@ -22985,7 +23406,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.70</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.71</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
