@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.69</title>
+<title>MPlace Hub v9.70</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -2127,7 +2127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.69</span>
+    <span class="brand-ver">v9.70</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5128,6 +5128,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.70 — Analityka kont: mini tabela ROAS odwrocona (najnowszy m-c na gorze)', desc:'W zakladce Analityka kont mini tabela pod wykresem ROAS Trend pokazuje teraz biezacy miesiac na gorze a najstarszy na dole — spojnie z glowna tabela wpisow ktora juz ma ten porzadek. Wykres ROAS Trend pozostaje bez zmian (PAZ→MAJ od lewej do prawej). (11.05.2026)'},
     {name:'v9.69 — Trend/Sheets: fix apples-to-oranges delty Σ grup', desc:'Σ MEBLE/LUXSEN/ONE pokazywaly artefakty (▲942% gdy Listopad mial 1 konto a Grudzien 3). Teraz delta liczona tylko gdy ten sam zestaw kont ma dane w obu miesiacach — inaczej delta ukryta (jak na wierszach indywidualnych). Audyt potwierdzil ze calc() / estym() / sumy sa poprawne. (05.05.2026)'},
     {name:'v9.68 — Zapisz Globalne synchronizuje D2D + widoczny toast', desc:'Klik "Zapisz Globalne" merguje sprzedaz/dzien do per-month entries, snapshotuje do D2D i syncuje do Firebase. Modal potwierdzenia (jak Zapisz wszystkie wpisy) zamiast niewidocznego komunikatu. Naprawia rozbieznosc miedzy form Globalnym a tabela D2D dla MEBLE. (05.05.2026)'},
     {name:'v9.67 — Pasek daty globalny', desc:'Biezacy miesiac / dzien / postep / historia — dodany do Cockpit, Dashboard, Agent, Trend, Results, Sheets. Jedna funkcja renderDateBars() dla wszystkich. (02.05.2026)'},
@@ -7178,7 +7179,7 @@ function renderAcCharts(k,D,prod){
   // Mini ROAS table
   document.getElementById('acRoasTable').innerHTML=`<table style="width:100%;border-collapse:collapse;border-top:1px solid rgba(255,255,255,.06)">
     <thead><tr>${['Mies.','ROAS Ads','ROAS Glob','ACOS','Marża'].map((h,i)=>`<th style="padding:4px 8px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);text-align:center;font-weight:400">${h}</th>`).join('')}</tr></thead>
-    <tbody>${D.map(d=>{
+    <tbody>${[...D].reverse().map(d=>{
       const c=calc(d,prod);
       return`<tr style="border-top:1px solid rgba(255,255,255,.03)">
         <td style="padding:4px 8px;font-size:10px;color:var(--text3);text-align:center">${d.m.substring(0,3).toUpperCase()}</td>
@@ -22984,7 +22985,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.69</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.70</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
