@@ -2197,6 +2197,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 <div class="topbar" style="display:none!important">
   <div class="topbar-inner">
     <button class="nav-btn" onclick="showView('agent')" id="navAgent" style="color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">Agent ✦</button>
+    <button class="nav-btn" onclick="showView('seo')" id="navSeo" style="color:#a3e635;background:rgba(163,230,53,.08);border:1px solid rgba(163,230,53,.2)">SEO ✦</button>
     <button class="nav-btn" onclick="showView('analiza')" id="navAnaliza" style="color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2)">Analysis</button>
     <button class="nav-btn" onclick="showView('kanibalizator')" id="navKanibalizator" style="color:#ef4444;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)">Promos</button>
     <button class="nav-btn" onclick="showView('strategia')" id="navStrategia" style="color:#ff6b35;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2)">Strategy</button>
@@ -3189,6 +3190,31 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       </div>
       <button onclick="agentSend()" id="agentSendBtn" style="font-family:var(--mono);font-size:11px;padding:6px 16px;border-radius:6px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.1);color:#34d399;cursor:pointer;transition:all .15s">▸ Wyslij</button>
     </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ VIEW: SEO ═══ -->
+<div class="view" id="viewSeo">
+<div class="container" style="padding:1rem 1.5rem;max-width:1200px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;gap:1rem;flex-wrap:wrap">
+    <div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.25rem">MPlace Agent</div>
+      <h2 style="margin:0;font-size:1.2rem;font-weight:700;color:#fff">SEO Dashboard</h2>
+    </div>
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <span id="seoSnapshotAge" style="font-family:var(--mono);font-size:10px;color:var(--text3)">—</span>
+      <button onclick="loadSeoView(true)" id="seoRefreshBtn" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:6px;border:1px solid rgba(163,230,53,.3);background:rgba(163,230,53,.08);color:#a3e635;cursor:pointer;transition:all .15s">↻ Odśwież</button>
+      <a href="http://100.75.16.60:3333" target="_blank" style="font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:6px;border:1px solid rgba(148,163,184,.2);background:rgba(148,163,184,.05);color:var(--text2);text-decoration:none">Panel →</a>
+    </div>
+  </div>
+  <div id="seoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem">
+    <div style="color:var(--text3);font-family:var(--mono);font-size:11px;grid-column:1/-1;padding:2rem;text-align:center">Ładowanie…</div>
+  </div>
+  <div id="seoEmptyState" style="display:none;padding:3rem;text-align:center;color:var(--text3);font-family:var(--mono);font-size:11px">
+    <div style="font-size:2rem;margin-bottom:.75rem">📊</div>
+    <div style="margin-bottom:.5rem">Brak danych — uruchom audit SEO</div>
+    <div style="font-size:10px;opacity:.6;max-width:320px;margin:0 auto">Dane pojawią się po pierwszym uruchomieniu snapshot-publishera:<br><code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:3px">npm run seo:snapshot</code></div>
   </div>
 </div>
 </div>
@@ -5024,6 +5050,10 @@ function showView(v){
     document.getElementById('viewAgent').classList.add('active');
     document.getElementById('navAgent').classList.add('active');
     initAgent();
+  } else if(v==='seo'){
+    document.getElementById('viewSeo').classList.add('active');
+    document.getElementById('navSeo').classList.add('active');
+    loadSeoView(false);
   } else if(v==='wiedza'){
     document.getElementById('viewWiedza').classList.add('active');
     document.getElementById('navWiedza').classList.add('active');
@@ -28641,6 +28671,120 @@ function mpToggleSidebar(forceClose){
   var isOpen=sb.classList.contains('mobile-open');
   if(forceClose||isOpen){sb.classList.remove('mobile-open');if(bd)bd.classList.remove('open');document.body.classList.remove('sidebar-open')}
   else{sb.classList.add('mobile-open');if(bd)bd.classList.add('open');document.body.classList.add('sidebar-open')}
+}
+
+// ─── SEO Dashboard ────────────────────────────────────────────────────────────
+var _seoLoaded = false;
+
+async function loadSeoView(forceRefresh) {
+  if (_seoLoaded && !forceRefresh) return;
+  var grid = document.getElementById('seoGrid');
+  var emptyEl = document.getElementById('seoEmptyState');
+  var ageEl = document.getElementById('seoSnapshotAge');
+  var btn = document.getElementById('seoRefreshBtn');
+
+  if (btn) { btn.textContent = '↻ …'; btn.disabled = true; }
+  if (grid) grid.innerHTML = '<div style="color:var(--text3);font-family:var(--mono);font-size:11px;grid-column:1/-1;padding:2rem;text-align:center">Ładowanie…</div>';
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  try {
+    var snap = await db.collection('seo_snapshots').doc('latest').get();
+    if (!snap.exists || !snap.data()) {
+      if (grid) grid.innerHTML = '';
+      if (emptyEl) emptyEl.style.display = 'block';
+      return;
+    }
+    var data = snap.data();
+    _seoLoaded = true;
+
+    // Stale data badge
+    var genAt = data.generatedAt ? new Date(data.generatedAt) : null;
+    if (genAt && ageEl) {
+      var hoursAgo = Math.round((Date.now() - genAt.getTime()) / 3600000);
+      if (hoursAgo < 24) {
+        ageEl.textContent = hoursAgo < 1 ? 'przed chwilą' : hoursAgo + 'h temu';
+        ageEl.style.color = '#a3e635';
+      } else if (hoursAgo < 48) {
+        ageEl.textContent = 'dane sprzed ' + hoursAgo + 'h';
+        ageEl.style.color = '#f59e0b';
+        ageEl.style.fontWeight = '600';
+      } else {
+        var daysAgo = Math.floor(hoursAgo / 24);
+        ageEl.textContent = '⚠ dane nieaktualne (' + daysAgo + 'd)';
+        ageEl.style.color = '#ef4444';
+        ageEl.style.fontWeight = '600';
+      }
+    }
+
+    var projects = data.projects || [];
+    if (!projects.length) {
+      if (grid) grid.innerHTML = '';
+      if (emptyEl) emptyEl.style.display = 'block';
+      return;
+    }
+    if (grid) grid.innerHTML = projects.map(renderSeoCard).join('');
+  } catch (e) {
+    if (grid) grid.innerHTML = '<div style="color:#ef4444;font-family:var(--mono);font-size:11px;grid-column:1/-1;padding:1rem">Błąd Firestore: ' + e.message + '</div>';
+  } finally {
+    if (btn) { btn.textContent = '↻ Odśwież'; btn.disabled = false; }
+  }
+}
+
+function renderSeoCard(p) {
+  var hasData = p.hasData !== false;
+  var panelUrl = 'http://100.75.16.60:3333';
+  var alertsHtml = (p.alerts || []).slice(0, 3).map(function(a){
+    return '<div style="font-size:9px;color:#f59e0b;font-family:var(--mono);margin-top:2px">⚠ ' + a + '</div>';
+  }).join('');
+
+  if (!hasData) {
+    return '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:1rem">'
+      + '<div style="font-weight:600;font-size:.85rem;color:#fff;margin-bottom:.5rem">' + (p.name || p.id) + '</div>'
+      + '<div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin:.75rem 0">Brak danych — uruchom audit</div>'
+      + '<a href="' + panelUrl + '" target="_blank" style="display:inline-block;font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:5px;border:1px solid rgba(148,163,184,.2);color:var(--text2);text-decoration:none">Otwórz panel →</a>'
+      + '</div>';
+  }
+
+  var trafficColor = (p.trafficTrend || '').charAt(0) === '+' ? '#a3e635' : (p.trafficTrend || '').charAt(0) === '-' ? '#f87171' : 'var(--text2)';
+  var geoColor = (p.geoScore || 0) >= 80 ? '#a3e635' : (p.geoScore || 0) >= 50 ? '#f59e0b' : '#ef4444';
+  var refreshBadge = (p.refreshQueue || 0) > 0
+    ? '<span style="background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.2);font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:10px">' + p.refreshQueue + ' refresh</span>'
+    : '';
+
+  return '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:1rem;transition:border-color .15s" onmouseenter="this.style.borderColor=\'rgba(163,230,53,.25)\'" onmouseleave="this.style.borderColor=\'rgba(255,255,255,.07)\'">'
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem">'
+    +   '<div>'
+    +     '<div style="font-weight:600;font-size:.85rem;color:#fff;margin-bottom:2px">' + (p.name || p.id) + '</div>'
+    +     '<a href="' + (p.url || '#') + '" target="_blank" style="font-size:9px;color:var(--text3);text-decoration:none;font-family:var(--mono)">' + (p.url || '').replace('https://','') + '</a>'
+    +   '</div>'
+    +   '<span style="font-size:9px;font-family:var(--mono);color:var(--text3);background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px">' + (p.cms || '') + '</span>'
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem">'
+    +   '<div style="background:rgba(255,255,255,.02);border-radius:6px;padding:.5rem">'
+    +     '<div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:2px">RUCH</div>'
+    +     '<div style="font-size:1.1rem;font-weight:700;color:#fff">' + (p.traffic || 0).toLocaleString('pl-PL') + '</div>'
+    +     (p.trafficTrend ? '<div style="font-size:9px;color:' + trafficColor + ';font-family:var(--mono)">' + p.trafficTrend + '</div>' : '')
+    +   '</div>'
+    +   '<div style="background:rgba(255,255,255,.02);border-radius:6px;padding:.5rem">'
+    +     '<div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:2px">TOP10 KW</div>'
+    +     '<div style="font-size:1.1rem;font-weight:700;color:#fff">' + (p.keywordsTop10 || 0) + '</div>'
+    +     '<div style="font-size:9px;color:var(--text3);font-family:var(--mono)">z ' + (p.keywordsTotal || 0) + '</div>'
+    +   '</div>'
+    +   '<div style="background:rgba(255,255,255,.02);border-radius:6px;padding:.5rem">'
+    +     '<div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:2px">GEO SCORE</div>'
+    +     '<div style="font-size:1.1rem;font-weight:700;color:' + geoColor + '">' + (p.geoScore || 0) + '</div>'
+    +   '</div>'
+    +   '<div style="background:rgba(255,255,255,.02);border-radius:6px;padding:.5rem">'
+    +     '<div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:2px">ARTYKUŁY</div>'
+    +     '<div style="font-size:1.1rem;font-weight:700;color:#fff">' + (p.articlesTotal || 0) + '</div>'
+    +     refreshBadge
+    +   '</div>'
+    + '</div>'
+    + alertsHtml
+    + '<div style="margin-top:.75rem">'
+    +   '<a href="' + panelUrl + '" target="_blank" style="display:block;text-align:center;font-family:var(--mono);font-size:9px;padding:5px;border-radius:5px;border:1px solid rgba(163,230,53,.2);background:rgba(163,230,53,.05);color:#a3e635;text-decoration:none">Otwórz panel →</a>'
+    + '</div>'
+    + '</div>';
 }
 </script>
 
