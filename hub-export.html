@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MPlace Hub → Panel Export</title>
+<style>
+  body { font-family: 'DM Mono', monospace, sans-serif; background: #0f1117; color: #e8eaf0; padding: 32px; max-width: 640px; margin: 0 auto; }
+  h1 { color: #ff6b35; font-size: 1.2rem; margin-bottom: 4px; }
+  p { color: #8b91a8; font-size: .85rem; margin-bottom: 24px; }
+  button { background: #ff6b35; color: #fff; border: none; border-radius: 8px; padding: 12px 28px; font-size: 1rem; cursor: pointer; }
+  button:disabled { opacity: .4; cursor: default; }
+  #status { margin-top: 20px; padding: 16px; border-radius: 8px; background: #181c26; font-size: .85rem; white-space: pre-wrap; display: none; }
+  #status.ok  { border: 1px solid rgba(45,212,160,.4); color: #2dd4a0; }
+  #status.err { border: 1px solid rgba(255,77,106,.4); color: #ff4d6a; }
+  #status.info { border: 1px solid rgba(255,107,53,.3); color: #ff6b35; }
+  label { font-size: .8rem; color: #8b91a8; display: block; margin-bottom: 6px; }
+  input { width: 100%; box-sizing: border-box; background: #181c26; border: 1px solid rgba(255,255,255,.1); color: #e8eaf0; border-radius: 6px; padding: 8px 12px; font-family: monospace; margin-bottom: 16px; }
+  .account-list { font-size: .8rem; color: #8b91a8; margin-bottom: 20px; }
+  .account-list span { display: inline-block; background: #1e2333; border-radius: 4px; padding: 3px 8px; margin: 2px; }
+  .account-list span.found { color: #2dd4a0; }
+  .account-list span.missing { color: #ff4d6a; opacity: .5; }
+</style>
+</head>
+<body>
+
+<h1>MPlace Hub → Panel Export</h1>
+<p>Otwórz tę stronę w tym samym oknie Chrome, gdzie normalnie używasz MPlace-Hub.<br>
+Kliknij "Eksportuj" — dane trafią automatycznie do panelu CEO.</p>
+
+<div id="preview" class="account-list"></div>
+
+<label for="panelUrl">URL panelu CEO</label>
+<input type="text" id="panelUrl" value="http://localhost:3333" placeholder="http://localhost:3333">
+
+<label for="panelToken">Token panelu (z paska URL panelu: ?token=…)</label>
+<input type="text" id="panelToken" placeholder="wklej token z ?token=XXXX">
+
+<button id="btn" onclick="doExport()">Eksportuj dane do panelu</button>
+
+<div id="status"></div>
+
+<script>
+const SK = 'adshub3_';
+const ACCOUNTS = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
+const GROUP = {
+  MobelKap:'MEBLE', PerfektCiecie:'MEBLE', MeblenaCzasie:'MEBLE',
+  Luxsen:'LUXSEN', Semmi:'LUXSEN', BOTAVIT:'LUXSEN',
+  Materazzi:'ONE', MtzzEU:'ONE', Ankado24:'ONE',
+};
+
+// Try to read token from URL params
+const urlParams = new URLSearchParams(window.location.search);
+const tokenFromUrl = urlParams.get('token');
+if (tokenFromUrl) document.getElementById('panelToken').value = tokenFromUrl;
+
+// Preview what we can find
+const preview = document.getElementById('preview');
+let foundCount = 0;
+for (const acc of ACCOUNTS) {
+  const raw = localStorage.getItem(SK + acc);
+  let found = false;
+  if (raw) {
+    try {
+      const rows = JSON.parse(raw);
+      if (Array.isArray(rows) && rows.length > 0) found = true;
+    } catch {}
+  }
+  if (found) foundCount++;
+  const span = document.createElement('span');
+  span.className = found ? 'found' : 'missing';
+  span.textContent = (found ? '✓ ' : '✗ ') + acc;
+  preview.appendChild(span);
+}
+
+if (foundCount === 0) {
+  showStatus('Nie znaleziono danych MPlace-Hub w localStorage tej strony.\n\nOtwórz hub-export.html Z TEJ SAMEJ PRZEGLĄDARKI i TEGO SAMEGO PROFILU, gdzie używasz MPlace-Hub (index.html).', 'err');
+  document.getElementById('btn').disabled = true;
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = type;
+  el.style.display = 'block';
+}
+
+async function doExport() {
+  const panelUrl = document.getElementById('panelUrl').value.trim().replace(/\/$/, '');
+  const token    = document.getElementById('panelToken').value.trim();
+  const btn      = document.getElementById('btn');
+
+  if (!token) { showStatus('Wklej token panelu (znajdziesz go w URL panelu po ?token=)', 'err'); return; }
+
+  showStatus('Czytam dane z localStorage...', 'info');
+  btn.disabled = true;
+
+  const payload = { generatedAt: new Date().toISOString(), accounts: {} };
+
+  for (const acc of ACCOUNTS) {
+    const raw = localStorage.getItem(SK + acc);
+    if (!raw) continue;
+    try {
+      const rows = JSON.parse(raw);
+      if (!Array.isArray(rows) || !rows.length) continue;
+      const withData = rows.filter(r => r.adsCost > 0 || r.sprzedaz > 0);
+      const last = withData.length ? withData[withData.length - 1] : rows[rows.length - 1];
+      payload.accounts[acc] = {
+        account: acc,
+        group:   GROUP[acc],
+        rows:    rows,
+        month:   last?.m ?? null,
+        roas:    last?.roas ?? null,
+        spend:   last?.adsCost ?? null,
+        revenue: last?.sprzedaz ?? null,
+        reklamaPct: last?.reklamaPct ?? null,
+      };
+    } catch (e) {
+      console.warn('Błąd parsowania', acc, e);
+    }
+  }
+
+  const accountCount = Object.keys(payload.accounts).length;
+  if (!accountCount) {
+    showStatus('Brak danych do eksportu.', 'err');
+    btn.disabled = false;
+    return;
+  }
+
+  showStatus(`Znaleziono ${accountCount}/9 kont. Wysyłam do panelu...`, 'info');
+
+  try {
+    const res = await fetch(`${panelUrl}/api/hub-import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Panel-Token': token },
+      body: JSON.stringify({ token, ...payload }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`HTTP ${res.status}: ${text}`);
+    }
+    const result = await res.json();
+
+    let summary = `✓ Eksport zakończony!\n\n${accountCount} kont zapisanych do panelu:\n`;
+    for (const [acc, data] of Object.entries(payload.accounts)) {
+      const r = data.roas?.toFixed(2) ?? '—';
+      const s = data.spend?.toFixed(0) ?? '—';
+      summary += `  ${acc}: ROAS ${r}x, spend ${s} PLN (${data.month})\n`;
+    }
+    summary += `\nOdśwież zakładkę Ads w panelu CEO.`;
+    showStatus(summary, 'ok');
+  } catch (e) {
+    // CORS fallback — show raw JSON for manual save
+    const json = JSON.stringify(payload, null, 2);
+    showStatus(
+      `Błąd połączenia z panelem: ${e.message}\n\n` +
+      `Skopiuj poniższy JSON i zapisz jako:\n~/MPlace-Agent/state/hub-latest.json\n\n` +
+      json.slice(0, 2000) + (json.length > 2000 ? '\n...(skrócono)' : ''),
+      'err'
+    );
+  }
+
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
