@@ -5,11 +5,11 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<script>(function(){var V='9.79';var s=sessionStorage.getItem('_hv');if(s!==V){sessionStorage.setItem('_hv',V);if(location.search.indexOf('_hv=')<0){location.replace(location.pathname+'?_hv='+V+(location.hash||''));}}})();</script>
+<script>(function(){var V='9.81';var s=sessionStorage.getItem('_hv');if(s!==V){sessionStorage.setItem('_hv',V);if(location.search.indexOf('_hv=')<0){location.replace(location.pathname+'?_hv='+V+(location.hash||''));}}})();</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.80</title>
+<title>MPlace Hub v9.81</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -464,7 +464,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .dashboard-card .metric-big,.dashboard-card .metric-row{color:#111 !important;}
   .dashboard-card .progress-bar-wrap{background:#e5e7eb !important;}
   .topbar,.save-bar,.btn,.nav-btn,#acAlerts,.sec-num,.tip{display:none!important;}
-  /* v9.80: ukryj nowy sidebar/topbar i zresetuj body padding (inaczej content jest wciśnięty na ~63mm) */
+  /* v9.81: ukryj nowy sidebar/topbar i zresetuj body padding (inaczej content jest wciśnięty na ~63mm) */
   #mpSidebar,#mpTopbar,.mp-sidebar,.mp-topbar,#zmTopbar,#zmAnnounceBar,.zm-topbar,.mp-search-bar{display:none!important;}
   html,body{padding:0!important;margin:0!important;background:#fff;color:#000;}
   /* Pokazuj tylko aktywny widok (nie wszystkie) */
@@ -2136,7 +2136,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.80</span>
+    <span class="brand-ver">v9.81</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -3399,6 +3399,18 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   </div>
 
   <div id="simContent"></div>
+</div>
+</div>
+
+<!-- ═══ VIEW: ARCHIWUM ═══ -->
+<div class="view" id="viewArchiwum">
+<div class="container">
+  <div style="margin-bottom:1.5rem">
+    <div class="ph-eyebrow">▸ Historia zakończonych współprac</div>
+    <div class="ph-title">Archiwum <span>klientów</span></div>
+    <div class="ph-sub" style="margin-top:.4rem">Dane historyczne klientów, z którymi zakończyliśmy współpracę · pełna historia · bez edycji</div>
+  </div>
+  <div id="archiwumContent"></div>
 </div>
 </div>
 
@@ -5060,6 +5072,9 @@ function showView(v){
     document.getElementById('viewSim').classList.add('active');
     document.getElementById('navSim').classList.add('active');
     initSim();
+  } else if(v==='archiwum'){
+    document.getElementById('viewArchiwum').classList.add('active');
+    renderArchiwum();
   } else if(v==='months'){
     document.getElementById('viewMonths').classList.add('active');
     document.getElementById('navMonths').classList.add('active');
@@ -5314,7 +5329,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
-    {name:'v9.80 — Fix print/PDF Analityki konta: ukryty sidebar/topbar, tylko aktywny widok', desc:'Print CSS nie ukrywal nowego #mpSidebar/#mpTopbar (sidebar zajmowal ~63mm na A4) i body mial padding-left:240px → content byl wciśnięty na resztę i pusty. Plus ".view{display:block!important}" pokazywal wszystkie widoki — tylko aktywny ma content, reszta rozpychala strone. Naprawione: ukryty sidebar, body padding 0, tylko .view.active widoczna. (11.05.2026)'},
+    {name:'v9.81 — Zakładka Archiwum: historia zakończonych współprac', desc:'Dedykowana zakładka Archiwum w grupie Analiza: pokazuje wszystkich zarchiwizowanych klientów (BOTAVIT, Ankado24) z pełną historią miesięczną. Karty z kluczowymi statystykami (łączna sprzedaż, avg ROAS, best ROAS, avg marża%, wydatki Ads) + tabela miesiąc po miesiącu z kolorowaniem ROAS względem BE. (01.07.2026)'},
     {name:'v9.73 — Fix m/m delta w Global: zdjety za rygorystyczny guard', desc:'v9.72 ukrywal m/m delta dla wszystkich par miesiecy w trybie Global jesli ktorykolwiek nie mial SK_GLOBAL. Teraz delta zawsze liczy sie z estymForView (= ta sama wartosc co kolumna Estymacja m-c w widoku). (11.05.2026)'},
     {name:'v9.72 — m/m delta respektuje toggle PL/Global w Arkuszu/Analityce', desc:'Kolumna m/m w Arkuszu i Analityce konta liczy delta z wartosci aktualnego widoku (PL lub Global), nie z raw d.sprzedaz. (11.05.2026)'},
     {name:'v9.71 — Globalne vs Polska only: split storage + toggle PL/Global', desc:'Forma "Rynki globalne" (multi-market PL+CZ+SK+HU) PRZESTAJE nadpisywac sprzedaz w Arkuszu/Wynikach. Dodano druga forme "MEBLE — Polska only (Centrum Finansow PL)" — to driver KPI canonical. Toggle PL/Global w Arkuszu, Wynikach, Analityce konta dla 3 kont MEBLE. Auto-migracja flaguje stare wpisy badge "M" jako legacy multi-market do korekty. SK_GLOBAL + SK_LOCAL syncuja sie do Firebase (multi-device). Naprawia mismatch: sprzedaz multi-market vs koszty Ads/wyroznienia PL-only. (11.05.2026)'},
@@ -11085,6 +11100,7 @@ function mpIcon(name, size, color) {
     split:    `<path d="M2 4H6L10 12H14" ${a}/><path d="M10 4H14M6 12H2" ${a}/>`,
     delta:    `<path d="M8 3L14 13H2Z" ${a}/>`,
     eye:      `<path d="M1.5 8C3 5 5.5 3.5 8 3.5 10.5 3.5 13 5 14.5 8 13 11 10.5 12.5 8 12.5 5.5 12.5 3 11 1.5 8Z" ${a}/><circle cx="8" cy="8" r="2" ${a}/>`,
+    archive:  `<rect x="1.5" y="5.5" width="13" height="8" rx="1" ${a}/><rect x="1.5" y="2.5" width="13" height="3" rx="1" ${a}/><path d="M6 10L8 12 10 10M8 8V12" ${a}/>`,
     logout:   `<path d="M9.5 3H13.5V13H9.5" ${a}/><path d="M2 8H10M7 5L10 8 7 11" ${a}/>`,
     search:   `<circle cx="7" cy="7" r="4.5" ${a}/><path d="M10.5 10.5L14 14" ${a}/>`,
     bell:     `<path d="M4 11V7.5C4 5 6 3 8 3 10 3 12 5 12 7.5V11L13 12H3L4 11Z" ${a}/><path d="M6.5 13C6.5 14 7.2 14.5 8 14.5 8.8 14.5 9.5 14 9.5 13" ${a}/>`,
@@ -11108,6 +11124,7 @@ const MP_NAV = [
     { k:'d2d',           id:'navSbD2d',       label:'D2D',       icon:'d2d', mob:1 },
     { k:'wyniki',        id:'navSbResults',   label:'Results',   icon:'results' },
     { k:'arkusz',        id:'navSbSheet',     label:'Sheet',     icon:'sheet' },
+    { k:'archiwum',     id:'navSbArchiwum',  label:'Archiwum',  icon:'archive' },
   ]},
   { group:'Operacyjne', items:[
     { k:'centrum',       id:'navSbCentrum',   label:'Przeglad ofert', icon:'eye' },
@@ -12918,6 +12935,121 @@ function renderMonths(){
   </div>`;
 
   content.innerHTML = html;
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// ARCHIWUM — Zakończone współprace
+// ═══════════════════════════════════════════════════════════
+
+function renderArchiwum(){
+  const wrap = document.getElementById('archiwumContent');
+  if(!wrap) return;
+
+  const archivedKeys = Object.keys(AC_META).filter(k => AC_META[k].archived);
+
+  if(!archivedKeys.length){
+    wrap.innerHTML = `<div style="color:var(--txt-muted);padding:3rem;text-align:center;font-family:var(--font-ui)">Brak zarchiwizowanych klientów.</div>`;
+    return;
+  }
+
+  const MONTH_ABBR = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
+  const MONTHS_FULL = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+
+  function abbr(m){
+    const i = MONTHS_FULL.indexOf(m);
+    return i>=0 ? MONTH_ABBR[i] : m;
+  }
+
+  let html = '';
+  for(const k of archivedKeys){
+    const meta = AC_META[k];
+    const grpKey = meta.group;
+    const grp = GROUPS[grpKey] || {};
+    const grpColor = GRP_COLORS[grpKey] || '#8b91a8';
+    const D = getData(k);
+    const prod = getProd(k);
+
+    if(!D.length){
+      html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;opacity:.55">
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+          <span style="font-family:var(--font-ui);font-size:1.1rem;font-weight:600;color:var(--txt)">${meta.name}</span>
+          <span style="font-size:.7rem;font-weight:600;padding:.15rem .5rem;border-radius:4px;background:${grpColor}22;color:${grpColor};border:1px solid ${grpColor}44">${grpKey}</span>
+          <span style="font-size:.7rem;color:var(--txt-muted);font-family:var(--font-ui)">(archiwum)</span>
+        </div>
+        <div style="color:var(--txt-muted);font-size:.85rem;font-family:var(--font-ui)">Brak danych historycznych.</div>
+      </div>`;
+      continue;
+    }
+
+    const first = D[0];
+    const last  = D[D.length-1];
+    const totalMonths = D.length;
+    const totalSales = D.reduce((s,d) => s + (d.sprzedaz||0), 0);
+    const totalAdsCost = D.reduce((s,d) => s + (d.adsCost||0), 0);
+    const avgRoas = D.filter(d=>d.roas>0).reduce((s,d,_,a)=>s+(d.roas/a.length),0);
+    const bestRoasEntry = D.reduce((b,d)=>(d.roas||0)>(b.roas||0)?d:b, D[0]);
+    const avgMargin = D.filter(d=>d.sprzedaz>0).map(d=>{
+      const c = calc(d, prod);
+      return (c.zysk/d.sprzedaz)*100;
+    });
+    const avgMarginPct = avgMargin.length ? avgMargin.reduce((a,b)=>a+b,0)/avgMargin.length : 0;
+
+    const statCard = (label, val, sub='') => `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.8rem 1rem;min-width:110px;flex:1">
+      <div style="font-size:.7rem;color:var(--txt-muted);font-family:var(--font-ui);margin-bottom:.2rem">${label}</div>
+      <div style="font-size:1.2rem;font-weight:700;font-family:var(--font-num);color:var(--txt)">${val}</div>
+      ${sub?`<div style="font-size:.7rem;color:var(--txt-muted);font-family:var(--font-ui);margin-top:.1rem">${sub}</div>`:''}
+    </div>`;
+
+    // Monthly history table
+    let tableRows = '';
+    for(const d of D){
+      const c = calc(d, prod);
+      const marginPct = d.sprzedaz>0 ? (c.zysk/d.sprzedaz)*100 : 0;
+      const roasColor = d.roas>0 ? (d.roas >= (1/(prod/100)) ? '#2dd4a0' : '#ff6b35') : 'var(--txt-muted)';
+      tableRows += `<tr>
+        <td style="font-family:var(--font-ui);color:var(--txt-muted);font-size:.8rem;padding:.4rem .6rem;white-space:nowrap">${abbr(d.m)}</td>
+        <td style="font-family:var(--font-num);font-size:.85rem;color:var(--txt);text-align:right;padding:.4rem .6rem">${d.sprzedaz>0?d.sprzedaz.toLocaleString('pl-PL',{maximumFractionDigits:0})+' zł':'—'}</td>
+        <td style="font-family:var(--font-num);font-size:.85rem;color:var(--txt);text-align:right;padding:.4rem .6rem">${d.adsCost>0?d.adsCost.toLocaleString('pl-PL',{maximumFractionDigits:0})+' zł':'—'}</td>
+        <td style="font-family:var(--font-num);font-size:.85rem;color:${roasColor};text-align:right;padding:.4rem .6rem;font-weight:600">${d.roas>0?d.roas.toFixed(2):'—'}</td>
+        <td style="font-family:var(--font-num);font-size:.85rem;color:var(--txt-muted);text-align:right;padding:.4rem .6rem">${marginPct>0?marginPct.toFixed(1)+'%':'—'}</td>
+        <td style="font-family:var(--font-num);font-size:.85rem;color:var(--txt-muted);text-align:right;padding:.4rem .6rem">${c.zysk>0?c.zysk.toLocaleString('pl-PL',{maximumFractionDigits:0})+' zł':'—'}</td>
+      </tr>`;
+    }
+
+    html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:2rem">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap">
+        <span style="font-family:var(--font-ui);font-size:1.2rem;font-weight:700;color:var(--txt)">${meta.name}</span>
+        <span style="font-size:.7rem;font-weight:600;padding:.2rem .55rem;border-radius:4px;background:${grpColor}22;color:${grpColor};border:1px solid ${grpColor}44;font-family:var(--font-ui)">${grpKey}</span>
+        <span style="font-size:.7rem;padding:.2rem .55rem;border-radius:4px;background:var(--bg3);color:var(--txt-muted);border:1px solid var(--border);font-family:var(--font-ui)">archiwum</span>
+        <span style="font-size:.75rem;color:var(--txt-muted);font-family:var(--font-ui);margin-left:auto">${abbr(first.m)} → ${abbr(last.m)} · ${totalMonths} mies.</span>
+      </div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem">
+        ${statCard('Sprzedaż łącznie', totalSales.toLocaleString('pl-PL',{maximumFractionDigits:0})+' zł', totalMonths+' mies.')}
+        ${statCard('Avg ROAS', avgRoas>0?avgRoas.toFixed(2):'—', 'BE: '+(1/(prod/100)).toFixed(2))}
+        ${statCard('Best ROAS', bestRoasEntry.roas>0?bestRoasEntry.roas.toFixed(2):'—', abbr(bestRoasEntry.m))}
+        ${statCard('Avg marża', avgMarginPct>0?avgMarginPct.toFixed(1)+'%':'—', 'netto po Ads')}
+        ${statCard('Wydano Ads', totalAdsCost>0?totalAdsCost.toLocaleString('pl-PL',{maximumFractionDigits:0})+' zł':'—', 'łącznie')}
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border)">
+              <th style="text-align:left;padding:.4rem .6rem;font-size:.7rem;color:var(--txt-muted);font-family:var(--font-ui);font-weight:500">Mies.</th>
+              <th style="text-align:right;padding:.4rem .6rem;font-size:.7rem;color:var(--txt-muted);font-family:var(--font-ui);font-weight:500">Sprzedaż</th>
+              <th style="text-align:right;padding:.4rem .6rem;font-size:.7rem;color:var(--txt-muted);font-family:var(--font-ui);font-weight:500">Ads</th>
+              <th style="text-align:right;padding:.4rem .6rem;font-size:.7rem;color:var(--txt-muted);font-family:var(--font-ui);font-weight:500">ROAS</th>
+              <th style="text-align:right;padding:.4rem .6rem;font-size:.7rem;color:var(--txt-muted);font-family:var(--font-ui);font-weight:500">Marża%</th>
+              <th style="text-align:right;padding:.4rem .6rem;font-size:.7rem;color:var(--txt-muted);font-family:var(--font-ui);font-weight:500">Zysk netto</th>
+            </tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }
+
+  wrap.innerHTML = html;
 }
 
 
@@ -23526,7 +23658,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.80</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.81</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
