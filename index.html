@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.74</title>
+<title>MPlace Hub v9.77</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -26,7 +26,7 @@
   --yellow:#f5a623;--yellow-bg:rgba(245,166,35,.07);--yellow-bd:rgba(245,166,35,.22);
   --blue:#4d9fff;--blue-bg:rgba(77,159,255,.07);--blue-bd:rgba(77,159,255,.22);
   --blue-in:rgba(77,159,255,.09);--blue-in-bd:rgba(77,159,255,.3);
-  --g-meble:#ff6b35;--g-luxsen:#2dd4a0;--g-one:#b47fff;
+  --g-meble:#ff6b35;--g-luxsen:#2dd4a0;--g-one:#b47fff;--g-two:#4d9fff;
   --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
   --display:'DM Mono',monospace;
   --sidebar-w:220px;--sidebar-w-compact:64px;
@@ -94,6 +94,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .mp-acc[data-g="meble"] .gd{background:var(--g-meble)}
 .mp-acc[data-g="luxsen"] .gd{background:var(--g-luxsen)}
 .mp-acc[data-g="one"] .gd{background:var(--g-one)}
+.mp-acc[data-g="two"] .gd{background:var(--g-two)}
 .mp-topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
 .mp-status-pill{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:#9ee9cd;padding:5px 14px;border-radius:999px;background:rgba(45,212,160,.1);border:1px solid rgba(45,212,160,.3)}
 .mp-status-pill .dot{width:6px;height:6px;border-radius:50%;background:#2dd4a0;box-shadow:0 0 6px rgba(45,212,160,.6)}
@@ -110,6 +111,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .nav-glbl.g-meble{color:var(--g-meble);}
 .nav-glbl.g-luxsen{color:var(--g-luxsen);}
 .nav-glbl.g-one{color:var(--g-one);}
+.nav-glbl.g-two{color:var(--g-two);}
 .nav-btn{font-family:var(--mono);font-size:10px;font-weight:400;padding:4px 9px;border-radius:5px;border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;line-height:1.4;}
 .nav-btn:hover{background:var(--bg3);color:var(--text);}
 .nav-btn.active{border-width:1px !important;opacity:1;filter:brightness(1.6) saturate(2.2);}
@@ -137,6 +139,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .g-meble-badge{color:var(--g-meble);border-color:rgba(255,107,53,.3);background:rgba(255,107,53,.07);}
 .g-luxsen-badge{color:var(--g-luxsen);border-color:rgba(45,212,160,.3);background:rgba(45,212,160,.07);}
 .g-one-badge{color:var(--g-one);border-color:rgba(180,127,255,.3);background:rgba(180,127,255,.07);}
+.g-two-badge{color:var(--g-two);border-color:rgba(77,159,255,.3);background:rgba(77,159,255,.07);}
 
 /* ── GRIDS ── */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
@@ -323,6 +326,7 @@ td.tb{color:var(--blue);}td.tm{color:var(--text3);}td.ta{color:var(--accent);}
 .egh-m{--group-c:var(--g-meble);color:var(--g-meble);}
 .egh-l{--group-c:var(--g-luxsen);color:var(--g-luxsen);}
 .egh-o{--group-c:var(--g-one);color:var(--g-one);}
+.egh-t{--group-c:var(--g-two);color:var(--g-two);}
 
 .aec{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:.6rem;overflow:hidden;}
 .aec-hdr{display:flex;align-items:center;gap:.55rem;padding:.55rem 1rem;border-bottom:1px solid var(--border);background:rgba(255,255,255,.018);}
@@ -459,7 +463,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
   .dashboard-card .metric-big,.dashboard-card .metric-row{color:#111 !important;}
   .dashboard-card .progress-bar-wrap{background:#e5e7eb !important;}
   .topbar,.save-bar,.btn,.nav-btn,#acAlerts,.sec-num,.tip{display:none!important;}
-  /* v9.74: ukryj nowy sidebar/topbar i zresetuj body padding (inaczej content jest wciśnięty na ~63mm) */
+  /* v9.77: ukryj nowy sidebar/topbar i zresetuj body padding (inaczej content jest wciśnięty na ~63mm) */
   #mpSidebar,#mpTopbar,.mp-sidebar,.mp-topbar,#zmTopbar,#zmAnnounceBar,.zm-topbar,.mp-search-bar{display:none!important;}
   html,body{padding:0!important;margin:0!important;background:#fff;color:#000;}
   /* Pokazuj tylko aktywny widok (nie wszystkie) */
@@ -1136,6 +1140,7 @@ table.arkusz-tbl tbody td:first-child{text-align:left;color:var(--text2);font-si
 .cmdk-tag.g-meble{color:#ff6b35;background:rgba(255,107,53,.1);}
 .cmdk-tag.g-luxsen{color:#2dd4a0;background:rgba(45,212,160,.1);}
 .cmdk-tag.g-one{color:#b47fff;background:rgba(180,127,255,.1);}
+.cmdk-tag.g-two{color:#4d9fff;background:rgba(77,159,255,.1);}
 .cmdk-tag.g-tab{color:var(--text3);background:var(--bg3);}
 .cmdk-empty{padding:20px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text3);}
 .cmdk-section{padding:6px 20px 2px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);opacity:.6;}
@@ -2130,7 +2135,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.74</span>
+    <span class="brand-ver">v9.77</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2163,7 +2168,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <span class="here" id="mpCrumbView">Dzis <span class="sep">/</span> Cockpit</span>
   </div>
   <div class="mp-accounts" id="mpAccounts" role="tablist" aria-label="Konta">
-    <div class="mp-acc active" data-acc="all" onclick="mpSelectAccount('all')"><span style="color:var(--text);font-weight:600">ALL</span> <span style="color:var(--text3)">9</span></div>
+    <div class="mp-acc active" data-acc="all" onclick="mpSelectAccount('all')"><span style="color:var(--text);font-weight:600">ALL</span> <span style="color:var(--text3)">7</span></div>
     <div class="mp-acc-sep"></div>
     <div class="mp-acc" data-g="meble" data-acc="MEBLE" onclick="mpSelectAccount('MEBLE')"><span class="gd"></span><span style="color:var(--text)">MEBLE</span></div>
     <div class="mp-acc" data-g="meble" data-acc="MobelKap" onclick="showView('MobelKap')"><span>MbK</span></div>
@@ -2173,12 +2178,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="mp-acc" data-g="luxsen" data-acc="LUXSEN" onclick="mpSelectAccount('LUXSEN')"><span class="gd"></span><span style="color:var(--text)">LUXSEN</span></div>
     <div class="mp-acc" data-g="luxsen" data-acc="Luxsen" onclick="showView('Luxsen')"><span>Lux</span></div>
     <div class="mp-acc" data-g="luxsen" data-acc="Semmi" onclick="showView('Semmi')"><span>Sem</span></div>
-    <div class="mp-acc" data-g="luxsen" data-acc="BOTAVIT" onclick="showView('BOTAVIT')"><span>BoV</span></div>
     <div class="mp-acc-sep"></div>
     <div class="mp-acc" data-g="one" data-acc="ONE" onclick="mpSelectAccount('ONE')"><span class="gd"></span><span style="color:var(--text)">ONE</span></div>
     <div class="mp-acc" data-g="one" data-acc="Materazzi" onclick="showView('Materazzi')"><span>Mtz</span></div>
     <div class="mp-acc" data-g="one" data-acc="MtzzEU" onclick="showView('MtzzEU')"><span>mEU</span></div>
-    <div class="mp-acc" data-g="one" data-acc="Ankado24" onclick="showView('Ankado24')"><span>a24</span></div>
+    <div class="mp-acc-sep"></div>
+    <div class="mp-acc" data-g="two" data-acc="TWO" onclick="mpSelectAccount('TWO')"><span class="gd"></span><span style="color:var(--text)">TWO</span></div>
+    <div class="mp-acc" data-g="two" data-acc="VitaClean" onclick="showView('VitaClean')"><span>VIT</span></div>
+    <div class="mp-acc" data-g="two" data-acc="DomGlamour" onclick="showView('DomGlamour')"><span>DOM</span></div>
   </div>
   <div class="mp-topbar-right">
     <div class="mp-status-pill" id="mpStatusPill"><span class="dot"></span> POLACZONO</div>
@@ -2240,12 +2247,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <span class="nav-glbl g-luxsen">LUXSEN</span>
     <button class="nav-btn" onclick="showView('Luxsen')" id="navLuxsen">Lux</button>
     <button class="nav-btn" onclick="showView('Semmi')" id="navSemmi">Sem</button>
-    <button class="nav-btn" onclick="showView('BOTAVIT')" id="navBOTAVIT">BoV</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-one">ONE</span>
     <button class="nav-btn" onclick="showView('Materazzi')" id="navMaterazzi">Mtz</button>
     <button class="nav-btn" onclick="showView('MtzzEU')" id="navMtzzEU">mEU</button>
-    <button class="nav-btn" onclick="showView('Ankado24')" id="navAnkado24">a24</button>
+    <div class="nav-sep"></div>
+    <span class="nav-glbl g-two">TWO</span>
+    <button class="nav-btn" onclick="showView('VitaClean')" id="navVitaClean">VIT</button>
+    <button class="nav-btn" onclick="showView('DomGlamour')" id="navDomGlamour">DOM</button>
   </div>
 </div>
 
@@ -2398,11 +2407,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <span style="width:1px;height:14px;background:var(--border);margin:0 4px"></span>
       <button class="dzis-konto-btn" onclick="dzisToggleKonto('Luxsen',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#2dd4a0;cursor:pointer">Lux</button>
       <button class="dzis-konto-btn" onclick="dzisToggleKonto('Semmi',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#2dd4a0;cursor:pointer">Sem</button>
-      <button class="dzis-konto-btn" onclick="dzisToggleKonto('BOTAVIT',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#2dd4a0;cursor:pointer">BoV</button>
       <span style="width:1px;height:14px;background:var(--border);margin:0 4px"></span>
       <button class="dzis-konto-btn" onclick="dzisToggleKonto('Materazzi',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#b47fff;cursor:pointer">Mtz</button>
       <button class="dzis-konto-btn" onclick="dzisToggleKonto('MtzzEU',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#b47fff;cursor:pointer">mEU</button>
-      <button class="dzis-konto-btn" onclick="dzisToggleKonto('Ankado24',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#b47fff;cursor:pointer">a24</button>
+      <span style="width:1px;height:14px;background:var(--border);margin:0 4px"></span>
+      <button class="dzis-konto-btn" onclick="dzisToggleKonto('VitaClean',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#4d9fff;cursor:pointer">VIT</button>
+      <button class="dzis-konto-btn" onclick="dzisToggleKonto('DomGlamour',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#4d9fff;cursor:pointer">DOM</button>
     </div>
     <div id="dzisUploadSlots" style="display:none;margin-top:8px"></div>
   </div>
@@ -2663,7 +2673,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
         </div>
         <div style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-luxsen);margin:.7rem 0 .4rem">LUXSEN — dynamiczne 20% zysku</div>
         <div class="biz-fee-row">
-          <div class="biz-fee-name">Luxsen + Semmi + BOTAVIT</div>
+          <div class="biz-fee-name">Luxsen + Semmi</div>
           <div class="biz-fee-type">% zysku</div>
           <input class="biz-fee-input" id="feePctLuxsen" type="number" value="20" oninput="renderBiznes()" style="color:var(--green)">
           <div class="biz-result" id="feeResLuxsen">—</div>
@@ -2677,12 +2687,20 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
           <div class="biz-result" id="feeResMaterazzis">—</div>
           <div class="biz-pct" id="feePctMaterazzis"><span class="tip" data-tip="Twoje stałe fee 3 500 zł netto jako % marży po reklamie Materazzi + MtzzEU.">?</span></div>
         </div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-two);margin:.7rem 0 .4rem">TWO</div>
         <div class="biz-fee-row">
-          <div class="biz-fee-name">a24</div>
+          <div class="biz-fee-name">VitaClean (VIT)</div>
           <div class="biz-fee-type">stałe netto</div>
-          <input class="biz-fee-input" id="feeAnkado" type="number" value="2900" oninput="renderBiznes()">
-          <div class="biz-result" id="feeResAnkado">—</div>
-          <div class="biz-pct" id="feePctAnkado"><span class="tip" data-tip="Twoje stałe fee 2 900 zł netto jako % marży po reklamie Ankado24.">?</span></div>
+          <input class="biz-fee-input" id="feeVitaClean" type="number" value="2900" oninput="renderBiznes()">
+          <div class="biz-result" id="feeResVitaClean">—</div>
+          <div class="biz-pct" id="feePctVitaClean"><span class="tip" data-tip="Twoje stałe fee 2 900 zł netto jako % marży po reklamie VitaClean.">?</span></div>
+        </div>
+        <div class="biz-fee-row">
+          <div class="biz-fee-name">Dom Glamour (DOM)</div>
+          <div class="biz-fee-type">stałe netto</div>
+          <input class="biz-fee-input" id="feeDomGlamour" type="number" value="2900" oninput="renderBiznes()">
+          <div class="biz-result" id="feeResDomGlamour">—</div>
+          <div class="biz-pct" id="feePctDomGlamour"><span class="tip" data-tip="Twoje stałe fee 2 900 zł netto jako % marży po reklamie Dom Glamour.">?</span></div>
         </div>
       </div>
     </div>
@@ -2722,7 +2740,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="ph-eyebrow">▸ TWOJE WYNAGRODZENIE AGENCYJNE <span class="ph-info-link" onclick="openInfoSection('tools')">? Info</span></div>
       <div class="ph-title">Rozliczenie <span>LUXSEN</span></div>
-      <div class="ph-sub" id="rozSub">Luxsen · Semmi · BOTAVIT · stawka 20% od marży po reklamie</div>
+      <div class="ph-sub" id="rozSub">Luxsen · Semmi · stawka 20% od marży po reklamie</div>
     </div>
     <div style="display:flex;align-items:center;gap:.5rem">
       <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">Twoja stawka:</div>
@@ -3180,7 +3198,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
   <!-- Input bar -->
   <div class="agent-input-bar">
-    <textarea id="agentInput" placeholder="Zapytaj o swoje konta... np. &#8222;Jesli podnose ROAS BOTAVIT do 7x to jaki wynik na koniec miesiaca?&#8221;"
+    <textarea id="agentInput" placeholder="Zapytaj o swoje konta... np. &#8222;Jesli podnose ROAS VitaClean do 7x to jaki wynik na koniec miesiaca?&#8221;"
       rows="4" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();agentSend()}"></textarea>
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
       <div class="agent-input-meta">
@@ -3508,8 +3526,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <select id="aaKonto" onchange="aaUpdateWyrInfo()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:12px;font-family:var(--mono)">
         <option value="">— wybierz konto —</option>
         <optgroup label="MEBLE"><option value="MobelKap">MobelKap</option><option value="PerfektCiecie">Perfekt Cięcie</option><option value="MeblenaCzasie">Meble na Czasie</option></optgroup>
-        <optgroup label="LUXSEN"><option value="Luxsen">Luxsen</option><option value="Semmi">Semmi</option><option value="BOTAVIT">BOTAVIT</option></optgroup>
-        <optgroup label="ONE"><option value="Materazzi">Materazzi</option><option value="MtzzEU">MtzzEU</option><option value="Ankado24">Ankado24</option></optgroup>
+        <optgroup label="LUXSEN"><option value="Luxsen">Luxsen</option><option value="Semmi">Semmi</option></optgroup>
+        <optgroup label="ONE"><option value="Materazzi">Materazzi</option><option value="MtzzEU">MtzzEU</option></optgroup>
+        <optgroup label="TWO"><option value="VitaClean">VitaClean (VIT)</option><option value="DomGlamour">Dom Glamour (DOM)</option></optgroup>
+        <optgroup label="— archiwum —"><option value="BOTAVIT">BOTAVIT (archiwum)</option><option value="Ankado24">Ankado24 (archiwum)</option></optgroup>
       </select>
     </div>
     <div>
@@ -3851,10 +3871,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
             <option value="MeblenaCzasie">Meble na Czasie (MC)</option>
             <option value="Luxsen">Luxsen</option>
             <option value="Semmi">Semmi</option>
-            <option value="BOTAVIT">BOTAVIT</option>
             <option value="Materazzi">Materazzi</option>
             <option value="MtzzEU">MtzzEU</option>
-            <option value="Ankado24">Ankado24</option>
+            <option value="VitaClean">VitaClean (VIT)</option>
+            <option value="DomGlamour">Dom Glamour (DOM)</option>
+            <option value="BOTAVIT">BOTAVIT (archiwum)</option>
+            <option value="Ankado24">Ankado24 (archiwum)</option>
           </select>
         </div>
         <div>
@@ -4659,8 +4681,9 @@ const DAYS_IN={styczeń:31,luty:28,marzec:31,kwiecień:30,maj:31,czerwiec:30,lip
 
 const GROUPS={
   MEBLE:{label:'MEBLE',c:'var(--g-meble)',cls:'g-meble-badge',egh:'egh-m',accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
-  LUXSEN:{label:'LUXSEN',c:'var(--g-luxsen)',cls:'g-luxsen-badge',egh:'egh-l',accs:['Luxsen','Semmi','BOTAVIT']},
-  ONE:{label:'ONE',c:'var(--g-one)',cls:'g-one-badge',egh:'egh-o',accs:['Materazzi','MtzzEU','Ankado24']},
+  LUXSEN:{label:'LUXSEN',c:'var(--g-luxsen)',cls:'g-luxsen-badge',egh:'egh-l',accs:['Luxsen','Semmi']},
+  ONE:{label:'ONE',c:'var(--g-one)',cls:'g-one-badge',egh:'egh-o',accs:['Materazzi','MtzzEU']},
+  TWO:{label:'TWO',c:'var(--g-two)',cls:'g-two-badge',egh:'egh-t',accs:['VitaClean','DomGlamour']},
 };
 const AC_META={
   MobelKap:{name:'MobelKap',group:'MEBLE',
@@ -4684,10 +4707,13 @@ const AC_META={
     strategiaOpis:'Wolumen mid-range (kwiecień 2026). Hero TOP92 wycofany przez Allegro. Marża spadła z 10.8% do 7.3%, ROAS 5.74 poniżej BE 7.62. Ownership: stoliki mid-range (KARO65, KAJA61, KAJA91, LARA, MAJA, DOUBLE KARO68). Nowy hero: stolik podnoszony rozkładany 92cm. 6 kategorii (27%). Pricing +2.5% utrzymany.',
     badge:'📦 WOLUMEN +2.5%'
   },
-  Luxsen:{name:'Luxsen',group:'LUXSEN'},Semmi:{name:'Semmi',group:'LUXSEN'},BOTAVIT:{name:'BOTAVIT',group:'LUXSEN'},
-  Materazzi:{name:'Materazzi',group:'ONE'},MtzzEU:{name:'MtzzEU',group:'ONE'},Ankado24:{name:'Ankado24',group:'ONE'},
+  Luxsen:{name:'Luxsen',group:'LUXSEN'},Semmi:{name:'Semmi',group:'LUXSEN'},
+  BOTAVIT:{name:'BOTAVIT',group:'LUXSEN',archived:true},
+  Materazzi:{name:'Materazzi',group:'ONE'},MtzzEU:{name:'MtzzEU',group:'ONE'},
+  Ankado24:{name:'Ankado24',group:'ONE',archived:true},
+  VitaClean:{name:'VitaClean',group:'TWO'},DomGlamour:{name:'Dom Glamour',group:'TWO'},
 };
-const DEFAULT_PRODUCER={MobelKap:65,PerfektCiecie:65,MeblenaCzasie:65,Luxsen:60,Semmi:60,BOTAVIT:60,Materazzi:55,MtzzEU:55,Ankado24:55};
+const DEFAULT_PRODUCER={MobelKap:65,PerfektCiecie:65,MeblenaCzasie:65,Luxsen:60,Semmi:60,BOTAVIT:60,Materazzi:55,MtzzEU:55,Ankado24:55,VitaClean:60,DomGlamour:60};
 
 // ═══════════════════════════════════════════════════════════
 // STORAGE
@@ -5160,9 +5186,10 @@ function showView(v){
 // ═══════════════════════════════════════════════════════════
 function renderArkusz(){
   const GROUPS=[
-    {key:'MEBLE',color:'#ff6b35',rgb:'255,107,53',accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
-    {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160',accs:['Luxsen','Semmi','BOTAVIT']},
-    {key:'ONE',  color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU','Ankado24']},
+    {key:'MEBLE', color:'#ff6b35',rgb:'255,107,53', accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
+    {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160', accs:['Luxsen','Semmi']},
+    {key:'ONE',   color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU']},
+    {key:'TWO',   color:'#4d9fff',rgb:'77,159,255', accs:['VitaClean','DomGlamour']},
   ];
   // v9.71: render toggle PL/Global + note above table
   const tg = document.getElementById('arkuszViewModeToggle');
@@ -5259,7 +5286,7 @@ function renderArkusz(){
 // ═══════════════════════════════════════════════════════════
 const INFO_SECTIONS = [
   { id:'start', label:'Zacznij tutaj', items:[
-    {name:'Pierwszy raz w MPlace Hub', desc:'Witaj w MPlace Hub — narzedziu do zarzadzania portfelem 9 kont Allegro. 3 grupy: MEBLE (MobelKap, PerfektCiecie, MeblenaCzasie), LUXSEN (Luxsen, Semmi, BOTAVIT), ONE (Materazzi, MtzzEU, Ankado24).', steps:['Zaloguj sie kontem Google (prawy gorny rog)','Przejdz do Data — wpisz dane wczorajsze dla kazdego konta','Otworz Dashboard — sprawdz ktore konta sa zielone/czerwone','Otworz Cockpit — kliknij Generuj plan → 10 zadan na dzis','Otworz Agent — zadaj pytanie o swoje konta','Powtarzaj codziennie — buduj streak w Cockpicie']},
+    {name:'Pierwszy raz w MPlace Hub', desc:'Witaj w MPlace Hub — narzedziu do zarzadzania portfelem 7 kont Allegro. 4 grupy: MEBLE (MobelKap, PerfektCiecie, MeblenaCzasie), LUXSEN (Luxsen, Semmi), ONE (Materazzi, MtzzEU), TWO (VitaClean, Dom Glamour).', steps:['Zaloguj sie kontem Google (prawy gorny rog)','Przejdz do Data — wpisz dane wczorajsze dla kazdego konta','Otworz Dashboard — sprawdz ktore konta sa zielone/czerwone','Otworz Cockpit — kliknij Generuj plan → 10 zadan na dzis','Otworz Agent — zadaj pytanie o swoje konta','Powtarzaj codziennie — buduj streak w Cockpicie']},
     {name:'Skad brac dane do wpisu?', desc:'<strong>Koszt Ads + ROAS:</strong> Allegro → Ads → Kampanie → eksport 24h<br><strong>Sprzedaz brutto:</strong> Allegro → Sprzedaz → podsumowanie<br><strong>Prowizja:</strong> Allegro → Sprzedaz → kolumna prowizja<br><strong>Wyroznienia:</strong> Allegro → Oferty → wyroznienia → suma<br><strong>Dostawa:</strong> Allegro → Centrum Finansow → koszty dostawy<br><strong>SS / Qlt:</strong> Allegro → Oceny i jakosc → status<br><br>Dane za dzien N wpisujesz w dniu N+1 (rano, przed Cockpitem).'},
     {name:'Typowy dzien pracy', desc:'<strong>Rano (8:00, 15 min):</strong> Data → Cockpit → Dashboard → Insights → odhaczaj taski<br><strong>Tydzien (pn, 1h):</strong> Analiza XLSX → Kanibalizator → Strategy<br><strong>Wieczor (30 min):</strong> Zmiany w Allegro Ads → eksport CSV/PDF → Kalendarz'},
     {name:'Mapa narzedzi', desc:'<strong>CODZIENNE:</strong> Cockpit → Dashboard → Data → Insights<br><strong>ANALIZA:</strong> Analiza → Kanibalizator → Screener → Strategy<br><strong>RAPORTY:</strong> Agent → Raport MTD → Prezentacja → PDF<br><strong>NARZEDZIA:</strong> Kalkulator → Symulator → Kalendarz → Wiedza<br><br><strong>Przeplyw:</strong> Data (wpis) → Dashboard (przeglad) → Insights (alerty) → Agent (analiza) → Raport (eksport). Wpisujesz raz, widzisz wszedzie.'},
@@ -5282,7 +5309,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
-    {name:'v9.74 — Fix print/PDF Analityki konta: ukryty sidebar/topbar, tylko aktywny widok', desc:'Print CSS nie ukrywal nowego #mpSidebar/#mpTopbar (sidebar zajmowal ~63mm na A4) i body mial padding-left:240px → content byl wciśnięty na resztę i pusty. Plus ".view{display:block!important}" pokazywal wszystkie widoki — tylko aktywny ma content, reszta rozpychala strone. Naprawione: ukryty sidebar, body padding 0, tylko .view.active widoczna. (11.05.2026)'},
+    {name:'v9.77 — Fix print/PDF Analityki konta: ukryty sidebar/topbar, tylko aktywny widok', desc:'Print CSS nie ukrywal nowego #mpSidebar/#mpTopbar (sidebar zajmowal ~63mm na A4) i body mial padding-left:240px → content byl wciśnięty na resztę i pusty. Plus ".view{display:block!important}" pokazywal wszystkie widoki — tylko aktywny ma content, reszta rozpychala strone. Naprawione: ukryty sidebar, body padding 0, tylko .view.active widoczna. (11.05.2026)'},
     {name:'v9.73 — Fix m/m delta w Global: zdjety za rygorystyczny guard', desc:'v9.72 ukrywal m/m delta dla wszystkich par miesiecy w trybie Global jesli ktorykolwiek nie mial SK_GLOBAL. Teraz delta zawsze liczy sie z estymForView (= ta sama wartosc co kolumna Estymacja m-c w widoku). (11.05.2026)'},
     {name:'v9.72 — m/m delta respektuje toggle PL/Global w Arkuszu/Analityce', desc:'Kolumna m/m w Arkuszu i Analityce konta liczy delta z wartosci aktualnego widoku (PL lub Global), nie z raw d.sprzedaz. (11.05.2026)'},
     {name:'v9.71 — Globalne vs Polska only: split storage + toggle PL/Global', desc:'Forma "Rynki globalne" (multi-market PL+CZ+SK+HU) PRZESTAJE nadpisywac sprzedaz w Arkuszu/Wynikach. Dodano druga forme "MEBLE — Polska only (Centrum Finansow PL)" — to driver KPI canonical. Toggle PL/Global w Arkuszu, Wynikach, Analityce konta dla 3 kont MEBLE. Auto-migracja flaguje stare wpisy badge "M" jako legacy multi-market do korekty. SK_GLOBAL + SK_LOCAL syncuja sie do Firebase (multi-device). Naprawia mismatch: sprzedaz multi-market vs koszty Ads/wyroznienia PL-only. (11.05.2026)'},
@@ -5309,9 +5336,9 @@ const INFO_SECTIONS = [
   ]},
   { id:'main', label:'Core Tools', items:[
     {name:'Cockpit', icon:'cockpit', goto:'dzis', desc:'Centrum dowodzenia dnia. AI generuje 23 spersonalizowanych zadań na podstawie danych 9 kont, bazy Wiedzy i ostatnich zmian. Gamifikacja: checkboxy, progress bar, streak dzienny, timer, "Did You Know" z losowymi insightami. Cache dzienny — generujesz raz, odhaczasz cały dzień. Priorytety: PILNE (czerwone), WAŻNE (żółte), INFO (niebieskie).', steps:['Kliknij ▶ Play w sidebarze (lub Cockpit)','Jeśli brak cache → kliknij "Generuj plan"','AI analizuje dane 9 kont + bazę Wiedzy + ostatnie analizy','Otrzymujesz 23 karty z zadaniami pogrupowane po priorytetach','Odhaczaj zadania klikając kartę — progress bar rośnie','Cel: 100% dziennie. Buduj streak (seria dni).','Opcja: Odśwież plan jeśli zmieniły się dane w ciągu dnia'], useWhen:'Codziennie rano jako pierwsza czynność. Nie pomijaj — streak motywuje.', caseStudy:'Poniedziałek rano: otwierasz Cockpit. AI widzi że Semmi miała spadek -25% w piątek i generuje zadanie "Sprawdź kampanie Semmi — spadek sprzedaży. Możliwy problem z CPC." Odhaczasz po sprawdzeniu.'},
-    {name:'Dashboard', icon:'dashboard', goto:'dashboard', desc:'Przegląd portfela 9 kont. Każde konto = karta z ROAS AKG, marżą, estymacją EOM. Kolor karty: zielona=rentowne, żółta=optymalizuj, czerwona=interwencja. Widgety: heatmap marż 3×3, ranking, traffic light wyróżnień, wykres bąbelkowy ROAS vs Marża. KPI bar: łączna sprzedaż MTD, ROAS ważony, konta w czerwieni, fee agencji.', steps:['Kliknij Dashboard','KPI bar na górze: sprzedaż, ROAS, konta w czerwieni','Karty kont: kolor = status','Kliknij kartę → szczegóły konta','Scrolluj: heatmap, ranking, traffic light'], useWhen:'Szybki przegląd portfela — które konta wymagają uwagi. Codziennie po wpisaniu danych.', caseStudy:'BOTAVIT czerwona karta (marża -9%, ROAS 1.30x poniżej BE 5.34x). Klikasz → Analysis.'},
+    {name:'Dashboard', icon:'dashboard', goto:'dashboard', desc:'Przegląd portfela 7 aktywnych kont. Każde konto = karta z ROAS AKG, marżą, estymacją EOM. Kolor karty: zielona=rentowne, żółta=optymalizuj, czerwona=interwencja. Widgety: heatmap marż, ranking, traffic light wyróżnień, wykres bąbelkowy ROAS vs Marża. KPI bar: łączna sprzedaż MTD, ROAS ważony, konta w czerwieni, fee agencji.', steps:['Kliknij Dashboard','KPI bar na górze: sprzedaż, ROAS, konta w czerwieni','Karty kont: kolor = status','Kliknij kartę → szczegóły konta','Scrolluj: heatmap, ranking, traffic light'], useWhen:'Szybki przegląd portfela — które konta wymagają uwagi. Codziennie po wpisaniu danych.', caseStudy:'Konto w czerwieni = ROAS poniżej BE lub marża <5%. Klikasz kartę → Analysis dla szczegółowej diagnozy.'},
     {name:'Data', icon:'data', goto:'entry', desc:'Codzienny wpis danych per konto. 3-kolumnowy layout: LEWA=lista 9 kont z progress, ŚRODEK=formularz (01 Koszty, 02 Sprzedaż, 03 Dostawa + KPI bar z deltami + Dziennik), PRAWA=Sanity Check AI + Wczoraj Referencja.<br><br><strong>Skąd dane:</strong><br>— Koszt Ads, ROAS → Allegro Ads → Kampanie → 24h<br>— Sprzedaż brutto, Prowizja → Allegro → Sprzedaż<br>— Wyróżnienia → Allegro → Oferty → wyróżnienia<br>— Dostawa → Centrum Finansów → koszty dostawy<br><br>Dane za dzień N wpisujesz w dniu N+1.', steps:['Kliknij Data','Lista kont: ✓=ma dane, kliknij konto','Sekcja 01: Koszt Ads, ROAS, Wartość Ads','Sekcja 02: Sprzedaż brutto, Prowizja, SS, Qlt','Sekcja 03: Dostawa, Monety, Wyróżnienia, Dzień','KPI aktualizuje się live + Sanity Check po prawej','Kliknij kolejne konto (auto-save localStorage)','Na końcu: Zapisz wszystkie wpisy → Firebase sync','Opcja: Zapisz do D2D → snapshot dnia'], useWhen:'Codziennie po pobraniu danych z Allegro.', caseStudy:'Wpisujesz PerfektCięcie: sprzedaż 62 491 zł. Sanity Check: "Sprzedaż -8% vs wczoraj (67 900). Sprawdź." Okazuje się: 2 bestsellery straciły Super Sprzedawcę.'},
-    {name:'Agent', icon:'agent', goto:'agent', desc:'Główny chat AI (Claude Sonnet 4.6). Kontekst: dane 9 kont + baza Wiedzy (41 wpisów). 9 kategorii Playbook (100 promptów). Eksporty: Raport MTD (PDF), PR (PDF), Prezentacja (PPTX), CSV.<br><br><strong>Playbook — 9 kategorii:</strong> Plan Dnia, Rentowność, ROAS/Ads, Kanibalizacja, D2D/Trend, Symulator, Insights, Mentor, Biznes.', steps:['Kliknij Agent','Playbook (lewa): kliknij prompt — formularz wypełnia się','Lub wpisz własne pytanie','Enter=wyślij, Shift+Enter=nowa linia','Agent analizuje dane i odpowiada','Kopiuj/Drukuj/Email/Czytaj(TTS)/MP3','Eksporty (prawa): Raport MTD, PDF, Prezentacja, CSV'], useWhen:'Gdy potrzebujesz analizy, symulacji, raportu lub porady. Agent widzi wszystkie dane i Wiedzę.', caseStudy:'Pytasz: "Jeśli podniosę ROAS BOTAVIT do 7x — jaki wynik EOM?" Agent: przy budżecie 4327 zł i ROAS 7x → sprzedaż +40%, marża z -9% do +12%.'},
+    {name:'Agent', icon:'agent', goto:'agent', desc:'Główny chat AI (Claude Sonnet 4.6). Kontekst: dane 7 kont + baza Wiedzy. 9 kategorii Playbook (100 promptów). Eksporty: Raport MTD (PDF), PR (PDF), Prezentacja (PPTX), CSV.<br><br><strong>Playbook — 9 kategorii:</strong> Plan Dnia, Rentowność, ROAS/Ads, Kanibalizacja, D2D/Trend, Symulator, Insights, Mentor, Biznes.', steps:['Kliknij Agent','Playbook (lewa): kliknij prompt — formularz wypełnia się','Lub wpisz własne pytanie','Enter=wyślij, Shift+Enter=nowa linia','Agent analizuje dane i odpowiada','Kopiuj/Drukuj/Email/Czytaj(TTS)/MP3','Eksporty (prawa): Raport MTD, PDF, Prezentacja, CSV'], useWhen:'Gdy potrzebujesz analizy, symulacji, raportu lub porady. Agent widzi wszystkie dane i Wiedzę.', caseStudy:'Pytasz: "Jeśli podniosę ROAS VitaClean do 7x — jaki wynik EOM?" Agent kalkuluje nowy budżet, sprzedaż i marżę.'},
   ]},
   { id:'ai', label:'AI Workflow', items:[
     {name:'Analysis', icon:'screener', goto:'analiza', desc:'Główne narzędzie analizy kampanii. Wgraj 3-4 XLSX z Allegro → AI generuje 10-sekcyjny raport z rekomendacjami per aukcja.<br><br><strong>3 wymagane pliki:</strong><br>1. Ads: "statystyki_oferty_*.xlsx" → panel Ads → Statystyki → Eksport<br>2. Odwiedziny: "odwiedziny_wg_ofert_*.xlsx" → Sprzedaż → Odwiedziny wg ofert<br>3. Sprzedaż: "sprzedaz_wg_ofert_*.xlsx" → Sprzedaż → Wg ofert<br><br><strong>Opcja:</strong> Ads 30d (kontekst) — zapobiega false positives z krótkich okresów.<br><br><strong>10 sekcji:</strong> Diagnoza → Zatrzymaj → Tnij → Skaluj → Kanibalizacja → Martwe punkty → Placement → Plan → Wyróżnienia → Podsumowanie', steps:['Wybierz konto z dropdown','Okres: 7d/14d/30d lub custom daty','Wgraj Raport 1 (Ads)','Wgraj Raport 2 (Odwiedziny)','Wgraj Raport 3 (Sprzedaż)','Opcja: Ads 30d kontekst','Wpisz uwagi (święta, problemy)','Opcja: TOTAL RESTART = pełna przebudowa','Kliknij Analizuj z AI (~30-60s)','Raport: Kopiuj/Drukuj/HTML/Email/Zapisz','Historia: ostatnie 20 raportów'], useWhen:'Co tydzień per konto MEBLE. Co 2 tyg. LUXSEN/ONE. Gdy Dashboard pokaże czerwoną kartę.', caseStudy:'MobelKap 14 dni: AI wykrywa 12 kampanii ROAS<3 do wyłączenia (oszczędność ~1200 zł/mies), 5 kampanii ROAS>10 do skalowania, kanibalizacja szafka 62 MK vs PC.'},
@@ -5362,8 +5389,9 @@ const INFO_SECTIONS = [
   ]},
   { id:'konta', label:'9 Accounts', items:[
     {name:'MEBLE (65%)', desc:'<strong>MobelKap</strong> (MoK), <strong>PerfektCięcie</strong> (PeC), <strong>MeblenaCzasie</strong> (MnC). Producent 65%. BE ROAS ≈5.7x. Fee: 7500 zł/mies netto. MnC=benchmark.'},
-    {name:'LUXSEN (60%)', desc:'<strong>Luxsen</strong> (Lux), <strong>Semmi</strong> (Sem), <strong>BOTAVIT</strong> (BoV). Producent 60%. BE ROAS ≈5.3x. Fee: 20% marży grupy (/1.23). Suplementy, kosmetyki.'},
-    {name:'ONE (55%)', desc:'<strong>Materazzi</strong> (Mtz), <strong>MtzzEU</strong> (mEU), <strong>Ankado24</strong> (a24). Producent 55%. BE ROAS ≈4.1x. Fee: Mtz+mEU=3500 zł, a24=2900 zł.'},
+    {name:'LUXSEN (60%)', desc:'<strong>Luxsen</strong> (Lux), <strong>Semmi</strong> (Sem). Producent 60%. BE ROAS ≈5.3x. Fee: 20% marży grupy (/1.23).'},
+    {name:'ONE (55%)', desc:'<strong>Materazzi</strong> (Mtz), <strong>MtzzEU</strong> (mEU). Producent 55%. BE ROAS ≈4.1x. Fee: 3500 zł stałe.'},
+    {name:'TWO (60%)', desc:'<strong>VitaClean</strong> (VIT), <strong>Dom Glamour</strong> (DOM). Producent 60%. Fee: 2900 zł stałe per konto.'},
   ]},
   { id:'workflow', label:'Daily Workflow', items:[
     {name:'Rano (15 min)', desc:'<strong>1.</strong> Cockpit → 10 zadań<br><strong>2.</strong> Dashboard — przegląd portfela<br><strong>3.</strong> Data — wpis danych z wczoraj<br><strong>4.</strong> Insights — nowe alerty?<br><strong>5.</strong> Odhaczaj zadania z Cockpita', useWhen:'Codziennie 8:00-8:15. Streak motywuje.'},
@@ -5564,8 +5592,9 @@ function renderInfoContent(id){
 function renderWyniki(){
   const GROUPS=[
     {key:'MEBLE', color:'#ff6b35',rgb:'255,107,53', accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
-    {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160', accs:['Luxsen','Semmi','BOTAVIT']},
-    {key:'ONE',   color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU','Ankado24']},
+    {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160', accs:['Luxsen','Semmi']},
+    {key:'ONE',   color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU']},
+    {key:'TWO',   color:'#4d9fff',rgb:'77,159,255', accs:['VitaClean','DomGlamour']},
   ];
   // v9.71: render toggle + note
   const tg = document.getElementById('wynikiViewModeToggle');
@@ -5983,15 +6012,16 @@ function initDashboardExtras(){
   const ALL_KEYS = Object.keys(AC_META);
   const GROUPS_DEF = {
     MEBLE:  { accs:['MobelKap','PerfektCiecie','MeblenaCzasie'], prod:65, color:'#ff6b35' },
-    LUXSEN: { accs:['Luxsen','Semmi','BOTAVIT'],                 prod:60, color:'#2dd4a0' },
-    ONE:    { accs:['Materazzi','MtzzEU','Ankado24'],            prod:55, color:'#b47fff' }
+    LUXSEN: { accs:['Luxsen','Semmi'],                           prod:60, color:'#2dd4a0' },
+    ONE:    { accs:['Materazzi','MtzzEU'],                       prod:55, color:'#b47fff' },
+    TWO:    { accs:['VitaClean','DomGlamour'],                   prod:60, color:'#4d9fff' },
   };
   const GRP_OF = {};
   Object.entries(GROUPS_DEF).forEach(([g,def])=>def.accs.forEach(k=>{GRP_OF[k]=g;}));
-  const ACC_SHORT = {MobelKap:'MoK',PerfektCiecie:'PeC',MeblenaCzasie:'MnC',Luxsen:'Lux',Semmi:'Sem',BOTAVIT:'BoV',Materazzi:'Mtz',MtzzEU:'mEU',Ankado24:'a24'};
+  const ACC_SHORT = {MobelKap:'MoK',PerfektCiecie:'PeC',MeblenaCzasie:'MnC',Luxsen:'Lux',Semmi:'Sem',BOTAVIT:'BoV',Materazzi:'Mtz',MtzzEU:'mEU',Ankado24:'a24',VitaClean:'VIT',DomGlamour:'DOM'};
 
-  // Collect current-month data per account
-  const accData = ALL_KEYS.map(k=>{
+  // Collect current-month data per account (active only — archived excluded)
+  const accData = ALL_KEYS.filter(k=>!AC_META[k].archived).map(k=>{
     const D=getData(k), prod=getProd(k);
     const last=D.find(d=>d.m===curM)||D[D.length-1];
     if(!last) return {k, sp:0, est:0, C:null};
@@ -6012,13 +6042,14 @@ function initDashboardExtras(){
   const redAccs    = accData.filter(a=>a.C.roasAds>0&&(a.C.roasAds<a.C.beRoasAds||a.C.mAfter<5));
 
   // Fee calculation
-  const luxsenMarza = ['Luxsen','Semmi','BOTAVIT'].reduce((s,k)=>{
+  const luxsenMarza = ['Luxsen','Semmi'].reduce((s,k)=>{
     const a=accData.find(x=>x.k===k); return s+(a?a.C.zysk:0);
   },0);
   const feeMEBLE   = 7500;
   const feeLUXSEN  = Math.max(0,luxsenMarza*0.20/1.23);
-  const feeONE     = (3500+3500+2900)/1.23;
-  const totalFee   = feeMEBLE + feeLUXSEN + feeONE;
+  const feeONE     = 3500;
+  const feeTWO     = 2900 + 2900;
+  const totalFee   = feeMEBLE + feeLUXSEN + feeONE + feeTWO;
 
   const setText = (id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   setText('kpiTotalSales', pln(totalSales));
@@ -6077,7 +6108,7 @@ function initDashboardExtras(){
   }
 
   // ── HEATMAP ────────────────────────────────────────────
-  const ORDER=['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
+  const ORDER=['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','MtzzEU','VitaClean','DomGlamour'];
   const hGrid=document.getElementById('heatmapGrid');
   if(hGrid){
     hGrid.innerHTML=ORDER.map(k=>{
@@ -6121,8 +6152,9 @@ function initDashboardExtras(){
         labels:labels6,
         datasets:[
           {label:'MEBLE',  data:months6.map(m=>grpSales(['MobelKap','PerfektCiecie','MeblenaCzasie'],m)), borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,.1)',tension:.4,fill:true,pointRadius:4},
-          {label:'LUXSEN', data:months6.map(m=>grpSales(['Luxsen','Semmi','BOTAVIT'],m)),                  borderColor:'#2dd4a0',backgroundColor:'rgba(45,212,160,.1)',tension:.4,fill:true,pointRadius:4},
-          {label:'ONE',    data:months6.map(m=>grpSales(['Materazzi','MtzzEU','Ankado24'],m)),             borderColor:'#b47fff',backgroundColor:'rgba(180,127,255,.1)',tension:.4,fill:true,pointRadius:4}
+          {label:'LUXSEN', data:months6.map(m=>grpSales(['Luxsen','Semmi'],m)),                            borderColor:'#2dd4a0',backgroundColor:'rgba(45,212,160,.1)',tension:.4,fill:true,pointRadius:4},
+          {label:'ONE',    data:months6.map(m=>grpSales(['Materazzi','MtzzEU'],m)),                        borderColor:'#b47fff',backgroundColor:'rgba(180,127,255,.1)',tension:.4,fill:true,pointRadius:4},
+          {label:'TWO',    data:months6.map(m=>grpSales(['VitaClean','DomGlamour'],m)),                    borderColor:'#4d9fff',backgroundColor:'rgba(77,159,255,.1)',tension:.4,fill:true,pointRadius:4}
         ]
       },
       options:{
@@ -6520,7 +6552,7 @@ function renderDataCenter(k){
   const meta = AC_META[k];
   let grp = '';
   Object.entries(GROUPS).forEach(([gKey,g])=>{ if(g.accs.includes(k)) grp=gKey; });
-  const _accShort = {MobelKap:'MoK',PerfektCiecie:'PeC',MeblenaCzasie:'MnC',Luxsen:'Lux',Semmi:'Sem',BOTAVIT:'BoV',Materazzi:'Mtz',MtzzEU:'mEU',Ankado24:'a24'};
+  const _accShort = {MobelKap:'MoK',PerfektCiecie:'PeC',MeblenaCzasie:'MnC',Luxsen:'Lux',Semmi:'Sem',BOTAVIT:'BoV',Materazzi:'Mtz',MtzzEU:'mEU',Ankado24:'a24',VitaClean:'VIT',DomGlamour:'DOM'};
   const last = D[D.length-1];
   const roasHist = D.filter(d=>d.roas>0).map(d=>d.roas);
   const roasRange = roasHist.length ? roasHist.reduce((a,b)=>Math.min(a,b),99).toFixed(1)+'-'+roasHist.reduce((a,b)=>Math.max(a,b),0).toFixed(1)+'x' : '—';
@@ -6684,7 +6716,7 @@ function renderDataRight(k){
   const todayDay = parseInt(document.getElementById('globalDay').value) || now.getDate();
   const {m:curM} = getSaveMonth(todayDay);
   const meta = AC_META[k];
-  const _as = {MobelKap:'MoK',PerfektCiecie:'PeC',MeblenaCzasie:'MnC',Luxsen:'Lux',Semmi:'Sem',BOTAVIT:'BoV',Materazzi:'Mtz',MtzzEU:'mEU',Ankado24:'a24'};
+  const _as = {MobelKap:'MoK',PerfektCiecie:'PeC',MeblenaCzasie:'MnC',Luxsen:'Lux',Semmi:'Sem',BOTAVIT:'BoV',Materazzi:'Mtz',MtzzEU:'mEU',Ankado24:'a24',VitaClean:'VIT',DomGlamour:'DOM'};
   const short = _as[k] || meta.name.slice(0,3);
 
   // Yesterday = previous snapshot (not current edit)
@@ -8030,7 +8062,7 @@ async function _syncPullAll() {
 // Also sync catalog per account (dynamic keys)
 async function _syncCatalogs() {
   if (!currentUser) return;
-  const accounts = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
+  const accounts = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','MtzzEU','VitaClean','DomGlamour'];
   for (const k of accounts) {
     const lsKey = 'catalog_' + k;
     const docName = 'catalog_' + k;
@@ -12844,9 +12876,39 @@ function renderMonths(){
     </tr>`;
   });
 
+  // Archiwum — BOTAVIT i Ankado24 (dane historyczne)
+  const archivedKeys = Object.keys(AC_META).filter(k => AC_META[k].archived);
+  if(archivedKeys.length){
+    html += `<tr style="background:var(--bg3);border-top:8px solid var(--bg)">
+      <td colspan="${allMonths.length + 1}" style="padding:5px 12px;font-family:var(--mono);font-size:10px;
+        letter-spacing:.13em;text-transform:uppercase;color:var(--text3);border-top:1px solid var(--border)">
+        archiwum
+      </td>
+    </tr>`;
+    archivedKeys.forEach((k, ai) => {
+      const meta = AC_META[k];
+      const rowBg = ai % 2 === 0 ? 'var(--bg2)' : 'var(--bg)';
+      const cells = allMonths.map((m, mi) => {
+        const v = getVal(k, m);
+        const isCur = m === curM;
+        return `<td style="padding:10px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,.04);opacity:.5">
+          <div style="font-size:15px;font-weight:500;color:var(--text3)">${v !== null ? fmtVal(v) : '—'}</div>
+        </td>`;
+      }).join('');
+      html += `<tr style="background:${rowBg}" class="months-row">
+        <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap;opacity:.5">
+          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--text3);margin-right:8px;vertical-align:middle"></span>
+          <span style="color:var(--text3);font-size:14px;font-weight:500">${meta.name}</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:6px">[arch.]</span>
+        </td>
+        ${cells}
+      </tr>`;
+    });
+  }
+
   html += `</tbody></table></div>
   <div style="margin-top:.75rem;font-family:var(--mono);font-size:10px;color:var(--text3)">
-    Kliknij wiersz konta → przejdź do szczegółów · est. = estymacja końca miesiąca · ▲▼ = zmiana vs poprzedni miesiąc
+    Kliknij wiersz konta → przejdź do szczegółów · est. = estymacja końca miesiąca · ▲▼ = zmiana vs poprzedni miesiąc · [arch.] = konto archiwalne
   </div>`;
 
   content.innerHTML = html;
@@ -13852,8 +13914,9 @@ async function runMTDReport(selectedKeys, dateFrom, dateTo, batchMode=false) {
   const snap = {};
   const groups = {
     MEBLE: { accs:['MobelKap','PerfektCiecie','MeblenaCzasie'], prod:65 },
-    LUXSEN:{ accs:['Luxsen','Semmi','BOTAVIT'], prod:60 },
-    ONE:   { accs:['Materazzi','MtzzEU','Ankado24'], prod:55 }
+    LUXSEN:{ accs:['Luxsen','Semmi'], prod:60 },
+    ONE:   { accs:['Materazzi','MtzzEU'], prod:55 },
+    TWO:   { accs:['VitaClean','DomGlamour'], prod:60 }
   };
 
   // Filter groups to only include selected accounts
@@ -14139,7 +14202,7 @@ async function generatePodcast() {
     // Fallback: parse from reportText if DOM failed
     if (!_pcMetrics.length) {
       const lines = reportText.split('\n').map(l => l.trim()).filter(l => l);
-      const accNames = ['MobelKap','PerfektCięcie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
+      const accNames = ['MobelKap','PerfektCięcie','MeblenaCzasie','Luxsen','Semmi','Materazzi','MtzzEU','VitaClean','Dom Glamour'];
       for (const line of lines) {
         const aMatch = accNames.find(a => line.includes(a));
         if (aMatch) {
@@ -14510,8 +14573,9 @@ async function runSlideReport(selectedKeys, dateFrom, dateTo) {
 
   const groups = {
     MEBLE: { accs:['MobelKap','PerfektCiecie','MeblenaCzasie'], prod:65 },
-    LUXSEN:{ accs:['Luxsen','Semmi','BOTAVIT'], prod:60 },
-    ONE:   { accs:['Materazzi','MtzzEU','Ankado24'], prod:55 }
+    LUXSEN:{ accs:['Luxsen','Semmi'], prod:60 },
+    ONE:   { accs:['Materazzi','MtzzEU'], prod:55 },
+    TWO:   { accs:['VitaClean','DomGlamour'], prod:60 }
   };
   const filteredGroups = {};
   Object.entries(groups).forEach(([gKey, g]) => {
@@ -15390,11 +15454,11 @@ function seedWiedzaDefaults() {
 
     // ── FEE AGENCJI ──
     { id:now+24, cat:'zasady', title:'Model fee agencji MPlace',
-      content:'MEBLE: 7500 zł netto stałe (3 konta)\nLUXSEN: 20% od marży grupy (brutto→netto /1.23)\nMaterazzi + MtzzEU: 3500 zł stałe\nAnkado24: 2900 zł stałe\n\n60% sprzedaży to koszt producenta, nie marża.\nMarża agencji liczy się od tego co zostaje PO producentzie, prowizji, dostawie i Ads.', created:now },
+      content:'MEBLE: 7500 zł netto stałe (3 konta)\nLUXSEN: 20% od marży grupy (brutto→netto /1.23) — Luxsen + Semmi\nMaterazzi + MtzzEU: 3500 zł stałe\nVitaClean: 2900 zł stałe\nDom Glamour: 2900 zł stałe\n\n60% sprzedaży to koszt producenta, nie marża.\nMarża agencji liczy się od tego co zostaje PO producentzie, prowizji, dostawie i Ads.', created:now },
 
     // ── STRUKTURA PORTFELA ──
-    { id:now+25, cat:'klient', title:'Struktura portfela — 3 grupy × 9 kont',
-      content:'MEBLE (producent 65%): MobelKap, PerfektCięcie, MeblenaCzasie — ten sam katalog, różne role\nLUXSEN (producent 60%): Luxsen, Semmi, BOTAVIT — różne branże (lampy, meble, suplementy)\nONE (producent 55%): Materazzi, MtzzEU (EU), Ankado24 — materace, EU ekspansja\n\nKażda grupa ma inną dynamikę:\n• MEBLE: kanibalizacja wewnętrzna, potrzebna segmentacja ról\n• LUXSEN: niezależne konta, różne rynki\n• ONE: Materazzi+MtzzEU to ten sam biznes (PL+EU)', created:now },
+    { id:now+25, cat:'klient', title:'Struktura portfela — 4 grupy × 7 kont',
+      content:'MEBLE (producent 65%): MobelKap, PerfektCięcie, MeblenaCzasie — ten sam katalog, różne role\nLUXSEN (producent 60%): Luxsen, Semmi — niezależne konta\nONE (producent 55%): Materazzi, MtzzEU (EU) — materace, EU ekspansja\nTWO (producent 60%): VitaClean (VIT), Dom Glamour (DOM) — nowe konta od 07.2026\n\nKażda grupa ma inną dynamikę:\n• MEBLE: kanibalizacja wewnętrzna, potrzebna segmentacja ról\n• LUXSEN: fee dynamiczne 20% marży grupy\n• ONE: Materazzi+MtzzEU to ten sam biznes (PL+EU)\n• TWO: fee stałe 2×2900 zł', created:now },
 
     // ── TOTAL RESTART ──
     { id:now+26, cat:'zasady', title:'Total Restart — metoda przebudowy kampanii Ads',
@@ -16244,7 +16308,7 @@ function addNoteFromInput(konto) {
 
 // Render all note logs on page load
 function initNoteLogs() {
-  ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'].forEach(k => renderNoteLog(k));
+  ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','MtzzEU','VitaClean','DomGlamour'].forEach(k => renderNoteLog(k));
 }
 document.addEventListener('DOMContentLoaded', initNoteLogs);
 
@@ -16436,11 +16500,12 @@ function decVerify(id,status){
 }
 
 const SK_ADS_HISTORY = 'mplace_ads_history_v1';
-const ADS_ACCOUNT_KEYS = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','BOTAVIT','Materazzi','MtzzEU','Ankado24'];
+const ADS_ACCOUNT_KEYS = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','MtzzEU','VitaClean','DomGlamour'];
 const ADS_ACCOUNT_NAMES = {
   MobelKap:'MobelKap',PerfektCiecie:'PerfektCięcie',MeblenaCzasie:'MeblenaCzasie',
-  Luxsen:'Luxsen',Semmi:'Semmi',BOTAVIT:'BOTAVIT',
-  Materazzi:'Materazzi',MtzzEU:'MtzzEU',Ankado24:'Ankado24'
+  Luxsen:'Luxsen',Semmi:'Semmi',
+  Materazzi:'Materazzi',MtzzEU:'MtzzEU',
+  VitaClean:'VitaClean',DomGlamour:'Dom Glamour'
 };
 
 // Detect account from filename
@@ -17173,7 +17238,7 @@ const PLAYBOOK_SECTIONS = {
       { id:'SE-09', name:'Symulator fee agencji – jak decyzje wpływają na wynagrodzenie', needsKonto: false,
         cel: 'Połączenie symulatora kont z modelem fee agencji – żeby widzieć jak każda decyzja operacyjna przekłada się na Twoje realne wynagrodzenie w zł.',
         tags:['#SYMULATOR','#MARŻA','#RENTOWNOŚĆ','#BIZNES-AGENCJI','#PROGNOZA'],
-        prompt: `Zasymuluj wpływ 3 scenariuszy operacyjnych na moje łączne fee agencyjne w bieżącym miesiącu.\n\nModel fee: MEBLE 7 500 zł netto / LUXSEN 20% od marży grupy / Materazzi+MtzzEU 3 500 zł / Ankado24 2 900 zł.\n\nA – Status quo: obecne tempo bez zmian\nB – Optymistyczny: wdrażam top 3 działania z ostatniego playbooka (podaj które i ich efekt na marżę LUXSEN)\nC – Pesymistyczny: LUXSEN traci 15% marży przez nieoptymalne Ads przez resztę miesiąca\n\nDla każdego: marża LUXSEN i fee z LUXSEN, łączne fee agencji, zmiana fee vs A, annualizowane fee (×12).\nKtóre jedno działanie dziś ma największy wpływ na moje wynagrodzenie i o ile zł może je zwiększyć?` },
+        prompt: `Zasymuluj wpływ 3 scenariuszy operacyjnych na moje łączne fee agencyjne w bieżącym miesiącu.\n\nModel fee: MEBLE 7 500 zł netto / LUXSEN 20% od marży grupy (Luxsen+Semmi) / Materazzi+MtzzEU 3 500 zł / VitaClean 2 900 zł / Dom Glamour 2 900 zł.\n\nA – Status quo: obecne tempo bez zmian\nB – Optymistyczny: wdrażam top 3 działania z ostatniego playbooka (podaj które i ich efekt na marżę LUXSEN)\nC – Pesymistyczny: LUXSEN traci 15% marży przez nieoptymalne Ads przez resztę miesiąca\n\nDla każdego: marża LUXSEN i fee z LUXSEN, łączne fee agencji, zmiana fee vs A, annualizowane fee (×12).\nKtóre jedno działanie dziś ma największy wpływ na moje wynagrodzenie i o ile zł może je zwiększyć?` },
       { id:'SE-10', name:'Symulator pełny – wszystkie dźwignie naraz', needsKonto: true,
         cel: 'Najbardziej rozbudowana symulacja – zmiana wszystkich 4 dźwigni jednocześnie (ROAS, budżet, prowizja, wyróżnienia) i efekt na marżę EOM całej agencji.',
         tags:['#SYMULATOR','#MARŻA','#ROAS','#BUDŻET','#WYRÓŻNIENIA','#RENTOWNOŚĆ'],
@@ -17211,7 +17276,7 @@ const PLAYBOOK_SECTIONS = {
       { id:'IA-07', name:'Insight LUXSEN – analiza modelu 20% fee', needsKonto: false,
         cel: 'LUXSEN to model 20% od marży – każda zmiana marży bezpośrednio uderza w Twoje fee. Agent alarmuje kiedy marża LUXSEN się zmienia i co za tym stoi.',
         tags:['#INSIGHTS','#LUXSEN','#MARŻA','#RENTOWNOŚĆ','#BIZNES-AGENCJI'],
-        prompt: `Przeanalizuj grupę LUXSEN (Luxsen, Semmi, BOTAVIT) pod kątem modelu wynagrodzenia agencji 20% od marży.\n\nDla każdego konta grupy podaj:\n1. Marża po reklamie MTD (zł),\n2. Moje fee z tego konta (20% × marża) MTD (zł),\n3. Prognoza marży EOM (zł) i prognoza mojego fee EOM (zł),\n4. Zmiana vs poprzedni miesiąc: marża (zł i %) i moje fee (zł),\n5. Główny czynnik zmiany marży (Ads, wyróżnienia, sprzedaż, prowizja).\n\nNastępnie wskaż wszystkie aktywne zagrożenia dla marży LUXSEN:\n– co obniża marżę teraz,\n– co może obniżyć marżę w kolejnych 14 dniach,\n– jakie działanie dziś chroni moją marżę (i fee) najbardziej.\n\nNa końcu: łączna prognoza fee z LUXSEN na EOM (zł) i jedno działanie które mogę wdrożyć dziś żeby zwiększyć fee o maksymalną kwotę w zł.` },
+        prompt: `Przeanalizuj grupę LUXSEN (Luxsen, Semmi) pod kątem modelu wynagrodzenia agencji 20% od marży.\n\nDla każdego konta grupy podaj:\n1. Marża po reklamie MTD (zł),\n2. Moje fee z tego konta (20% × marża) MTD (zł),\n3. Prognoza marży EOM (zł) i prognoza mojego fee EOM (zł),\n4. Zmiana vs poprzedni miesiąc: marża (zł i %) i moje fee (zł),\n5. Główny czynnik zmiany marży (Ads, wyróżnienia, sprzedaż, prowizja).\n\nNastępnie wskaż wszystkie aktywne zagrożenia dla marży LUXSEN:\n– co obniża marżę teraz,\n– co może obniżyć marżę w kolejnych 14 dniach,\n– jakie działanie dziś chroni moją marżę (i fee) najbardziej.\n\nNa końcu: łączna prognoza fee z LUXSEN na EOM (zł) i jedno działanie które mogę wdrożyć dziś żeby zwiększyć fee o maksymalną kwotę w zł.` },
       { id:'IA-08', name:'Wczesny sygnał – wykryj problem zanim urośnie', needsKonto: false,
         cel: 'Analiza słabych sygnałów – małych odchyleń w danych, które jeszcze nie są kryzysem, ale mogą nim być za 7–14 dni.',
         tags:['#INSIGHTS','#ALERTY','#TREND','#D2D','#ANOMALIE'],
@@ -17237,11 +17302,11 @@ const PLAYBOOK_SECTIONS = {
       { id:'RC-02', name:'Raport MTD – pełny dla klienta LUXSEN', needsKonto: false,
         cel: 'Raport dla klienta LUXSEN z uwzględnieniem modelu 20% od marży – klient widzi nie tylko wyniki ale też jak Twoje działania przekładają się na jego zysk.',
         tags:['#RAPORT','#LUXSEN','#MARŻA','#ROAS','#MAIL-DO-KLIENTA','#BIZNES-AGENCJI'],
-        prompt: `Przygotuj raport MTD dla klienta grupy LUXSEN (Luxsen, Semmi, BOTAVIT).\n\n6 sekcji:\n1. PODSUMOWANIE WYKONAWCZE – wynik marży MTD, trend vs poprzedni miesiąc, prognoza EOM.\n2. WYNIKI LICZBOWE – tabela: Konto / Sprzedaż MTD / Marża (%) / Marża (zł) / ROAS Ads / Zmiana marży vs poprzedni miesiąc (pp).\n3. ANALIZA MARŻY – co wpłynęło na marżę (Ads, wyróżnienia, prowizja, mix). Dla każdego czynnika: wpływ w zł.\n4. CO ZROBILIŚMY – 3–5 działań z efektem w zł. Nacisk na ochronę i wzrost marży klienta.\n5. PLAN NA 2 TYGODNIE – 3 działania z prognozowanym efektem na marżę (zł).\n6. PROGNOZA EOM – marża grupy LUXSEN łącznie i per konto (zł).\n\nStyl: partnerski, zorientowany na zysk. Klient płaci 20% od marży więc zależy nam na tym samym.` },
+        prompt: `Przygotuj raport MTD dla klienta grupy LUXSEN (Luxsen, Semmi).\n\n6 sekcji:\n1. PODSUMOWANIE WYKONAWCZE – wynik marży MTD, trend vs poprzedni miesiąc, prognoza EOM.\n2. WYNIKI LICZBOWE – tabela: Konto / Sprzedaż MTD / Marża (%) / Marża (zł) / ROAS Ads / Zmiana marży vs poprzedni miesiąc (pp).\n3. ANALIZA MARŻY – co wpłynęło na marżę (Ads, wyróżnienia, prowizja, mix). Dla każdego czynnika: wpływ w zł.\n4. CO ZROBILIŚMY – 3–5 działań z efektem w zł. Nacisk na ochronę i wzrost marży klienta.\n5. PLAN NA 2 TYGODNIE – 3 działania z prognozowanym efektem na marżę (zł).\n6. PROGNOZA EOM – marża grupy LUXSEN łącznie i per konto (zł).\n\nStyl: partnerski, zorientowany na zysk. Klient płaci 20% od marży więc zależy nam na tym samym.` },
       { id:'RC-03', name:'Raport MTD – pełny dla klienta ONE', needsKonto: false,
-        cel: 'Raport dla klientów grupy ONE (Materazzi, MtzzEU, Ankado24) – nacisk na wyniki operacyjne i wartość dodaną agencji.',
+        cel: 'Raport dla klientów grupy ONE (Materazzi, MtzzEU) – nacisk na wyniki operacyjne i wartość dodaną agencji.',
         tags:['#RAPORT','#MARŻA','#ROAS','#MAIL-DO-KLIENTA'],
-        prompt: `Przygotuj raport MTD dla klientów grupy ONE (Materazzi, MtzzEU, Ankado24).\n\n6 sekcji:\n1. PODSUMOWANIE WYKONAWCZE – per konto jedno zdanie: jak idzie miesiąc i prognoza EOM.\n2. WYNIKI LICZBOWE – tabela: Konto / Sprzedaż MTD / Marża (%) / ROAS / Koszt Ads / Wyróżnienia / Zmiana vs poprzedni.\n3. CO ZROBILIŚMY – per konto 2–3 działania z efektem. Co by się stało bez tych działań (strata lub zysk w zł).\n4. OBSERWACJE – max 2 per konto: sezonowość, zmiana algorytmu, konkurencja.\n5. PLAN NA KOLEJNY TYDZIEŃ – per konto 2 działania z oczekiwanym efektem.\n6. PROGNOZA EOM – per konto sprzedaż i marża (zł).\n\nStyl: profesjonalny, konkretny. Raport musi pokazywać wartość agencji przez konkretne działania.` },
+        prompt: `Przygotuj raport MTD dla klientów grupy ONE (Materazzi, MtzzEU).\n\n6 sekcji:\n1. PODSUMOWANIE WYKONAWCZE – per konto jedno zdanie: jak idzie miesiąc i prognoza EOM.\n2. WYNIKI LICZBOWE – tabela: Konto / Sprzedaż MTD / Marża (%) / ROAS / Koszt Ads / Wyróżnienia / Zmiana vs poprzedni.\n3. CO ZROBILIŚMY – per konto 2–3 działania z efektem. Co by się stało bez tych działań (strata lub zysk w zł).\n4. OBSERWACJE – max 2 per konto: sezonowość, zmiana algorytmu, konkurencja.\n5. PLAN NA KOLEJNY TYDZIEŃ – per konto 2 działania z oczekiwanym efektem.\n6. PROGNOZA EOM – per konto sprzedaż i marża (zł).\n\nStyl: profesjonalny, konkretny. Raport musi pokazywać wartość agencji przez konkretne działania.` },
       { id:'RC-04', name:'Mail tygodniowy – krótki update dla klienta', needsKonto: true,
         cel: 'Krótki mail tygodniowy do klienta – nie pełny raport, tylko najważniejsze info w 5 zdaniach gotowe do wklejenia w maila lub WhatsApp.',
         tags:['#RAPORT','#MAIL-DO-KLIENTA','#SZYBKA-DECYZJA','#TREND'],
@@ -17325,19 +17390,19 @@ const PLAYBOOK_SECTIONS = {
       { id:'BA-01', name:'Prognoza fee agencji – ile zarobię w tym miesiącu', needsKonto: false,
         cel: 'Aktualna prognoza Twojego wynagrodzenia agencyjnego na koniec miesiąca – per klient i łącznie, z trendem vs poprzedni miesiąc.',
         tags:['#BIZNES-AGENCJI','#PROGNOZA','#MARŻA','#LUXSEN','#EOM'],
-        prompt: `Oblicz prognozę mojego łącznego fee agencyjnego na koniec bieżącego miesiąca.\n\nModel fee:\nMEBLE: stałe 7 500 zł netto,\nLUXSEN: 20% od łącznej marży po reklamie grupy LUXSEN,\nMaterazzi + MtzzEU: stałe 3 500 zł,\nAnkado24: stałe 2 900 zł.\n\nDla każdego klienta podaj:\n1. Podstawa naliczenia fee (marża grupy dla LUXSEN / stałe dla pozostałych),\n2. Fee MTD (zł) – ile już zarobiłem do dziś,\n3. Prognoza fee EOM (zł) przy obecnym tempie,\n4. Zmiana fee vs poprzedni miesiąc (zł i %),\n5. Status: LEPIEJ / NA POZIOMIE / GORZEJ niż poprzedni miesiąc.\n\nNa końcu:\n– Łączne fee agencji EOM (zł),\n– Annualizowane fee przy obecnym tempie (× 12 miesięcy),\n– Które działanie operacyjne dziś ma największy wpływ na moje fee w tym miesiącu i o ile zł może je zwiększyć?` },
+        prompt: `Oblicz prognozę mojego łącznego fee agencyjnego na koniec bieżącego miesiąca.\n\nModel fee:\nMEBLE: stałe 7 500 zł netto,\nLUXSEN: 20% od łącznej marży po reklamie grupy LUXSEN (Luxsen + Semmi),\nMaterazzi + MtzzEU: stałe 3 500 zł,\nVitaClean: stałe 2 900 zł,\nDom Glamour: stałe 2 900 zł.\n\nDla każdego klienta podaj:\n1. Podstawa naliczenia fee (marża grupy dla LUXSEN / stałe dla pozostałych),\n2. Fee MTD (zł) – ile już zarobiłem do dziś,\n3. Prognoza fee EOM (zł) przy obecnym tempie,\n4. Zmiana fee vs poprzedni miesiąc (zł i %),\n5. Status: LEPIEJ / NA POZIOMIE / GORZEJ niż poprzedni miesiąc.\n\nNa końcu:\n– Łączne fee agencji EOM (zł),\n– Annualizowane fee przy obecnym tempie (× 12 miesięcy),\n– Które działanie operacyjne dziś ma największy wpływ na moje fee w tym miesiącu i o ile zł może je zwiększyć?` },
       { id:'BA-02', name:'LUXSEN fee – maksymalizacja 20% od marży', needsKonto: false,
         cel: 'LUXSEN to jedyny klient z modelem zmiennym – Agent szuka konkretnych działań które zwiększą marżę LUXSEN i tym samym Twoje fee.',
         tags:['#BIZNES-AGENCJI','#LUXSEN','#MARŻA','#ROAS','#SYMULATOR'],
-        prompt: `Skup się wyłącznie na grupie LUXSEN i znajdź działania które maksymalizują marżę grupy w bieżącym miesiącu.\n\nPamiętaj: każdy +1 000 zł marży LUXSEN = +200 zł mojego fee.\n\n4 obszary:\n1. ADS – kampanie ROAS >130% BE do przeskalowania. Efekt na marżę (zł).\n2. WYRÓŻNIENIA – konta LUXSEN przepalające >5%. Ile marży odzyska się po korekcie (zł)?\n3. BUDŻET – optymalna realokacja między Luxsen, Semmi, BOTAVIT. Efekt na marżę (zł).\n4. QUICK WINS – co zrobić dziś w 30 minut żeby poprawić marżę LUXSEN jeszcze w tym miesiącu.\n\nDla każdego obszaru: działanie → efekt na marżę LUXSEN (zł) → efekt na moje fee (zł).\nŁączny potencjał wzrostu fee z LUXSEN w tym miesiącu (zł).` },
+        prompt: `Skup się wyłącznie na grupie LUXSEN i znajdź działania które maksymalizują marżę grupy w bieżącym miesiącu.\n\nPamiętaj: każdy +1 000 zł marży LUXSEN = +200 zł mojego fee.\n\n4 obszary:\n1. ADS – kampanie ROAS >130% BE do przeskalowania. Efekt na marżę (zł).\n2. WYRÓŻNIENIA – konta LUXSEN przepalające >5%. Ile marży odzyska się po korekcie (zł)?\n3. BUDŻET – optymalna realokacja między Luxsen i Semmi. Efekt na marżę (zł).\n4. QUICK WINS – co zrobić dziś w 30 minut żeby poprawić marżę LUXSEN jeszcze w tym miesiącu.\n\nDla każdego obszaru: działanie → efekt na marżę LUXSEN (zł) → efekt na moje fee (zł).\nŁączny potencjał wzrostu fee z LUXSEN w tym miesiącu (zł).` },
       { id:'BA-03', name:'Rentowność klientów – który klient jest najbardziej wartościowy', needsKonto: false,
         cel: 'Analiza portfela klientów pod kątem wartości biznesowej dla agencji – nie tylko fee ale też czas, ryzyko i potencjał wzrostu.',
         tags:['#BIZNES-AGENCJI','#RENTOWNOŚĆ','#PROGNOZA','#MENTOR','#WSZYSTKIE-KONTA'],
-        prompt: `Oceń każdego klienta agencji pod kątem wartości biznesowej dla mnie.\n\nDla każdego klienta (MEBLE / LUXSEN / Materazzi+MtzzEU / Ankado24) przeanalizuj 5 wymiarów:\n1. FEE MIESIĘCZNE – aktualne (zł) i trend (rośnie / spada / stabilne),\n2. CZAS OBSŁUGI – szacowane godziny tygodniowo i zwrot zł/godz.,\n3. RYZYKO – czy klient może odejść lub obniżyć fee w ciągu 6 miesięcy? Ocena ryzyka 1–5,\n4. POTENCJAŁ WZROSTU – czy fee może wzrosnąć (nowe konta, większy budżet, nowe usługi)? Szacunek w zł/mies.,\n5. TRUDNOŚĆ OBSŁUGI – jak skomplikowane jest zarządzanie tym klientem (kanibalizacja, zmienność wyników, wymagania raportowe). Ocena 1–5.\n\nDla każdego klienta zsumuj ocenę i stwórz ranking: który klient jest najbardziej wartościowy biznesowo dla agencji (nie tylko największe fee, ale fee / czas / ryzyko).\nNa końcu: jeden wniosek dla każdego klienta – co powinienem zrobić żeby zwiększyć jego wartość dla agencji lub zmniejszyć koszt jego obsługi w ciągu 3 miesięcy.` },
+        prompt: `Oceń każdego klienta agencji pod kątem wartości biznesowej dla mnie.\n\nDla każdego klienta (MEBLE / LUXSEN / Materazzi+MtzzEU / VitaClean / Dom Glamour) przeanalizuj 5 wymiarów:\n1. FEE MIESIĘCZNE – aktualne (zł) i trend (rośnie / spada / stabilne),\n2. CZAS OBSŁUGI – szacowane godziny tygodniowo i zwrot zł/godz.,\n3. RYZYKO – czy klient może odejść lub obniżyć fee w ciągu 6 miesięcy? Ocena ryzyka 1–5,\n4. POTENCJAŁ WZROSTU – czy fee może wzrosnąć (nowe konta, większy budżet, nowe usługi)? Szacunek w zł/mies.,\n5. TRUDNOŚĆ OBSŁUGI – jak skomplikowane jest zarządzanie tym klientem (kanibalizacja, zmienność wyników, wymagania raportowe). Ocena 1–5.\n\nDla każdego klienta zsumuj ocenę i stwórz ranking: który klient jest najbardziej wartościowy biznesowo dla agencji (nie tylko największe fee, ale fee / czas / ryzyko).\nNa końcu: jeden wniosek dla każdego klienta – co powinienem zrobić żeby zwiększyć jego wartość dla agencji lub zmniejszyć koszt jego obsługi w ciągu 3 miesięcy.` },
       { id:'BA-04', name:'Rozliczenie LUXSEN – faktura 20% od marży', needsKonto: false,
         cel: 'Gotowe wyliczenie do faktury dla LUXSEN – transparentne, oparte na danych, z rozpisaniem per konto i gotowym opisem do faktury.',
         tags:['#BIZNES-AGENCJI','#LUXSEN','#MARŻA','#RAPORT','#RENTOWNOŚĆ'],
-        prompt: `Przygotuj wyliczenie do faktury dla klienta LUXSEN za bieżący miesiąc.\n\nKROK 1 – MARŻA PER KONTO:\nDla każdego konta (Luxsen, Semmi, BOTAVIT): Sprzedaż / Koszt producenta / Prowizja / Dostawa / Ads / Wyróżnienia / Marża po reklamie (zł) / Marża po reklamie (%).\n\nKROK 2 – PODSTAWA NALICZENIA:\nŁączna marża grupy LUXSEN (zł). Moje fee = 20% × łączna marża.\n\nKROK 3 – OPIS DO FAKTURY:\n2–3 zdania w stylu: 'Usługa zarządzania kontami Allegro dla grupy LUXSEN w miesiącu [X]. Wynagrodzenie zmienne 20% od marży po reklamie w wysokości [Y] zł. Podstawa: marża [Z] zł.'\n\nNa końcu: porównanie fee LUXSEN vs poprzedni miesiąc i główna przyczyna zmiany.` },
+        prompt: `Przygotuj wyliczenie do faktury dla klienta LUXSEN za bieżący miesiąc.\n\nKROK 1 – MARŻA PER KONTO:\nDla każdego konta (Luxsen, Semmi): Sprzedaż / Koszt producenta / Prowizja / Dostawa / Ads / Wyróżnienia / Marża po reklamie (zł) / Marża po reklamie (%).\n\nKROK 2 – PODSTAWA NALICZENIA:\nŁączna marża grupy LUXSEN (zł). Moje fee = 20% × łączna marża.\n\nKROK 3 – OPIS DO FAKTURY:\n2–3 zdania w stylu: 'Usługa zarządzania kontami Allegro dla grupy LUXSEN w miesiącu [X]. Wynagrodzenie zmienne 20% od marży po reklamie w wysokości [Y] zł. Podstawa: marża [Z] zł.'\n\nNa końcu: porównanie fee LUXSEN vs poprzedni miesiąc i główna przyczyna zmiany.` },
       { id:'BA-05', name:'Prognoza fee na 3 miesiące – planowanie finansowe', needsKonto: false,
         cel: 'Prognoza wynagrodzenia agencyjnego na kolejne 3 miesiące – z uwzględnieniem sezonowości, trendów kont i planowanych działań.',
         tags:['#BIZNES-AGENCJI','#PROGNOZA','#MARŻA','#LUXSEN','#SYMULATOR','#TREND'],
@@ -18500,7 +18565,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
 
   if (isTotalRestart) {
     // ─── TOTAL RESTART MODE ───
-    const kontoSkrot = { MobelKap:'MK', PerfektCiecie:'PC', MeblenaCzasie:'MC', Luxsen:'LX', Semmi:'SM', BOTAVIT:'BV', Materazzi:'MZ', MtzzEU:'ME', Ankado24:'AK' }[kontoKey] || kontoKey.substring(0,2).toUpperCase();
+    const kontoSkrot = { MobelKap:'MK', PerfektCiecie:'PC', MeblenaCzasie:'MC', Luxsen:'LX', Semmi:'SM', BOTAVIT:'BV', Materazzi:'MZ', MtzzEU:'ME', Ankado24:'AK', VitaClean:'VIT', DomGlamour:'DOM' }[kontoKey] || kontoKey.substring(0,2).toUpperCase();
     // Oblicz target Ads i max budżet
     const adsTargetPct = meta ? meta.adsTarget : 5.5;
     const eomEst = (konwersja && konwersja.totWartosc) ? konwersja.totWartosc : 0;
@@ -18791,7 +18856,7 @@ function aaBuildPrompt(konto, okres, uwagi, ads, sprzedaz, konwersja, beRoas, ad
       p += `TOP ${Math.min(15, kandydaciAds.length)} KANDYDATÓW DO NOWYCH KAMPANII ADS:\n`;
       p += `(sortowane po wizytach malejąco — im więcej wizyt organicznych, tym większy potencjał Ads)\n\n`;
       // Mapowanie konta → skrót dla nazw grup
-      const kontoSkrotMap = { MobelKap:'MK', PerfektCiecie:'PC', MeblenaCzasie:'MC', Luxsen:'LX', Semmi:'SM', BOTAVIT:'BV', Materazzi:'MZ', MtzzEU:'ME', Ankado24:'AK' };
+      const kontoSkrotMap = { MobelKap:'MK', PerfektCiecie:'PC', MeblenaCzasie:'MC', Luxsen:'LX', Semmi:'SM', BOTAVIT:'BV', Materazzi:'MZ', MtzzEU:'ME', Ankado24:'AK', VitaClean:'VIT', DomGlamour:'DOM' };
       const kontoSkrotForGroups = kontoSkrotMap[kontoKey] || kontoKey.substring(0,2).toUpperCase();
 
       kandydaciAds.slice(0, 15).forEach((o, i) => {
@@ -19374,7 +19439,7 @@ function aaTRValidateJSON(data, roasMap, beRoas) {
 }
 
 function aaTRRender(data, kontoKey) {
-  const ks = { MobelKap:'MK', PerfektCiecie:'PC', MeblenaCzasie:'MC', Luxsen:'LX', Semmi:'SM', BOTAVIT:'BV', Materazzi:'MZ', MtzzEU:'ME', Ankado24:'AK' }[kontoKey] || kontoKey.substring(0,2).toUpperCase();
+  const ks = { MobelKap:'MK', PerfektCiecie:'PC', MeblenaCzasie:'MC', Luxsen:'LX', Semmi:'SM', BOTAVIT:'BV', Materazzi:'MZ', MtzzEU:'ME', Ankado24:'AK', VitaClean:'VIT', DomGlamour:'DOM' }[kontoKey] || kontoKey.substring(0,2).toUpperCase();
   const kontoName = (typeof AC_META !== 'undefined' && AC_META[kontoKey]) ? AC_META[kontoKey].name : kontoKey;
 
   // Policz totale
@@ -20631,7 +20696,7 @@ function dzisRenderUploadSlots() {
   const container = document.getElementById('dzisUploadSlots');
   if (!window._dzisSelectedKonta.length) { container.style.display = 'none'; return; }
   container.style.display = 'block';
-  const skrotKonta = { MobelKap:'MK', PerfektCiecie:'PC', MeblenaCzasie:'MnC', Luxsen:'Lux', Semmi:'Sem', BOTAVIT:'BoV', Materazzi:'Mtz', MtzzEU:'mEU', Ankado24:'a24' };
+  const skrotKonta = { MobelKap:'MK', PerfektCiecie:'PC', MeblenaCzasie:'MnC', Luxsen:'Lux', Semmi:'Sem', BOTAVIT:'BoV', Materazzi:'Mtz', MtzzEU:'mEU', Ankado24:'a24', VitaClean:'VIT', DomGlamour:'DOM' };
   container.innerHTML = window._dzisSelectedKonta.map(k => {
     const name = AC_META[k]?.name || k;
     const sk = skrotKonta[k] || k;
@@ -23455,7 +23520,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.74</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.77</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -24403,7 +24468,7 @@ function scrRenderFilesList() {
     return;
   }
 
-  const kontoSkrot = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC', Luxsen: 'Lux', Semmi: 'Sem', BOTAVIT: 'BoV', Materazzi: 'Mtz', MtzzEU: 'mEU', Ankado24: 'a24' };
+  const kontoSkrot = { MobelKap: 'MK', PerfektCiecie: 'PC', MeblenaCzasie: 'MC', Luxsen: 'Lux', Semmi: 'Sem', BOTAVIT: 'BoV', Materazzi: 'Mtz', MtzzEU: 'mEU', Ankado24: 'a24', VitaClean: 'VIT', DomGlamour: 'DOM' };
   const typeLabels = { ads: 'Ads', sprzedaz: 'Odwiedziny', konwersja: 'Sprzedaż', ads30d: 'Ads 30d', konkurencja: 'Konkurencja', pdf: 'PDF' };
   const typeColors = { ads: '#38bdf8', sprzedaz: '#34d399', konwersja: '#f5a623', ads30d: '#a78bfa', konkurencja: '#ef4444', pdf: '#4d9fff' };
   const sourceIcon = { name: '📁', file: '📄', manual: '✋' };
@@ -25384,7 +25449,7 @@ function klkBuildCheat(){
 // ROZLICZENIE LUXSEN
 // ═══════════════════════════════════════════════════════════
 function renderRozliczenie(){
-  const LUXSEN_ACCS = ['Luxsen','Semmi','BOTAVIT'];
+  const LUXSEN_ACCS = ['Luxsen','Semmi'];
   const stawka = parseFloat(document.getElementById('rozStawka')?.value)||20;
   const now = new Date();
   const curM = MONTHS[now.getMonth()];
@@ -25410,7 +25475,7 @@ function renderRozliczenie(){
   }).join('');
 
   document.getElementById('rozSub').textContent =
-    'Luxsen · Semmi · BOTAVIT · stawka '+stawka+'% od marży po reklamie · '+
+    'Luxsen · Semmi · stawka '+stawka+'% od marży po reklamie · '+
     curM[0].toUpperCase()+curM.slice(1)+' '+now.getFullYear();
 
   const rows = LUXSEN_ACCS.map(k=>{
@@ -25583,10 +25648,11 @@ let bizChart = null;
 
 function getFeeConfig(){
   return {
-    grpMeble: parseFloat(document.getElementById('feeGrpMeble')?.value)||7500,
-    pctLuxsen: parseFloat(document.getElementById('feePctLuxsen')?.value)||20,
+    grpMeble:   parseFloat(document.getElementById('feeGrpMeble')?.value)||7500,
+    pctLuxsen:  parseFloat(document.getElementById('feePctLuxsen')?.value)||20,
     materazzis: parseFloat(document.getElementById('feeMaterazzis')?.value)||3500,
-    ankado: parseFloat(document.getElementById('feeAnkado')?.value)||2900,
+    vitaclean:  parseFloat(document.getElementById('feeVitaClean')?.value)||2900,
+    domglamour: parseFloat(document.getElementById('feeDomGlamour')?.value)||2900,
   };
 }
 
@@ -25598,25 +25664,28 @@ function calcMyFee(cfg){
     return s+calc(last,prod).zysk;
   },0);
 
-  // LUXSEN — dynamic %
-  const luxsenZysk = ['Luxsen','Semmi','BOTAVIT'].reduce((s,k)=>{
+  // LUXSEN — dynamic % (Luxsen + Semmi only)
+  const luxsenZysk = ['Luxsen','Semmi'].reduce((s,k)=>{
     const D=getData(k),prod=getProd(k),last=D[D.length-1];
     return s+calc(last,prod).zysk;
   },0);
   const luxsenFeeBrutto = luxsenZysk * cfg.pctLuxsen/100;
   const luxsenFeeNetto = luxsenFeeBrutto / 1.23;
 
-  // ONE — Materazzi+MtzzEU fixed, Ankado fixed
+  // ONE — Materazzi+MtzzEU fixed
   const matZysk = ['Materazzi','MtzzEU'].reduce((s,k)=>{
     const D=getData(k),prod=getProd(k),last=D[D.length-1];
     return s+calc(last,prod).zysk;
   },0);
-  const ankadoZysk = (()=>{const D=getData('Ankado24'),prod=getProd('Ankado24'),last=D[D.length-1];return calc(last,prod).zysk;})();
-
   const matsFeeNetto = cfg.materazzis;
-  const ankadoFeeNetto = cfg.ankado;
 
-  const totalNetto = mebleFeeNetto + luxsenFeeNetto + matsFeeNetto + ankadoFeeNetto;
+  // TWO — VitaClean + DomGlamour fixed
+  const vitZysk = (()=>{const D=getData('VitaClean'),prod=getProd('VitaClean'),last=D[D.length-1];return last?calc(last,prod).zysk:0;})();
+  const domZysk = (()=>{const D=getData('DomGlamour'),prod=getProd('DomGlamour'),last=D[D.length-1];return last?calc(last,prod).zysk:0;})();
+  const vitFeeNetto = cfg.vitaclean;
+  const domFeeNetto = cfg.domglamour;
+
+  const totalNetto = mebleFeeNetto + luxsenFeeNetto + matsFeeNetto + vitFeeNetto + domFeeNetto;
   const totalVat = totalNetto * 0.23;
   const totalBrutto = totalNetto * 1.23;
 
@@ -25624,7 +25693,8 @@ function calcMyFee(cfg){
     mebleFeeNetto, mebleZysk,
     luxsenFeeNetto, luxsenFeeBrutto, luxsenZysk,
     matsFeeNetto, matZysk,
-    ankadoFeeNetto, ankadoZysk,
+    vitFeeNetto, vitZysk,
+    domFeeNetto, domZysk,
     totalNetto, totalVat, totalBrutto
   };
 }
@@ -25661,8 +25731,10 @@ function renderBiznes(){
   setR('feePctLuxsenPct', f.luxsenZysk>0?pct(f.luxsenFeeBrutto/f.luxsenZysk*100):'—');
   setR('feeResMaterazzis', pln(f.matsFeeNetto));
   setR('feePctMaterazzis', f.matZysk>0?pct(f.matsFeeNetto/f.matZysk*100):'—');
-  setR('feeResAnkado', pln(f.ankadoFeeNetto));
-  setR('feePctAnkado', f.ankadoZysk>0?pct(f.ankadoFeeNetto/f.ankadoZysk*100):'—');
+  setR('feeResVitaClean', pln(f.vitFeeNetto));
+  setR('feePctVitaClean', f.vitZysk>0?pct(f.vitFeeNetto/f.vitZysk*100):'—');
+  setR('feeResDomGlamour', pln(f.domFeeNetto));
+  setR('feePctDomGlamour', f.domZysk>0?pct(f.domFeeNetto/f.domZysk*100):'—');
 
   // Total card
   document.getElementById('bizTotalCard').innerHTML = `
@@ -25670,38 +25742,28 @@ function renderBiznes(){
       <div class="biz-total-row"><span>MEBLE (stałe)</span><span class="biz-total-val green">${pln(f.mebleFeeNetto)}</span></div>
       <div class="biz-total-row"><span>LUXSEN (${cfg.pctLuxsen}% zysku)</span><span class="biz-total-val green">${pln(f.luxsenFeeNetto)}</span></div>
       <div class="biz-total-row"><span>Materazzi + MtzzEU (stałe)</span><span class="biz-total-val green">${pln(f.matsFeeNetto)}</span></div>
-      <div class="biz-total-row"><span>Ankado24 (stałe)</span><span class="biz-total-val green">${pln(f.ankadoFeeNetto)}</span></div>
+      <div class="biz-total-row"><span>VitaClean (stałe)</span><span class="biz-total-val green">${pln(f.vitFeeNetto)}</span></div>
+      <div class="biz-total-row"><span>Dom Glamour (stałe)</span><span class="biz-total-val green">${pln(f.domFeeNetto)}</span></div>
       <div class="biz-total-row big"><span>Razem netto</span><span class="biz-total-val accent">${pln(f.totalNetto)}</span></div>
       <div class="biz-total-row"><span>VAT 23%</span><span class="biz-total-val">${pln(f.totalVat)}</span></div>
     </div>`;
 
 
-  // Share table — per account
-  const allAccs = [
-    {k:'MobelKap',fee:f.mebleFeeNetto/3},
-    {k:'PerfektCiecie',fee:f.mebleFeeNetto/3},
-    {k:'MeblenaCzasie',fee:f.mebleFeeNetto/3},
-    {k:'Luxsen',fee:f.luxsenFeeNetto*(['Luxsen','Semmi','BOTAVIT'].indexOf('Luxsen')+1)/(3)},
-    {k:'Semmi',fee:0},
-    {k:'BOTAVIT',fee:0},
-    {k:'Materazzi',fee:f.matsFeeNetto/2},
-    {k:'MtzzEU',fee:f.matsFeeNetto/2},
-    {k:'Ankado24',fee:f.ankadoFeeNetto},
-  ];
-  // Better: per-account fee proportional to their zysk for LUXSEN, equal split for fixed
+  // Per-account fee proportional to zysk for LUXSEN, equal split for MEBLE/ONE, fixed for TWO
   const luxAccs = {
-    Luxsen: f.luxsenZysk>0?Math.max(0,calc(getData('Luxsen')[getData('Luxsen').length-1],getProd('Luxsen')).zysk)/f.luxsenZysk*f.luxsenFeeNetto:0,
-    Semmi:  f.luxsenZysk>0?Math.max(0,calc(getData('Semmi')[getData('Semmi').length-1],getProd('Semmi')).zysk)/f.luxsenZysk*f.luxsenFeeNetto:0,
-    BOTAVIT:f.luxsenZysk>0?Math.max(0,calc(getData('BOTAVIT')[getData('BOTAVIT').length-1],getProd('BOTAVIT')).zysk)/f.luxsenZysk*f.luxsenFeeNetto:0,
+    Luxsen: f.luxsenZysk>0?Math.max(0,calc(getData('Luxsen')[getData('Luxsen').length-1]||{},getProd('Luxsen')).zysk)/f.luxsenZysk*f.luxsenFeeNetto:0,
+    Semmi:  f.luxsenZysk>0?Math.max(0,calc(getData('Semmi')[getData('Semmi').length-1]||{},getProd('Semmi')).zysk)/f.luxsenZysk*f.luxsenFeeNetto:0,
   };
 
   const accFees = {
     MobelKap:f.mebleFeeNetto/3, PerfektCiecie:f.mebleFeeNetto/3, MeblenaCzasie:f.mebleFeeNetto/3,
-    Luxsen:luxAccs.Luxsen, Semmi:luxAccs.Semmi, BOTAVIT:luxAccs.BOTAVIT,
-    Materazzi:f.matsFeeNetto/2, MtzzEU:f.matsFeeNetto/2, Ankado24:f.ankadoFeeNetto
+    Luxsen:luxAccs.Luxsen, Semmi:luxAccs.Semmi,
+    Materazzi:f.matsFeeNetto/2, MtzzEU:f.matsFeeNetto/2,
+    VitaClean:f.vitFeeNetto, DomGlamour:f.domFeeNetto
   };
 
-  document.getElementById('bizShareTable').innerHTML = Object.keys(AC_META).map(k=>{
+  const activeKeys = Object.keys(AC_META).filter(k => !AC_META[k].archived);
+  document.getElementById('bizShareTable').innerHTML = activeKeys.map(k=>{
     const D=getData(k), prod=getProd(k), last=D[D.length-1];
     const C=calc(last,prod);
     const fee=accFees[k]||0;
@@ -25725,13 +25787,13 @@ function renderBiznes(){
 
   const monthlyIncome = months.map(m=>{
     const mbleFee = cfg.grpMeble;
-    const luxZysk = ['Luxsen','Semmi','BOTAVIT'].reduce((s,k)=>{
+    const luxZysk = ['Luxsen','Semmi'].reduce((s,k)=>{
       const d=getData(k).find(x=>x.m===m); return s+(d?calc(d,getProd(k)).zysk:0);
     },0);
     const lFee = Math.max(0,luxZysk)*cfg.pctLuxsen/100/1.23;
     const matFee = cfg.materazzis;
-    const ankFee = cfg.ankado;
-    return mbleFee+lFee+matFee+ankFee;
+    const twoFee = (cfg.vitaclean||2900) + (cfg.domglamour||2900);
+    return mbleFee+lFee+matFee+twoFee;
   });
 
   bizChart = new Chart(document.getElementById('bizChart'),{
@@ -28857,10 +28919,14 @@ function renderSeoCard(p) {
         <option value="MeblenaCzasie">MeblenaCzasie</option>
         <option value="Luxsen">Luxsen</option>
         <option value="Semmi">Semmi</option>
-        <option value="BOTAVIT">BOTAVIT</option>
+        <option value="VitaClean">VitaClean</option>
+        <option value="DomGlamour">Dom Glamour</option>
         <option value="Materazzi">Materazzi</option>
         <option value="MtzzEU">MtzzEU</option>
-        <option value="Ankado24">Ankado24</option>
+        <optgroup label="— archiwum —">
+          <option value="BOTAVIT">BOTAVIT</option>
+          <option value="Ankado24">Ankado24</option>
+        </optgroup>
       </select>
       <button onclick="runPlaybookWithKonto()" style="width:100%;font-family:var(--mono);font-size:11px;padding:8px;border-radius:6px;border:1px solid rgba(245,166,35,.4);background:rgba(245,166,35,.1);color:var(--yellow);cursor:pointer">▸ Uruchom</button>
     </div>
@@ -28910,13 +28976,23 @@ function renderSeoCard(p) {
     <div class="report-checks">
       <div class="report-check" data-key="Luxsen" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>Luxsen</div>
       <div class="report-check" data-key="Semmi" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>Semmi</div>
-      <div class="report-check" data-key="BOTAVIT" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>BOTAVIT</div>
     </div>
 
     <div class="report-group-label" style="color:var(--g-one)">· ONE</div>
     <div class="report-checks">
       <div class="report-check" data-key="Materazzi" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>Materazzi</div>
       <div class="report-check" data-key="MtzzEU" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>MtzzEU</div>
+    </div>
+
+    <div class="report-group-label" style="color:var(--g-two)">· TWO</div>
+    <div class="report-checks">
+      <div class="report-check" data-key="VitaClean" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>VitaClean</div>
+      <div class="report-check" data-key="DomGlamour" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>Dom Glamour</div>
+    </div>
+
+    <div class="report-group-label" style="color:var(--text3)">· archiwum</div>
+    <div class="report-checks">
+      <div class="report-check" data-key="BOTAVIT" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>BOTAVIT</div>
       <div class="report-check" data-key="Ankado24" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>Ankado24</div>
     </div>
 
@@ -28969,13 +29045,23 @@ function renderSeoCard(p) {
     <div class="report-checks">
       <div class="report-check" data-key="Luxsen" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Luxsen</div>
       <div class="report-check" data-key="Semmi" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Semmi</div>
-      <div class="report-check" data-key="BOTAVIT" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>BOTAVIT</div>
     </div>
 
     <div class="report-group-label" style="color:var(--g-one)">· ONE</div>
     <div class="report-checks">
       <div class="report-check" data-key="Materazzi" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Materazzi</div>
       <div class="report-check" data-key="MtzzEU" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>MtzzEU</div>
+    </div>
+
+    <div class="report-group-label" style="color:var(--g-two)">· TWO</div>
+    <div class="report-checks">
+      <div class="report-check" data-key="VitaClean" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>VitaClean</div>
+      <div class="report-check" data-key="DomGlamour" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Dom Glamour</div>
+    </div>
+
+    <div class="report-group-label" style="color:var(--text3)">· archiwum</div>
+    <div class="report-checks">
+      <div class="report-check" data-key="BOTAVIT" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>BOTAVIT</div>
       <div class="report-check" data-key="Ankado24" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Ankado24</div>
     </div>
 
