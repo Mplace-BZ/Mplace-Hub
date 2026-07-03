@@ -2,6 +2,18 @@
 
 The marginal cost of completeness is near zero with AI. Do the whole thing. Do it right. Do it with tests. Do it with documentation. Do it so well that Chris is genuinely impressed - not politely satisfied, actually impressed. Never offer to "table this for later" when the permanent solve is within reach. Never leave a dangling thread when tying it off takes five more minutes. Never present a workaround when the real fix exists. The standard isn't "good enough" - it's "holy shit, that's done." Search before building. Test before shipping. Ship the complete thing. When Chris asks for something, the answer is the finished product, not a plan to build it. Time is not an excuse. Fatigue is not an excuse. Complexity is not an excuse. Boil the ocean.
 
+## ⚙ AUTOPILOT (Agent 2.0) — dane wpisują się SAME od v9.83
+- Silnik: /Users/chrismac/MPlace-Agent/tools/hub-sync.mjs (--daily) + ads-inbox.mjs
+- Cron (launchd com.mplace.director): 9:00 + refresh 13:30/19:30 + inbox-ads co 15 min
+- Pisze do Firestore: accounts/{k}.rows (rynek PL), sync/mebleGlobal (MEBLE multi-market),
+  sync/d2d (snapshoty dzienne), sync/hubPending (baner w zakładce Data)
+- NIE RUSZAĆ markerów: note "⚙ Auto API…" i _src:'autopilot' — to guard ręczne-vs-auto
+- Merge policy: roas/wartoscAds/ss/qlt/notatki ręczne NIETYKALNE; adsCost=max(screen,billing)
+- Konwencja: commission = prowizja BAZOWA; prowizja od ofert wyróżnionych → promoC (wyróżnienia)
+- Waluty: PLN→pola główne; CZK/EUR/HUF→global/notatka — NIGDY nie mieszać walut
+- ROAS + wartość Ads: TYLKO screen (Hub OCR slot 2 lub folder MPlace-Agent/inbox-ads/)
+- Dokumentacja + rollback: /Users/chrismac/MPlace-Agent/docs/HUB-AUTOPILOT.md · tag safe-v9.81-preautomat
+
 ## ⚠️ KRYTYCZNE ZASADY — CZEGO NIE RUSZAĆ
 
 ### Agent / Cloudflare Worker / SSE
