@@ -56,13 +56,16 @@ service cloud.firestore {
     }
 
     match /workerIndex/{emailDoc} {
-      allow read: if isSignedIn();
+      allow read: if isSignedIn() && (
+        resource.data.ownerUid == request.auth.uid
+        || exists(/databases/$(database)/documents/workerUids/$(request.auth.uid))
+      );
       allow write: if isSignedIn()
         && (resource == null || resource.data.ownerUid == request.auth.uid);
     }
 
     match /workerUids/{uid} {
-      allow read: if isSignedIn();
+      allow read: if isSignedIn() && request.auth.uid == uid;
       allow create, update: if isSignedIn() && request.auth.uid == uid;
     }
 
