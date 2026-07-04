@@ -9,12 +9,12 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.85</title>
+<title>MPlace Hub v9.86</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" integrity="sha384-en/ztfPSRkGfME4KIm05joYXynqzUgbsG5nMrj/xEFAHXkeZfO3yMK8QQ+mP7p1/" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha384-y49Zu59jZHJL/PLKgZPv3k2WI9c0Yp3pWB76V8OBVCb0QBKS8l4Ff3YslzHVX76Y" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
 :root{
   /* frozen design tokens */
@@ -2091,10 +2091,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon.svg">
 
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js" integrity="sha384-b1CWci0SaI05xAJao7+U+7e+gNKOl4vZnNQHy/DYL4qnfACkhq8nV/8rasGUskSc" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js" integrity="sha384-0Gg4gw2/vCGckM+XGxUmijbO/g+KBWwhLeWlPzehXm7IyXIW1dXJT3FKBdJ8wK+B" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore-compat.js" integrity="sha384-Ge64KfBOULClHbopA+CuNwcDKcmElYkeU/wCXmAiWN0pqlbET6cPN8IiwMz9w33f" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-storage-compat.js" integrity="sha384-DIF9rYODATiWLW/M4ALUj3vpeyupDtMbWLdXtlEohTy1+RD+uFx0Ojgp/xArhN3W" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
@@ -2136,7 +2136,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.85</span>
+    <span class="brand-ver">v9.86</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5329,8 +5329,9 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.86 — Security P2: XSS/DOMPurify, SRI na CDN, catch bloki, Firebase 11.10', desc:'DOMPurify 3.4.8 + mdSafe/htmlSafe: 19 ścieżek AI→innerHTML objętych sanityzacją. SRI sha384 na 13 bibliotekach (10 statycznych + 3 dynamiczne XLSX). Firebase 10.12→11.10 + jsPDF 2.5.2. Brak esc() w 2 miejscach: last.note (Account Card) + Decision Log (d.action/rationale/expectedResult/followUpResult) — naprawione. 12 pustych catch bloków → console.warn. (04.07.2026)'},
     {name:'v9.85 — Usuwanie prezentacji kasuje też dokument z Firestore', desc:'Naprawiony bug: klik × w Zapisane Prezentacje usuwał tylko lokalny wpis, a publiczny dokument (i link view.html) zostawał w publicPresentations. Teraz sharePresentation() wpina firestoreId do wpisu historii (obsługa wielokrotnego udostępnienia = tablica), a deletePresentation() + clearAllPresentations() kasują powiązane dokumenty przez .delete() (reguła: ownerUid==auth.uid). Osierocone publikacje sprzed v9.84 (bez ownerUid) wymagają czyszczenia service-account. (04.07.2026)'},
-    {name:'v9.84 — Security P1: Firebase ID token auth, klucz Admin SDK poza repo, Firestore ownerUid', desc:'WORKER_AUTH Bearer Czucio123$ usunięty — zastąpiony getWorkerToken() (Firebase ID token, 23 call sites). Downloads/ dodany do .gitignore, klucz Admin SDK RSA przeniesiony poza repo. publicPresentations: create wymaga ownerUid==auth.uid, właściciel może usuwać swoje prezentacje. claude-sonnet-4-20250514 → claude-sonnet-4-6. (04.07.2026)'},
+    {name:'v9.84 — Security P1: Firebase ID token auth, klucz Admin SDK poza repo, Firestore ownerUid', desc:'Legacy token statyczny usunięty — zastąpiony getWorkerToken() (Firebase ID token, 23 call sites). Downloads/ dodany do .gitignore, klucz Admin SDK RSA przeniesiony poza repo. publicPresentations: create wymaga ownerUid==auth.uid, właściciel może usuwać swoje prezentacje. claude-sonnet-4-20250514 → claude-sonnet-4-6. (04.07.2026)'},
     {name:'v9.83 — Autopilot (Agent 2.0): pełna automatyzacja wpisywania danych', desc:'Cron w MPlace-Agent wpisuje dane finansowe SAM: 9:00 (dane za wczoraj), refresh 13:30 i 19:30 (billing Allegro dolicza spóźnione opłaty). Zapisuje: wiersz konta (10 kont, rynek PL), mebleGlobal (MEBLE multi-market), snapshot D2D (zakładki D2D/Trend działają bez klikania Zapisz), hubPending. Polityka merge: ROAS/wartość Ads/SS/Qlt/notatki ręczne NIETYKALNE, koszt Ads = max(screen, billing), ręczne wiersze historyczne chronione guardem. Konwencja skalibrowana do arkusza (prowizja bazowa; prowizja od ofert wyróżnionych → wyróżnienia — zgodność 99,6% z wpisami ręcznymi). Skrzynka inbox-ads/: wrzuć screenshot Panelu Ads (mk.png, materazzi.jpg) → vision odczytuje ROAS/wartość → auto-zapis co 15 min. Baner w Data pokazuje status + checklist kont bez ROAS. Waluty: PL→pola główne, CZK/EUR/HUF→global, zero mieszania. (03.07.2026)'},
     {name:'v9.82 — Auto-fill z Allegro API: panel „Agent proponuje"', desc:'Silnik hub-sync (MPlace-Agent) pobiera codziennie o 9:00 dane finansowe MTD z Allegro order+billing API i zapisuje propozycję do Firestore (sync/hubPending). W zakładce Data: baner „Agent pobrał dane" z przyciskiem „Wypełnij wszystkie" + przycisk „⚡ z API" per konto. Wypełnia sprzedaż, prowizję%, dostawę, wyróżnienia, koszt Ads (dobrany z billingu) — rynek PL. Waluty obce (CZK/EUR/HUF) rozdzielone osobno. ROAS + wartość Ads zostają ręcznym screenem (adsPending — brak campaigns API). Nic nie ląduje na twardo: proponuje → sprawdzasz → Zapisz. (03.07.2026)'},
     {name:'v9.81 — Zakładka Archiwum: historia zakończonych współprac', desc:'Dedykowana zakładka Archiwum w grupie Analiza: pokazuje wszystkich zarchiwizowanych klientów (BOTAVIT, Ankado24) z pełną historią miesięczną. Karty z kluczowymi statystykami (łączna sprzedaż, avg ROAS, best ROAS, avg marża%, wydatki Ads) + tabela miesiąc po miesiącu z kolorowaniem ROAS względem BE. (01.07.2026)'},
@@ -7365,7 +7366,7 @@ function renderAccount(k){
   document.getElementById('acStatus').className='status-block '+cls;
   document.getElementById('acSIcon').textContent=cls==='plus'?'✓':cls==='minus'?'⚠':'⚡';
   document.getElementById('acSTitle').textContent=cls==='plus'?'Kampanie rentowne':cls==='minus'?'Wymagana interwencja':'Wyniki do monitorowania';
-  if(last.note) document.getElementById('acSBody').innerHTML=`ROAS Ads ${xf(C.roasAds)} (BE: ${xf(C.beRoasAds)}) · ROAS Glob ${xf(C.roasGlob)} · ACOS ${C.acosTotal!=null?pct(C.acosTotal):'—'} · Marża ${pct(C.mAfter)}<br><span style='color:var(--yellow);font-size:11px'>📝 ${last.note}</span>`;
+  if(last.note) document.getElementById('acSBody').innerHTML=`ROAS Ads ${xf(C.roasAds)} (BE: ${xf(C.beRoasAds)}) · ROAS Glob ${xf(C.roasGlob)} · ACOS ${C.acosTotal!=null?pct(C.acosTotal):'—'} · Marża ${pct(C.mAfter)}<br><span style='color:var(--yellow);font-size:11px'>📝 ${esc(last.note)}</span>`;
   else document.getElementById('acSBody').textContent=`ROAS Ads ${xf(C.roasAds)} (BE: ${xf(C.beRoasAds)}) · ROAS Glob ${xf(C.roasGlob)} · ACOS ${C.acosTotal!=null?pct(C.acosTotal):'—'} · Marża ${pct(C.mAfter)}`;
 
   // Estymacja
@@ -9124,7 +9125,7 @@ async function zmCopySecret(id, field, ev) {
     await zmTeamRef().collection('secretsLog').add({
       konto: s.konto, field, user: currentUser.email, at: Date.now()
     });
-  } catch(e) {}
+  } catch(e) { console.warn('[secrets-log] Firebase write failed', e); }
   // Toast on button
   if (btn) {
     const orig = btn.textContent;
@@ -10748,7 +10749,7 @@ ${items.map((it,i) => `${i+1}. ${it}`).join('\n')}`;
     try {
       const obj = JSON.parse(raw.trim().replace(/^```json\s*/i,'').replace(/```\s*$/,''));
       aiTasks = obj.tasks || [];
-    } catch(e) {}
+    } catch(e) { console.warn('[cockpit] JSON parse aiTasks failed', e); }
   }
   // Merge AI results back with original tasks by item match
   return tasks.map(orig => {
@@ -10961,6 +10962,20 @@ function zmRenderWorkers() {
 }
 
 function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// Markdown → bezpieczny HTML. Renderuje treść z AI/Firestore/userinput przez marked,
+// potem sanityzuje DOMPurify (usuwa <script>, on*=, javascript: itd.). Zawsze używać
+// dla treści, która NIE jest statycznym szablonem pisanym przez nas.
+function mdSafe(src) {
+  const s = src == null ? '' : String(src);
+  const raw = (typeof marked !== 'undefined') ? marked.parse(s) : s.replace(/\n/g, '<br>');
+  return (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(raw) : raw;
+}
+// Sanityzacja gotowego HTML (np. zapisanego r.html z historii raportów).
+function htmlSafe(h) {
+  const s = h == null ? '' : String(h);
+  return (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(s) : s;
+}
 
 // ════════════════════════════════════════
 // TASKS CRUD
@@ -12083,7 +12098,7 @@ function renderInsights(){
         </div>`).join('')}
       </div>` + content.innerHTML;
     }
-  } catch(e) {}
+  } catch(e) { console.warn('[insights] renderInsights DOM', e); }
 }
 
 
@@ -13584,7 +13599,7 @@ DANE HISTORYCZNE PER KONTO:
         if (d.followUpResult) ctx += `    Wynik: ${d.followUpResult}\n`;
       });
     }
-  } catch(e) {}
+  } catch(e) { console.warn('[decision-log] buildCtx', e); }
   return ctx;
 }
 
@@ -13664,14 +13679,14 @@ async function agentSend(){
     const text = await readSSE(resp);
 
     // Format response: convert markdown-like to HTML
-    const html = text
+    const html = htmlSafe(text
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
       .replace(/^### (.+)$/gm, '<h3>$1</h3>')
       .replace(/^## (.+)$/gm, '<h3>$1</h3>')
       .replace(/^# (.+)$/gm, '<h3>$1</h3>')
       .replace(/\n\n/g, '</p><p>')
-      .replace(/\n/g, '<br>');
+      .replace(/\n/g, '<br>'));
 
     // Replace thinking bubble with AI response bubble
     const aTime = new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'});
@@ -14284,11 +14299,11 @@ function openReportWindow(aiText, curM, dayNum, snap, groups, selectedKeys) {
   const scopeLabel = isAll ? 'Wszystkie konta' : selectedKeys.map(k=>AC_META[k]?.name||k).join(', ');
 
   // Format AI text to HTML
-  const aiHtml = aiText
+  const aiHtml = htmlSafe(aiText
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/^#{1,3} (.+)$/gm, '<h3>$1</h3>')
     .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>');
+    .replace(/\n/g, '<br>'));
 
   // Build group summary table rows
   let groupRows = '';
@@ -14995,7 +15010,7 @@ function openSlideWindow(aiText, curM, selectedKeys, accDataArr, histId) {
     const pre = block.trim().replace(/\*\*PUENTA:\*\*\s*(.+)/g,
       '<div class="slide-puenta" style="margin-top:1rem;padding:.6rem 1rem;background:#faf5ff;border-left:3px solid #b47fff;font-weight:500;color:#111;font-size:12px;border-radius:0 6px 6px 0">$1</div>');
     const cleaned = pre.replace(/~~(.+?)~~/g, '$1'); // usuń strikethrough — AI nie powinno przekreślać tekstu
-    const html = (typeof marked !== 'undefined') ? marked.parse(cleaned) : cleaned.replace(/\n/g,'<br>');
+    const html = mdSafe(cleaned);
     return `<div class="slide-block" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:2rem 2.5rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06)">
       <div class="slide-number" style="font-family:'DM Mono',monospace;font-size:10px;color:#b47fff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem">SLAJD ${num}</div>
       <div class="slide-title" style="line-height:1.7;color:#374151;font-size:13px">${html}</div>
@@ -15459,11 +15474,11 @@ function saveReportToHistory(aiText, curM, dayNum, snap, groups, selectedKeys) {
     });
   });
 
-  const aiHtml = aiText
+  const aiHtml = htmlSafe(aiText
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/^#{1,3} (.+)$/gm, '<h3>$1</h3>')
     .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>');
+    .replace(/\n/g, '<br>'));
 
   history.unshift({
     id, curM, dayNum, scopeLabel,
@@ -16764,10 +16779,10 @@ function renderDecisions(){
         <span style="font-size:14px;color:var(--text2)">${kName}</span>
         <span style="margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--text3)">${dateStr}</span>
       </div>
-      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px">${d.action}</div>
-      ${d.rationale?`<div style="font-size:14px;color:var(--text2);margin-bottom:4px">${d.rationale}</div>`:''}
-      ${d.expectedResult?`<div style="font-size:13px;color:var(--text3);font-style:italic">Oczekiwany efekt: ${d.expectedResult}</div>`:''}
-      ${d.followUpResult?`<div style="margin-top:6px;padding:8px 12px;background:rgba(${d.status==='verified'?'52,211,153':'239,68,68'},.06);border-radius:6px;font-size:14px;color:${sC[d.status]}">Wynik: ${d.followUpResult}</div>`:''}
+      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px">${esc(d.action)}</div>
+      ${d.rationale?`<div style="font-size:14px;color:var(--text2);margin-bottom:4px">${esc(d.rationale)}</div>`:''}
+      ${d.expectedResult?`<div style="font-size:13px;color:var(--text3);font-style:italic">Oczekiwany efekt: ${esc(d.expectedResult)}</div>`:''}
+      ${d.followUpResult?`<div style="margin-top:6px;padding:8px 12px;background:rgba(${d.status==='verified'?'52,211,153':'239,68,68'},.06);border-radius:6px;font-size:14px;color:${sC[d.status]}">Wynik: ${esc(d.followUpResult)}</div>`:''}
       ${overdue?`<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
         <span style="font-family:var(--mono);font-size:11px;color:#ef4444">Follow-up: ${d.followUpDate}</span>
         <button onclick="decVerify(${d.id},'verified')" style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.08);color:#34d399;cursor:pointer">Zadziałało</button>
@@ -16943,6 +16958,8 @@ async function adsLoadSheetJS() {
   await new Promise((res,rej)=>{
     const s=document.createElement('script');
     s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.integrity='sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw';
+    s.crossOrigin='anonymous';
     s.onload=res; s.onerror=rej;
     document.head.appendChild(s);
   });
@@ -17184,11 +17201,11 @@ function openAdsReportWindow(entry) {
     });
   });
 
-  const aiHtml = (entry.aiText||'')
+  const aiHtml = htmlSafe((entry.aiText||'')
     .replace(/###\s*(.+)/g,'<h3 style="margin:1.2rem 0 .4rem;font-size:13px;color:#1a1a2e;border-left:3px solid #f472b6;padding-left:.75rem">$1</h3>')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/\n\n/g,'</p><p style="margin:.5rem 0">')
-    .replace(/\n/g,'<br>');
+    .replace(/\n/g,'<br>'));
 
   const existing = document.getElementById('adsReportOverlay');
   if(existing) existing.remove();
@@ -18311,6 +18328,8 @@ async function aaLoadSheetJS() {
   await new Promise((res, rej) => {
     const s = document.createElement('script');
     s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.integrity = 'sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw';
+    s.crossOrigin = 'anonymous';
     s.onload = res; s.onerror = rej;
     document.head.appendChild(s);
   });
@@ -19927,7 +19946,7 @@ async function aaRunAnalysis() {
       text = aaTRValidate(text, _roasMap, beRoas);
     }
 
-    const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+    const html = mdSafe(text);
     const now = new Date();
 
     window._aaLastText = text;
@@ -20046,7 +20065,7 @@ function mhCopy(source, btn) {
 
 function mhBuildPrintHTML(r) {
   const m = r.meta || {};
-  const html = r.html || (typeof marked !== 'undefined' ? marked.parse(r.text || '') : (r.text || '').replace(/\n/g,'<br>'));
+  const html = r.html ? htmlSafe(r.html) : mdSafe(r.text || '');
   return `<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><title>${m.title||m.konto||'Raport'} — ${m.okres||''}</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -20215,7 +20234,7 @@ function mhOpenSavedReport(id, source) {
   const all = JSON.parse(localStorage.getItem('mhSavedReports') || '[]');
   const r = all.find(x => x.id === id);
   if (!r) return;
-  const html = r.html || (typeof marked !== 'undefined' ? marked.parse(r.text || '') : (r.text || '').replace(/\n/g,'<br>'));
+  const html = r.html ? htmlSafe(r.html) : mdSafe(r.text || '');
   const colors = {analiza:'#38bdf8', crossborder:'#3b82f6', architect:'#06b6d4', titleanalyzer:'#10b981'};
   const col = colors[source] || '#3b82f6';
   // Find result container per source
@@ -20325,7 +20344,7 @@ KRYTYCZNE ZASADY PREZENTACJI (OBOWIĄZKOWE):
 
 function aaPrintResult() {
   if (!window._aaLastHtml && !window._aaLastText) return;
-  const printHtml = window._aaLastHtml || (typeof marked !== 'undefined' ? marked.parse(window._aaLastText) : window._aaLastText.replace(/\n/g,'<br>'));
+  const printHtml = window._aaLastHtml ? htmlSafe(window._aaLastHtml) : mdSafe(window._aaLastText);
   const m = window._aaLastMeta || {};
   const w = window.open('', '_blank');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${m.konto||'Raport'} — ${m.okres||''}</title>
@@ -20559,7 +20578,7 @@ async function aaChatSend() {
       })
     });
     const text = await readSSE(resp);
-    const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+    const html = mdSafe(text);
 
     const thinkEl = document.getElementById('aaChatThinking');
     if (thinkEl) thinkEl.remove();
@@ -21153,7 +21172,7 @@ async function generateDzis() {
         }
       } catch(_){}
       if (!parsed) {
-        const html = (typeof marked !== 'undefined') ? marked.parse(raw) : raw.replace(/\n/g,'<br>');
+        const html = mdSafe(raw);
         content.innerHTML = `<div class="agent-md" style="font-size:13px;line-height:1.7">${html}</div>`;
         window._aaLastText = raw;
         loading.style.display = 'none';
@@ -21913,7 +21932,7 @@ async function cbRunAnalysis() {
       })
     });
     const text = await readSSE(resp);
-    const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+    const html = mdSafe(text);
     const now = new Date();
     const okres = cbGetOkresText();
 
@@ -21958,7 +21977,7 @@ function kbLoadWyroznienia() {
     });
     const rem = document.getElementById('kbWyrRemoved');
     if (rem && saved._removed) rem.value = saved._removed;
-  } catch(e) {}
+  } catch(e) { console.warn('[kanibalizator] kbWyr state restore', e); }
 }
 
 function kbSaveWyroznienia() {
@@ -22059,7 +22078,7 @@ function wyrUpdateBudget() {
           wyrCost = wyrCost * ratio;
         }
       }
-    } catch(e) {}
+    } catch(e) { console.warn('[kanibalizator] wyrCost calc', e); }
 
     const wyrPct = monthlySprzedaz > 0 ? (wyrCost / monthlySprzedaz * 100) : 0;
     const status = wyrPct === 0 ? 'brak danych' : wyrPct <= pctCel ? '✅ w celu' : '🔴 powyżej celu';
@@ -22163,7 +22182,7 @@ function stratRenderMeble() {
         curKpi.roasAds = C && typeof C.roasAds === 'number' ? C.roasAds : 0;
         curKpi.beRoas = C && typeof C.beRoasAds === 'number' ? C.beRoasAds : 0;
       }
-    } catch(e) {}
+    } catch(e) { console.warn('[kanibalizator] kpi calc', e); }
 
     // Status vs targets
     const adsStatus = curKpi.adsPct === 0 ? 'brak' : curKpi.adsPct <= meta.adsTarget ? 'ok' : 'over';
@@ -22307,7 +22326,7 @@ function caLoadLastPlan() {
     const latest = plans[0];
     if (!latest.text) return;
     window._caArchLastPlan = latest.text;
-    const html = (typeof marked !== 'undefined') ? marked.parse(latest.text) : latest.text.replace(/\n/g, '<br>');
+    const html = mdSafe(latest.text);
     const meta = { title: 'AI Architect — Plan reorganizacji MEBLE', okres: '3 konta', date: latest.date || '' };
     if (typeof mhSetReport === 'function') mhSetReport('architect', latest.text, html, meta);
     const planWrap = document.getElementById('caArchPlan');
@@ -22329,7 +22348,7 @@ function caLoadLastPlan() {
     if (printBtn) printBtn.style.display = 'inline-block';
     const status = document.getElementById('caArchRunStatus');
     if (status) { status.textContent = '✓ Plan załadowany z historii'; status.style.color = '#34d399'; }
-  } catch(e) {}
+  } catch(e) { console.warn('[ca] loadLastPlan', e); }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -22920,7 +22939,7 @@ function caSaveCampaignsForKonto(konto, list) {
     all[konto] = list;
     localStorage.setItem(CA_KEY, JSON.stringify(all));
     _syncPush('adsCampaigns').catch(e=>console.error(e));
-  } catch(e) {}
+  } catch(e) { console.warn('[ads] saveCampaigns', e); }
 }
 
 function caNextSequenceNumber(konto) {
@@ -23302,8 +23321,8 @@ async function caRunArchitect() {
       if (plans.length > 5) plans.pop();
       localStorage.setItem('caArchPlans', JSON.stringify(plans));
       _syncPush('caArchPlans').catch(e=>console.error(e));
-    } catch(e) {}
-    const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+    } catch(e) { console.warn('[ca] saveArchPlan', e); }
+    const html = mdSafe(text);
     const meta = { title: 'AI Architect — Plan reorganizacji MEBLE', okres: '3 konta', date: new Date().toLocaleString('pl-PL') };
     if (typeof mhSetReport === 'function') mhSetReport('architect', text, html, meta);
     if (planWrap) {
@@ -23804,7 +23823,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.85</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.86</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -24088,7 +24107,7 @@ async function kbRun() {
       })
     });
     const text = await readSSE(resp);
-    const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+    const html = mdSafe(text);
     const now = new Date();
 
     window._aaLastText = text;
@@ -25182,7 +25201,7 @@ function scrDeleteSession(id) {
 
 // Render historii przy starcie
 if (typeof window !== 'undefined') {
-  window.addEventListener('load', () => { try { scrRenderHistoryList(); } catch(e) {} });
+  window.addEventListener('load', () => { try { scrRenderHistoryList(); } catch(e) { console.warn('[screener] renderHistoryList init', e); } });
 }
 
 async function scrSend() {
@@ -25309,7 +25328,7 @@ async function scrSend() {
       }
     }
 
-    const html = (typeof marked !== 'undefined') ? marked.parse(text) : text.replace(/\n/g, '<br>');
+    const html = mdSafe(text);
 
     // Add assistant response to history
     window._scrHistory.push({ role: 'assistant', content: text });
@@ -26400,7 +26419,7 @@ ${lines.map((l,i)=>`${i+1}. ${l.trim()}`).join('\n')}`;
       taSaveHistory(konto, lines, jsonData);
     } else {
       // Fallback: render raw markdown
-      const html = typeof marked !== 'undefined' ? marked.parse(text) : text.replace(/\n/g,'<br>');
+      const html = mdSafe(text);
       document.getElementById('taResult').innerHTML = `<div class="agent-msg" style="border-left:3px solid #10b981;padding:1rem;background:rgba(16,185,129,.04);border-radius:0 8px 8px 0">
         <div class="agent-md">${html}</div>
         ${typeof mhReportButtonsHTML === 'function' ? mhReportButtonsHTML('titleanalyzer') : ''}
@@ -26502,7 +26521,7 @@ function taSaveHistory(konto, lines, data){
     localStorage.setItem(TA_HISTORY_KEY, JSON.stringify(hist));
     _syncPush('taHistory').catch(e=>console.error(e));
     taRenderHistory();
-  } catch(e){}
+  } catch(e) { console.warn('[ta] saveHistory', e); }
 }
 
 function taRenderHistory(){
@@ -28188,6 +28207,8 @@ async function _ca2EnsureXLSX() {
   await new Promise((res, rej) => {
     const s = document.createElement('script');
     s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.integrity = 'sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw';
+    s.crossOrigin = 'anonymous';
     s.onload = res; s.onerror = rej;
     document.head.appendChild(s);
   });
@@ -29523,6 +29544,7 @@ function renderSeoCard(p) {
   </button>
 </nav>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js" integrity="sha384-odPBjvtXVM/5hOYIr3A1dB+flh0c3wAT3bSesIOqEGmyUA4JoKf/YTWy0XKOYAY7" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.8/purify.min.js" integrity="sha384-R99bc6AdiNZcL+ueHrz0xh6SyglwkdixKGUnBqeJrDSFsFfD/HBaI345ap29kH9g" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>
