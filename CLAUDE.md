@@ -40,18 +40,22 @@ The marginal cost of completeness is near zero with AI. Do the whole thing. Do i
 - Nie skracaj promptów — wszystkie 100 musi być zachowane w pełnej treści
 
 ## Stack
-- Vanilla JS, jeden plik index.html (~776KB, ~12200 linii)
+
+- Vanilla JS, jeden plik index.html (~1.8MB, ~29 500 linii)
 - Chart.js 4.4.1 + datalabels plugin
-- SheetJS (XLSX 0.18.5) — parsowanie plików Excel
-- Firebase Firestore + Google OAuth
+- SheetJS (XLSX 0.18.5) — parsowanie plików Excel (ostatnia wersja MIT)
+- DOMPurify 3.4.8 + marked.js 9.1.6 — sanityzacja i renderowanie markdown
+- Firebase 11.10.0 Firestore + Google OAuth
 - GitHub Pages: mplace-bz.github.io/Mplace-Hub/
 - Agent proxy: Cloudflare Worker red-haze-5f37mplace-agent.contactmplace.workers.dev
 
 ## Model AI
 - claude-sonnet-4-6
-- max_tokens: 4096 (Agent/Raport), 8192 (Prezentacja/Analiza/Kanibalizator)
+- max_tokens: 512 (Smart Search), 1024 (Voice/Decision JSON), 2048 (Podcast),
+  4096 (Screener std), 8192 (Analizy/Kanibalizator/Cockpit), 16384 (Cockpit/CA Architect/Screener pełny)
 - Klucz API: mplace-agent (console.anthropic.com)
 - Worker obsługuje vision (base64 images w content[])
+- Wszystkie CDN z SRI sha384 (integrity= + crossorigin=anonymous)
 
 ## Design System
 - DM Mono dla liczb, DM Sans dla tekstu UI
