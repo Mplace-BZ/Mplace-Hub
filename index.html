@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.83</title>
+<title>MPlace Hub v9.84</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -2136,7 +2136,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.83</span>
+    <span class="brand-ver">v9.84</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5329,6 +5329,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.84 — Security P1: Firebase ID token auth, klucz Admin SDK poza repo, Firestore ownerUid', desc:'WORKER_AUTH Bearer Czucio123$ usunięty — zastąpiony getWorkerToken() (Firebase ID token, 23 call sites). Downloads/ dodany do .gitignore, klucz Admin SDK RSA przeniesiony poza repo. publicPresentations: create wymaga ownerUid==auth.uid, właściciel może usuwać swoje prezentacje. claude-sonnet-4-20250514 → claude-sonnet-4-6. (04.07.2026)'},
     {name:'v9.83 — Autopilot (Agent 2.0): pełna automatyzacja wpisywania danych', desc:'Cron w MPlace-Agent wpisuje dane finansowe SAM: 9:00 (dane za wczoraj), refresh 13:30 i 19:30 (billing Allegro dolicza spóźnione opłaty). Zapisuje: wiersz konta (10 kont, rynek PL), mebleGlobal (MEBLE multi-market), snapshot D2D (zakładki D2D/Trend działają bez klikania Zapisz), hubPending. Polityka merge: ROAS/wartość Ads/SS/Qlt/notatki ręczne NIETYKALNE, koszt Ads = max(screen, billing), ręczne wiersze historyczne chronione guardem. Konwencja skalibrowana do arkusza (prowizja bazowa; prowizja od ofert wyróżnionych → wyróżnienia — zgodność 99,6% z wpisami ręcznymi). Skrzynka inbox-ads/: wrzuć screenshot Panelu Ads (mk.png, materazzi.jpg) → vision odczytuje ROAS/wartość → auto-zapis co 15 min. Baner w Data pokazuje status + checklist kont bez ROAS. Waluty: PL→pola główne, CZK/EUR/HUF→global, zero mieszania. (03.07.2026)'},
     {name:'v9.82 — Auto-fill z Allegro API: panel „Agent proponuje"', desc:'Silnik hub-sync (MPlace-Agent) pobiera codziennie o 9:00 dane finansowe MTD z Allegro order+billing API i zapisuje propozycję do Firestore (sync/hubPending). W zakładce Data: baner „Agent pobrał dane" z przyciskiem „Wypełnij wszystkie" + przycisk „⚡ z API" per konto. Wypełnia sprzedaż, prowizję%, dostawę, wyróżnienia, koszt Ads (dobrany z billingu) — rynek PL. Waluty obce (CZK/EUR/HUF) rozdzielone osobno. ROAS + wartość Ads zostają ręcznym screenem (adsPending — brak campaigns API). Nic nie ląduje na twardo: proponuje → sprawdzasz → Zapisz. (03.07.2026)'},
     {name:'v9.81 — Zakładka Archiwum: historia zakończonych współprac', desc:'Dedykowana zakładka Archiwum w grupie Analiza: pokazuje wszystkich zarchiwizowanych klientów (BOTAVIT, Ankado24) z pełną historią miesięczną. Karty z kluczowymi statystykami (łączna sprzedaż, avg ROAS, best ROAS, avg marża%, wydatki Ads) + tabela miesiąc po miesiącu z kolorowaniem ROAS względem BE. (01.07.2026)'},
@@ -6025,7 +6026,14 @@ function toggleCmpAcc(k, btn){
 
 // ── WORKER CONFIG ────────────────────────────────────────
 const WORKER_URL = 'https://red-haze-5f37mplace-agent.contactmplace.workers.dev';
-const WORKER_AUTH = 'Bearer Czucio123$';
+
+async function getWorkerToken() {
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) return '';
+    return await user.getIdToken();
+  } catch(e) { console.warn('[auth] getIdToken:', e); return ''; }
+}
 
 // ── DASHBOARD EXTRAS ─────────────────────────────────────
 function initDashboardExtras(){
@@ -6987,7 +6995,7 @@ ZASADY:
   try {
     const resp = await fetch(WORKER_URL + '/', {
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':WORKER_AUTH},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer ' + await getWorkerToken()},
       body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:512, messages:[{role:'user',content}] })
     });
     const raw = await readSSE(resp);
@@ -9706,7 +9714,7 @@ FORMAT ODPOWIEDZI:
   const userPrompt = `Raport źródłowy (typ: ${sourceType}):\n\n${trimmedSource}\n\nWygeneruj taski wg zasad systemu. Zwróć tylko JSON, maksymalnie 10 zadań.`;
   const resp = await fetch(WORKER_URL + '/', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 8192,
@@ -10722,7 +10730,7 @@ Lista pozycji:
 ${items.map((it,i) => `${i+1}. ${it}`).join('\n')}`;
   const resp = await fetch(WORKER_URL + '/', {
     method: 'POST',
-    headers: { 'Content-Type':'application/json', 'Authorization': WORKER_AUTH },
+    headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 8192,
@@ -13643,10 +13651,7 @@ async function agentSend(){
   try {
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': WORKER_AUTH,
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -14242,7 +14247,7 @@ Bądź konkretny jak analityk finansowy. Podawaj liczby. Odpowiedz po polsku.`;
   try {
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -14472,7 +14477,7 @@ async function generatePodcast() {
     // Step 1: Claude rephrase to podcast script
     const rResp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 2048,
@@ -14500,7 +14505,7 @@ ZASADY:
     // Step 2: ElevenLabs TTS (via Worker proxy)
     const ttsResp = await fetch(WORKER_URL + '/tts', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         text: podcastScript.substring(0, 2500),
         voice_id: getVoiceId(),
@@ -14953,7 +14958,7 @@ ${SLIDE_REPORT_PROMPT}`;
   try {
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -15268,6 +15273,7 @@ async function sharePresentation(btn) {
       html: slidesInner,
       scope: _shareMeta.curM,
       date: _shareMeta.dateStr,
+      ownerUid: firebase.auth().currentUser?.uid || '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     const url = `https://mplace-bz.github.io/Mplace-Hub/view.html?id=${id}`;
@@ -15966,7 +15972,7 @@ ${reportText}`;
 
   const resp = await fetch(WORKER_URL + '/', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
@@ -16373,7 +16379,7 @@ async function speakText(text) {
   try {
     const rResp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1024,
@@ -16403,10 +16409,7 @@ ZASADY:
   try {
     const resp = await fetch(WORKER_URL + '/tts', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': WORKER_AUTH
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         text: trimmed,
         voice_id: getVoiceId(),
@@ -16988,9 +16991,9 @@ async function adsRunAnalysis() {
   try {
     const res = await fetch(WORKER_URL + '/', {
       method:'POST',
-      headers:{'Content-Type':'application/json', 'Authorization': WORKER_AUTH},
+      headers:{'Content-Type':'application/json', 'Authorization': 'Bearer ' + await getWorkerToken()},
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-sonnet-4-6',
         max_tokens:8192,
         system: buildAgentContext(),
         messages:[{role:'user',content:prompt}]
@@ -19859,7 +19862,7 @@ async function aaRunAnalysis() {
 
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 16384,
@@ -20266,7 +20269,7 @@ KRYTYCZNE ZASADY PREZENTACJI (OBOWIĄZKOWE):
   try {
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -20512,7 +20515,7 @@ async function aaChatSend() {
   try {
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 4096,
@@ -21093,7 +21096,7 @@ async function generateDzis() {
 
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -21866,7 +21869,7 @@ async function cbRunAnalysis() {
 
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -23245,7 +23248,7 @@ async function caRunArchitect() {
 
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 16384,
@@ -23766,7 +23769,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.83</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.84</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -24041,7 +24044,7 @@ async function kbRun() {
 
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -25223,7 +25226,7 @@ async function scrSend() {
   try {
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 16384,
@@ -26335,7 +26338,7 @@ ${lines.map((l,i)=>`${i+1}. ${l.trim()}`).join('\n')}`;
   try {
     const resp = await fetch(WORKER_URL + '/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8192,
@@ -27769,7 +27772,7 @@ Odpowiedz TYLKO JSON.`;
   try {
     const response = await fetch(WORKER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': WORKER_AUTH },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await getWorkerToken() },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6-20250514',
         max_tokens: 4096,
