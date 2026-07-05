@@ -1,0 +1,14 @@
+# Cloudflare Worker — MPlace Hub proxy (AI + FootyStats + TTS)
+# Deploy z CLI:  cd worker && wrangler deploy
+# Nazwa MUSI zgadzać się z istniejącym Workerem na CF, żeby nie tworzyć duplikatu.
+
+name = "red-haze-5f37mplace-agent"
+main = "index.js"
+compatibility_date = "2026-07-04"
+workers_dev = true
+
+# ── Sekrety (NIE wpisuj wartości tutaj) ──
+# Ustaw raz w dashboardzie (Settings → Variables and Secrets) ALBO z CLI:
+#   wrangler secret put ANTHROPIC_API_KEY
+#   wrangler secret put FOOTY_API_KEY
+#   wrangler secret put ELEVENLABS_API_KEY
