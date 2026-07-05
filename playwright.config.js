@@ -6,13 +6,14 @@ module.exports = defineConfig({
   retries: 1,
   reporter: 'list',
   use: {
-    baseURL: 'http://localhost:3333',
+    // 3333 zajmuje panel MPlace-Agent (401 z tokenem) — testy mają własny port
+    baseURL: 'http://localhost:3344',
     viewport: { width: 1280, height: 800 },
   },
   webServer: {
-    command: 'npx serve -s . -p 3333 --no-clipboard',
-    port: 3333,
-    reuseExistingServer: true,
+    command: 'npx serve -s . -p 3344 --no-clipboard',
+    port: 3344,
+    reuseExistingServer: false,
   },
   projects: [
     {

@@ -58,6 +58,19 @@ async function bypassAuth(page) {
 
   await page.evaluate(() => {
 
+    // Seed: konta bez wpisu w buildInit (dodane po v9.79: GAL/VitaClean/DomGlamour)
+    // mają getData()===[] i crashują rendery przez calc(undefined) w dashboard/biznes.
+    // Produkcja ma dane z localStorage/Firestore — test env musi je zasiać.
+    if (typeof AC_META !== 'undefined' && typeof getData === 'function') {
+      Object.keys(AC_META).forEach(k => {
+        if (getData(k).length === 0) {
+          localStorage.setItem('adshub3_' + k, JSON.stringify([
+            { m: 'kwiecień', ss: '', qlt: null, sprzedaz: 10000, dostawaPct: 0, obowPct: 11, adsCost: 500, roas: 6, wartoscAds: 3000, reklamaPct: 12 }
+          ]));
+        }
+      });
+    }
+
     // Show sidebar + topbar (hidden until auth with style="display:none")
     const sb = document.getElementById('mpSidebar');
     const tb = document.getElementById('mpTopbar');
