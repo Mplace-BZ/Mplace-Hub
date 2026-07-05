@@ -5,11 +5,11 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<script>(function(){var V='9.87';var s=sessionStorage.getItem('_hv');if(s!==V){sessionStorage.setItem('_hv',V);if(location.search.indexOf('_hv=')<0){location.replace(location.pathname+'?_hv='+V+(location.hash||''));}}})();</script>
+<script>(function(){var V='9.88';var s=sessionStorage.getItem('_hv');if(s!==V){sessionStorage.setItem('_hv',V);if(location.search.indexOf('_hv=')<0){location.replace(location.pathname+'?_hv='+V+(location.hash||''));}}})();</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.87</title>
+<title>MPlace Hub v9.88</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" integrity="sha384-en/ztfPSRkGfME4KIm05joYXynqzUgbsG5nMrj/xEFAHXkeZfO3yMK8QQ+mP7p1/" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -2136,7 +2136,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.87</span>
+    <span class="brand-ver">v9.88</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5329,6 +5329,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.88 — sharePodcast ustawia ownerUid (wymóg nowych reguł Firestore)', desc:'Pre-flight przed deployem reguł wykrył: sharePodcast() nie zapisywał ownerUid ani na dokumencie publicPodcasts, ani na chunkach audio — po zaostrzeniu reguł (create wymaga ownerUid==auth.uid) publikacja padłaby z permission-denied. Dodano ownerUid (wzorzec z sharePresentation) do dokumentu i każdego chunka. Bonus: delete podcastów przez właściciela zacznie działać dla nowych publikacji (stare, bez ownerUid, wymagają czyszczenia service-account — jak prezentacje sprzed v9.84). (05.07.2026)'},
     {name:'v9.87 — Cache-buster sync, SRI viewery, worker/ w repo, firestore publicPodcasts', desc:'Cache-buster zsynchronizowany z wersją aplikacji (był 9.83, app była 9.86 — mechanizm wymuszonego odświeżenia był martwy). view.html + listen.html: SRI sha384 + DOMPurify 3.4.8 + Firebase 11.10 (zrównano z index.html). worker/ dodany do repo (proxy AI + auth; sekrety w CF dashboard). publicPodcasts Firestore: create wymaga teraz ownerUid==auth.uid (analogicznie do publicPresentations). (05.07.2026)'},
     {name:'v9.86 — Security P2: XSS/DOMPurify, SRI na CDN, catch bloki, Firebase 11.10', desc:'DOMPurify 3.4.8 + mdSafe/htmlSafe: 19 ścieżek AI→innerHTML objętych sanityzacją. SRI sha384 na 13 bibliotekach (10 statycznych + 3 dynamiczne XLSX). Firebase 10.12→11.10 + jsPDF 2.5.2. Brak esc() w 2 miejscach: last.note (Account Card) + Decision Log (d.action/rationale/expectedResult/followUpResult) — naprawione. 12 pustych catch bloków → console.warn. (04.07.2026)'},
     {name:'v9.85 — Usuwanie prezentacji kasuje też dokument z Firestore', desc:'Naprawiony bug: klik × w Zapisane Prezentacje usuwał tylko lokalny wpis, a publiczny dokument (i link view.html) zostawał w publicPresentations. Teraz sharePresentation() wpina firestoreId do wpisu historii (obsługa wielokrotnego udostępnienia = tablica), a deletePresentation() + clearAllPresentations() kasują powiązane dokumenty przez .delete() (reguła: ownerUid==auth.uid). Osierocone publikacje sprzed v9.84 (bez ownerUid) wymagają czyszczenia service-account. (04.07.2026)'},
@@ -14756,16 +14757,18 @@ async function sharePodcast(id, btn) {
     const CHUNK = 800000;
     const chunks = Math.ceil(b64.length / CHUNK);
     const shareId = crypto.randomUUID();
+    const ownerUid = firebase.auth().currentUser?.uid || '';
     await firebase.firestore().collection('publicPodcasts').doc(shareId).set({
       title: pod.title || 'MPlace Briefing', date: pod.date || '',
       script: (pod.script || '').substring(0, 200), chunks: chunks,
       metrics: pod.metrics || [],
+      ownerUid: ownerUid,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     for (let i = 0; i < chunks; i++) {
       if (btn) btn.textContent = 'Upload ' + (i+1) + '/' + chunks + '...';
       await firebase.firestore().collection('publicPodcasts').doc(shareId)
-        .collection('audio').doc('chunk_' + i).set({ data: b64.substring(i * CHUNK, (i+1) * CHUNK) });
+        .collection('audio').doc('chunk_' + i).set({ data: b64.substring(i * CHUNK, (i+1) * CHUNK), ownerUid: ownerUid });
     }
     const url = 'https://mplace-bz.github.io/Mplace-Hub/listen.html?id=' + shareId;
     await navigator.clipboard.writeText(url);
@@ -23824,7 +23827,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.87</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.88</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
