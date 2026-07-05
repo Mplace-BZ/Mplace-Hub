@@ -4,7 +4,7 @@
   "scripts": {
     "test": "npx playwright test",
     "test:headed": "npx playwright test --headed",
-    "serve": "npx serve -s . -p 3333 --no-clipboard"
+    "serve": "npx serve -s . -p 3344 --no-clipboard"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",
