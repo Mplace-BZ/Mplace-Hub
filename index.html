@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.89</title>
+<title>MPlace Hub v9.90</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" integrity="sha384-en/ztfPSRkGfME4KIm05joYXynqzUgbsG5nMrj/xEFAHXkeZfO3yMK8QQ+mP7p1/" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -2136,7 +2136,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.89</span>
+    <span class="brand-ver">v9.90</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2281,6 +2281,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
 <!-- ═══ VIEW: WPISZ DANE ═══ -->
 <div class="view" id="viewEntry">
+<!-- Batch Ads OCR — statyczny kontener POZA dataCenterContent (re-render przy zmianie konta nie kasuje wklejonych screenów) -->
+<div id="batchOcrWrap"></div>
 <div class="data-layout">
   <!-- LEFT: Account list -->
   <div class="data-left">
@@ -5329,6 +5331,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.90 — Batch Ads OCR: wklej screeny wszystkich kont naraz (zakładka Data)', desc:'Nowa sekcja nad formularzem Data: grid slotów per aktywne konto (10), Ctrl+V screen Panelu Ads w każdy slot, jeden przycisk ODCZYTAJ WSZYSTKIE I ZAPISZ. Vision (claude-sonnet-4-6, 1 obraz = 1 call, współbieżność 2) czyta Koszt/ROAS/Wartość sprzedaży, zapis do wierszy bieżącego miesiąca wg polityki ads-inbox (roas/wartoscAds ze screena, adsCost=max), potem saveAllWithSync (Firestore+D2D). Błędny screen = badge na slocie + retry tylko błędnych; częściowy batch OK. Link "batch (wszystkie naraz)" w banerze Autopilota. Stary OCR per konto bez zmian. (10.07.2026)'},
     {name:'v9.89 — Security Runda 2: esc() na danych z XLSX i err.message (25 miejsc)', desc:'Audyt data-flow do sinków innerHTML. Naprawione: 13 interpolacji pól tekstowych z plików Allegro XLSX (oferta/kampania/grupa/title) w 5 blokach — raport print Ads, hierarchia kampanii, eksport grup, tabela Kanibalizatora, tabele Centrum Analitycznego; 11 komunikatów błędów ${err.message}→esc(); lista wyróżnień z textarea. Zweryfikowane jako bezpieczne bez zmian: output AI (mdSafe), alerty/KPI Account Card (tylko liczby), konteksty promptów AI (tekst, nie DOM). (05.07.2026)'},
     {name:'v9.88 — sharePodcast ustawia ownerUid (wymóg nowych reguł Firestore)', desc:'Pre-flight przed deployem reguł wykrył: sharePodcast() nie zapisywał ownerUid ani na dokumencie publicPodcasts, ani na chunkach audio — po zaostrzeniu reguł (create wymaga ownerUid==auth.uid) publikacja padłaby z permission-denied. Dodano ownerUid (wzorzec z sharePresentation) do dokumentu i każdego chunka. Bonus: delete podcastów przez właściciela zacznie działać dla nowych publikacji (stare, bez ownerUid, wymagają czyszczenia service-account — jak prezentacje sprzed v9.84). (05.07.2026)'},
     {name:'v9.87 — Cache-buster sync, SRI viewery, worker/ w repo, firestore publicPodcasts', desc:'Cache-buster zsynchronizowany z wersją aplikacji (był 9.83, app była 9.86 — mechanizm wymuszonego odświeżenia był martwy). view.html + listen.html: SRI sha384 + DOMPurify 3.4.8 + Firebase 11.10 (zrównano z index.html). worker/ dodany do repo (proxy AI + auth; sekrety w CF dashboard). publicPodcasts Firestore: create wymaga teraz ownerUid==auth.uid (analogicznie do publicPresentations). (05.07.2026)'},
@@ -6433,6 +6436,7 @@ function renderEntry(){
   renderDataLeft();
   if (!_dataActiveKey) _dataActiveKey = Object.keys(AC_META)[0];
   dataSelectAccount(_dataActiveKey);
+  if(typeof renderBatchOcr === 'function') renderBatchOcr();
 }
 
 function renderEntryCard(k,dotColor,curM){
@@ -6625,7 +6629,7 @@ function renderDataCenter(k){
     if(_autoK.length){
       const _gen = window._hubPending && window._hubPending.generatedAt ? new Date(window._hubPending.generatedAt).toLocaleString('pl-PL',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
       const _adsTxt = _adsMiss.length
-        ? `<span style="color:#f5a623">screen Ads (ROAS) brakuje: ${_adsMiss.join(', ')} → wklej niżej lub wrzuć do inbox-ads/</span>`
+        ? `<span style="color:#f5a623">screen Ads (ROAS) brakuje: ${_adsMiss.join(', ')} → <a href="#" onclick="batchOcrOpen();return false" style="color:#f5a623;text-decoration:underline">batch (wszystkie naraz)</a>, wklej niżej lub wrzuć do inbox-ads/</span>`
         : `<span style="color:#2dd4a0">✓ komplet — wszystkie konta mają ROAS</span>`;
       apiBanner = `<div style="margin-bottom:1rem;border:1px solid rgba(45,212,160,.3);border-radius:8px;background:rgba(45,212,160,.06);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
         <div style="display:flex;flex-direction:column;gap:3px">
@@ -7027,6 +7031,199 @@ ZASADY:
     status.style.color = 'var(--red)';
   }
   btn.disabled = false;
+}
+
+// ── Batch Ads OCR: wklej screeny WSZYSTKICH kont naraz → odczyt → zapis ──
+// Stan poza dataCenterContent (przeżywa zmianę konta). Polityka jak ads-inbox.mjs:
+// roas/wartoscAds = screen autorytatywny, adsCost = max(istniejący, screen).
+window._batchOcrImages = {};   // k -> {base64, mediaType, dataUrl}
+window._batchOcrStatus = {};   // k -> 'pasted' | 'reading' | 'done' | 'error'
+window._batchOcrErr    = {};   // k -> komunikat błędu
+window._batchOcrOpen   = false;
+window._batchOcrBusy   = false;
+
+function batchOcrKeys(){ return Object.keys(AC_META).filter(k=>!AC_META[k].archived); }
+
+function renderBatchOcr(){
+  const wrap = document.getElementById('batchOcrWrap');
+  if(!wrap) return;
+  const keys = batchOcrKeys();
+  const nImg = keys.filter(k=>window._batchOcrImages[k]).length;
+  if(!window._batchOcrOpen){
+    wrap.innerHTML = `<div onclick="batchOcrToggle()" style="margin:0 0 10px;border:1px solid rgba(255,107,53,.25);border-radius:8px;background:rgba(255,107,53,.04);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+      <span style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:600">▸ BATCH ADS — wklej screeny wszystkich kont naraz${nImg?` (${nImg}/${keys.length})`:''}</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">rozwiń</span>
+    </div>`;
+    return;
+  }
+  const slots = keys.map(k=>{
+    let gc = 'var(--accent)';
+    Object.values(GROUPS).forEach(g=>{ if(g.accs.includes(k)) gc = g.c; });
+    const img = window._batchOcrImages[k];
+    const st = window._batchOcrStatus[k];
+    let badge = '';
+    if(st==='pasted')  badge = `<span style="color:#f5a623">wklejony</span>`;
+    if(st==='reading') badge = `<span style="color:var(--accent)">⟳ czytam...</span>`;
+    if(st==='done')    badge = `<span style="color:#2dd4a0">✓ zapisane</span>`;
+    if(st==='error')   badge = `<span style="color:var(--red)" title="${esc(window._batchOcrErr[k]||'')}">✗ ${esc((window._batchOcrErr[k]||'błąd').slice(0,40))}</span>`;
+    const border = st==='done'?'rgba(45,212,160,.5)':st==='error'?'rgba(239,68,68,.5)':img?'rgba(52,211,153,.5)':'rgba(255,107,53,.3)';
+    return `<div class="data-ocr-slot" onclick="this.querySelector('.data-ocr-paste').focus()" style="border:1px dashed ${border};border-radius:6px;padding:6px 8px;min-height:64px;cursor:pointer;background:${img?'rgba(52,211,153,.04)':'transparent'}">
+      <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">
+        <span style="width:7px;height:7px;border-radius:50%;background:${gc};flex:none"></span>
+        <span style="font-size:10px;color:var(--text);font-family:var(--mono);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${AC_META[k].name}</span>
+        ${img?`<span onclick="event.stopPropagation();batchOcrClearOne('${k}')" title="Usuń screen" style="margin-left:auto;color:var(--text3);font-size:11px;cursor:pointer">✕</span>`:''}
+      </div>
+      <div contenteditable="true" class="data-ocr-paste" onpaste="batchOcrPaste(event,'${k}')" style="min-height:30px;outline:none;font-size:9px;color:var(--text3);font-family:var(--mono)">${img?`<img src="${img.dataUrl}" style="max-height:40px;max-width:100%;border-radius:3px">`:'Ctrl+V tutaj'}</div>
+      <div style="font-family:var(--mono);font-size:9px;min-height:12px">${badge}</div>
+    </div>`;
+  }).join('');
+  wrap.innerHTML = `<div style="margin:0 0 12px;border:1px solid rgba(255,107,53,.3);border-radius:8px;background:rgba(255,107,53,.04);padding:12px 14px">
+    <div onclick="batchOcrToggle()" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;cursor:pointer">
+      <span style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:600">▾ BATCH ADS — wklej screen Panelu Ads dla każdego konta (Ctrl+V), potem jeden klik czyta i zapisuje wszystkie</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">zwiń</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-bottom:10px">${slots}</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button id="batchOcrBtn" onclick="batchOcrReadAll()" ${window._batchOcrBusy?'disabled':''} style="font-family:var(--mono);font-size:11px;padding:8px 20px;border-radius:6px;border:1px solid rgba(255,107,53,.4);background:rgba(255,107,53,.12);color:#ff6b35;cursor:pointer;font-weight:600${window._batchOcrBusy?';opacity:.5':''}">ODCZYTAJ WSZYSTKIE I ZAPISZ</button>
+      <button onclick="batchOcrClearAll()" style="font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer">Wyczyść</button>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${nImg}/${keys.length} screenów</span>
+      <span id="batchOcrGlobalStatus" style="font-family:var(--mono);font-size:10px;color:var(--text3)"></span>
+    </div>
+  </div>`;
+}
+
+function batchOcrToggle(){ window._batchOcrOpen = !window._batchOcrOpen; renderBatchOcr(); }
+function batchOcrOpen(){
+  window._batchOcrOpen = true; renderBatchOcr();
+  document.getElementById('batchOcrWrap')?.scrollIntoView({behavior:'smooth'});
+}
+
+async function batchOcrPaste(e, k){
+  e.preventDefault();
+  const items = e.clipboardData?.items;
+  if(!items) return;
+  for(const item of items){
+    if(item.type.startsWith('image/')){
+      const r = await aaResizeImage(item.getAsFile(), 1024);
+      window._batchOcrImages[k] = r;
+      window._batchOcrStatus[k] = 'pasted';
+      delete window._batchOcrErr[k];
+      renderBatchOcr();
+      return;
+    }
+  }
+}
+
+function batchOcrClearOne(k){
+  delete window._batchOcrImages[k];
+  delete window._batchOcrStatus[k];
+  delete window._batchOcrErr[k];
+  renderBatchOcr();
+}
+
+function batchOcrClearAll(){
+  window._batchOcrImages = {}; window._batchOcrStatus = {}; window._batchOcrErr = {};
+  renderBatchOcr();
+}
+
+async function batchOcrReadOne(k){
+  const img = window._batchOcrImages[k];
+  const content = [
+    { type:'text', text:'PANEL ADS Allegro — konto '+AC_META[k].name },
+    { type:'image', source:{ type:'base64', media_type:img.mediaType, data:img.base64 }},
+    { type:'text', text:`Odczytaj dane ze screena Panelu Ads Allegro (tabela statystyk kampanii).
+Zwroc TYLKO JSON, zero komentarzy:
+{"adsCost":LICZBA,"roas":LICZBA,"wartoscAds":LICZBA}
+
+ZASADY:
+- adsCost = Koszt brutto (zl, zaokraglij do pelnych)
+- roas = ROAS (np 5.23)
+- wartoscAds = Wartosc sprzedazy (zl, zaokraglij do pelnych)
+- Wartosci nieczytelne/brakujace → 0
+- TYLKO JSON, nic wiecej` }
+  ];
+  const resp = await fetch(WORKER_URL + '/', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer ' + await getWorkerToken()},
+    body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:512, messages:[{role:'user',content}] })
+  });
+  const raw = await readSSE(resp);
+  const jsonMatch = raw.match(/\{[\s\S]*?\}/);
+  if(!jsonMatch) throw new Error('Brak JSON w odpowiedzi');
+  const d = JSON.parse(jsonMatch[0]);
+  d.adsCost = Math.round(d.adsCost||0); d.roas = +(d.roas||0); d.wartoscAds = Math.round(d.wartoscAds||0);
+  if(!(d.adsCost>0) && !(d.roas>0) && !(d.wartoscAds>0)) throw new Error('Screen nieczytelny (same zera)');
+  // Cross-compute jak updateAuto: brakująca trzecia wartość z dwóch pozostałych
+  if(d.roas>0 && !(d.wartoscAds>0) && d.adsCost>0) d.wartoscAds = Math.round(d.adsCost*d.roas);
+  if(d.wartoscAds>0 && !(d.roas>0) && d.adsCost>0) d.roas = parseFloat((d.wartoscAds/d.adsCost).toFixed(2));
+  return d;
+}
+
+// Zapis do wiersza bieżącego miesiąca — TYLKO roas/wartoscAds/adsCost (polityka ads-inbox.mjs).
+// hubApplyToRow celowo NIE ruszany (autopilot nie pisze ROAS — to jest ta druga połowa).
+function batchApplyAdsToRow(k, curM, d){
+  const D = getData(k);
+  let row = D.find(x => x.m === curM);
+  if(!row){ row = { m: curM }; D.push(row); }
+  if(d.roas>0) row.roas = d.roas;
+  if(d.wartoscAds>0) row.wartoscAds = d.wartoscAds;
+  row.adsCost = Math.max(row.adsCost||0, d.adsCost||0);
+  row._adsScreenAt = Date.now();
+  setData(k, D);
+}
+
+async function batchOcrReadAll(){
+  if(window._batchOcrBusy) return;
+  const gStatus = () => document.getElementById('batchOcrGlobalStatus');
+  const targets = batchOcrKeys().filter(k => window._batchOcrImages[k] && window._batchOcrStatus[k] !== 'done');
+  if(!targets.length){ const s=gStatus(); if(s){ s.textContent='Wklej min. 1 screen (Ctrl+V w slot konta)'; s.style.color='var(--red)'; } return; }
+
+  window._batchOcrBusy = true;
+  renderBatchOcr();
+  const dzienGlobal = parseInt(document.getElementById('globalDay')?.value) || new Date().getDate();
+  const {m:curM} = getSaveMonth(dzienGlobal);
+  // Zachowaj ręczne edycje otwartego formularza ZANIM ruszymy wiersze
+  if(_dataActiveKey) dataSaveCurrentToLocal(_dataActiveKey);
+
+  let ok = 0, fail = 0;
+  const queue = [...targets];
+  const worker = async () => {
+    while(queue.length){
+      const k = queue.shift();
+      window._batchOcrStatus[k] = 'reading';
+      renderBatchOcr();
+      try{
+        const d = await batchOcrReadOne(k);
+        batchApplyAdsToRow(k, curM, d);
+        // Aktywne konto: zsynchronizuj DOM formularza, inaczej finalny save nadpisze wiersz starymi wartościami
+        if(_dataActiveKey === k){
+          const setV = (id,val) => { const el = document.getElementById(id); if(el && val>0){ el.value = val; el.style.background='rgba(255,107,53,.12)'; el.style.borderColor='rgba(255,107,53,.3)'; }};
+          const row = getData(k).find(x=>x.m===curM) || {};
+          setV('e_'+k+'_adsC', row.adsCost);
+          setV('e_'+k+'_roas', row.roas);
+          setV('e_'+k+'_wartoscAds', row.wartoscAds);
+          updateAuto(k);
+          if(typeof dataUpdateSanity === 'function') dataUpdateSanity(k);
+        }
+        window._batchOcrStatus[k] = 'done'; ok++;
+      }catch(err){
+        console.error('batchOcr '+k+':', err);
+        window._batchOcrStatus[k] = 'error';
+        window._batchOcrErr[k] = err.message || 'błąd odczytu';
+        fail++;
+      }
+      renderBatchOcr();
+    }
+  };
+  await Promise.all([worker(), worker()]); // współbieżność 2
+
+  window._batchOcrBusy = false;
+  renderBatchOcr();
+  const s = gStatus();
+  if(s){ s.textContent = `✓ ${ok} odczytane${fail?`, ${fail} błędów (klik ponownie = retry błędnych)`:''} — zapisuję...`; s.style.color = fail?'#f5a623':'#2dd4a0'; }
+  if(ok > 0) await saveAllWithSync(); // localStorage + Firestore + D2D + renderEntry (odświeży też tę sekcję)
+  const s2 = gStatus();
+  if(s2){ s2.textContent = `✓ ${ok} kont zapisanych (${curM})${fail?` · ${fail} błędów — klik ponownie = retry`:''}`; s2.style.color = fail?'#f5a623':'#2dd4a0'; }
 }
 
 // ── Auto-fill z Allegro API (hubPending) — silnik hub-sync pisze o 9:00 ─────────
@@ -23828,7 +24025,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.89</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.90</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
