@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.90</title>
+<title>MPlace Hub v9.91</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" integrity="sha384-en/ztfPSRkGfME4KIm05joYXynqzUgbsG5nMrj/xEFAHXkeZfO3yMK8QQ+mP7p1/" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -2136,7 +2136,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.90</span>
+    <span class="brand-ver">v9.91</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2792,6 +2792,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="card" id="rozSummary"></div>
     <div class="card" id="rozInvoice"></div>
   </div>
+
+  <!-- HISTORIA FEE -->
+  <div class="card mb" id="rozHistory"></div>
 
 </div>
 </div>
@@ -5331,7 +5334,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
-    {name:'v9.90 — Batch Ads OCR: wklej screeny wszystkich kont naraz (zakładka Data)', desc:'Nowa sekcja nad formularzem Data: grid slotów per aktywne konto (10), Ctrl+V screen Panelu Ads w każdy slot, jeden przycisk ODCZYTAJ WSZYSTKIE I ZAPISZ. Vision (claude-sonnet-4-6, 1 obraz = 1 call, współbieżność 2) czyta Koszt/ROAS/Wartość sprzedaży, zapis do wierszy bieżącego miesiąca wg polityki ads-inbox (roas/wartoscAds ze screena, adsCost=max), potem saveAllWithSync (Firestore+D2D). Błędny screen = badge na slocie + retry tylko błędnych; częściowy batch OK. Link "batch (wszystkie naraz)" w banerze Autopilota. Stary OCR per konto bez zmian. (10.07.2026)'},
+    {name:'v9.91 — Batch Ads OCR: wklej screeny wszystkich kont naraz (zakładka Data)', desc:'Nowa sekcja nad formularzem Data: grid slotów per aktywne konto (10), Ctrl+V screen Panelu Ads w każdy slot, jeden przycisk ODCZYTAJ WSZYSTKIE I ZAPISZ. Vision (claude-sonnet-4-6, 1 obraz = 1 call, współbieżność 2) czyta Koszt/ROAS/Wartość sprzedaży, zapis do wierszy bieżącego miesiąca wg polityki ads-inbox (roas/wartoscAds ze screena, adsCost=max), potem saveAllWithSync (Firestore+D2D). Błędny screen = badge na slocie + retry tylko błędnych; częściowy batch OK. Link "batch (wszystkie naraz)" w banerze Autopilota. Stary OCR per konto bez zmian. (10.07.2026)'},
     {name:'v9.89 — Security Runda 2: esc() na danych z XLSX i err.message (25 miejsc)', desc:'Audyt data-flow do sinków innerHTML. Naprawione: 13 interpolacji pól tekstowych z plików Allegro XLSX (oferta/kampania/grupa/title) w 5 blokach — raport print Ads, hierarchia kampanii, eksport grup, tabela Kanibalizatora, tabele Centrum Analitycznego; 11 komunikatów błędów ${err.message}→esc(); lista wyróżnień z textarea. Zweryfikowane jako bezpieczne bez zmian: output AI (mdSafe), alerty/KPI Account Card (tylko liczby), konteksty promptów AI (tekst, nie DOM). (05.07.2026)'},
     {name:'v9.88 — sharePodcast ustawia ownerUid (wymóg nowych reguł Firestore)', desc:'Pre-flight przed deployem reguł wykrył: sharePodcast() nie zapisywał ownerUid ani na dokumencie publicPodcasts, ani na chunkach audio — po zaostrzeniu reguł (create wymaga ownerUid==auth.uid) publikacja padłaby z permission-denied. Dodano ownerUid (wzorzec z sharePresentation) do dokumentu i każdego chunka. Bonus: delete podcastów przez właściciela zacznie działać dla nowych publikacji (stare, bez ownerUid, wymagają czyszczenia service-account — jak prezentacje sprzed v9.84). (05.07.2026)'},
     {name:'v9.87 — Cache-buster sync, SRI viewery, worker/ w repo, firestore publicPodcasts', desc:'Cache-buster zsynchronizowany z wersją aplikacji (był 9.83, app była 9.86 — mechanizm wymuszonego odświeżenia był martwy). view.html + listen.html: SRI sha384 + DOMPurify 3.4.8 + Firebase 11.10 (zrównano z index.html). worker/ dodany do repo (proxy AI + auth; sekrety w CF dashboard). publicPodcasts Firestore: create wymaga teraz ownerUid==auth.uid (analogicznie do publicPresentations). (05.07.2026)'},
@@ -24025,7 +24028,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.90</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.91</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -25958,6 +25961,8 @@ function renderRozliczenie(){
   const stawka = parseFloat(document.getElementById('rozStawka')?.value)||20;
   const now = new Date();
   const curM = MONTHS[now.getMonth()];
+  const MONTHS_GEN = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
+  const curMGen = MONTHS_GEN[now.getMonth()];
   // Populate date bar
   const rozNow = new Date();
   const rozCurM = MONTHS[rozNow.getMonth()];
@@ -26068,7 +26073,7 @@ function renderRozliczenie(){
   document.getElementById('rozSummary').innerHTML = `
     <div class="card-title yellow">Podsumowanie grupy LUXSEN</div>
     <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:.7rem">
-      Status na dzień: <strong style="color:var(--yellow)">${statusDay} marca ${now.getFullYear()}</strong>
+      Status na dzień: <strong style="color:var(--yellow)">${statusDay} ${curMGen} ${now.getFullYear()}</strong>
       &nbsp;·&nbsp; jeszcze ${daysInM-statusDay} dni do końca miesiąca
     </div>
     <table class="bk-tbl">
@@ -26079,7 +26084,7 @@ function renderRozliczenie(){
       <tr><td>Netto (÷1,23)</td><td></td><td style="color:var(--yellow);font-weight:600">${pln(totalFee)}</td></tr>
       <tr><td>VAT 23%</td><td></td><td style="color:var(--text3)">${pln(totalVat)}</td></tr>
       <tr class="bk-total"><td>Brutto do faktury</td><td></td><td style="color:var(--yellow);font-size:16px">${pln(totalBrutto)}</td></tr>
-      <tr class="bk-sep"><td colspan="3">Estymacja — koniec marca</td></tr>
+      <tr class="bk-sep"><td colspan="3">Estymacja — koniec ${curMGen}</td></tr>
       <tr><td>Est. marża EOM</td><td></td><td style="color:var(--green)">${pln(estTotalZyskEOM)}</td></tr>
       <tr><td>Est. wynagrodzenie brutto</td><td></td><td style="color:var(--green);font-weight:600">${pln(estFeeEOM)}</td></tr>
       <tr><td style="color:var(--text3);font-size:10px">w tym netto</td><td></td><td style="color:var(--text3)">${pln(estFeeEOMnetto)}</td></tr>
@@ -26101,7 +26106,7 @@ function renderRozliczenie(){
     <div class="card-title yellow">Faktura — pozycje</div>
     <div style="font-size:11px;color:var(--text3);margin-bottom:.75rem;line-height:1.6">
       Miesiąc: <strong style="color:var(--text)">${curM[0].toUpperCase()+curM.slice(1)} ${now.getFullYear()}</strong>
-      &nbsp;·&nbsp; Status na dzień: <strong style="color:var(--yellow)">${statusDay} marca</strong><br>
+      &nbsp;·&nbsp; Status na dzień: <strong style="color:var(--yellow)">${statusDay} ${curMGen}</strong><br>
       Podstawa: marża po całej reklamie × ${stawka}%
     </div>
     <table style="width:100%;border-collapse:collapse">
@@ -26139,6 +26144,56 @@ function renderRozliczenie(){
         <td style="padding:5px 8px;font-family:var(--mono);font-size:12px;color:var(--blue);text-align:right">${pln(p.fee)} <span style="color:var(--text3);font-size:10px">/ ${pln(p.feeN)} netto</span></td>
       </tr>`).join('')}
     </table>`;
+
+  // Historia fee — zamknięte miesiące
+  const allM = new Set();
+  LUXSEN_ACCS.forEach(k => getData(k).forEach(d => { if(d.m !== curM) allM.add(d.m); }));
+  const histMonths = [...allM].sort((a,b) => MONTHS.indexOf(a) - MONTHS.indexOf(b));
+  const rozHist = document.getElementById('rozHistory');
+  if(histMonths.length && rozHist){
+    const histData = histMonths.map(m => {
+      let totalSprzedaz=0, totalZysk=0;
+      LUXSEN_ACCS.forEach(k => {
+        const row = getData(k).find(d=>d.m===m);
+        if(!row) return;
+        totalSprzedaz += row.sprzedaz||0;
+        totalZysk += calc(row, getProd(k)).zysk||0;
+      });
+      const feeBrutto = totalZysk * stawka/100;
+      return {m, totalSprzedaz, totalZysk, feeBrutto, feeNetto: feeBrutto/1.23};
+    });
+    const totHistFeeBrutto = histData.reduce((s,h)=>s+h.feeBrutto,0);
+    const totHistFeeNetto  = histData.reduce((s,h)=>s+h.feeNetto,0);
+    rozHist.innerHTML = `
+      <div class="card-title yellow">Historia fee LUXSEN — ${now.getFullYear()}</div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:.75rem;letter-spacing:.06em;text-transform:uppercase">Rzeczywiste wynagrodzenie za zamknięte miesiące</div>
+      <table class="data-tbl">
+        <thead><tr>
+          <th>Miesiąc</th>
+          <th>Sprzedaż grupy</th>
+          <th>Marża po reklamie</th>
+          <th style="color:var(--accent)">Fee brutto</th>
+          <th>Fee netto</th>
+        </tr></thead>
+        <tbody>
+          ${histData.map(h=>`<tr>
+            <td class="tc" style="font-weight:600">${h.m[0].toUpperCase()+h.m.slice(1)}</td>
+            <td class="tg">${pln(h.totalSprzedaz)}</td>
+            <td class="${h.totalZysk>=0?'tg':'tr'}" style="font-weight:600">${pln(h.totalZysk)}</td>
+            <td style="color:var(--accent);font-family:var(--mono);font-weight:600;font-size:12px">${pln(h.feeBrutto)}</td>
+            <td class="ty">${pln(h.feeNetto)}</td>
+          </tr>`).join('')}
+          <tr style="border-top:2px solid rgba(245,166,35,.3)">
+            <td style="font-weight:600;font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em">SUMA ${now.getFullYear()}</td>
+            <td></td><td></td>
+            <td style="color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px">${pln(totHistFeeBrutto)}</td>
+            <td class="ty" style="font-weight:700;font-size:13px">${pln(totHistFeeNetto)}</td>
+          </tr>
+        </tbody>
+      </table>`;
+  } else if(rozHist){
+    rozHist.innerHTML='';
+  }
 }
 
 
