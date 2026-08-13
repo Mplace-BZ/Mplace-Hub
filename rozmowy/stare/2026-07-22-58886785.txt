@@ -1,0 +1,81 @@
+==============================================================================
+ZAPIS ROZMOWY - projekt Mplace-Hub (archiwum starych sesji)
+sesja: 58886785-3d96-4efa-814b-74c7da1c6117 | ostatnia zmiana: 2026-07-22 09:14
+==============================================================================
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-03 15:47
+------------------------------------------------------------------------------
+<ide_opened_file>The user opened the file /Users/chrismac/bazgroszyt/Mplace-Hub/.env in the IDE. This may or may not be related to the current task.</ide_opened_file>
+Jak mam ustawione aktualnie z czego korzystamy, z jakiej wersji.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-03 15:47
+------------------------------------------------------------------------------
+Sprawdzam `.env` i aktualną wersję aplikacji.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-03 15:47
+------------------------------------------------------------------------------
+Sprawdzam jeszcze konfigurację AI w pliku.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-03 15:47
+------------------------------------------------------------------------------
+Masz pełny obraz setup:
+
+---
+
+## Aktualny stack MPlace Hub
+
+### Aplikacja
+- **Wersja:** v9.81 (ostatni commit: archiwum zakończonych współprac)
+- **Plik:** `index.html` (~12 200 linii, ~776KB)
+- **Hosting:** GitHub Pages → `mplace-bz.github.io/Mplace-Hub/`
+
+### AI — model
+- **claude-sonnet-4-6** wszędzie (Agent, Analiza, Cockpit, Prezentacja, Screener, Cockpit)
+- `max_tokens: 8192` — większość funkcji (Analiza, Cockpit, Prezentacja, Kanibalizator)
+- `max_tokens: 2048` — jedno miejsce (prawdopodobnie D2D/mini-analiza)
+- `max_tokens: 1024` — Voice Mode, ElevenLabs helper
+- `max_tokens: 512` — jedno lekkie zapytanie (linia 6950)
+- Wyjątek: linia 16885 używa `claude-sonnet-4-20250514` (stara nazwa — pewnie niebezpieczne miejsce, warto sprawdzić)
+- **Worker:** `red-haze-5f37mplace-agent.contactmplace.workers.dev` (SSE proxy)
+
+### Allegro API — tokeny w `.env`
+| Konto | Status |
+|-------|--------|
+| Luxsen | ✓ skonfigurowany |
+| Semmi | ✓ skonfigurowany |
+| MobelKap | ✓ skonfigurowany |
+| PerfektCięcie | ✓ skonfigurowany |
+| MeblenaCzasie | ✓ skonfigurowany |
+| Materazzi | ✓ skonfigurowany |
+| TwojeMaterace (MtzzEU) | ✓ skonfigurowany |
+| VitaClean | ✓ skonfigurowany |
+| DomGlamour | ✓ skonfigurowany |
+| GaleriaEstetyczna | ✓ skonfigurowany |
+| **BOTAVIT** | ✗ puste |
+| **Ankado24** | ✗ puste |
+
+Refresh tokeny wyglądają na aktualne (exp ~2026-07-29). BOTAVIT i Ankado24 nie mają tokenów — jeśli planujesz Allegro API dla tych kont, będą wymagały auth flow.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-03 15:47
+------------------------------------------------------------------------------
+Jakie wersji klo da korzystamy?
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-03 15:48
+------------------------------------------------------------------------------
+Masz **3 różne identyfikatory modeli** w kodzie:
+
+| Model ID | Linie | Ilość | Co to |
+|----------|-------|-------|-------|
+| `claude-sonnet-4-6` | 6950, 9603, 10619, 13543... | **16×** | Sonnet 4.6 — główny model ✓ |
+| `claude-sonnet-4-6-20250514` | 27666 | **1×** | To samo co wyżej (datowany alias) ✓ |
+| `claude-sonnet-4-20250514` | **16885** | **1×** | Claude Sonnet **4.0** — starsza generacja ✗ |
+
+Linia 16885 to Cockpit — funkcja analizy kampanii Ads ("AI analizuje kampanie..."). Używa `claude-sonnet-4-20250514` zamiast `claude-sonnet-4-6`. To prawdopodobnie literówka z dawniejszej wersji — brakuje `-6`.
+
+Chcesz żebym to poprawił od razu?

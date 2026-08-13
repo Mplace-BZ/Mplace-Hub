@@ -1,0 +1,82 @@
+==============================================================================
+ZAPIS ROZMOWY - projekt Mplace-Hub (archiwum starych sesji)
+sesja: c7d81ac6-3faa-40b1-abfb-16af09fc054b | ostatnia zmiana: 2026-07-22 09:14
+==============================================================================
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-08 17:08
+------------------------------------------------------------------------------
+Cześć, tu Claude (asystent AI Chrisa). Chris planuje wdrożyć asystentkę do współpracy — techniczna, junior, praca zdalna. Chcemy zrozumieć co już masz dla pracowników zanim cokolwiek zbudujemy od nowa.
+
+Powiedz mi:
+
+Czy masz moduł pracowników? Co umie — taski, statusy, rozliczanie godzin?
+Jak pracownik się loguje? Osobny link, panel, czy tylko przez Ciebie?
+Czy jest onboarding/wiki? Miejsce gdzie trzymasz instrukcje dla nowych osób?
+Co NIE istnieje — czego brakuje żebyśmy mogli jutro dać jej dostęp i pierwsze taski?
+Odpowiedz punktowo, będę na tym budował plan techniczny.
+
+Tyle — czekam na jego odpowiedź.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-08 17:08
+------------------------------------------------------------------------------
+Sprawdzam aktualny stan kodu przed odpowiedzią — nie chcę cytować pamięci, która może być nieaktualna.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-08 17:12
+------------------------------------------------------------------------------
+Mam pełny obraz. Oto co istnieje i co brakuje:
+
+---
+
+## 1. Moduł pracowników — tak, istnieje i jest rozbudowany
+
+**Panel Pracownika** to 11 zakładek po stronie właściciela + 7-przyciskowy panel po stronie pracownika.
+
+**Taski:** pełny system w Firebase (`teams/{uid}/tasks/`)
+- pola: tytuł, opis, assignee, status (todo/in_progress/done/verified), priorytet (PILNE/WAŻNE/INFO), konto, deadline, checklist, komentarze głosowe i tekstowe, historia audytowa
+- pracownik: zmienia status, odhacza checklist, komentuje — nie może tworzyć zadań samodzielnie (tylko przycisk SOS na nagłówkowe PILNE)
+- właściciel: Task Factory — AI parsuje raport Allegro w gotowe taski; batch creator na listy ID
+
+**Czas pracy / rozliczenie:** zegar live, "Zakończ dzień", historia sesji per pracownik — ale jedno logowanie na dobę, brak eksportu do CSV, brak stawki godzinowej
+
+**Wiedza zespołu:** właściciel pisze artykuły (FAQ/Playbook/Zasady/Linki), pracownik czyta tylko. Plus osobna sekcja Briefingi per konto z przypisaniem do konkretnych pracowników.
+
+---
+
+## 2. Jak się loguje pracownik
+
+**Jeden URL, ten sam `index.html`.** Pracownik wchodzi na `mplace-bz.github.io/Mplace-Hub/`, loguje się przez Google. System wykrywa rolę automatycznie:
+- ma konto w Firebase → właściciel → pełna aplikacja
+- jego email jest w `workerIndex` (dodany przez Ciebie w zakładce Pracownicy) → widok pracownika, ograniczona nawigacja
+- ani to, ani to → ekran "Brak dostępu"
+
+Uprawnienia per pracownik konfigurujesz checkboxami przy jego karcie: tasks / wiedza / messages.
+
+---
+
+## 3. Onboarding / wiki
+
+Jest — zakładka "Wiedza zespołu" + "Briefingi". Pracownik ma dostęp read-only. Nie ma wyszukiwarki po stronie pracownika, nie ma potwierdzeń przeczytania briefingu.
+
+---
+
+## 4. Czego brakuje, żeby jutro dać jej dostęp i pierwsze taski
+
+**To możesz zrobić dziś bez żadnego kodu:**
+1. Zakładka Pracownicy → Dodaj pracownika → jej email Google → zaznacz dostępy (tasks + wiedza) → Zapisz
+2. Ona wchodzi na Hub i loguje się — widzi swój panel od razu
+
+**To istnieje jako stub, nie działa:**
+- Messaging / Wiadomości — access flag zapisany w DB, ale zero UI, zero backendu
+- Brak eksportu rozliczenia godzin
+
+**To brakuje dla junior technicznej:**
+- Nie może sama tworzyć tasków (np. "pytam o coś", "zrobiłam X") — tylko SOS
+- Brak onboardingu step-by-step dla nowej osoby
+- Brak miejsca, gdzie napisze do Ciebie bezpośrednio (messaging = stub)
+
+---
+
+**Rekomendacja na jutro:** dodaj jej email w zakładce Pracownicy i ona ma gotowy dostęp. Jeśli chcesz żeby mogła pisać do Ciebie wiadomości lub tworzyć zadania (np. raportuję co zrobiłam) — powiedz, to zbuduję jako pierwsze, zanim ona zacznie. Co jest ważniejsze: messaging czy task-creation po stronie pracownika?

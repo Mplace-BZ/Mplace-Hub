@@ -1,0 +1,150 @@
+==============================================================================
+ZAPIS ROZMOWY - projekt Mplace-Hub (archiwum starych sesji)
+sesja: 61f59940-327c-4623-81f1-440ead3b2c44 | ostatnia zmiana: 2026-07-22 09:14
+==============================================================================
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-07 08:45
+------------------------------------------------------------------------------
+Zobacz czy pobrałość dane z API Allegro sprzedażowe w duch mienie. W sensie dostałem na slaka informacje, ale nie widzę tego w programie. Sprawdź i daj mi znaciu.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 08:45
+------------------------------------------------------------------------------
+Sprawdzam logi autopilota i status synca.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 08:46
+------------------------------------------------------------------------------
+Dane zostały pobrane. Teraz sprawdzam czy trafiły do Firestore (czy nie ma błędu zapisu).
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 08:46
+------------------------------------------------------------------------------
+Sync przebiegł bez błędów — hub-sync.mjs skończył exit 0 o 09:03. Sprawdzam szczegóły co dokładnie zapisał do Huba.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 08:58
+------------------------------------------------------------------------------
+Dane sprzedażowe są — wszystkie 10 kont zapisane o 09:03 dziś. Ale widzę, że `roas=null` i `adsPending=True` dla każdego konta. Sprawdzam co to oznacza dla widoku w Hubie.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 08:59
+------------------------------------------------------------------------------
+Mam pełny obraz. Oto co się stało:
+
+**Sync przebiegł POMYŚLNIE** — hub-sync.mjs skończył exit 0 o 09:03, dane dla wszystkich 10 kont zostały zapisane do Firestore.
+
+Konkretnie co zapisano w lipcu (MTD przez dzień 6):
+
+| Konto | Sprzedaż | Zamówień |
+|---|---|---|
+| Materazzi | 398 785 zł | 671 szt |
+| MobelKap | 29 119 zł | 82 szt |
+| MeblenaCzasie | 29 822 zł | 112 szt |
+| Luxsen | 22 601 zł | 93 szt |
+| PerfektCięcie | 16 214 zł | 60 szt |
+| MtzzEU | 11 523 zł | 17 szt |
+| GaleriaEstetyczna | 10 430 zł | 65 szt |
+| Semmi | 2 526 zł | 7 szt |
+| DomGlamour | 6 505 zł | 30 szt |
+| VitaClean | 1 256 zł | 21 szt |
+
+**Dlaczego możesz nie widzieć w Hubie — 2 możliwe powody:**
+
+1. **Odśwież przeglądarkę** — jeśli Hub był otwarty przed 09:03, Firebase onSnapshot powinien to złapać automatycznie, ale twardy refresh (Cmd+Shift+R) na pewno pokaże aktualne dane.
+
+2. **ROAS i wartość Ads są puste (adsPending=True)** — to celowe. ROAS pochodzi WYŁĄCZNIE ze screenshotów panelu Ads, nie z API. Żeby go uzupełnić: wrzuć screenshoty do `MPlace-Agent/inbox-ads/` (mk.png, materazzi.jpg itp.) → automatycznie doczyta w ciągu 15 min.
+
+**Co pokazywał Slack** — standup (06:02) pokazał dane czerwcowe Ads (ads-monitor). Sync lipiec (09:03) to osobny proces — to te dane powinny być teraz w Hubie po odświeżeniu.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-07 10:57
+------------------------------------------------------------------------------
+Czy nas leka mogę dostawać z dnia poprzedniego? Ile zamówień, nie sumaryczno miesiąca.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 10:58
+------------------------------------------------------------------------------
+Sprawdzam jak standup jest budowany i skąd czerpie dane.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 10:58
+------------------------------------------------------------------------------
+Jasne - standup w ogóle nie czyta pliku `hub-autopilot-{date}.json`. Ma dane Ads (ROAS), ale nie ma dziennej sprzedaży. Trzeba dodać nową sekcję.
+
+Sprawdzam jeszcze format assemblowania standupu żeby wiedzieć gdzie wcisnąć blok.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 10:58
+------------------------------------------------------------------------------
+Widzę problem — standup idzie o 08:00, hub-autopilot o 09:00. Muszę sprawdzić czy jest wcześniejszy run do odczytania.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 10:59
+------------------------------------------------------------------------------
+Dobry plan — ale muszę przestawić hub-autopilot z 09:00 na 07:00, bo inaczej standup (08:00) zawsze odczyta plik sprzed 2 dni. Sprawdzam gdzie jest harmonogram.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 11:00
+------------------------------------------------------------------------------
+Plan jest jasny. Standup chodzi o 08:00, hub-autopilot o 09:00 — więc zawsze jest za późno. Robię dwie zmiany:
+
+1. Przestawiam hub-autopilot z 09:00 → **07:00** w `cron.mjs`
+2. Dodaję sekcję `🛒 SPRZEDAŻ WCZORAJ` do `standup.mjs`
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 11:00
+------------------------------------------------------------------------------
+Mam wszystko co potrzebuję. Robię obie zmiany.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 11:00
+------------------------------------------------------------------------------
+Teraz dodaję funkcję `collectSales()` i sekcję do standupu.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 11:00
+------------------------------------------------------------------------------
+Teraz dodaję sekcję do assemblowania standupu — znajdę miejsce gdzie `collectAds` jest wywoływane i dodam `collectSales` równolegle.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 11:01
+------------------------------------------------------------------------------
+Teraz dodaję sekcję do outputu — po ADS, przed CONTENT.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 11:01
+------------------------------------------------------------------------------
+Testuję — czy standup uruchamia się bez błędów składniowych.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 11:03
+------------------------------------------------------------------------------
+Sekcja działa ale pokazuje fallback — debug dlaczego nie czyta pliku.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 11:03
+------------------------------------------------------------------------------
+Problem znaleziony — `hub-autopilot-shadow.json` sortuje się przed datowanymi plikami. Poprawiam filtr.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 11:04
+------------------------------------------------------------------------------
+Działa. Jutrzejszy standup (po 07:00 gdy hub-autopilot pobierze dane) będzie pokazywał dokładnie to. Committuję obie zmiany.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-07 11:04
+------------------------------------------------------------------------------
+Gotowe. Jutro od rana Slack będzie wyglądał tak:
+
+```
+## 🛒 SPRZEDAŻ WCZORAJ
+[SPRZEDAŻ] WCZORAJ 7.07: 132 166 zł · 283 zamówień
+  ONE: 101 504 zł (175 zam.) | MEBLE: 17 638 zł (59 zam.) | LUXSEN: 10 000 zł (26 zam.) | TWO: 3026 zł (23 zam.)
+  TOP: Materazzi 100 056 zł / 173 zam. · Luxsen 8628 zł / 22 zam. · MobelKap 7455 zł / 19 zam.
+```
+
+**Co zmieniłem:**
+- `hub-autopilot` przesuniętym z 09:00 → **07:00** — teraz leci przed standup (08:00), więc ma zawsze świeże dane
+- `standup.mjs` — nowa sekcja czyta plik dniowy, pokazuje łączną sprzedaż, podział per grupa i top 3 konta z zamówieniami

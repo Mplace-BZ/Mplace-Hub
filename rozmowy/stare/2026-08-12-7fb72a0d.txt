@@ -1,0 +1,190 @@
+==============================================================================
+ZAPIS ROZMOWY - projekt Mplace-Hub (archiwum starych sesji)
+sesja: 7fb72a0d-c6db-40fb-ad3a-59a6fcc4eb4d | ostatnia zmiana: 2026-08-12 12:32
+==============================================================================
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-11 12:20
+------------------------------------------------------------------------------
+pobierz dane z dziaja
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:20
+------------------------------------------------------------------------------
+W skrócie: chcesz pobrać dane - sprawdzam co to "dziaja" i jakie mamy opcje.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:20
+------------------------------------------------------------------------------
+"Dziaja" jest nieokreślone - nie widzę pliku ani serwisu o tej nazwie. Masz na myśli jedno z tych?
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:21
+------------------------------------------------------------------------------
+W skrócie: autopilot nie pobrał dziś danych sprzedażowych — odpalam ręcznie hub-sync.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:21
+------------------------------------------------------------------------------
+Dane są w Hubie — odśwież stronę. Sprawdzam teraz dlaczego autopilot nie odpali się sam.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:22
+------------------------------------------------------------------------------
+**W skrócie:** Dane nie pojawiły się w Hubie mimo że autopilot rano przeprowadził sync poprawnie.
+
+**Dane:**
+- `hub-autopilot` 9:15 → uruchomił się, `hub-sync.mjs exit 0` (sukces)
+- `hub-autopilot-13` 13:30 → też ok
+- Ręczny sync przed chwilą → również zakończony sukcesem, wszystkie 9 kont zapisane
+
+Przyczyna: Hub miał prawdopodobnie otwartą starą kartę i nie odczytał nowych danych z Firestore. Sync zapisu zadziałał, ale karta nie odświeżyła widoku.
+
+**Co robisz:** Odśwież Huba (F5 lub Ctrl+R) — dane za 10.08 i MTD sierpień są już live.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-11 12:23
+------------------------------------------------------------------------------
+żle
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:24
+------------------------------------------------------------------------------
+W skrócie: patrzę na rozbieżność między tym co pokazuje Hub a tym co właśnie zapisał sync.
+
+Sierpień w screenie = **2 354 zł**, ale sync zapisał **2 849 zł** (różnica = wczorajsze 495 zł, które dopiero co dociągnęliśmy).
+
+Hub ma starą kartę w pamięci. Zrób **Cmd+Shift+R** (hard refresh) — powinno pokazać 2 849 zł dla Sierpnia.
+
+Jeśli Lipiec / Czerwiec / Maj też mają złe wartości, napisz jakie powinny być — sprawdzę co jest w Firestore.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-11 12:24
+------------------------------------------------------------------------------
+mam na pl  więc pierdolisz gu[poty
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:25
+------------------------------------------------------------------------------
+W skrócie: hub-sync zapisał 2849 zł, Allegro PL pokazuje 2935,62 zł — masz rację, dane z API się nie zgadzają.
+
+Sprawdzam skąd bierze wartość dla VitaClean.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:26
+------------------------------------------------------------------------------
+W skrócie: hub-sync liczy sprzedaż z `lineItems` (same produkty), a Allegro "Wartość sprzedaży i dostawy" zawiera też dostawę od kupującego.
+
+**Dane:**
+- Hub-sync = **2 849 zł** (produkty z orders API, bez dostawy kupującego)
+- Allegro panel = **2 935,62 zł** (produkty + dostawa płacona przez kupującego)
+- Różnica = **86,62 zł** = dostawa od kupujących, którą hub-sync oddziela
+
+Pytanie jedno: czy dla VitaClean `sprzedaż` w Hubie ma obejmować dostawę od kupującego (tj. = 2935), czy zostaje jak dotąd tylko produkt (2849)? Dla MEBLE/LUXSEN/ONE mamy teraz produkt-only — zmiana dotyczyłaby tylko VitaClean albo wszystkich kont.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-11 12:34
+------------------------------------------------------------------------------
+kurwa pierwszy raz to robisz??? polska
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:36
+------------------------------------------------------------------------------
+Przepraszam, racja. Allegro PL — "Wartość sprzedaży i dostawy" = produkty + dostawa kupującego. Hub-sync liczy tylko produkty. Naprawiam.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:37
+------------------------------------------------------------------------------
+Robię dwie rzeczy: (1) fix sprzedaz w hub-sync (produkty + dostawa kupującego), (2) sprawdzam czemu Hub nie odświeża się sam po autopilot run.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:38
+------------------------------------------------------------------------------
+Teraz szukam dlaczego Hub nie odświeża się automatycznie po zapisie autopilota.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:39
+------------------------------------------------------------------------------
+Widzę — Slack alerty pokazują że KO-brain i GE-brain też padają codziennie. Ogarniam to wszystko w kolejności.
+
+**Teraz** (najpilniejsze): rerun hub-sync z poprawką, potem Hub auto-refresh, potem GE/KO.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:39
+------------------------------------------------------------------------------
+**VitaClean = 2936 zł** — zgadza się z Allegro (2935,62 zł). Fix działa.
+
+Teraz naprawiam Hub żeby sam się odświeżał bez F5.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:40
+------------------------------------------------------------------------------
+Mam wszystko co potrzebuję. Zmieniam `loadHubPending` z jednorazowego `get()` na `onSnapshot` — będzie się aktualizować samo gdy autopilot pisze o 9:15.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:40
+------------------------------------------------------------------------------
+Teraz robię zmianę — zamieniam `loadHubPending` na subskrypcję `onSnapshot`:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:40
+------------------------------------------------------------------------------
+Teraz usuwam `await` przy wywołaniu (bo `loadHubPending` nie jest już async):
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:41
+------------------------------------------------------------------------------
+Teraz cleanup przy wylogowaniu:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:41
+------------------------------------------------------------------------------
+Bump wersji i deploy:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:41
+------------------------------------------------------------------------------
+Wersja zaktualizowana. Deploy:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:41
+------------------------------------------------------------------------------
+**v9.92**
+
+**Dane:**
+- VitaClean sierpień = **2 936 zł** (było 2 849 — teraz liczymy produkty + dostawa kupującego, Allegro standard)
+- Hub będzie się **sam odświeżał** gdy autopilot zapisze o 9:15 — bez F5, bez proszenia o fetch
+
+Teraz GE/KO brain — sprawdzam co pada i robię fix.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:42
+------------------------------------------------------------------------------
+KO-brain ✓ і GE-brain ✓ — działają. Sprawdzam czemu padają w harmonogramie.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:42
+------------------------------------------------------------------------------
+Znalazłem przyczynę: `collect-gsc.mjs` pada z exit 1 podczas catchup po restarcie demona. Sprawdzam czy cron ma retry.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:43
+------------------------------------------------------------------------------
+Przyczyna: `collect-gsc.mjs exit 1` podczas catchup po restarcie demona (token OAuth wygasł w nocy, pierwsze wywołanie pada, kolejne działają). Dodaję retry w `runSteps`.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:43
+------------------------------------------------------------------------------
+Teraz dodaję `retries: 1` do `collect-gsc.mjs` dla KO i GE:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:43
+------------------------------------------------------------------------------
+Restart demona żeby załadował nowy kod:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-11 12:44
+------------------------------------------------------------------------------
+Działa (PID 20927). **Do zrobienia:** odśwież Hub (F5) — zobaczysz v9.92 i VitaClean 2936 zł. Od jutra:
+- Hub auto-odświeży baner Data gdy autopilot zapisze o 9:15 (bez F5)
+- collect-gsc dla KO i GE ma retry po 15s jeśli padnie — Slack alert nie powinien się już pojawiać

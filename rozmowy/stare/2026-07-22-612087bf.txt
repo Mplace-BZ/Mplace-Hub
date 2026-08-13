@@ -1,0 +1,1631 @@
+==============================================================================
+ZAPIS ROZMOWY - projekt Mplace-Hub (archiwum starych sesji)
+sesja: 612087bf-eb4e-4048-a2e6-23aa647dd1ff | ostatnia zmiana: 2026-07-22 09:14
+==============================================================================
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 10:10
+------------------------------------------------------------------------------
+Pokaż jakie masz dostępy do A-piki otwórz mi ten nasz MD, zobaczymy co brakuje.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:10
+------------------------------------------------------------------------------
+Czytam CLAUDE.md projektu i zestawiam z dostępnymi API.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:10
+------------------------------------------------------------------------------
+Oto co masz dostępne w tej sesji Claude Code vs co jest w projekcie:
+
+---
+
+## Dostępne MCP API (aktywne w tej sesji)
+
+| MCP | Co robi | Użyteczność dla Hub |
+|-----|---------|---------------------|
+| **Apify** | Web scraping, data extraction | Pobieranie cen z Allegro, monitoring konkurencji |
+| **Google Drive** | Read/write/search plików GDrive | Udostępnianie raportów, backup danych |
+| **Higgsfield** | Generowanie video/image/audio | Niska — marketing content |
+
+---
+
+## Co jest w projekcie (CLAUDE.md) a NIE ma jako MCP
+
+| Potrzeba | Status |
+|----------|--------|
+| **Allegro API** — pobieranie cen MK (linia 115: "Ceny MK = 0 zł") | Brak bezpośredniego MCP — **Apify może to zastąpić** (scraper Allegro) |
+| **Firebase** | Dostępny via client SDK w app, nie jako MCP |
+| **Claude API** | Przez Cloudflare Worker (SSE) — działa, nie dotykać |
+| **GitHub** | Via `gh` CLI w Bash — działa |
+
+---
+
+## Największa luka — Allegro ceny MK
+
+CLAUDE.md wprost mówi: *"Ceny MK = 0 zł (brak danych, do pobrania z Allegro API/CSV)"* — Apify ma aktorów do scrapowania Allegro. Mogę to rozwiązać teraz jeśli chcesz.
+
+Chcesz żebym coś z tym zrobił — np. odpalił Apify scraper na konta MEBLE?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 10:11
+------------------------------------------------------------------------------
+Hotfush Mi. Dostępny do naszych kąt API Allegro. A pi alegrów czarę robiliśmy poszukaj.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:11
+------------------------------------------------------------------------------
+Szukam istniejącego kodu Allegro API w projekcie.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:11
+------------------------------------------------------------------------------
+Mam pełny obraz. Oto stan Allegro API w projekcie:
+
+---
+
+## Stan Allegro API — co mamy
+
+**Scaffolding zrobiony (linia 28513):**
+- UI na Settings z polami Client ID / Client Secret / Redirect URI
+- `getAllegroConfig()` / `saveAllegroConfig()` — zapis do localStorage
+- `renderAllegroApiSettings()` — panel konfiguracji
+
+**Czego NIE MA (blokuje działanie):**
+- OAuth flow — `allegroTestConnection()` dosłownie ma `alert('OAuth flow nie jest jeszcze zaimplementowany')`
+- Brak strony `/callback` do obsługi tokena
+- Brak `allegroFetch()` — żadnych prawdziwych zapytań do API
+- Brak refresh tokena
+- Status w UI: `"Scaffolding — OAuth flow w przygotowaniu"`
+
+---
+
+## Co potrzeba żeby to zadziałało
+
+Allegro REST API wspiera dwa flow:
+
+| Flow | Czy pasuje | Trudność |
+|------|-----------|---------|
+| **Authorization Code** | Tak — mamy GitHub Pages + redirect | Srednia — trzeba strony `/callback` |
+| **Device Authorization** | Tak — łatwiejszy, bez callback page | Prosta — tylko polling |
+
+**Device Authorization** byłby prostszy — użytkownik otwiera link, zatwierdza w przeglądarce, token wraca przez polling. Żadnej strony callback.
+
+---
+
+Masz Client ID i Secret z apps.developer.allegro.pl? Jeśli tak — mogę zrobić pełny OAuth flow (Device Auth) + `allegroFetch()` + auto-pull cen ofert MK. Całość z jednym commitem.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 10:40
+------------------------------------------------------------------------------
+Jak chce Allegro API zobaczyć? Nic więcej, Allegro Appie. Znajdź masz to. Wczoraj na tym pracowaliśmy, mam nawet to otwarte. Chcesz, żebyś ty to znalazł.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:40
+------------------------------------------------------------------------------
+Szukam w pamięci i ostatnich plikach.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:41
+------------------------------------------------------------------------------
+Znalazłem — MPlace-Agent ma już tokeny Allegro!
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:42
+------------------------------------------------------------------------------
+Mamy kompletny stack! Czytam co jest zbudowane.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:42
+------------------------------------------------------------------------------
+Mam kompletny obraz. Podsumowanie:
+
+---
+
+## Stan Allegro API — pełny obraz
+
+### Co mamy (MPlace-Agent)
+
+| Plik | Status |
+|------|--------|
+| `allegro-auth.mjs` | Kompletny — Device Flow OAuth, refresh, status |
+| `allegro-pricer.mjs` | Kompletny — orchestrator cen MEBLE, rekomendacje, cross-account |
+| `allegro-stats-import.mjs` | Kompletny — parser XLSX z panelu |
+| `allegro-tokens.json` | Ważny token (uzyskany 29.06, user `78725893`) |
+| `allegro-tokens-semmi.json` | Ważny token Semmi (user `126101774`) |
+
+### Dane w `.env` — masz credentials dla **WSZYSTKICH** kont
+
+```
+ALLEGRO_CLIENT_ID_MOBELKAP / _SECRET
+ALLEGRO_CLIENT_ID_PERFEKTCIECIE / _SECRET
+ALLEGRO_CLIENT_ID_MEBLENACZASIE / _SECRET
+ALLEGRO_CLIENT_ID_LUXSEN / _SECRET
+ALLEGRO_CLIENT_ID_SEMMI / _SECRET
+ALLEGRO_CLIENT_ID_MATERAZZI / _SECRET
+ALLEGRO_CLIENT_ID_TWOJEMATERACE / _SECRET
+```
+
+### Problem
+
+`allegro-auth.mjs` czyta `ALLEGRO_CLIENT_ID` (bez sufiksu) — stąd `--status` mówi "brak". Moduł nie obsługuje jeszcze nazewnictwa per-konto.
+
+### Hub (index.html) — scaffolding tylko
+
+Formularz Settings istnieje (linia 28513) ale brak prawdziwego OAuth — tylko `alert('nie zaimplementowane')`.
+
+---
+
+**Co chcesz zrobić?** Podłączyć Allegro API do Hub (pull cen ofert MK bezpośrednio z API), czy coś innego?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 10:51
+------------------------------------------------------------------------------
+Bede dodawał nowe dostepy do allegra dla kont Więc przygotuj mi lista i otwórz ten panel, ja będę tam wklejał to. 
+Materazzi
+Twoje Materace EU
+Vitaclean
+Dom Glamour
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:52
+------------------------------------------------------------------------------
+Sprawdzam gdzie panel jest w Hub i co mamy w .env.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:53
+------------------------------------------------------------------------------
+Panel HTML nie istnieje — funkcja jest, ale brak `<div id="allegroApiSettings">`. Zbuduję porządny panel i dodam placeholdery do .env dla 2 brakujących kont.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:53
+------------------------------------------------------------------------------
+Mam pełny obraz. Dodam VitaClean i Dom Glamour do .env i otworzę plik.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:07
+------------------------------------------------------------------------------
+Plik otwarty w VS Code. Oto co wypełnić:
+
+---
+
+## Lista do uzupełnienia — Allegro API credentials
+
+Konto | Klucz w .env | Status
+------|-------------|-------
+**Materazzi** | `ALLEGRO_CLIENT_ID_MATERAZZI` + `_SECRET` | puste — wklej
+**Twoje Materace EU** | `ALLEGRO_CLIENT_ID_TWOJEMATERACE` + `_SECRET` | puste — wklej
+**VitaClean** | `ALLEGRO_CLIENT_ID_VITACLEAN` + `_SECRET` | puste — wklej
+**Dom Glamour** | `ALLEGRO_CLIENT_ID_DOMGLAMOUR` + `_SECRET` | puste — wklej
+
+---
+
+Credentials bierzesz z [apps.developer.allegro.pl](https://apps.developer.allegro.pl) — każde konto ma osobną aplikację. Format: `Client ID` (32 znaki hex) + `Client Secret` (64 znaki).
+
+Po wklejeniu daj znać — uruchomię `--setup` per konto żeby wymienić Client ID/Secret na access token.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:12
+------------------------------------------------------------------------------
+<ide_opened_file>The user opened the file /Users/chrismac/bazgroszyt/Mplace-Hub/mnc_restart_plan_final.md in the IDE. This may or may not be related to the current task.</ide_opened_file>
+Dodaj pozostałe konta. Mam tylko to. 
+# MPlace Hub — klucze API per konto
+# NIE commitować — .gitignore go blokuje
+
+# ── Allegro API — konta Luxsen ───────────────────────────────────────────────
+ALLEGRO_CLIENT_ID_LUXSEN=1a58e35a891c4c3fbb1d3fb6776c33f0
+ALLEGRO_CLIENT_SECRET_LUXSEN=jZL6ijb5ZNCIck8e0wJjnoc3UwRB80GZXJaSWQpba670OdKDo6hFqo2bb7S2L0zF
+ALLEGRO_REFRESH_TOKEN_LUXSEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FsbGVncm8ucGwiLCJ1c2VyX25hbWUiOiI3ODcyNTg5MyIsInNjb3BlIjpbImFsbGVncm86YXBpOm9yZGVyczpyZWFkIiwiYWxsZWdybzphcGk6ZnVsZmlsbG1lbnQ6cmVhZCIsImFsbGVncm86YXBpOnByb2ZpbGU6d3JpdGUiLCJhbGxlZ3JvOmFwaTpzYWxlOm9mZmVyczp3cml0ZSIsImFsbGVncm86YXBpOmZ1bGZpbGxtZW50OndyaXRlIiwiYWxsZWdybzphcGk6YmlsbGluZzpyZWFkIiwiYWxsZWdybzphcGk6Y2FtcGFpZ25zIiwiYWxsZWdybzphcGk6ZGlzcHV0ZXMiLCJhbGxlZ3JvOmFwaTphZmZpbGlhdGU6d3JpdGUiLCJhbGxlZ3JvOmFwaTpzYWxlOm9mZmVyczpyZWFkIiwiYWxsZWdybzphcGk6YmlkcyIsImFsbGVncm86YXBpOnNoaXBtZW50czp3cml0ZSIsImFsbGVncm86YXBpOm9yZGVyczp3cml0ZSIsImFsbGVncm86YXBpOmFkcyIsImFsbGVncm86YXBpOnBheW1lbnRzOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpzZXR0aW5nczp3cml0ZSIsImFsbGVncm86YXBpOnByb2ZpbGU6cmVhZCIsImFsbGVncm86YXBpOnJhdGluZ3MiLCJhbGxlZ3JvOmFwaTphZmZpbGlhdGU6cmVhZCIsImFsbGVncm86YXBpOnNhbGU6c2V0dGluZ3M6cmVhZCIsImFsbGVncm86YXBpOnBheW1lbnRzOnJlYWQiLCJhbGxlZ3JvOmFwaTpzaGlwbWVudHM6cmVhZCIsImFsbGVncm86YXBpOm1lc3NhZ2luZyJdLCJhdGkiOiJmNGY3ODg0Zi04MTdkLTQxNDAtYmMyZi1iZjNhMDMzODRhMmEiLCJhbGxlZ3JvX2FwaSI6dHJ1ZSwiZXhwIjoxNzkwNTExMzgzLCJjbGllbnRfaWQiOiIxYTU4ZTM1YTg5MWM0YzNmYmIxZDNmYjY3NzZjMzNmMCIsImp0aSI6IjNjNjY3ZDM2LWU5MGEtNGFkMi04NTE2LWVkNmJlMWQ4OTUzOCJ9.7eCnldvZRdxPV__YtN4QRRAFHLxV0JKY7FFwmhZaE74BTUffrwNrHlrrfLavD-WPFl743hM0CEnNs0tCxSDtc60_Jzm_CTi1gisILxsLjEdtL_KXuschWgJ0PWXlAVqkP3ZYTm3cpk4izgOWFGhWMCu_HKj30g_WN4oqs8wGJ_oUSuB-FNXcpy29jxesdN3wVp-BpWY-UjDwke2dIvbQSkurpo8GaVYdNmH6GUUCvcqRfkDaHkwKs1IWA7x0-fHzAlYdl8lraZvmQbzuC_dfprMICcGHVNYuyvvr1So327O02804QRUvYDXXMD01OLfl2VVAcVQKHEwdsDiELk8EiA
+
+# ── Allegro API — konto Semmi ─────────────────────────────────────────────────
+ALLEGRO_CLIENT_ID_SEMMI=99172f465055472cadfc7345dd478aeb
+ALLEGRO_CLIENT_SECRET_SEMMI=N8VROv7XLTURPWxENY2p7ZEqmgmKUCcg9KgIJHRi1yMaAdgoR0FW9ko4zwX8XTyK
+ALLEGRO_REFRESH_TOKEN_SEMMI=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FsbGVncm8ucGwiLCJ1c2VyX25hbWUiOiIxMjYxMDE3NzQiLCJzY29wZSI6WyJhbGxlZ3JvOmFwaTpvcmRlcnM6cmVhZCIsImFsbGVncm86YXBpOmZ1bGZpbGxtZW50OnJlYWQiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpmdWxmaWxsbWVudDp3cml0ZSIsImFsbGVncm86YXBpOmJpbGxpbmc6cmVhZCIsImFsbGVncm86YXBpOmNhbXBhaWducyIsImFsbGVncm86YXBpOmRpc3B1dGVzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6cmVhZCIsImFsbGVncm86YXBpOmJpZHMiLCJhbGxlZ3JvOmFwaTpzaGlwbWVudHM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpvcmRlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTphZHMiLCJhbGxlZ3JvOmFwaTpwYXltZW50czp3cml0ZSIsImFsbGVncm86YXBpOnNhbGU6c2V0dGluZ3M6d3JpdGUiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOnJlYWQiLCJhbGxlZ3JvOmFwaTpyYXRpbmdzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOnJlYWQiLCJhbGxlZ3JvOmFwaTpzYWxlOnNldHRpbmdzOnJlYWQiLCJhbGxlZ3JvOmFwaTpwYXltZW50czpyZWFkIiwiYWxsZWdybzphcGk6c2hpcG1lbnRzOnJlYWQiLCJhbGxlZ3JvOmFwaTptZXNzYWdpbmciXSwiYXRpIjoiNDQ5ODdlMDktZTlkZS00ZmVkLWIwN2ItMjkzNmM0MDk4YjdkIiwiYWxsZWdyb19hcGkiOnRydWUsImV4cCI6MTc5MDUwMjc0NCwiY2xpZW50X2lkIjoiOTkxNzJmNDY1MDU1NDcyY2FkZmM3MzQ1ZGQ0NzhhZWIiLCJqdGkiOiIyYTU0ZTcyNS0yMTJmLTQ5N2MtOGFkNi02NGMyZjc1NDhmYWMifQ.VJBGP84ofOYZNt2ma7uSQARLVABBArPd1a6H15Db6iMcYoZiYyI1KTbMsHJsbOdsPksPN2rd5AbExbkj-Jf20WJwN_m3xN530-W9QhJkZggiPCvWgR17L9PKkm55KWVexF3lWPRc_DUC0JZsdJSnzSOWKPK8tHBvlCoNzBjcvu4OpZ0QRJJHvgvp4WrTxv1uxBJeADtBnux7Ng7YYqwnv0T_5r8U2qH3WwfzkncmB3Ptj7hb_DBe80aGEadzsKqOtfxD7aDHPGSOc-Vi--Fqr2cUyCxH1FTM9VCIKS_fL1tfs6aSdBKpvT-dZGW61-SH0IYo0io4EuOT5_-hhmei8w
+
+# ── Allegro API — grupa MEBLE ─────────────────────────────────────────────────
+ALLEGRO_CLIENT_ID_MOBELKAP=
+ALLEGRO_CLIENT_SECRET_MOBELKAP=
+ALLEGRO_REFRESH_TOKEN_MOBELKAP=
+
+ALLEGRO_CLIENT_ID_PERFEKTCIECIE=4a72a2319202497b9ef5ff159c572913
+ALLEGRO_CLIENT_SECRET_PERFEKTCIECIE=9YOYL0p3POsgmILcmTv1c0B6m05RHOuyvd1d2TymNUNLlBWGDgTti2gvvAglwULb
+ALLEGRO_REFRESH_TOKEN_PERFEKTCIECIE=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FsbGVncm8ucGwiLCJ1c2VyX25hbWUiOiIxMDI2OTc2MTgiLCJzY29wZSI6WyJhbGxlZ3JvOmFwaTpvcmRlcnM6cmVhZCIsImFsbGVncm86YXBpOmZ1bGZpbGxtZW50OnJlYWQiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpmdWxmaWxsbWVudDp3cml0ZSIsImFsbGVncm86YXBpOmJpbGxpbmc6cmVhZCIsImFsbGVncm86YXBpOmNhbXBhaWducyIsImFsbGVncm86YXBpOmRpc3B1dGVzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6cmVhZCIsImFsbGVncm86YXBpOmJpZHMiLCJhbGxlZ3JvOmFwaTpzaGlwbWVudHM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpvcmRlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTphZHMiLCJhbGxlZ3JvOmFwaTpwYXltZW50czp3cml0ZSIsImFsbGVncm86YXBpOnNhbGU6c2V0dGluZ3M6d3JpdGUiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOnJlYWQiLCJhbGxlZ3JvOmFwaTpyYXRpbmdzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOnJlYWQiLCJhbGxlZ3JvOmFwaTpzYWxlOnNldHRpbmdzOnJlYWQiLCJhbGxlZ3JvOmFwaTpwYXltZW50czpyZWFkIiwiYWxsZWdybzphcGk6c2hpcG1lbnRzOnJlYWQiLCJhbGxlZ3JvOmFwaTptZXNzYWdpbmciXSwiYXRpIjoiNDBiNGNiMGEtMGZhNS00MWQwLThkZjUtZjc4NjNmOWEwZDA1IiwiYWxsZWdyb19hcGkiOnRydWUsImV4cCI6MTc5MDUwMzM2NywiY2xpZW50X2lkIjoiNGE3MmEyMzE5MjAyNDk3YjllZjVmZjE1OWM1NzI5MTMiLCJqdGkiOiI2YjAyOGU4MS00YWRhLTRhOTEtYjAzNS0wMWIxNzMxYzNmOWYifQ.LOlhXMKfdVBlU42_kEL_uPPCAV-rMnVWqd66RQFQrTmpX9UKQd1pD_GrcfTnlGknz8lAEN2AVWHjvoZql4771Ssf30FrbyliC-7hR6hVx0v1WGJJ42oH4sxnaUN4V18B97SSsqVz0OqTiVkBxrqIpS0IUiwCN5oFAHPEdR1fKJoiklECEJI2o-IsbID47AYE6hmP--Yn_XDbEUVCqz_o-9uUS14fNmFRgFzDNomCK8vcd8v9tUOlDbBJlnYdzSBTA5PK3lxj7WeTDY2KkzF8djwXEsl56-TF80JS9O6NbzLgkNjrFcbnvhnqM3A2tZFvkBvP0NEV0tLUKT9OMLf5Jw
+
+ALLEGRO_CLIENT_ID_MEBLENACZASIE=ae738d8b7542454782d6d494c9a86271
+ALLEGRO_CLIENT_SECRET_MEBLENACZASIE=Q5yLHvpR8ZLv9SWtyj9i9v82QXmEE6pYdCTVADi0KZil2lGvoqeAh8bOpJN8oq1y
+ALLEGRO_REFRESH_TOKEN_MEBLENACZASIE=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FsbGVncm8ucGwiLCJ1c2VyX25hbWUiOiIxMDQ5Nzg0OTMiLCJzY29wZSI6WyJhbGxlZ3JvOmFwaTpvcmRlcnM6cmVhZCIsImFsbGVncm86YXBpOmZ1bGZpbGxtZW50OnJlYWQiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpmdWxmaWxsbWVudDp3cml0ZSIsImFsbGVncm86YXBpOmJpbGxpbmc6cmVhZCIsImFsbGVncm86YXBpOmNhbXBhaWducyIsImFsbGVncm86YXBpOmRpc3B1dGVzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6cmVhZCIsImFsbGVncm86YXBpOmJpZHMiLCJhbGxlZ3JvOmFwaTpzaGlwbWVudHM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpvcmRlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTphZHMiLCJhbGxlZ3JvOmFwaTpwYXltZW50czp3cml0ZSIsImFsbGVncm86YXBpOnNhbGU6c2V0dGluZ3M6d3JpdGUiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOnJlYWQiLCJhbGxlZ3JvOmFwaTpyYXRpbmdzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOnJlYWQiLCJhbGxlZ3JvOmFwaTpzYWxlOnNldHRpbmdzOnJlYWQiLCJhbGxlZ3JvOmFwaTpwYXltZW50czpyZWFkIiwiYWxsZWdybzphcGk6c2hpcG1lbnRzOnJlYWQiLCJhbGxlZ3JvOmFwaTptZXNzYWdpbmciXSwiYXRpIjoiMzMwYTc1YjQtYmYxOS00OWVlLTk0NzYtOGY0NDM0ZGIzOGVjIiwiYWxsZWdyb19hcGkiOnRydWUsImV4cCI6MTc5MDUwNTA1NSwiY2xpZW50X2lkIjoiYWU3MzhkOGI3NTQyNDU0NzgyZDZkNDk0YzlhODYyNzEiLCJqdGkiOiJjMTk5MjQxMy1iNThkLTQ0ODEtODAzMC01YTMwOTU1OWVkMjgifQ.3uYrj8kPPr5C5dFEjH9gfT5zTc-oENhHl7ndXcaKKk-kQX2MkAu3P1xakcSh6ERpmYPEOVMMy4chjYaPSO2se1fm7MUtX3EwZg0lv_e7gvqYDksTGxwO4z3qlRGXcq8cnFL3kMIr47TGZz50s-xbZOPChFHSBgFJt_mfn-6lb3DD4bUXHGcNKcPo-vMunl9CNSBTSUA4kEEg-zB8-UfQ4YgYVIxHZVWYIgL4seTfwAGL3TKXpcZIaWI60jOXLJ-sRIReq2fO_P6DzM_YiX5gNnCu11QshLFAGieKwqWpXp7m-MzyLrJizaUgOPCiOSwLyFTc0Ze57fHl1dX-raJmQg
+
+# ── Allegro API — grupa ONE ───────────────────────────────────────────────────
+ALLEGRO_CLIENT_ID_MATERAZZI=315521e9364e41a6b09df24f657f85cf
+ALLEGRO_CLIENT_SECRET_MATERAZZI=TcLGmGwvQvusca7E0fI8UJvBx2rCYVGNv47uKuUSG8m70mHZPyJ0QYBpcZS3uyAA
+ALLEGRO_REFRESH_TOKEN_MATERAZZI=
+
+ALLEGRO_CLIENT_ID_TWOJEMATERACE=d845fa21d23f43aabf8e0183a14abda5
+ALLEGRO_CLIENT_SECRET_TWOJEMATERACE=Ie3EjvzuMrOwChM8G88mrARBoZAcMZWzyZYykxtzf1djPnMU1zosmZX5m2JZtXPA
+ALLEGRO_REFRESH_TOKEN_TWOJEMATERACE=
+
+# Redirect URI (wspólne)
+REDIRECT_URI=https://mplace-bz.github.io/Mplace-Hub/callback
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:12
+------------------------------------------------------------------------------
+Wklejam wszystko do .env — uzupełniam credentials + dodaję REFRESH_TOKEN per konto.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:15
+------------------------------------------------------------------------------
+Gotowe. Podsumowanie stanu:
+
+| Konto | Client ID | Secret | Refresh Token |
+|-------|-----------|--------|---------------|
+| **Luxsen** | ✓ | ✓ | ✓ |
+| **Semmi** | ✓ | ✓ | ✓ |
+| **PerfektCięcie** | ✓ | ✓ | ✓ |
+| **MeblenaCzasie** | ✓ | ✓ | ✓ |
+| **Materazzi** | ✓ | ✓ | puste — potrzebny |
+| **TwojeMatrace EU** | ✓ | ✓ | puste — potrzebny |
+| **MobelKap** | puste | puste | puste |
+| **VitaClean** | puste | puste | puste |
+| **Dom Glamour** | puste | puste | puste |
+
+Brakuje:
+- **MobelKap** — cały zestaw (Client ID + Secret + Refresh Token)
+- **VitaClean** — cały zestaw
+- **Dom Glamour** — cały zestaw
+- **Materazzi i TwojeMatrace** — tylko Refresh Token (mają już ID+Secret)
+
+Dla Materazzi i TwojeMatrace mogę uruchomić `--setup` przez Device Flow od razu — potrzebuję tylko otworzyć link w przeglądarce. Chcesz?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:16
+------------------------------------------------------------------------------
+<ide_opened_file>The user opened the file /Users/chrismac/bazgroszyt/Mplace-Hub/.env in the IDE. This may or may not be related to the current task.</ide_opened_file>
+Czy do Nvidia dałeś nowe konta? i zobacz, tam mobile cup jest. Jest brak wita klin, dom glamour i właśnie wkleiłem materacji i twoje materaca. 
+# MPlace Hub — klucze API per konto
+# NIE commitować — .gitignore go blokuje
+
+# ── Allegro API — konta Luxsen ───────────────────────────────────────────────
+ALLEGRO_CLIENT_ID_LUXSEN=1a58e35a891c4c3fbb1d3fb6776c33f0
+ALLEGRO_CLIENT_SECRET_LUXSEN=jZL6ijb5ZNCIck8e0wJjnoc3UwRB80GZXJaSWQpba670OdKDo6hFqo2bb7S2L0zF
+ALLEGRO_REFRESH_TOKEN_LUXSEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FsbGVncm8ucGwiLCJ1c2VyX25hbWUiOiI3ODcyNTg5MyIsInNjb3BlIjpbImFsbGVncm86YXBpOm9yZGVyczpyZWFkIiwiYWxsZWdybzphcGk6ZnVsZmlsbG1lbnQ6cmVhZCIsImFsbGVncm86YXBpOnByb2ZpbGU6d3JpdGUiLCJhbGxlZ3JvOmFwaTpzYWxlOm9mZmVyczp3cml0ZSIsImFsbGVncm86YXBpOmZ1bGZpbGxtZW50OndyaXRlIiwiYWxsZWdybzphcGk6YmlsbGluZzpyZWFkIiwiYWxsZWdybzphcGk6Y2FtcGFpZ25zIiwiYWxsZWdybzphcGk6ZGlzcHV0ZXMiLCJhbGxlZ3JvOmFwaTphZmZpbGlhdGU6d3JpdGUiLCJhbGxlZ3JvOmFwaTpzYWxlOm9mZmVyczpyZWFkIiwiYWxsZWdybzphcGk6YmlkcyIsImFsbGVncm86YXBpOnNoaXBtZW50czp3cml0ZSIsImFsbGVncm86YXBpOm9yZGVyczp3cml0ZSIsImFsbGVncm86YXBpOmFkcyIsImFsbGVncm86YXBpOnBheW1lbnRzOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpzZXR0aW5nczp3cml0ZSIsImFsbGVncm86YXBpOnByb2ZpbGU6cmVhZCIsImFsbGVncm86YXBpOnJhdGluZ3MiLCJhbGxlZ3JvOmFwaTphZmZpbGlhdGU6cmVhZCIsImFsbGVncm86YXBpOnNhbGU6c2V0dGluZ3M6cmVhZCIsImFsbGVncm86YXBpOnBheW1lbnRzOnJlYWQiLCJhbGxlZ3JvOmFwaTpzaGlwbWVudHM6cmVhZCIsImFsbGVncm86YXBpOm1lc3NhZ2luZyJdLCJhdGkiOiJmNGY3ODg0Zi04MTdkLTQxNDAtYmMyZi1iZjNhMDMzODRhMmEiLCJhbGxlZ3JvX2FwaSI6dHJ1ZSwiZXhwIjoxNzkwNTExMzgzLCJjbGllbnRfaWQiOiIxYTU4ZTM1YTg5MWM0YzNmYmIxZDNmYjY3NzZjMzNmMCIsImp0aSI6IjNjNjY3ZDM2LWU5MGEtNGFkMi04NTE2LWVkNmJlMWQ4OTUzOCJ9.7eCnldvZRdxPV__YtN4QRRAFHLxV0JKY7FFwmhZaE74BTUffrwNrHlrrfLavD-WPFl743hM0CEnNs0tCxSDtc60_Jzm_CTi1gisILxsLjEdtL_KXuschWgJ0PWXlAVqkP3ZYTm3cpk4izgOWFGhWMCu_HKj30g_WN4oqs8wGJ_oUSuB-FNXcpy29jxesdN3wVp-BpWY-UjDwke2dIvbQSkurpo8GaVYdNmH6GUUCvcqRfkDaHkwKs1IWA7x0-fHzAlYdl8lraZvmQbzuC_dfprMICcGHVNYuyvvr1So327O02804QRUvYDXXMD01OLfl2VVAcVQKHEwdsDiELk8EiA
+
+# ── Allegro API — konto Semmi ─────────────────────────────────────────────────
+ALLEGRO_CLIENT_ID_SEMMI=99172f465055472cadfc7345dd478aeb
+ALLEGRO_CLIENT_SECRET_SEMMI=N8VROv7XLTURPWxENY2p7ZEqmgmKUCcg9KgIJHRi1yMaAdgoR0FW9ko4zwX8XTyK
+ALLEGRO_REFRESH_TOKEN_SEMMI=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FsbGVncm8ucGwiLCJ1c2VyX25hbWUiOiIxMjYxMDE3NzQiLCJzY29wZSI6WyJhbGxlZ3JvOmFwaTpvcmRlcnM6cmVhZCIsImFsbGVncm86YXBpOmZ1bGZpbGxtZW50OnJlYWQiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpmdWxmaWxsbWVudDp3cml0ZSIsImFsbGVncm86YXBpOmJpbGxpbmc6cmVhZCIsImFsbGVncm86YXBpOmNhbXBhaWducyIsImFsbGVncm86YXBpOmRpc3B1dGVzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6cmVhZCIsImFsbGVncm86YXBpOmJpZHMiLCJhbGxlZ3JvOmFwaTpzaGlwbWVudHM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpvcmRlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTphZHMiLCJhbGxlZ3JvOmFwaTpwYXltZW50czp3cml0ZSIsImFsbGVncm86YXBpOnNhbGU6c2V0dGluZ3M6d3JpdGUiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOnJlYWQiLCJhbGxlZ3JvOmFwaTpyYXRpbmdzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOnJlYWQiLCJhbGxlZ3JvOmFwaTpzYWxlOnNldHRpbmdzOnJlYWQiLCJhbGxlZ3JvOmFwaTpwYXltZW50czpyZWFkIiwiYWxsZWdybzphcGk6c2hpcG1lbnRzOnJlYWQiLCJhbGxlZ3JvOmFwaTptZXNzYWdpbmciXSwiYXRpIjoiNDQ5ODdlMDktZTlkZS00ZmVkLWIwN2ItMjkzNmM0MDk4YjdkIiwiYWxsZWdyb19hcGkiOnRydWUsImV4cCI6MTc5MDUwMjc0NCwiY2xpZW50X2lkIjoiOTkxNzJmNDY1MDU1NDcyY2FkZmM3MzQ1ZGQ0NzhhZWIiLCJqdGkiOiIyYTU0ZTcyNS0yMTJmLTQ5N2MtOGFkNi02NGMyZjc1NDhmYWMifQ.VJBGP84ofOYZNt2ma7uSQARLVABBArPd1a6H15Db6iMcYoZiYyI1KTbMsHJsbOdsPksPN2rd5AbExbkj-Jf20WJwN_m3xN530-W9QhJkZggiPCvWgR17L9PKkm55KWVexF3lWPRc_DUC0JZsdJSnzSOWKPK8tHBvlCoNzBjcvu4OpZ0QRJJHvgvp4WrTxv1uxBJeADtBnux7Ng7YYqwnv0T_5r8U2qH3WwfzkncmB3Ptj7hb_DBe80aGEadzsKqOtfxD7aDHPGSOc-Vi--Fqr2cUyCxH1FTM9VCIKS_fL1tfs6aSdBKpvT-dZGW61-SH0IYo0io4EuOT5_-hhmei8w
+
+# ── Allegro API — grupa MEBLE ─────────────────────────────────────────────────
+ALLEGRO_CLIENT_ID_MOBELKAP=
+ALLEGRO_CLIENT_SECRET_MOBELKAP=
+ALLEGRO_REFRESH_TOKEN_MOBELKAP=
+
+ALLEGRO_CLIENT_ID_PERFEKTCIECIE=4a72a2319202497b9ef5ff159c572913
+ALLEGRO_CLIENT_SECRET_PERFEKTCIECIE=9YOYL0p3POsgmILcmTv1c0B6m05RHOuyvd1d2TymNUNLlBWGDgTti2gvvAglwULb
+ALLEGRO_REFRESH_TOKEN_PERFEKTCIECIE=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FsbGVncm8ucGwiLCJ1c2VyX25hbWUiOiIxMDI2OTc2MTgiLCJzY29wZSI6WyJhbGxlZ3JvOmFwaTpvcmRlcnM6cmVhZCIsImFsbGVncm86YXBpOmZ1bGZpbGxtZW50OnJlYWQiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpmdWxmaWxsbWVudDp3cml0ZSIsImFsbGVncm86YXBpOmJpbGxpbmc6cmVhZCIsImFsbGVncm86YXBpOmNhbXBhaWducyIsImFsbGVncm86YXBpOmRpc3B1dGVzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6cmVhZCIsImFsbGVncm86YXBpOmJpZHMiLCJhbGxlZ3JvOmFwaTpzaGlwbWVudHM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpvcmRlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTphZHMiLCJhbGxlZ3JvOmFwaTpwYXltZW50czp3cml0ZSIsImFsbGVncm86YXBpOnNhbGU6c2V0dGluZ3M6d3JpdGUiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOnJlYWQiLCJhbGxlZ3JvOmFwaTpyYXRpbmdzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOnJlYWQiLCJhbGxlZ3JvOmFwaTpzYWxlOnNldHRpbmdzOnJlYWQiLCJhbGxlZ3JvOmFwaTpwYXltZW50czpyZWFkIiwiYWxsZWdybzphcGk6c2hpcG1lbnRzOnJlYWQiLCJhbGxlZ3JvOmFwaTptZXNzYWdpbmciXSwiYXRpIjoiNDBiNGNiMGEtMGZhNS00MWQwLThkZjUtZjc4NjNmOWEwZDA1IiwiYWxsZWdyb19hcGkiOnRydWUsImV4cCI6MTc5MDUwMzM2NywiY2xpZW50X2lkIjoiNGE3MmEyMzE5MjAyNDk3YjllZjVmZjE1OWM1NzI5MTMiLCJqdGkiOiI2YjAyOGU4MS00YWRhLTRhOTEtYjAzNS0wMWIxNzMxYzNmOWYifQ.LOlhXMKfdVBlU42_kEL_uPPCAV-rMnVWqd66RQFQrTmpX9UKQd1pD_GrcfTnlGknz8lAEN2AVWHjvoZql4771Ssf30FrbyliC-7hR6hVx0v1WGJJ42oH4sxnaUN4V18B97SSsqVz0OqTiVkBxrqIpS0IUiwCN5oFAHPEdR1fKJoiklECEJI2o-IsbID47AYE6hmP--Yn_XDbEUVCqz_o-9uUS14fNmFRgFzDNomCK8vcd8v9tUOlDbBJlnYdzSBTA5PK3lxj7WeTDY2KkzF8djwXEsl56-TF80JS9O6NbzLgkNjrFcbnvhnqM3A2tZFvkBvP0NEV0tLUKT9OMLf5Jw
+
+ALLEGRO_CLIENT_ID_MEBLENACZASIE=ae738d8b7542454782d6d494c9a86271
+ALLEGRO_CLIENT_SECRET_MEBLENACZASIE=Q5yLHvpR8ZLv9SWtyj9i9v82QXmEE6pYdCTVADi0KZil2lGvoqeAh8bOpJN8oq1y
+ALLEGRO_REFRESH_TOKEN_MEBLENACZASIE=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FsbGVncm8ucGwiLCJ1c2VyX25hbWUiOiIxMDQ5Nzg0OTMiLCJzY29wZSI6WyJhbGxlZ3JvOmFwaTpvcmRlcnM6cmVhZCIsImFsbGVncm86YXBpOmZ1bGZpbGxtZW50OnJlYWQiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpmdWxmaWxsbWVudDp3cml0ZSIsImFsbGVncm86YXBpOmJpbGxpbmc6cmVhZCIsImFsbGVncm86YXBpOmNhbXBhaWducyIsImFsbGVncm86YXBpOmRpc3B1dGVzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOndyaXRlIiwiYWxsZWdybzphcGk6c2FsZTpvZmZlcnM6cmVhZCIsImFsbGVncm86YXBpOmJpZHMiLCJhbGxlZ3JvOmFwaTpzaGlwbWVudHM6d3JpdGUiLCJhbGxlZ3JvOmFwaTpvcmRlcnM6d3JpdGUiLCJhbGxlZ3JvOmFwaTphZHMiLCJhbGxlZ3JvOmFwaTpwYXltZW50czp3cml0ZSIsImFsbGVncm86YXBpOnNhbGU6c2V0dGluZ3M6d3JpdGUiLCJhbGxlZ3JvOmFwaTpwcm9maWxlOnJlYWQiLCJhbGxlZ3JvOmFwaTpyYXRpbmdzIiwiYWxsZWdybzphcGk6YWZmaWxpYXRlOnJlYWQiLCJhbGxlZ3JvOmFwaTpzYWxlOnNldHRpbmdzOnJlYWQiLCJhbGxlZ3JvOmFwaTpwYXltZW50czpyZWFkIiwiYWxsZWdybzphcGk6c2hpcG1lbnRzOnJlYWQiLCJhbGxlZ3JvOmFwaTptZXNzYWdpbmciXSwiYXRpIjoiMzMwYTc1YjQtYmYxOS00OWVlLTk0NzYtOGY0NDM0ZGIzOGVjIiwiYWxsZWdyb19hcGkiOnRydWUsImV4cCI6MTc5MDUwNTA1NSwiY2xpZW50X2lkIjoiYWU3MzhkOGI3NTQyNDU0NzgyZDZkNDk0YzlhODYyNzEiLCJqdGkiOiJjMTk5MjQxMy1iNThkLTQ0ODEtODAzMC01YTMwOTU1OWVkMjgifQ.3uYrj8kPPr5C5dFEjH9gfT5zTc-oENhHl7ndXcaKKk-kQX2MkAu3P1xakcSh6ERpmYPEOVMMy4chjYaPSO2se1fm7MUtX3EwZg0lv_e7gvqYDksTGxwO4z3qlRGXcq8cnFL3kMIr47TGZz50s-xbZOPChFHSBgFJt_mfn-6lb3DD4bUXHGcNKcPo-vMunl9CNSBTSUA4kEEg-zB8-UfQ4YgYVIxHZVWYIgL4seTfwAGL3TKXpcZIaWI60jOXLJ-sRIReq2fO_P6DzM_YiX5gNnCu11QshLFAGieKwqWpXp7m-MzyLrJizaUgOPCiOSwLyFTc0Ze57fHl1dX-raJmQg
+
+# ── Allegro API — grupa ONE ───────────────────────────────────────────────────
+ALLEGRO_CLIENT_ID_MATERAZZI=315521e9364e41a6b09df24f657f85cf
+ALLEGRO_CLIENT_SECRET_MATERAZZI=TcLGmGwvQvusca7E0fI8UJvBx2rCYVGNv47uKuUSG8m70mHZPyJ0QYBpcZS3uyAA
+ALLEGRO_REFRESH_TOKEN_MATERAZZI=
+
+ALLEGRO_CLIENT_ID_TWOJEMATERACE=d845fa21d23f43aabf8e0183a14abda5
+ALLEGRO_CLIENT_SECRET_TWOJEMATERACE=Ie3EjvzuMrOwChM8G88mrARBoZAcMZWzyZYykxtzf1djPnMU1zosmZX5m2JZtXPA
+ALLEGRO_REFRESH_TOKEN_TWOJEMATERACE=
+.env
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:17
+------------------------------------------------------------------------------
+Sprawdzam Hub .env i synchronizuję.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:17
+------------------------------------------------------------------------------
+Widzę — Hub/.env ma Materazzi i TwojeMatrace (właśnie wklejone), ale brakuje VitaClean i Dom Glamour. Dodaję do obu plików.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:17
+------------------------------------------------------------------------------
+Teraz sprawdzam czy MPlace-Agent/.env też ma VitaClean i Dom Glamour (dodałem wcześniej):
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:17
+------------------------------------------------------------------------------
+Oba pliki zsynchronizowane. Stan końcowy:
+
+| Konto | Hub/.env | Agent/.env |
+|-------|----------|------------|
+| **Luxsen** | ✓ komplet | ✓ komplet |
+| **Semmi** | ✓ komplet | ✓ komplet |
+| **PerfektCięcie** | ✓ komplet | ✓ komplet |
+| **MeblenaCzasie** | ✓ komplet | ✓ komplet |
+| **Materazzi** | ✓ ID+Secret | ✓ ID+Secret |
+| **TwojeMatrace EU** | ✓ ID+Secret | ✓ ID+Secret |
+| **MobelKap** | puste | puste |
+| **VitaClean** | puste — dodane | puste — dodane |
+| **Dom Glamour** | puste — dodane | puste — dodane |
+
+Brakuje 3 kont — MobelKap, VitaClean, Dom Glamour — gdy dostaniesz credentials z apps.developer.allegro.pl, wklejasz analogicznie i gotowe. Refresh tokeny dla Materazzi i TwojeMatrace też są puste — robię je przez `--setup` gdy chcesz.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:28
+------------------------------------------------------------------------------
+<ide_opened_file>The user opened the file /Users/chrismac/bazgroszyt/Mplace-Hub/.env in the IDE. This may or may not be related to the current task.</ide_opened_file>
+sprawdz czy wszystko masz?
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:28
+------------------------------------------------------------------------------
+Czytam aktualny stan Hub/.env po zmianach.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:28
+------------------------------------------------------------------------------
+Teraz synchronizuję nowe wartości (MobelKap, VitaClean, Dom Glamour) do MPlace-Agent/.env.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:29
+------------------------------------------------------------------------------
+Oba pliki zsynchronizowane. Finalny stan:
+
+| Konto | ID + Secret | Refresh Token |
+|-------|-------------|---------------|
+| Luxsen | ✓ | ✓ |
+| Semmi | ✓ | ✓ |
+| PerfektCięcie | ✓ | ✓ |
+| MeblenaCzasie | ✓ | ✓ |
+| **MobelKap** | ✓ | puste |
+| **Materazzi** | ✓ | puste |
+| **TwojeMatrace EU** | ✓ | puste |
+| **VitaClean** | ✓ | puste |
+| **Dom Glamour** | ✓ | puste |
+
+Wszystkie 9 kont mają Client ID i Secret — komplet. Brakuje tylko Refresh Tokenów dla 5 kont (MobelKap, Materazzi, TwojeMatrace, VitaClean, Dom Glamour). Te generuje `--setup` przez Device Flow — jeden link w przeglądarce per konto. Robię to teraz?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:30
+------------------------------------------------------------------------------
+Zrób refresh tolkan dla mobil, kap, materacji itd. Każdy po kolei.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:30
+------------------------------------------------------------------------------
+Piszę skrypt do Device Flow per konto, potem odpalam pierwszy.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:31
+------------------------------------------------------------------------------
+Skrypt gotowy. Odpalam MobelKap jako pierwszy:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:37
+------------------------------------------------------------------------------
+---
+
+**MobelKap — czekam na autoryzację**
+
+Otwórz w przeglądarce (zalogowany jako MobelKap):
+
+**[https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje](https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje)**
+
+Wpisz kod: **`kjmachip`**
+
+Gdy zatwierdzisz — token zapisze się automatycznie i przejdziemy do Materazzi.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:39
+------------------------------------------------------------------------------
+<task-notification>
+<task-id>b5shookwi</task-id>
+<tool-use-id>toolu_019dCytBFuLZPJeQuV8YUjKv</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-chrismac-bazgroszyt-Mplace-Hub/612087bf-eb4e-4048-a2e6-23aa647dd1ff/tasks/b5shookwi.output</output-file>
+<status>completed</status>
+<summary>Background command "Start Allegro Device Flow for MobelKap" completed (exit code 0)</summary>
+</task-notification>
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:39
+------------------------------------------------------------------------------
+MobelKap gotowy. Odpalam Materazzi:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:40
+------------------------------------------------------------------------------
+**MobelKap ✅ — token zapisany.**
+
+---
+
+**Materazzi — teraz**
+
+Zaloguj się jako Materazzi i otwórz:
+
+**[https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje](https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje)**
+
+Kod: **`afej7yb2`**
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:40
+------------------------------------------------------------------------------
+<task-notification>
+<task-id>bcu6ects6</task-id>
+<tool-use-id>toolu_01D52jHmzi91EbuhQ1Vx78cV</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-chrismac-bazgroszyt-Mplace-Hub/612087bf-eb4e-4048-a2e6-23aa647dd1ff/tasks/bcu6ects6.output</output-file>
+<status>completed</status>
+<summary>Background command "Start Allegro Device Flow for Materazzi" completed (exit code 0)</summary>
+</task-notification>
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:41
+------------------------------------------------------------------------------
+**Materazzi ✅ — token zapisany.**
+
+---
+
+**TwojeMatrace EU — teraz**
+
+Zaloguj się jako TwojeMatrace EU i otwórz:
+
+**[https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje](https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje)**
+
+Kod: **`vnttubhg`**
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:41
+------------------------------------------------------------------------------
+<task-notification>
+<task-id>bohzms0i9</task-id>
+<tool-use-id>toolu_013woyP9rQ719HJBGy8fVtbw</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-chrismac-bazgroszyt-Mplace-Hub/612087bf-eb4e-4048-a2e6-23aa647dd1ff/tasks/bohzms0i9.output</output-file>
+<status>completed</status>
+<summary>Background command "Start Allegro Device Flow for TwojeMatrace" completed (exit code 0)</summary>
+</task-notification>
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:42
+------------------------------------------------------------------------------
+**TwojeMatrace EU ✅ — token zapisany.**
+
+---
+
+**VitaClean — teraz**
+
+Zaloguj się jako VitaClean i otwórz:
+
+**[https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje](https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje)**
+
+Kod: **`i4geka2n`**
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:42
+------------------------------------------------------------------------------
+<task-notification>
+<task-id>b7t78nwps</task-id>
+<tool-use-id>toolu_01HWs95D1JvaR75n9GKLWta3</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-chrismac-bazgroszyt-Mplace-Hub/612087bf-eb4e-4048-a2e6-23aa647dd1ff/tasks/b7t78nwps.output</output-file>
+<status>completed</status>
+<summary>Background command "Start Allegro Device Flow for VitaClean" completed (exit code 0)</summary>
+</task-notification>
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:42
+------------------------------------------------------------------------------
+**VitaClean ✅ — token zapisany.**
+
+---
+
+**Dom Glamour — ostatnie**
+
+Zaloguj się jako Dom Glamour i otwórz:
+
+**[https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje](https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje)**
+
+Kod: **`jekda013`**
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:43
+------------------------------------------------------------------------------
+<task-notification>
+<task-id>bkn4wvjv8</task-id>
+<tool-use-id>toolu_018XbtRKgyoRmcDibBAiHy7t</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-chrismac-bazgroszyt-Mplace-Hub/612087bf-eb4e-4048-a2e6-23aa647dd1ff/tasks/bkn4wvjv8.output</output-file>
+<status>completed</status>
+<summary>Background command "Start Allegro Device Flow for Dom Glamour" completed (exit code 0)</summary>
+</task-notification>
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:43
+------------------------------------------------------------------------------
+**Dom Glamour ✅ — gotowe.**
+
+Wszystkie 9 kont mają kompletne credentials:
+
+| Konto | Status |
+|-------|--------|
+| Luxsen | ✓ |
+| Semmi | ✓ |
+| MobelKap | ✓ |
+| PerfektCięcie | ✓ |
+| MeblenaCzasie | ✓ |
+| Materazzi | ✓ |
+| TwojeMatrace EU | ✓ |
+| VitaClean | ✓ |
+| Dom Glamour | ✓ |
+
+Tokeny zapisane w obu plikach (`Hub/.env` i `Agent/.env`) + pliki JSON w `state/`. Co robimy dalej z tym API — pull danych ofert, cen, Ads?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:43
+------------------------------------------------------------------------------
+czy to jest bezpieczne odpytawanie na raz 9 kont allegro APi?
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:44
+------------------------------------------------------------------------------
+Tak, bezpieczne — i to z ważnego powodu:
+
+**Każde konto = osobny Client ID = osobny limit**
+
+Allegro liczy rate limit per aplikacja (per `client_id`), nie per IP ani per konto właściciela. Masz 9 różnych Client ID → 9 niezależnych pul limitów.
+
+```
+MobelKap     [client_id: 7d1caa4c] → 900 req/min własny limit
+PerfektCięcie [client_id: 4a72a231] → 900 req/min własny limit
+Materazzi    [client_id: 315521e9] → 900 req/min własny limit
+... itd.
+```
+
+Odpytanie wszystkich 9 naraz = jak 9 niezależnych firm pytających swoje konta. Allegro tego nie widzi jako "masowe".
+
+---
+
+**Jedyne realne ryzyka:**
+
+| Ryzyko | Poziom | Dlaczego |
+|--------|--------|---------|
+| Rate limit per endpoint | Niski | 9 × kilka req = pomijalny ruch |
+| IP throttling | Bardzo niski | Allegro nie stosuje IP-based limitów dla API |
+| ToS naruszenie | Brak | Zarządzasz kontami klientów — to legalny use case |
+
+---
+
+**Praktyczna granica** to nie 9 kont równolegle, ale to ile requestów robisz per konto — np. pobieranie 1000 ofert per konto z paginacją może zajść w limit, ale `Promise.all()` na 9 kont z 1 requestem każde = bez problemu.
+
+Chcesz żebym teraz napisał `allegro-fetch-all.mjs` który pobiera dane z wszystkich 9 równolegle?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:46
+------------------------------------------------------------------------------
+Przeczytaj ten wątek:
+Uwaga, uwaga. Ile dajesz punktów za nas? HUB! w skali 1 do 10 Co tak naprawdę mu brakuje? jednej rzeczy, ja wiem, co to jest. aby był automat. co sądzisz?
+8/10.
+
+Robi rzeczy, które normalnie wymagają 3 osobnych narzędzi + analityka. Jeden plik, zero setupu, działa na każdym urządzeniu po zalogowaniu. Agent z kontekstem, Cockpit z gamifikacją, Archiwum, prezentacje klienckie — to nie jest "dashboard", to system operacyjny agencji.
+
+Odejmuje 2 punkty za jedno:
+
+Dane wchodzą ręcznie.
+
+Cały automat się zatrzymuje przy Tobie. Każdy wpis, każdy upload XLSX, każde "dane za wczoraj" — to Ty. Hub reaguje na dane idealnie, ale dane nie płyną same.
+
+I właśnie dlatego masz otwarty allegro-setup-account.mjs.
+
+To jest ta jedna rzecz — Allegro API pull. Zamiast ręcznego wpisywania: Hub sam pobiera sprzedaż, Ads, odwiedziny dla każdego konta co 24h. Cockpit startuje z danymi już na miejscu. Insights strzelają same. Agent ma kontekst bez uploadu.
+
+Wtedy to jest 10/10 i prawdziwy automat.
+
+Jak daleko jesteś z tym agentem Allegro?
+
+Tutaj właśnie mamy plan zrobienie tak, żeby dane były pobierane na przykład o godzinie 9 albo w jakichś okresach. Może wszystkie na raz i wpadałoby to do Haba naszego. Jak ty to widzisz? Teraz robię to ręcznie. Czy jest szansa, że może to być zautomatyzowane? .
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:46
+------------------------------------------------------------------------------
+Świetne pytanie — to jest właśnie ta jedna zmiana, która robi z Hub automatu. Najpierw zbadaję co już mamy po obu stronach.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:47
+------------------------------------------------------------------------------
+Agenci badają kod. Czekam na wyniki obu — zaraz buduję plan.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:48
+------------------------------------------------------------------------------
+<task-notification>
+<task-id>a409ed9a8e6aa7569</task-id>
+<tool-use-id>toolu_01VLqnAp5okjLqoMAbqXKNrf</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-chrismac-bazgroszyt-Mplace-Hub/612087bf-eb4e-4048-a2e6-23aa647dd1ff/tasks/a409ed9a8e6aa7569.output</output-file>
+<status>completed</status>
+<summary>Agent "Explore Allegro API capabilities and existing MPlace-Agent code" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Perfect! Teraz mam wszystko co potrzebne. Przygotowuję kompleksowy raport.
+
+## Analiza kodu Allegro API w MPlace-Agent
+
+Na podstawie zbadania kodu znalazłem kompletny obraz integracji Allegro z systemem Agent. Oto szczegółowe raporty:
+
+---
+
+## 1. PARSER XLSX vs. REST API (allegro-parser.mjs)
+
+**Ścieżka**: `/Users/chrismac/MPlace-Agent/agents/ads-specialist/allegro-parser.mjs`
+
+### Tryby operacyjne:
+- **XLSX (domyślnie)**: Parsuje pliki `Ads_statystyki_oferty_*.xlsx` z eksportu panelu Allegro
+- **API (gdy token dostępny)**: `GET https://api.allegro.pl/ads/campaigns`
+
+### Dane parsowane z XLSX:
+```
+- offerId (ID oferty)
+- title (Tytuł)
+- campaign (Nazwa kampanii)
+- spend (Wydatki w zł) → normalizuje kolumny: 'Wydatki (zł)', 'Wydatki', 'Koszt (zł)'
+- revenue (Wartość sprzedaży w zł)
+- clicks
+- impressions
+- conversions (Konwersje/Transakcje)
+```
+
+**Kolumny obsługiwane** (w COL_MAP, linie 48-57):
+- `spend`: ['Wydatki (zł)', 'Wydatki', 'Koszt (zł)', 'Cost']
+- `revenue`: ['Wartość sprzedaży (zł)', 'Wartość sprzedaży', 'Revenue', 'Przychód (zł)']
+- `conversions`: ['Konwersje', 'Conversions', 'Transakcje']
+
+**Obliczane metryki** (funkcja normalizeRow, linie 67-88):
+- CPC: `spend / clicks`
+- CTR: `(clicks / impressions) * 100`
+- ROAS: `revenue / spend`
+
+**Wyjście**: `state/campaign-map-{YYYY-MM-DD}.json` z strukturą:
+```javascript
+{
+  generated_at: ISO,
+  date: YYYY-MM-DD,
+  groups: {
+    MEBLE: {
+      accounts: {
+        MobelKap: {
+          account, group, be_roas, campaigns: {...},
+          summary: { campaigns_total, spend_total, roas_weighted, ... }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## 2. STATS IMPORT (allegro-stats-import.mjs)
+
+**Ścieżka**: `/Users/chrismac/MPlace-Agent/agents/ads-specialist/allegro-stats-import.mjs`
+
+### Źródło danych:
+- **Katalog**: `Base/` (relatywnie od ROOT)
+- **Plik**: Eksport "Odwiedziny i Sprzedaż" z panelu sprzedawcy Allegro
+
+### Parsuje kolumny:
+```
+- Sprzedawca (link)
+- Nazwa oferty
+- ID oferty (link)
+- ID produktu (link)
+- Liczba wizyt
+- Transakcje
+- Śr. liczba sztuk
+- Konwersja (%)
+- Dodania do koszyka
+- Polubienia
+```
+
+### Normalizacja kont (ALLEGRO_ACCOUNT_MAP, linie 32-39):
+```javascript
+'mobelkap' → 'mobelkap'
+'perfektciecie' → 'perfektciecie'
+'meblenaczasie' | 'meble-na-czasie' → 'meblenaczasie'
+```
+
+### Fallback: prefix pliku (FILE_PREFIX_MAP, linie 42-46):
+```javascript
+'MK_' → 'mobelkap'
+'PC_' → 'perfektciecie'
+'MnC_' → 'meblenaczasie'
+```
+
+### Wyjście:
+- **Funkcja eksportowa**: `saveOfferStats(date, account, rows)`
+- **Tabela DB**: `offer_stats` (columns: audit_id, offer_name, visits, transactions, conversion, cart_adds, favorites)
+- **CLI**: `node allegro-stats-import.mjs [--dir=Base] [--date=YYYY-MM-DD] [--dry-run]`
+
+---
+
+## 3. ALLEGRO REST API ENDPOINTS
+
+### Zdefiniowane Endpoints:
+
+#### A. `/ads/campaigns` (allegro-parser.mjs, linie 128-178)
+```javascript
+GET https://api.allegro.pl/ads/campaigns?dateFrom={date}&amp;dateTo={date}&amp;limit=100
+Headers:
+  Authorization: Bearer {token}
+  Accept: application/vnd.allegro.public.v1+json
+```
+
+**Status**: ❌ **ZAMKNIĘTY** (wymaga specjalnego zatwierdzenia agencji od Allegro)
+
+- Dokumentacja: Linie 109-112 wyjaśniają, że `/ads/` wymaga osobnego onboardingu
+- Kontakt: `developers@allegro.pl`
+- Fallback: Automatycznie przechodzi na XLSX (funkcja fetchFromAllegroAPI zwraca null przy 403/404)
+
+**Mapowanie odpowiedzi**:
+```javascript
+campaigns.map(c =&gt; ({
+  offerId: c.id,
+  title: c.name,
+  campaign: c.name,
+  spend: c.spend | c.cost,
+  revenue: c.revenue | c.attributedRevenue,
+  clicks: c.clicks,
+  impressions: c.impressions,
+  conversions: c.conversions | c.transactions
+}))
+```
+
+#### B. `/sale/offers` (price-history.mjs, linie 31-53)
+```javascript
+GET https://api.allegro.pl/sale/offers?limit=100&amp;offset={offset}&amp;publication.status=ACTIVE
+Headers:
+  Authorization: Bearer {token}
+  Accept: application/vnd.allegro.public.v1+json
+```
+
+**Status**: ✅ **DOSTĘPNY** (scope: `allegro:api:sale:offers:read`)
+
+**Pobiera**: Wszystkie aktywne oferty sprzedawcy (z paginacją)
+
+**Normalizacja** (normalizeSeller, linie 60-72):
+```javascript
+{
+  offer_id: id,
+  offer_name: name,
+  price: sellingMode.price.amount,
+  original_price: sellingMode.originalPrice.amount,
+  stock: publication.stock
+}
+```
+
+**Wyjście**: `savePriceSnapshots()` do tabeli `price_snapshots`
+
+---
+
+## 4. SCHEDULER INTEGRACJA (scheduler/cron.mjs)
+
+**Ścieżka**: `/Users/chrismac/MPlace-Agent/scheduler/cron.mjs`
+
+### Aktualny harmonogram dla Allegro:
+
+| Zadanie | Godzina | Dzień | Plik | Funkcja |
+|---------|---------|-------|------|---------|
+| `bl-sync` | 6:00 | daily | `baselinker-sync.mjs` | Pobiera eksport CSV z BaseLinker |
+| `allegro-stats-import` | 6:10 | daily | `allegro-stats-import.mjs` | Importuje "Odwiedziny i Sprzedaż" |
+| `hub-monitor` | 7:45 | daily | `hub-monitor.mjs` | Czyta dane z MPlace-Hub localStorage |
+| `ads-monitor` | 7:50 | daily | `daily-monitor.mjs` | Wczytuje campaign-map, wykrywa anomalie |
+| `ads-weekly` | 8:10 | poniedziałek | `weekly-report-runner.mjs` | Raport tygodniowy |
+
+### Brakujące integracje (okazje):
+❌ `/sale/offers` — ceny ofert nie są pobierane automatycznie (tylko ręczny snapshot via `price-history.mjs`)
+❌ `/billing/billing-entries` — prowizja i koszty nie są pobierane
+
+---
+
+## 5. AUTORYZACJA (allegro-auth.mjs &amp; allegro-setup-account.mjs)
+
+**Ścieżka OAuth2 Device Flow**:
+
+### Setup per konto (allegro-setup-account.mjs, linie 1-157):
+```bash
+node allegro-setup-account.mjs MOBELKAP
+# lub
+node allegro-setup-account.mjs LUXSEN
+```
+
+**Czyta z .env**:
+```
+ALLEGRO_CLIENT_ID_MOBELKAP
+ALLEGRO_CLIENT_SECRET_MOBELKAP
+ALLEGRO_CLIENT_ID_LUXSEN
+... itd
+```
+
+**Zapisuje**: `ALLEGRO_REFRESH_TOKEN_{KONTO}` do:
+- `/Users/chrismac/MPlace-Agent/.env`
+- `/Users/chrismac/bazgroszyt/Mplace-Hub/.env`
+
+**Token storage** (allegro-tokens-{konto}.json):
+```javascript
+{
+  access_token,
+  refresh_token,
+  token_type: "bearer",
+  expires_at,
+  scope,
+  obtained_at,
+  account
+}
+```
+
+### Token validation (getValidToken(), linie 229-253):
+1. Sprawdź czy token świeży
+2. Jeśli wygasł → automatycznie odśwież (refresh_token)
+3. Jeśli brak tokenów → zwróć null (graceful fallback do XLSX)
+
+**Scopes w tokenie** (allegro-auth.mjs, linie 96-100):
+```javascript
+[
+  'allegro:api:campaigns',           // dla /ads/campaigns (gdy będzie dostępne)
+  'allegro:api:sale:offers:read',    // dla /sale/offers
+  'allegro:api:profile:read'         // dla profilu
+]
+```
+
+### Sprawdzenie statusu:
+```bash
+node agents/ads-specialist/allegro-auth.mjs --status
+```
+
+---
+
+## 6. HUB READER (integrations/hub-reader.mjs)
+
+**Ścieżka**: `/Users/chrismac/MPlace-Agent/integrations/hub-reader.mjs`
+
+### Źródło danych:
+- **Plik**: `state/hub-latest.json` (eksportowany z MPlace-Hub)
+- **Fallback**: Firestore (jeśli dostępny FIREBASE_SERVICE_ACCOUNT_KEY_PATH)
+
+### Struktura (hub-latest.json):
+```javascript
+{
+  generatedAt: ISO,
+  accounts: {
+    MobelKap: {
+      account: "MobelKap",
+      group: "MEBLE",
+      rows: [
+        {
+          m: "czerwiec",
+          roas: 5.16,
+          adsCost: 10490,
+          sprzedaz: 99234,
+          wartoscAds: 54151,
+          reklamaPct: ?
+        }
+      ],
+      month: "czerwiec",
+      roas: 5.16,
+      spend: 10490,
+      revenue: 99234
+    }
+  }
+}
+```
+
+### Funkcje eksportowe:
+- `getHubMonthlyRoas()` → zwraca ostatni pełny miesiąc per konto
+- `tryFirestore()` → fallback jeśli hub-latest.json brak
+
+**Mapowanie kont** (GROUP_MAP, linie 27-31):
+```javascript
+MobelKap, PerfektCiecie, MeblenaCzasie → MEBLE
+Luxsen, Semmi, BOTAVIT → LUXSEN
+Materazzi, MtzzEU, Ankado24 → ONE
+```
+
+---
+
+## 7. TOKEN STORAGE (state/)
+
+**Istniejące pliki tokenów**:
+```
+allegro-tokens.json                  (główny token — dla wszystkich)
+allegro-tokens-mobelkap.json         (per konto)
+allegro-tokens-semmi.json
+allegro-tokens-materazzi.json
+allegro-tokens-domglamour.json
+allegro-tokens-vitaclean.json
+allegro-tokens-twojematerace.json
+hub-latest.json                       (dane Hub z ostatniego eksportu)
+```
+
+**Struktura tokena** (linie 206-216 allegro-auth.mjs):
+```javascript
+{
+  access_token: string,
+  refresh_token: string,
+  token_type: "Bearer",
+  expires_at: timestamp,              // Date.now() + (expires_in * 1000)
+  scope: string (space-separated),
+  obtained_at: ISO timestamp
+}
+```
+
+---
+
+## 8. BASELINKER SYNC (baselinker-sync.mjs)
+
+**Ścieżka**: `/Users/chrismac/MPlace-Agent/agents/ads-specialist/baselinker-sync.mjs`
+
+### Źródło:
+- **CSV Export URL**: `process.env.BASELINKER_EXPORT_URL` (credential — niebezpieczny)
+- **Format**: semicolon-delimited UTF-8 CSV
+
+### Parsuje kolumny:
+```
+account_name | sku | title | price | quantity_now | quantity_sold
+promoted | date_last_sell | competition_price | competition_seller
+```
+
+### Normalizacja konta (normalizeAccount, linie 42-56):
+Usuwane znaki diakrytyczne: ę→e, ą→a, ś→s, ó→o, ł→l itd.
+
+### Wyjście:
+- **Funkcja**: `saveBLSnapshot(date, rows)`
+- **Tabela DB**: `bl_snapshots`
+- **CLI**: `node baselinker-sync.mjs [--date=YYYY-MM-DD] [--dry-run]`
+
+---
+
+## KLUCZOWE ODKRYCIA: Jakie dane mogą być wciągnięte automatycznie
+
+### ✅ JUŻ AUTOMATYCZNE:
+1. **Campaing stats** — `allegro-stats-import.mjs` o 6:10 codziennie (odwiedziny, konwersje)
+2. **Campaign metrics** — `daily-monitor.mjs` o 7:50 (ROAS, CPC, alerts)
+3. **Ceny/Stock** — `price-history.mjs` (manualnie, może być zautomatyzowane)
+
+### ⚠️ CZĘŚCIOWO (wymaga ręcznego eksportu):
+1. **Ads stats (spend/revenue/ROAS)** — XLSX eksport z panelu → `allegro-parser.mjs`
+   - Endpoint `/ads/campaigns` jest **zablokowany** (czeka na zatwierdzenie Allegro)
+   - Fallback: XLSX działa doskonale
+   
+2. **Oferty + ceny** — `/sale/offers` REST API dostępny, ale nie zaplanowany w cron
+   - Można go uruchomić automatycznie (brak problemu technicznych)
+
+### ❌ NIEDOSTĘPNE (Allegro nie udostępnia):
+1. `/billing/billing-entries` — **brak endpoint'u** do pobierania prowizji/kosztów
+2. Koszty operacyjne kampanii — musisz je pobrać ręcznie z panelu
+
+---
+
+## KONKRETNE AKCJE DO AUTOMACJI
+
+### 1. Automatyzuj `/sale/offers` snapshot (ceny)
+**Funkcja**: `snapshotPrices()` w `price-history.mjs` (linie 80-99)
+**Dodaj do cron.mjs** (około godziny 6:30):
+```javascript
+{
+  name:   'prices-snapshot',
+  hour:   6, minute: 30,
+  days:   'daily',
+  steps: [
+    { script: 'agents/ads-specialist/price-snapshot.mjs', sqlite: true, wait: true },
+  ],
+}
+```
+
+### 2. Poczekaj na Allegro /ads/campaigns approval
+**Status**: `allegro-parser.mjs` linie 109-112 już są gotowe
+**Kontakt**: developers@allegro.pl — opisz że chcesz pobierać kampanie dla klientów
+
+---
+
+## MAPOWANIE DANYCH DO TABEL DB
+
+| Źródło | Funkcja zapisu | Tabela DB | Kolumny |
+|--------|---|---|---|
+| XLSX stats | `saveAdsSnapshot()` | `ads_snapshots` | spend_today, revenue_today, roas_today, cpc_today, impressions_today |
+| BaseLinker CSV | `saveBLSnapshot()` | `bl_snapshots` | account, auction_id, sku, price, quantity_now, quantity_sold |
+| Allegro /sale/offers | `savePriceSnapshots()` | `price_snapshots` | offer_id, price, original_price, stock |
+| Hub localStorage | `getHubMonthlyRoas()` | Firestore / JSON | roas, spend, revenue, reklamaPct |
+| XLSX stats | `saveOfferStats()` | `offer_stats` | visits, transactions, conversion, cart_adds, favorites |
+
+---
+
+## PODSUMOWANIE
+
+Twój system **już pobiera dużo danych automatycznie** (schedulerem cron):
+- ✅ Statystyki ofert (odwiedziny, konwersje) — 6:10
+- ✅ Metryki kampanii (ROAS, anomalie) — 7:50
+- ✅ Dane BaseLinker — 6:00
+
+**Brakuje**:
+- `/sale/offers` snapshot — jest kod, brakuje harmonogramu
+- `/ads/campaigns` — czeka na approval Allegro (technologia gotowa)
+- Koszty operacyjne — Allegro ich nie udostępnia REST API
+
+**Pliki do integracji**: 
+- `/Users/chrismac/MPlace-Agent/scheduler/cron.mjs` (dodaj tasks)
+- `/Users/chrismac/MPlace-Agent/agents/ads-specialist/price-history.mjs` (logika snapshot)
+- `/Users/chrismac/MPlace-Agent/agents/ads-specialist/allegro-parser.mjs` (gotowy na /ads/campaigns)</result>
+<usage><subagent_tokens>66446</subagent_tokens><tool_uses>25</tool_uses><duration_ms>74455</duration_ms></usage>
+</task-notification>
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:48
+------------------------------------------------------------------------------
+Jeden agent skończył. Czekam na drugi (struktura Hub data entry).
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:48
+------------------------------------------------------------------------------
+<task-notification>
+<task-id>a393264987a20dd4d</task-id>
+<tool-use-id>toolu_01QuSJYfKytSZXZ3Wns9nj9e</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-chrismac-bazgroszyt-Mplace-Hub/612087bf-eb4e-4048-a2e6-23aa647dd1ff/tasks/a393264987a20dd4d.output</output-file>
+<status>completed</status>
+<summary>Agent "Explore Hub data entry structure" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Based on my thorough analysis of the index.html file, here's a comprehensive report on the data structure and key functions:
+
+## 1. POLA RĘCZNEGO WPISU W ZAKŁADCE DATA (Entry Form)
+
+**Lokalizacja:** funkcja `renderEntryCard()` — linie 6423-6489
+
+Formularz ma 3 sekcje — dokładnie te pola są wpisywane ręcznie per konto per dzień:
+
+### Sekcja ROW A (dane z panelu Allegro Ads):
+- **`adsCost`** — Koszt Ads (zł) — ID: `e_${k}_adsC`
+- **`roas`** — ROAS kampanii — ID: `e_${k}_roas`
+- **`wartoscAds`** — Wartość Ads (zł) — ID: `e_${k}_wartoscAds`
+- **`ss`** — Super Sprzedawca (T/N/-) — ID: `e_${k}_ss` (select)
+- **`qlt`** — Quality (liczba 0-500) — ID: `e_${k}_qlt`
+- **`sprzedaz`** — Sprzedaż brutto (zł) — ID: `e_${k}_sp`
+- **`commission`** — Prowizja Allegro % — ID: `e_${k}_comm`
+
+### Sekcja ROW B (Trade Analytics - kolor niebieski):
+- **`delivery`** — Dostawa (zł) — ID: `e_${k}_del`
+- **`promoC`** — Wyróżnienia (zł) — ID: `e_${k}_promoC`
+- **`coinsC`** — Monety (zł) — ID: `e_${k}_coinsC`
+- **`dzien`** — Dzień wpisu (liczba) — ID: `e_${k}_dzien` (opcjonalne — auto-fill z globalnego dnia)
+
+### Dodatkowe pola:
+- **`note`** — Dziennik/notatka per konto — ID: `e_${k}_note`
+- **Producent %** — ID: `eprod_${k}` (zapisywane w oddzielnym `SK_PROD` — nie w głównym entry)
+
+---
+
+## 2. STRUKTURA OBIEKTU DANYCH PER KONTO PER DZIEŃ (localStorage schema)
+
+**localStorage key format:** `adshub3_${kontoName}` (np. `adshub3_MobelKap`)
+
+**Struktura JSON pojedynczego wpisu (entry):**
+
+```javascript
+{
+  m: "marzec",                    // miesiąc (pl string)
+  ss: "T" | "N" | "",             // Super Sprzedawca status
+  qlt: 340,                       // Quality/Jakość
+  sprzedaz: 79175,                // Sprzedaż brutto (zł)
+  delivery: 3971,                 // Koszty dostawy (zł)
+  commission: 11.1,               // Prowizja Allegro (%)
+  adsCost: 5341,                  // Koszt Ads (zł)
+  roas: 6.11,                     // ROAS kampanii (wpisane ręcznie)
+  wartoscAds: 32619,              // Wartość Ads/sprzedaż z Ads (zł)
+  promoC: 4449,                   // Wyróżnienia - Promowanie (zł)
+  elasticC: 0,                    // Elastic (zł) — zawsze 0
+  coinsC: 0,                      // Monety (zł)
+  dzien: 20,                      // Dzień wpisu (dane za dzień N-1)
+  note: "",                       // Dziennik/notatka
+  estOver: null,                  // Estymacja (null = auto-calc)
+  savedAt: 1719849600000,         // timestamp
+  savedDay: "01.07.2026"          // data w formacie lokalnym
+}
+```
+
+**Struktura główna per konto w localStorage:**
+```javascript
+getData(k) // zwraca array tych entry objects
+// Przechowywane jako: [entry_pazdziernik, entry_listopad, entry_grudzien, ..., entry_biezacy_miesiac]
+```
+
+**Producent** — oddzielnie:
+```javascript
+localStorage.getItem('adshub3_prod_MobelKap') // np. "65"
+// Default values: MEBLE=65%, LUXSEN=60%, ONE=55%, TWO=60%
+```
+
+---
+
+## 3. FUNKCJA `saveAllWithSync()` — CO ROBI
+
+**Lokalizacja:** linie 8136-8202
+
+### Przebieg:
+1. **Zapisuje active account z DOM** → `dataSaveCurrentToLocal(_dataActiveKey)` — zbiera dane z formularza do localStorage
+2. **Iteruje po wszystkich kontach** — szuka tych, które mają dane za bieżący miesiąc
+3. **Walidacja** — jeśli żadne konto nie ma danych, pokazuje alert "Uzupełnij przynajmniej jedno konto"
+4. **Sync do Firebase Firestore** — jeśli user zalogowany (`currentUser`), zapisuje każde konto via `saveAccToFS(k)`
+5. **Pokazuje status** — "⟳ Zapisywanie..." → "✓ Zsynchronizowano" lub "✗ Błąd sync — dane w localStorage"
+6. **Re-render widoków** — `renderEntry()`, `renderAccount()`, `initDashboardExtras()`
+7. **Auto-snapshot D2D** — `saveSnapshotD2D()` (day-to-day history)
+8. **Update badge** — zmienia ikonę syncu w topbarze
+
+### Zwane z przycisku:
+```html
+&lt;button onclick="saveAllWithSync()"&gt;▸ Zapisz wszystkie wpisy&lt;/button&gt;
+```
+
+---
+
+## 4. COCKPIT — POBIERANIE DANYCH I GENEROWANIE ZADAŃ
+
+**Lokalizacja:** funkcja `generateDzis()` — linie 20892-21032
+
+### Gdzie pobiera dane:
+1. **getData(k).find(r =&gt; r.m === curM)** — ostatnia entrada każdego konta za bieżący miesiąc
+2. **getProd(k)** — producent % z localStorage (SK_PROD)
+3. **calc(d, prod)** — funkcja kalkulująca marżę, ACOS, ROAS Globalne
+
+### Co wysyła do AI (prompt builder):
+
+```javascript
+// Dla każdego konta:
+`${AC_META[k].name} (${AC_META[k].group}): 
+  Sprzedaż ${Math.round(d.sprzedaz||0)} zł | 
+  Marża ${C.mAfter.toFixed(1)}% | 
+  ROAS ${(d.roas||0).toFixed(2)} | 
+  BE ${C.beRoasAds?C.beRoasAds.toFixed(2):'—'} | 
+  Ads% ${C.acosAds?C.acosAds.toFixed(1):'—'}% | 
+  Wyróżn. ${d.sprzedaz&gt;0?((d.promoC||0)/d.sprzedaz*100).toFixed(1):'0'}%`
+```
+
+### POLA WYMAGANE DO GENEROWANIA 10 ZADAŃ:
+- **sprzedaz** — aby obliczyć marżę i procenty
+- **adsCost** + **wartoscAds** — aby obliczyć ROAS i ACOS
+- **roas** — ręcznie wpisany ROAS kampanii
+- **promoC** — procent wyróżnień
+- **commission** — prowizja %
+- **delivery** — dla marży netto
+
+### Dodatkowe dane w prompcie:
+- **lastAnalyses** — ostatnie 3 analizy (z `aaHistory`)
+- **lastKanibalizacja** — ostatnia kanibalizacja (z `kbHistory`)
+- **Uploaded XLSX files** — Ads/Sprzedaż/Konwersja (parsed via `aaParseFile`)
+- **Catalog context** — `buildCatalogContext()`
+
+### AI Model:
+- **Model:** `claude-sonnet-4-6`
+- **max_tokens:** 8192
+- **Response format:** JSON z 10 zadaniami (Priority: PILNE 1-3, WAŻNE 4-7, INFO 8-10)
+
+### Cache:
+- **Key:** `dzisCache` w localStorage
+- **Walidacja:** jeśli cache ma dzisiejszą datę i tasks → używa cache (nie generuje nowo)
+- **Struktura cache:**
+```javascript
+{
+  date: "01.07.2026",
+  tasks: [ {priority, title, konto, efekt, opis}, ... ],
+  summary: "1 zdanie motywacyjne"
+}
+```
+
+---
+
+## 5. ISTNIEJĄCE FUNKCJE AUTO-FILL I IMPORT
+
+### A) Auto-fill w formularzu Data
+
+**Funkcja:** `updateAuto(k)` — linie 6980-7051
+
+Automatycznie uzupełnia:
+- **`wartoscAds`** = `adsCost × roas` (jeśli wartoscAds puste, a mamy koszt i ROAS)
+- **`roas`** = `wartoscAds / adsCost` (jeśli ROAS puste, a mamy wartość i koszt)
+
+Wizualnie: zielone pole + tooltip "Auto: ..."
+
+### B) Import XLSX Files
+
+**Funkcja:** `aaParseFile(file, type)` — linie 18173-18450+
+
+Obsługuje 3 typy raportów z Allegro Ads:
+
+#### Type: `'ads'`
+- **Źródło:** Export "Statystyki" z Allegro Ads
+- **Szukane kolumny:** Nazwa kampanii, Nazwa grupy reklam, Tytuł oferty, Numer oferty, Koszt(PLN), Wartość sprzedaży(PLN), Wyświetlenia, Kliknięcia, CPC, ROAS, Liczba sprzedanych sztuk
+- **Zwraca:**
+```javascript
+{
+  type: 'ads',
+  kampanie: [],         // array kampanii z metrykami
+  aggregated: [],       // aggregate per aukcja (nr oferty)
+  totKoszt, totSprzedaz, totRoas,
+  zgnile: [],           // koszt &gt;= 30 zł, 0 sprzedaży
+  kosztZgnile,
+  gwiazdy: [],          // ROAS &gt;= 7, min 3 szt lub koszt &gt;= 50 zł
+  potencjalne: []       // ROAS &gt;= 7, &lt; 3 szt, &lt; 50 zł
+}
+```
+
+#### Type: `'sprzedaz'` (Odwiedziny wg ofert)
+- **Szukane kolumny:** Nazwa oferty, ID oferty, Liczba wizyt, Transakcje, Konwersja, Dodania do koszyka, Dodane do ulubionych, Polubienia
+- **Zwraca:**
+```javascript
+{
+  type: 'sprzedaz',
+  oferty: [],           // sorted by wizyty
+  totWizyty, totTransakcje, srKonwersja,
+  martwePunkty: [],     // &gt;= 10 wizyt, 0 transakcji
+  porzuconeKoszyki: []  // &gt; 0 koszyka, 0 transakcji
+}
+```
+
+#### Type: `'konwersja'` (Sprzedaż wg ofert — INNY format)
+- **Szukane kolumny:** Nazwa oferty, Wartość sprzedaży
+- **Zwraca:**
+```javascript
+{
+  type: 'konwersja',
+  oferty: [],
+  totWartosc
+}
+```
+
+### C) File Upload w Cockpit
+
+Cockpit pozwala na upload 4 plików XLSX:
+- Slot 1: **Ads** (Statystyki)
+- Slot 2: **Sprzedaż/Odwiedziny** (Odwiedziny wg ofert)
+- Slot 3: **Konwersja** (Sprzedaż wg ofert)
+- Slot 4: **Ads 30d** (dla porównania trendu)
+
+Auto-detect typu pliku — jeśli user pomyli sloty, parser automatycznie przełącza typ na podstawie zawartości arkusza.
+
+### D) Bulk Import
+
+**Nie istnieje** dedykowana funkcja do bulk importu danych do entry form. Auto-fill jest limitowany tylko do Wartość Ads / ROAS.
+
+---
+
+## 6. FLOW: DATA → COCKPIT → WYKONANIE
+
+```
+1. Wpis Data: setData(k, D) → localStorage adshub3_${k}
+   ↓
+2. Zapisz: saveAllWithSync() → Firebase Firestore (SK key na każdy doc)
+   ↓
+3. Cockpit: generateDzis() → čyta getData(k) z localStorage
+   ↓
+4. AI: generuje 10 zadań (10 wersja 9.13+, było 23 zadania w v9.12)
+   ↓
+5. Cache: localStorage dzisCache (cały dzień)
+   ↓
+6. Render: dzisRenderTasks() → karty z checkboxami
+   ↓
+7. Track: localStorage dzis_done_${date} (lista ID zrobionych)
+```
+
+---
+
+## 7. KLUCZOWE LINIE KODU
+
+| Co | Linia | Plik |
+|---|---|---|
+| Klucze localStorage | 4738-4739 | `SK='adshub3_'` |
+| buildInit - defaultowe dane | 4769-4833 | Tabela 9 kont + miesiące |
+| getData/setData | 4740-4741 | Getter/Setter |
+| Struktura entry | 4745-4767 | Komentarz + migrate() |
+| Entry form rendering | 6423-6489 | renderEntryCard() |
+| Auto-fill Wartość/ROAS | 6986-6997 | updateAuto() |
+| Zbieranie danych z DOM | 6536-6566 | dataSaveCurrentToLocal() |
+| SaveAllWithSync | 8136-8202 | Główna funkcja zapisu |
+| Cockpit Data Gather | 20934-20941 | Sekcja w generateDzis() |
+| AI Prompt Builder | 20930-20984 | Zasady i format JSON |
+| Cache DZIS | 21022-23 | DZIS_CACHE_KEY |
+| aaParseFile (Ads) | 18219-18320 | Ads parser + agregacja |
+| aaParseFile (Sprzedaż) | 18322-18362 | Wizyty parser |
+
+---
+
+## 8. BAZA DANYCH — 9 KONT
+
+```javascript
+MobelKap (MEBLE)
+PerfektCiecie (MEBLE)
+MeblenaCzasie (MEBLE)
+Luxsen (LUXSEN)
+Semmi (LUXSEN)
+BOTAVIT (LUXSEN — nowe)
+Materazzi (ONE)
+MtzzEU (ONE)
+Ankado24 (ONE archived)
+VitaClean (TWO)
+DomGlamour (TWO)
+GaleriaEstetyczna (TWO — nowe)
+```
+
+Struktura kont w AC_META (4700-4732):
+```javascript
+{kontoKey: {name: 'Nazwa', group: 'MEBLE|LUXSEN|ONE|TWO', archived: true/false}}
+```
+
+To jest pełny audit danych w pliku — struktura jest zoptymalizowana pod localStorage + Firebase dual-write, z auto-fill dla ROAS/WartościAds i parserem XLSX dla Cockpita. Cockpit w v9.13+ używa 10 zadań (nie 23).</result>
+<usage><subagent_tokens>57108</subagent_tokens><tool_uses>29</tool_uses><duration_ms>83866</duration_ms></usage>
+</task-notification>
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:50
+------------------------------------------------------------------------------
+Mam pełny obraz. Teraz projektuję plan.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:53
+------------------------------------------------------------------------------
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary Request and Intent:
+The user wants to automate Allegro API data pulls into MPlace Hub (currently a manual process). The conversation evolved from: (1) discovering existing Allegro API integrations, (2) setting up OAuth credentials for all 9 accounts, (3) generating Device Flow refresh tokens for 5 missing accounts, and (4) NOW planning an automated daily pull system where data from Allegro flows into Hub automatically (around 9:00 AM) instead of being manually entered each day. The user explicitly stated: "Tutaj właśnie mamy plan zrobienie tak, żeby dane były pobierane na przykład o godzinie 9 albo w jakichś okresach. Może wszystkie na raz i wpadałoby to do Haba naszego."
+
+2. Key Technical Concepts:
+- **MPlace Hub** — single-file vanilla JS app (index.html, ~12200 lines), GitHub Pages hosted
+- **Allegro REST API** — OAuth2 Device Flow per account, scopes: sale:offers:read, campaigns, billing:read
+- **Per-account credentials** — ALLEGRO_CLIENT_ID_{ACCOUNT} / SECRET / REFRESH_TOKEN pattern in .env
+- **Dual .env files** — /Users/chrismac/MPlace-Agent/.env AND /Users/chrismac/bazgroszyt/Mplace-Hub/.env must stay in sync
+- **MPlace-Agent** — Node.js agent system with cron scheduler in /Users/chrismac/MPlace-Agent/
+- **Allegro /ads/campaigns** — BLOCKED endpoint requiring special agency onboarding (developers@allegro.pl)
+- **Hub localStorage schema** — `adshub3_${kontoName}` keys with entry objects per month
+- **Firebase Firestore** — sync layer via saveAllWithSync() (dual-write with localStorage as primary)
+- **Device Flow OAuth** — interactive browser approval per account, tokens saved to state/ directory
+- **hub-reader.mjs** — reads Hub data from state/hub-latest.json or Firestore fallback
+- **cron.mjs scheduler** — existing tasks: bl-sync 6:00, allegro-stats-import 6:10, hub-monitor 7:45, ads-monitor 7:50
+
+3. Files and Code Sections:
+
+- **/Users/chrismac/bazgroszyt/Mplace-Hub/.env** (newly created/populated by user)
+  - Contains all 9 accounts' Allegro credentials: CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN
+  - MobelKap: 7d1caa4c... / P1Ws7gBRFY7...
+  - PerfektCięcie: 4a72a231... / 9YOYL0p3...
+  - MeblenaCzasie: ae738d8b... / Q5yLHvpR...
+  - Luxsen: 1a58e35a... / jZL6ijb5... (with refresh token)
+  - Semmi: 99172f46... / N8VROv7X... (with refresh token)
+  - Materazzi: 315521e9... / TcLGmGwv...
+  - TwojeMatrace: d845fa21... / Ie3EjvzuMr...
+  - VitaClean: f6d4fe8c... / pJaftOtd...
+  - DomGlamour: 4884b0c0... / CHnv1t33...
+  - ALLEGRO_REDIRECT_URI=https://mplace-bz.github.io/Mplace-Hub/callback
+
+- **/Users/chrismac/MPlace-Agent/.env** (synced to match Hub .env)
+  - Same credential structure; all 9 accounts with REFRESH_TOKEN fields
+  - Also contains: ANTHROPIC_API_KEY, GOOGLE keys, FB/Meta tokens, Slack tokens, ElevenLabs, Apify, BaseLinker
+
+- **/Users/chrismac/MPlace-Agent/agents/ads-specialist/allegro-setup-account.mjs** (NEWLY CREATED)
+  - Runs Allegro Device Flow for a specific account
+  - Usage: `node allegro-setup-account.mjs MOBELKAP`
+  - Reads ALLEGRO_CLIENT_ID_{ACCOUNT} and ALLEGRO_CLIENT_SECRET_{ACCOUNT} from Agent .env
+  - Runs full Device Flow polling loop
+  - Saves ALLEGRO_REFRESH_TOKEN_{ACCOUNT} to BOTH .env files
+  - Saves token JSON to state/allegro-tokens-{account}.json (mode 0o600)
+  - Key function: writeEnvKey(filePath, key, value) — regex replace in .env file
+
+- **/Users/chrismac/MPlace-Agent/agents/ads-specialist/allegro-auth.mjs**
+  - Complete OAuth2 Device Flow implementation
+  - Exports: getValidToken(), getAuthStatus()
+  - Reads from ALLEGRO_CLIENT_ID (no suffix) — designed for single account
+  - Handles refresh token auto-rotation
+  - NOTE: /ads/campaigns endpoint is BLOCKED - needs Allegro agency approval
+
+- **/Users/chrismac/MPlace-Agent/agents/ads-specialist/allegro-parser.mjs**
+  - Parses XLSX from Allegro Ads OR calls /ads/campaigns (blocked)
+  - COL_MAP for spend/revenue/conversions column names
+  - Falls back gracefully to XLSX when API returns 403/404
+
+- **/Users/chrismac/MPlace-Agent/agents/ads-specialist/allegro-stats-import.mjs**
+  - Parses "Odwiedziny i Sprzedaż" XLSX exports
+  - Account mapping: mobelkap/perfektciecie/meblenaczasie
+  - File prefix fallback: MK_/PC_/MnC_
+  - Saves to offer_stats table via saveOfferStats()
+
+- **/Users/chrismac/MPlace-Agent/integrations/hub-reader.mjs**
+  - Reads state/hub-latest.json or Firestore
+  - Returns monthly ROAS per account
+  - GROUP_MAP: MobelKap/PerfektCiecie/MeblenaCzasie→MEBLE, Luxsen/Semmi/BOTAVIT→LUXSEN, etc.
+
+- **/Users/chrismac/MPlace-Agent/scheduler/cron.mjs**
+  - Existing schedule: bl-sync 6:00, allegro-stats-import 6:10, hub-monitor 7:45, ads-monitor 7:50, ads-weekly Monday 8:10
+
+- **/Users/chrismac/MPlace-Agent/state/** (token files created during session)
+  - allegro-tokens-mobelkap.json
+  - allegro-tokens-materazzi.json
+  - allegro-tokens-twojematerace.json
+  - allegro-tokens-vitaclean.json
+  - allegro-tokens-domglamour.json
+
+- **Hub index.html - Key data structures:**
+  - localStorage key: `adshub3_${kontoName}`
+  - Entry object: `{m, ss, qlt, sprzedaz, delivery, commission, adsCost, roas, wartoscAds, promoC, elasticC, coinsC, dzien, note, estOver, savedAt, savedDay}`
+  - saveAllWithSync() at line ~8136: saves to localStorage + Firebase Firestore
+  - generateDzis() at line ~20892: Cockpit task generation, reads getData(k)
+  - renderEntryCard() at line ~6423: entry form rendering
+  - dataSaveCurrentToLocal() at line ~6536: DOM → localStorage
+
+4. Errors and Fixes:
+- **allegro-auth.mjs reads ALLEGRO_CLIENT_ID (no suffix)** but .env has per-account naming ALLEGRO_CLIENT_ID_MOBELKAP etc. → Solved by creating new allegro-setup-account.mjs that reads the per-account naming convention directly
+- **Hub .env panel element #allegroApiSettings doesn't exist in HTML** — renderAllegroApiSettings() function exists (line 28534) but the container div was never added to HTML. Identified as dead scaffolding code. Not fixed yet — out of scope for current task.
+- **/ads/campaigns BLOCKED** — Allegro Ads API requires special agency onboarding. Token has the scope but Allegro returns 403/404. fallback to XLSX works. Need to contact developers@allegro.pl for access.
+
+5. Problem Solving:
+- **Credential sync problem**: Two separate .env files (Hub and Agent) needed to stay synchronized. Solved by writing script that saves to both simultaneously.
+- **Device Flow per account**: allegro-auth.mjs only handled generic ALLEGRO_CLIENT_ID. Created allegro-setup-account.mjs for per-account Device Flow with CLI argument.
+- **All 9 accounts now have refresh tokens**: MobelKap, Materazzi, TwojeMatrace, VitaClean, DomGlamour tokens generated in this session. Luxsen, Semmi, PerfektCięcie, MeblenaCzasie had tokens from before.
+- **Automation blocker identified**: The core manually-entered data (adsCost, roas, wartoscAds) comes from Allegro Ads which requires /ads/campaigns — a blocked endpoint. This is the main technical challenge for full automation.
+
+6. All User Messages:
+- "Pokaż jakie masz dostępy do A-piki otwórz mi ten nasz MD, zobaczymy co brakuje."
+- "Jak chce Allegro API zobaczyć? Nic więcej, Allegro Appie. Znajdź masz to. Wczoraj na tym pracowaliśmy, mam nawet to otwarte. Chcesz, żebyś ty to znalazł."
+- "Bede dodawał nowe dostepy do allegra dla kont Więc przygotuj mi lista i otwórz ten panel, ja będę tam wklejał to. Materazzi / Twoje Materace EU / Vitaclean / Dom Glamour"
+- User pasted full credentials format with REFRESH_TOKEN fields for all accounts (Luxsen, Semmi, PerfektCięcie, MeblenaCzasie, Materazzi, TwojeMatrace) — Materazzi and TwojeMatrace had empty refresh tokens
+- "Dodaj pozostałe konta. Mam tylko to." [pasted full credentials including MobelKap: 7d1caa4c..., VitaClean: f6d4fe8c..., DomGlamour: 4884b0c0...]
+- "Czy do Nvidia dałeś nowe konta? i zobacz, tam mobile cup jest. Jest brak wita klin, dom glamour i właśnie wklejłem materacji i twoje materaca." [pasted Hub .env with MobelKap filled in]
+- "sprawdz czy wszystko masz?" [after updating Hub .env]
+- "Zrób refresh tolkan dla mobil, kap, materacji itd. Każdy po kolei."
+- "poszło" (during Materazzi flow — confirmation it worked)
+- "czy to jest bezpieczne odpytawanie na raz 9 kont allegro APi?"
+- Thread share about Hub being 8/10, missing automation: "Przeczytaj ten wątek: Uwaga, uwaga. Ile dajesz punktów za nas? HUB!... jednej rzeczy... aby był automat..."
+- "Tutaj właśnie mamy plan zrobienie tak, żeby dane były pobierane na przykład o godzinie 9 albo w jakichś okresach. Może wszystkie na raz i wpadałoby to do Haba naszego. Jak ty to widzisz? Teraz robię to ręcznie. Czy jest szansa, że może to być zautomatyzowane?"
+
+**Security constraints (verbatim):**
+- "NIE commitować — .gitignore go blokuje" (about .env files)
+- Hub CLAUDE.md: "NIE modyfikuj funkcji fetch wysyłającej zapytania do Cloudflare Worker"
+- Hub CLAUDE.md: "NIE zmieniaj obsługi odpowiedzi SSE"
+- Hub CLAUDE.md: "Nigdy nie modyfikuj @media print"
+- Hub CLAUDE.md: "Save = zawsze saveAllWithSync() — nigdy saveAll()"
+
+7. Pending Tasks:
+- **PLAN MODE ACTIVE**: Must write plan to /Users/chrismac/.claude/plans/przeczytaj-ten-w-tek-uwaga-floating-crayon.md
+- Design automated Allegro API data pull system for all 9 accounts
+- Plan how pulled data flows into Hub (Firebase → Hub reads on load, or direct localStorage injection via some mechanism)
+- Address /ads/campaigns blocker (either apply for agency access or find workaround)
+- Plan cron schedule (user wants ~9:00 AM daily pull)
+
+8. Current Work:
+Plan mode is active. Two Explore agents completed their research:
+
+**Agent 1 findings (Hub structure):**
+- Manually entered fields: adsCost, roas, wartoscAds, ss, qlt, sprzedaz, commission, delivery, promoC, coinsC, dzien
+- localStorage key: adshub3_{konto}
+- Entry JSON structure confirmed
+- saveAllWithSync() → Firebase sync
+- Cockpit reads getData(k) from localStorage
+
+**Agent 2 findings (Allegro API):**
+- /sale/offers: ✅ AVAILABLE (prices, stock) — but these aren't the manually entered fields
+- /ads/campaigns: ❌ BLOCKED — needs Allegro agency onboarding
+- /billing/billing-entries: ❌ NOT AVAILABLE
+- price-history.mjs has snapshotPrices() for /sale/offers but not scheduled
+- cron.mjs already has allegro-stats-import at 6:10 (odwiedziny/konwersje from XLSX)
+- hub-reader.mjs reads state/hub-latest.json
+
+**Critical discovery**: The core data that Hub needs (adsCost, roas, wartoscAds) comes from Allegro Ads — which requires /ads/campaigns endpoint that is BLOCKED. This means full automation requires either:
+1. Applying for Allegro agency API access (developers@allegro.pl)
+2. Alternative: Allegro exports XLSX via some automation (not via REST)
+3. Partial automation: what CAN be pulled (/sale/offers for prices, existing stats imports)
+
+9. Optional Next Step:
+The user asked "Tutaj właśnie mamy plan zrobienie tak, żeby dane były pobierane na przykład o godzinie 9 albo w jakichś okresach. Może wszystkie na raz i wpadałoby to do Haba naszego."
+
+The plan file must be written at /Users/chrismac/.claude/plans/przeczytaj-ten-w-tek-uwaga-floating-crayon.md detailing:
+1. **What IS automatable now** (even without /ads/ access): sale/offers snapshots, existing stats imports
+2. **The /ads/campaigns blocker** and what to do about it (apply for agency access)
+3. **Data flow architecture**: Allegro API → MPlace-Agent cron → state/hub-latest.json → Hub reads via Firebase or direct inject
+4. **Specific cron schedule** at 9:00 AM pulling all 9 accounts in parallel
+5. **How data enters Hub**: Firebase write from Agent → Hub reads on load (already has hub-reader.mjs pattern)
+6. **Realistic scope**: What can be done TODAY vs. what requires Allegro approval
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/chrismac/.claude/projects/-Users-chrismac-bazgroszyt-Mplace-Hub/612087bf-eb4e-4048-a2e6-23aa647dd1ff.jsonl
+Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:53
+------------------------------------------------------------------------------
+Czekam na plan od agenta, ale równolegle przeczytam kluczowe pliki które potrzebuję do finalizacji planu.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:53
+------------------------------------------------------------------------------
+Teraz przeczytam kluczowe sekcje Hub — Firebase init i entry form.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:55
+------------------------------------------------------------------------------
+Mam wszystko co potrzebuję. Piszę plan.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:57
+------------------------------------------------------------------------------
+Plan gotowy. Kluczowe punkty planu:
+
+- **3 pliki**: nowy `allegro-daily-pull.mjs`, edycja `cron.mjs`, edycja `index.html`
+- **5 pól z API** (adsCost, sprzedaz, commission, delivery, promoC) → z 9 ręcznych zostają 3 (ROAS, SS, Qlt)
+- **Architektura**: Agent → Firebase `users/{uid}/allegroAutoEntry/{date}` → Hub czyta po logowaniu
+- **Cron**: 9:05 daily (po istniejącym `result-7d` o 9:00)
+- **Zero zmian Firestore rules** — istniejące `users/{userId}/{document=**}` pokrywają nową ścieżkę
+
+Przed implementacją potrzebuję znać `HUB_OWNER_UID` — to UID Chrisa z Firebase Authentication. Znajdziesz go w Firebase Console → Authentication → Users → `chris.maczka@gmail.com`.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 12:50
+------------------------------------------------------------------------------
+Plan zaparkowany. Przechodzę do nowego zadania: pobieram dane DomGlamour miesiąc po miesiącu z Allegro API od lutego 2026.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 12:50
+------------------------------------------------------------------------------
+Token DomGlamour ważny jeszcze 11h. Piszę skrypt do pobrania danych miesiąc po miesiącu.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 12:52
+------------------------------------------------------------------------------
+Dwa problemy: (1) billing typy niezidentyfikowane (`NSP`, `PAD`, `SUC`), (2) orders — te same 662 dla każdego miesiąca (filtr dat nie działa). Debuguję.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 12:53
+------------------------------------------------------------------------------
+Billing typy teraz jasne: `NSP`=Ads, `SUC`=prowizja, `DPB`=dostawa, `FE1`=wyróżnienia. Orders filtr `boughtAt` ignorowany przez API — obiekt zamówienia nie ma pola `boughtAt`. Trzeba sprawdzić poprawne pola zamówień.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 12:55
+------------------------------------------------------------------------------
+Billing typy mam już mapowane (`NSP`→Ads, `SUC`→prowizja, `DPB`→dostawa, `FE1`→wyróżnienia). Problem z orders — sprawdzam czy filtr `boughtAt` naprawdę nie działa.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 12:56
+------------------------------------------------------------------------------
+Filtr `boughtAt` w orders API jest całkowicie ignorowany. Rozwiązanie: pobiorę **wszystkie 662 zamówień** (7 stron API) i filtruję po `payment.finishedAt` po stronie klienta. Billing działa — poprawiam mapping typów.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 12:58
+------------------------------------------------------------------------------
+Działa! Mam pełne dane dla DomGlamour. Teraz też pobieram VitaClean równolegle.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 12:58
+------------------------------------------------------------------------------
+Mam dane z obu kont. Oto wyniki:
+
+---
+
+**DomGlamour — historia od lutego 2026**
+
+| Miesiąc | Sprzedaż | Zamówienia | Ads | Prowizja | Comm% | Dostawa | Wyróżn. |
+|---------|----------|-----------|-----|---------|-------|---------|---------|
+| 2026-02 | 4 386 zł | 2 | 1 095 zł | 486 zł | 11.1% | 0 zł | 159 zł |
+| 2026-03 | 10 130 zł | 30 | 873 zł | 1 122 zł | 11.1% | 150 zł | 130 zł |
+| 2026-04 | 42 238 zł | 203 | 2 665 zł | 4 706 zł | 11.1% | 2 561 zł | 87 zł |
+| 2026-05 | 53 711 zł | 219 | 3 166 zł | 5 910 zł | 11.0% | 2 901 zł | 46 zł |
+| 2026-06 | 58 818 zł | 207 | 3 074 zł | 5 522 zł | 9.4% | 1 899 zł | 0 zł |
+
+ROAS (szacowany: sprzedaz/ads): Lut 4.0x → Mar 11.6x → Kwi 15.8x → Maj 17.0x → Cze 19.1x
+
+---
+
+**VitaClean — historia od lutego 2026**
+
+| Miesiąc | Sprzedaż | Zamówienia | Ads | Prowizja* | Comm%* | Dostawa | Wyróżn. |
+|---------|----------|-----------|-----|---------|-------|---------|---------|
+| 2026-02 | 90 zł | 2 | 0 zł | 10 zł | 11.1% | 0 zł | 0 zł |
+| 2026-03 | 0 zł | 0 | — | — | — | — | — |
+| 2026-04 | 96 zł | 2 | 0 zł | 12 zł | 12.9% | 0 zł | 0 zł |
+| 2026-05 | 42 082 zł | 85 | 1 471 zł | 995 zł* | 2.4%* | 88 zł | 568 zł |
+| 2026-06 | 47 408 zł | 109 | 1 835 zł | 592 zł* | 1.2%* | 179 zł | 603 zł |
+
+\* VitaClean ma w billingu niezmapowane typy `HB4`, `HLB`, `ORB`, `FSF` — prawdopodobnie dodatkowe wyróżnienia i opłaty. Prowizja może być niedoszacowana. Trzeba zidentyfikować te typy.
+
+---
+
+**Wniosek z walidacji:** API działa. Sprzedaż, Ads, Dostawa — czyste dane. Prowizja % jest wyliczana z SUC/sprzedaz i działa dla DOM (11.1% to prawidłowe). ROAS historyczny wymaga ręcznego dorzucenia z panelu Allegro (nie ma w billing API). Niezmapowane typy VitaClean wymagają identyfikacji.
+
+Chcesz żebym: (1) zidentyfikował brakujące typy VitaClean, (2) wpisał dane DOM do Huba, czy (3) wrócił do planu automatyzacji?

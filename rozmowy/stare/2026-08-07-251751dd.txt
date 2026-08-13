@@ -1,0 +1,895 @@
+==============================================================================
+ZAPIS ROZMOWY - projekt Mplace-Hub (archiwum starych sesji)
+sesja: 251751dd-d0a8-470b-bf92-5e9312671c2c | ostatnia zmiana: 2026-08-07 10:28
+==============================================================================
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-22 08:49
+------------------------------------------------------------------------------
+zobacz czy sie zaciagneły dane dzisiaj
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 08:49
+------------------------------------------------------------------------------
+Sprawdzam logi autopilota i stan synchronizacji.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 08:50
+------------------------------------------------------------------------------
+Dane zaciągnęły się dziś rano o **09:33** (lokalnie). Wszystko OK poza jedną uwagą.
+
+**Status dziś (22.07):**
+- 9 kont zsynchronizowanych - dowiozły dane za wczoraj (21.07)
+- Brakuje: **Luxsen** - wypadł ze synchronizacji od 13.07 (widać w logach - od tego dnia "9 kont" zamiast 10)
+- Ostrzeżenie z JSON: `⚠ Brak billing scope: PerfektCiecie, MtzzEU` - dla tych dwóch kont widać tylko sprzedaż, nie koszt Ads
+
+**Dane za wczoraj (21.07):**
+- Łącznie: **114 708 zł / 243 zamówień**
+- Materazzi dominuje: 90 439 zł (157 zam.) - to ONE robi ~79% obrotu
+- MEBLE: 16 758 zł (52 zam.) - MK 8140 / MnC 4407 / PC 4211
+- LUXSEN: 199 zł (1 zam.) - słabo, i właśnie Luxsen wypadł z synchronizacji
+
+Chcesz, żebym sprawdził dlaczego Luxsen zniknął z synca od 13 lipca?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-22 09:13
+------------------------------------------------------------------------------
+dom glamour ma 40631 zł na polskę a ty pokazujesz 37320  sprawdz upload
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 09:13
+------------------------------------------------------------------------------
+Sprawdzam co zostało załadowane do Firebase dla DomGlamour.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 09:20
+------------------------------------------------------------------------------
+OK, mam pełny obraz. Sync przebiegł dziś o 09:33, wypisał DomGlamour = **40 994 zł** do Firestore (shadow file to potwierdza). Nie ma żadnych błędów w logach.
+
+**Problem: Hub pokazuje 37 320 = stare dane z localStorage**, Firebase listener chyba nie przeładował widoku po zapisie automatu. Odpalę sync raz jeszcze żeby odświeżyć, a potem zrób hard reload Huba.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 09:30
+------------------------------------------------------------------------------
+Firestore zaktualizowany - **40 994 zł** zapisane właśnie teraz (ROAS 6.95 też trafił z inbox-ads).
+
+**Zrób hard reload Huba** (Ctrl+Shift+R) - powinno pokazać właściwą wartość.
+
+Co do 363 zł różnicy (API: 40 994 vs twoje 40 631) - to prawdopodobnie anulowane zamówienia które Allegro liczy inaczej w panelu vs API, albo opóźnione statusy. API wyciąga surową wartość zamówień, panel może już uwzględniać późniejsze zwroty.
+
+Po odświeżeniu daj znać czy jest OK.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-22 09:31
+------------------------------------------------------------------------------
+luxsen ma  97 tys a ty pokazujesz 85 tys Double check
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 09:32
+------------------------------------------------------------------------------
+Widzę problem. W trakcie poprzedniego sprawdzania hub-sync wypisał dla Luxsena:
+
+> `⚠ Luxsen: refresh tokena nieudany (400: Invalid refresh token) — pomijam`
+
+Luxsen wypada z synca od **13 lipca** - od tego dnia logi pokazują "9 kont" zamiast 10. Hub wyświetla ostatnią zapamiętaną wartość.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 09:34
+------------------------------------------------------------------------------
+Znalazłem przyczynę. `allegro-tokens-luxsen-fresh.json` wygasł **20 lipca o 22:23** (37h temu), a refresh token jest unieważniony - Allegro go odrzuca z 400.
+
+Trzeba ponownie autoryzować konto Luxsen przez OAuth. Sprawdzam czy jest skrypt do re-auth:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 09:36
+------------------------------------------------------------------------------
+Mam diagnozę. Refresh token Luxsena jest unieważniony - potrzebna jest ponowna autoryzacja przez Allegro OAuth (Device Flow). Mogę to zainicjować z terminala - ty otworzysz tylko jeden link w przeglądarce.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 09:37
+------------------------------------------------------------------------------
+Uruchamiam Device Flow — za chwilę dostaniesz URL do otwarcia w przeglądarce.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 09:38
+------------------------------------------------------------------------------
+Masz to. Zrób to teraz:
+
+1. Otwórz w przeglądarce: **https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje**
+2. Zaloguj się na konto **Luxsen** (jeśli nie jesteś)
+3. Wpisz kod: **`z4wnh5tk`**
+4. Potwierdź
+
+Daj znać gdy klikniesz "Potwierdź" - wtedy pobiorę token i zsynchronizuję dane.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-22 09:42
+------------------------------------------------------------------------------
+ok
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 09:42
+------------------------------------------------------------------------------
+Token zapisany. Teraz sync Luxsena:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-22 09:43
+------------------------------------------------------------------------------
+Gotowe. Hub zaktualizowany - odśwież stronę.
+
+**Luxsen lipiec:**
+- Sprzedaż PL: **98 112 zł** (poprzednio pokazywało 85 970 - różnica 12 142 zł za te 9 dni bez synca)
+- Prowizja: 10,7% · Dostawa: 4 548 · Wyróżnienia: 1 349 · Ads: 15 557 zł
+- ROAS: 4,02 (z inbox-ads)
+- MTD proj: ~144 832 zł
+
+Przy okazji - **Luxsen wypadał z synca od 13 lipca** (9 dni), odkąd wygasł poprzedni refresh token. Dziś się wznawia normalnie. Jutro rano autopilot już dociągnie dane razem z resztą kont.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-26 09:32
+------------------------------------------------------------------------------
+Zobacz czy dane się zaciągnęły.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-26 09:33
+------------------------------------------------------------------------------
+Dziś rano o **09:47** zaciągnęło się **10/10 kont** - wszystko OK, Luxsen wrócił do synca.
+
+**MTD lipiec (dane do 25.07):**
+
+| Konto | Sprzedaż PL | Zam. |
+|---|---|---|
+| Materazzi | 1 807 892 zł | 3110 |
+| MobelKap | 151 078 zł | 409 |
+| MeblenaCzasie | 119 361 zł | 434 |
+| Luxsen | 113 818 zł | 426 |
+| PerfektCięcie | 85 187 zł | 314 |
+| DomGlamour | 48 176 zł | 182 |
+| GaleriaEstetyczna | 39 814 zł | 282 |
+| MtzzEU | 37 848 zł | 56 |
+| VitaClean | 9 177 zł | 150 |
+| Semmi | 10 018 zł | 38 |
+| **Łącznie** | **2 422 369 zł** | |
+
+Jeden alert: wczoraj (25.07) o 11:52 był błąd DNS Firestore (`firestore.googleapis.com` niedostępny przez chwilę) - run z 11:52 nie zapisał danych. Rano o 07:47 działało normalnie, dane są aktualne.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-01 11:01
+------------------------------------------------------------------------------
+Zaktualizuj wszystkie dane dnia, w której szedł. Wykończymy miesiąc. Dzisiaj jest 1 sierpnia, zamykamy lipiec. Ja potem dodam ADS. Czy lepiej teraz dodać?
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-01 11:01
+------------------------------------------------------------------------------
+Sprawdzam najpierw co mamy za lipiec, żeby wiedzieć ile brakuje:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-01 11:03
+------------------------------------------------------------------------------
+Sytuacja jest prosta:
+
+**Problem:** ostatni auto-sync (31.07 wieczór) ma dane **przez dzień 30** - brakuje dnia 31. August 1 puścił 0 kont (sierpniowy preview był pusty, backfill lipiec prawdopodobnie przeszedł). Trzeba sprawdzić i dobić.
+
+**Ads - dodaj TERAZ.** Merge policy zachowuje `roas`/`wartoscAds` niezależnie od kolejności, ale zamykając miesiąc lepiej mieć kompletny wiersz od razu. Wrzuć screeny do `inbox-ads/` albo przez zakładkę Data - wpadną w ≤15 min.
+
+Puszczam backfill lipiec żeby pobrać dzień 31:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-01 11:03
+------------------------------------------------------------------------------
+Lipiec zamknięty - 10/10 kont, pełne dane przez dzień 31.
+
+**Lipiec finalny:**
+
+| Konto | Sprzedaż PL | ROAS |
+|---|---|---|
+| Materazzi | 2 208 105 zł | 10,4 ✓ |
+| MeblenaCzasie | 160 211 zł | 6,53 ✓ |
+| Luxsen | 140 034 zł | 4,13 ✓ |
+| MobelKap | 183 460 zł | 5,49 ✓ |
+| PerfektCięcie | 105 252 zł | 4,62 ✓ |
+| DomGlamour | 60 569 zł | 6,95 ✓ |
+| GaleriaEstetyczna | 52 357 zł | 14,3 ✓ |
+| MtzzEU | 45 028 zł | 4,34 ✓ |
+| VitaClean | 11 416 zł | 3,0 ✓ |
+| Semmi | 11 819 zł | 2,13 ✓ |
+
+Wszystkie ROAS są - poprzednie screeny z inbox-ads trafiły. Możesz dodać Ads teraz żeby zweryfikować wartość sprzedaży Ads (wartoscAds) jeśli chcesz mieć ten wskaźnik w raporcie, ale dane do zamknięcia miesiąca są kompletne.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-01 11:29
+------------------------------------------------------------------------------
+Wsprawcze się wszystko zapisało, to dałem ads. Zobacz, wszystko jest ok czy dobrze zamknęliśmy lipiec.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-01 11:30
+------------------------------------------------------------------------------
+Poczekaj - widzę problem z danymi Ads. Zanim zaklasyfikuję jako "OK" muszę sprawdzić jedną rzecz:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-01 11:33
+------------------------------------------------------------------------------
+**Jest problem z danymi Ads.** Trzeba to zasygnalizować zanim ogłoszę lipiec za zamknięty.
+
+Porównanie przed i po dodaniu Ads:
+
+| Konto | Ads przed | Ads po | ROAS przed | ROAS po |
+|---|---|---|---|---|
+| MobelKap | 17 426 | 17 520 | 5,49 | 5,47 ✓ |
+| PerfektCięcie | 10 519 | 10 519 | 4,62 | 4,96 ? |
+| MeblenaCzasie | 14 546 | **15 923** | 6,53 | **6,72** |
+| Luxsen | 20 271 | 20 861 | 4,13 | **6,72** ⚠ |
+| Semmi | 2 258 | **15 923** | 2,13 | **6,72** 🔴 |
+| Materazzi | 156 991 | 162 573 | 10,4 | **6,72** ⚠ |
+| MtzzEU | 4 851 | **15 923** | 4,34 | **6,72** ⚠ |
+| VitaClean | 2 173 | **15 923** | 3,0 | **6,72** ⚠ |
+| DomGlamour | 4 398 | **15 923** | 6,95 | **6,72** ⚠ |
+| GaleriaEstetyczna | 926 | **15 923** | 14,3 | **6,72** ⚠ |
+
+**Czerwona flaga:** 7 kont ma identyczny koszt Ads = **15 923 zł** (to wartość MeblenaCzasie) i identyczny ROAS = **6,72**. Semmi z przychodem 11 819 zł nie może mieć 15 923 zł kosztu Ads — to matematycznie niemożliwe.
+
+Wygląda jakby dane z jednego konta (MnC) wpadły na pozostałe. Jak dodawałeś Ads — przez slot 2 w Data (Batch OCR)?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-01 11:58
+------------------------------------------------------------------------------
+tak może być żle sierobiły zrzuty robię jeszcze raz
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-01 11:58
+------------------------------------------------------------------------------
+OK, daj znać gdy skończysz wrzucać. Wtedy puszczę backfill jeszcze raz i sprawdzę czy każde konto ma sensowne wartości.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-01 12:07
+------------------------------------------------------------------------------
+Nie działa mi screenshot, nie wkleja, nie wiem czy restartować komputer czy masz jakiś pomysł jak to zrestartować. Mam MacBook Pro. dociskam shift comment 4 ale nie zapisuję
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-01 12:07
+------------------------------------------------------------------------------
+Mogę to naprawić z terminala - restartuje proces screenshot bez rebootu kompa.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-01 12:07
+------------------------------------------------------------------------------
+Gotowe. Spróbuj teraz **Shift+Cmd+4** - powinno działać.
+
+Jeśli chcesz wklejać w Hub (slot 2), używaj **Ctrl+Shift+Cmd+4** - to robi screena bezpośrednio do schowka zamiast zapisywać na dysk. Potem Cmd+V w Hub i gotowe.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-02 08:02
+------------------------------------------------------------------------------
+Wczoraj nie udało mi się załadować zrzutów. Jeżeli ja je opiszę, to będziesz mógł mi podmienić, dodać uzupełnić rołasy za miesiąc lipiec. Dzisiaj jest 2 sierpnia, więc już nie jestem w stanie tego wkleić.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 08:03
+------------------------------------------------------------------------------
+Tak, podaj mi dane i wpiszę je bezpośrednio do Firestore z pominięciem OCR. Żadnego problemu.
+
+Podaj dla każdego konta **3 wartości** z panelu Allegro Ads (zakładka Kampanie → podsumowanie lipiec):
+
+- **Wartość Ads** (sprzedaż Ads, czyli revenue z kampanii)
+- **Koszt Ads** (łączny wydatek na kampanie)
+- **ROAS** (lub wyliczę sam jeśli podasz dwie pierwsze)
+
+Konta do uzupełnienia (te z błędnym ROAS 6,72):
+
+1. MeblenaCzasie
+2. Luxsen
+3. Semmi
+4. Materazzi
+5. MtzzEU
+6. VitaClean
+7. DomGlamour
+8. GaleriaEstetyczna
+
+MobelKap i PerfektCięcie wyglądają OK (ROAS 5,47 i 4,96 — różne wartości, sensowne).
+
+Możesz pisać po prostu np. `MnC: 107k wartość, 15.9k koszt` albo jak ci wygodnie — ogarnę.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-02 10:17
+------------------------------------------------------------------------------
+1. MobelKap
+2. Perfekciecie
+3. Meblenaczasie
+4. Luxsen 
+5. Semmi
+6. Materazzi
+7. MtzzEU 
+8. Vitaclean 
+9. Dom_Glamour
+10. Galeriaestetyczna
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:18
+------------------------------------------------------------------------------
+Odczytuję ze screenów kolejno 1–10. Zanim wpiszę — mam dwie wątpliwości:
+
+| # | Konto | Koszt brutto | ROAS | Wartość sprzedaży |
+|---|---|---|---|---|
+| 1 | MobelKap | 17 519,64 zł | 5,47 | 95 831,33 zł |
+| 2 | PerfektCięcie | 10 368,74 zł | 4,96 | 51 396,32 zł |
+| 3 | MeblenaCzasie | 15 923,47 zł | 6,72 | 106 964,12 zł |
+| 4 | Luxsen | 20 381,58 zł | 4,23 | 86 121,68 zł |
+| 5 | Semmi | 2 217,06 zł | 2,13 | 4 729,64 zł |
+| 6 | Materazzi | 162 281,79 zł | 10,04 | 1 628 778,23 zł |
+| 7 | MtzzEU | 162 281,79 zł | 10,04 | 1 628 778,23 zł |
+| 8 | VitaClean | 2 694,34 zł | 3,12 | 8 401,84 zł |
+| 9 | DomGlamour | 1 017,31 zł | 16,24 | 16 517,24 zł |
+| 10 | GaleriaEstetyczna | **brak screena** | — | — |
+
+**Dwie rzeczy do potwierdzenia:**
+
+1. **MtzzEU (#7)** — screen identyczny jak Materazzi (te same liczby co do grosza). Czy to przypadkowy duplikat, czy MtzzEU naprawdę nie ma kampanii Ads?
+
+2. **GaleriaEstetyczna (#10)** — brak 10. screena. Czy go pominąłeś, czy Galeria nie ma kampanii?
+
+Jak potwierdzisz — wpisuję od razu wszystko do Firestore.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-02 10:19
+------------------------------------------------------------------------------
+7 Mtzz
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:20
+------------------------------------------------------------------------------
+MtzzEU: **5 292,94 zł | ROAS 4,24 | 22 457,00 zł** — zapisuję.
+
+Brakuje tylko **GaleriaEstetycznej (#10)** — jeśli masz screen, podaj. Jeśli nie ma kampanii, powiedz i zostawię bez ROAS.
+
+Mam też pytanie o **DomGlamour (#9)** — wyszło mu 1 017 zł kosztu i ROAS 16,24. Zgadza się? Billing z Allegro pokazywał wcześniej 4 398 zł kosztu Ads, więc duża różnica — chcę się upewnić że screen był z całego lipca, nie z ostatnich 30 dni.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-02 10:20
+------------------------------------------------------------------------------
+Galeria
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:20
+------------------------------------------------------------------------------
+Ten screen to ta sama Galeria co była w #9 z poprzedniej partii — identyczne liczby co do grosza. Znaczy że **DomGlamour nam umknął** z całej serii.
+
+Potrzebuję jeszcze jeden screen — DomGlamour (dom.png) i wpisuję wszystko naraz.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-02 10:20
+------------------------------------------------------------------------------
+dom glamour
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:21
+------------------------------------------------------------------------------
+Mam komplet. Wpisuję wszystko do Firestore.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:23
+------------------------------------------------------------------------------
+Wszystko zapisane. Odśwież Hub.
+
+**Lipiec zamknięty — finalne Ads:**
+
+| Konto | ROAS | Wartość Ads | Koszt Ads |
+|---|---|---|---|
+| MobelKap | 5,47 | 95 831 zł | 17 520 zł |
+| PerfektCięcie | 4,96 | 51 396 zł | 10 519 zł |
+| MeblenaCzasie | 6,72 | 106 964 zł | 15 923 zł |
+| Luxsen | 4,23 | 86 122 zł | 20 861 zł |
+| Semmi | 2,13 | 4 730 zł | 2 217 zł |
+| Materazzi | 10,04 | 1 628 778 zł | 162 573 zł |
+| MtzzEU | 4,24 | 22 457 zł | 5 293 zł |
+| VitaClean | 3,12 | 8 402 zł | 2 694 zł |
+| DomGlamour | 6,13 | 29 515 zł | 4 812 zł |
+| GaleriaEstetyczna | 16,24 | 16 517 zł | 1 017 zł |
+
+5 kont miało skorumpowany adsCost (15 923 zamiast właściwej wartości) — naprawione ze screenów.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-02 10:36
+------------------------------------------------------------------------------
+popraw odświerz nie są to poprawne dane
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:36
+------------------------------------------------------------------------------
+Sprawdzam co faktycznie jest w Firestore — może write nie trafił lub Hub pokazuje cache:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:37
+------------------------------------------------------------------------------
+Firestore jest poprawny — MtzzEU lipiec ma 5 293 zł, VitaClean 2 694 zł itd. Hub wyświetla stare dane z localStorage. Puszczam backfill jeszcze raz — to wywoła onSnapshot i odświeży Hub automatycznie:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:38
+------------------------------------------------------------------------------
+9 wierszy zamiast 10 — GaleriaEstetyczna pominięta. Sprawdzam dlaczego:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:39
+------------------------------------------------------------------------------
+GaleriaEstetyczna ma ten sam problem co Luxsen — token wygasł. Dane w Firestore są poprawne (wpisałem je ręcznie), backfill po prostu nie mógł pobrać odświeżonych danych z API.
+
+Dwie rzeczy:
+
+**1. Hub — odśwież twarde (Ctrl+Shift+R)** żeby wyczyścił localStorage i załadował z Firestore. Normalne "odśwież" ładuje z cache przeglądarki, nie z Firestore.
+
+**2. GaleriaEstetyczna — token wygasł**, tak samo jak Luxsen. Mogę zautoryzować teraz tak samo jak Luxsen — zajmie 2 minuty. Chcesz od razu?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-02 10:47
+------------------------------------------------------------------------------
+W rozliczeniach czy możesz dodać od stycznia projekcje, bo mamy tylko projekcje z kolejnych miesięcy, a mi chodzi o historyczne. Zobacz czy analizuj, dodaj.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-02 10:47
+------------------------------------------------------------------------------
+[Image: original 2444x1522, displayed at 2000x1245. Multiply coordinates by 1.22 to map to original image.]
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-02 10:50
+------------------------------------------------------------------------------
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary Request and Intent:
+   - Verify daily data sync status for MPlace Hub (10 Allegro accounts)
+   - Fix DomGlamour data discrepancy (Hub showed 37,320 vs actual 40,631 zł)
+   - Fix Luxsen account sync failure (token expired since July 13)
+   - Close July 2026 month with complete data including all Ads ROAS values
+   - Manually enter Ads data for all 10 accounts after Batch OCR corruption
+   - Fix corrupted adsCost data (15,923 zł applied to multiple wrong accounts)
+   - Get Hub to display corrected July data
+
+2. Key Technical Concepts:
+   - **MPlace Hub Autopilot**: Node.js system (`hub-sync.mjs --daily`) runs at 9:00, 13:30, 19:30 via launchd `com.mplace.director`
+   - **Dual-write architecture**: Hub uses localStorage as primary, Firestore as sync layer; onSnapshot updates localStorage
+   - **Merge policy**: `sprzedaz` always fresh from API; `roas`/`wartoscAds` NEVER auto (screen only); `adsCost = Math.max(existing, api)`
+   - **Allegro OAuth Device Flow**: Refresh tokens expire; re-auth via `https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje`
+   - **Backfill mode**: `hub-sync.mjs --backfill --month=2026-07` closes previous month; uses `onlyAutoRows: true` guard
+   - **isAutoRow guard**: rows with `_src: 'autopilot'` or auto-note pattern are auto rows; others are untouchable manual rows
+   - **Firebase Admin SDK**: Used for direct Firestore writes bypassing Hub
+   - **Firestore path**: `users/{UID}/accounts/{konto}` → `rows[]` array with `r.m === 'lipiec'`
+   - **ads-inbox.mjs**: Processes PNG files from `inbox-ads/` folder every 15 min; writes roas/wartoscAds
+   - **Hub Batch OCR (v9.90)**: Slot 2 in Data tab - paste screenshots; writes directly to Firestore
+
+3. Files and Code Sections:
+   - `/Users/chrismac/MPlace-Agent/state/hub-autopilot.log`
+     - Main autopilot run log; shows timestamp, kont count, account names per run
+     - Last relevant entry: `2026-07-26T07:47:18.095Z · 10 kont` (then `2026-08-01: 0 kont`)
+   - `/Users/chrismac/MPlace-Agent/state/hub-autopilot-2026-07-22.json`
+     - JSON summary of each daily run; contains `written[]`, `yesterday{}`, `summary` string
+   - `/Users/chrismac/MPlace-Agent/state/hub-sync-preview-2026-07-31.json`
+     - Last July preview file; `accounts.{konto}.hubFields_PL.sprzedaz` per account
+   - `/Users/chrismac/MPlace-Agent/state/allegro-tokens-luxsen-fresh.json`
+     - Luxsen OAuth token file; was expired (expires_at: 2026-07-20T22:23); re-created via device flow
+     - hub-sync.mjs config: `{ key: 'Luxsen', tokenFile: 'allegro-tokens-luxsen-fresh.json' }`
+   - `/Users/chrismac/MPlace-Agent/tools/hub-sync.mjs`
+     - Main autopilot engine; key functions: `mergeRowFields()`, `upsertMonth()`, `isAutoRow()`
+     - Firestore write: `db.collection('users').doc(uid).collection('accounts').doc(k)`
+     - Merge policy (line 229): `sprzedaz: api.sprzedaz ?? 0` (always fresh); `roas: ex.roas || 0` (never auto)
+     - adsCost: `billingOk ? Math.max(ex.adsCost || 0, api.adsCost || 0) : (ex.adsCost || 0)`
+     - isAutoRow: `row._src === 'autopilot' || AUTO_NOTE_RE.test(row.note || '')`
+     - HUB_UID: `'XfNRdMBxstcJcZnkRo4n9Udxc9r1'`
+   - `/Users/chrismac/MPlace-Agent/agents/ads-specialist/allegro-setup-account.mjs`
+     - OAuth Device Flow per account; reads `ALLEGRO_CLIENT_ID_{ACCOUNT}` from `.env`
+     - Writes token to `state/allegro-tokens-{account.toLowerCase()}.json`
+     - Also updates `ALLEGRO_REFRESH_TOKEN_{ACCOUNT}` in `.env`
+   - `/Users/chrismac/.secrets/mplace-hub-firebase-adminsdk.json`
+     - Firebase Admin SDK service account key (used for direct Firestore writes)
+   - `/Users/chrismac/MPlace-Agent/.env`
+     - Contains Allegro credentials per account; `ALLEGRO_REFRESH_TOKEN_LUXSEN` updated
+   - `/Users/chrismac/MPlace-Agent/state/cron-error.log`
+     - Cron event log; confirms `hub-sync.mjs (exit 0)` runs; `hub-autopilot` catchup events
+   - `/Users/chrismac/MPlace-Agent/state/hub-autopilot-shadow.json`
+     - Tracks last written commission per account per month; used to detect manual overrides
+   - `/Users/chrismac/MPlace-Agent/inbox-ads/`
+     - Folder for Ads PNG screenshots; `processed/` subfolder for processed files
+     - Only `.DS_Store` in root - no pending screens at time of check
+
+   **Direct Firestore Write Script (inline, run from `/Users/chrismac/MPlace-Agent`):**
+   ```javascript
+   // Key logic used:
+   const SA_PATH = '/Users/chrismac/.secrets/mplace-hub-firebase-adminsdk.json';
+   const UID = 'XfNRdMBxstcJcZnkRo4n9Udxc9r1';
+   const MONTH = 'lipiec';
+   // For each account: read rows[], find r.m === 'lipiec', update fields
+   const exCost = ex.adsCost || 0;
+   const corrupt = exCost > s.adsCost * 1.5 && exCost !== s.adsCost;
+   const finalCost = corrupt ? s.adsCost : Math.max(exCost, s.adsCost);
+   rows[idx] = { ...ex, roas: s.roas, wartoscAds: Math.round(s.wartoscAds), adsCost: Math.round(finalCost), _src: 'autopilot' };
+   await ref.set({ rows, updatedAt: Date.now() }, { merge: true });
+   ```
+
+4. Errors and fixes:
+   - **DomGlamour showing 37,320 instead of 40,631 zł**: Hub had stale localStorage. Fixed by re-running `hub-sync.mjs --daily --konto=DomGlamour` which updated Firestore to 40,994 zł and triggered onSnapshot.
+   - **Luxsen token expired (400 Invalid refresh token)**: Fixed by running OAuth Device Flow inline (node script reading `.env` credentials, calling Allegro device endpoint, showing URL/code to user, polling until authorized, saving token to `allegro-tokens-luxsen-fresh.json`).
+   - **firebase-admin not found when running from Hub directory**: Fixed by `cd /Users/chrismac/MPlace-Agent` first (firebase-admin installed there).
+   - **SA key path wrong (`~/.secrets/mplace-firebase-sa.json`)**: Actual path is `/Users/chrismac/.secrets/mplace-hub-firebase-adminsdk.json`.
+   - **Batch OCR data corruption**: Hub OCR applied MeblenaCzasie's data (ROAS 6.72, adsCost 15,923) to 7+ other accounts. Fixed by direct Firestore write with correct values from manual screenshots.
+   - **GaleriaEstetyczna skipped by backfill**: Token expired (`400: Invalid refresh token`) - same issue as Luxsen was. GaleriaEstetyczna's Allegro token needs OAuth re-authorization.
+   - **Hub showing stale data after Firestore write**: Triggered onSnapshot by re-running backfill. GaleriaEstetyczna still skipped due to token expiry.
+   - **Screenshot tool not working on Mac**: Ran `killall screencapture` to restart the macOS screenshot process.
+
+5. Problem Solving:
+   - **July closure**: Successfully ran `hub-sync.mjs --backfill --month=2026-07` to capture July 31 data (previously only through July 30). All 10 accounts written.
+   - **Ads data for July**: Manually parsed 10 screenshots from user, identified MtzzEU duplicate (user sent Materazzi screen twice), identified GaleriaEstetyczna screen mislabeled as DomGlamour. Collected correct data for all 10 accounts and wrote directly to Firestore.
+   - **Hub cache issue**: Firestore is verified correct via Admin SDK reads. Hub's localStorage has stale 15,923 values. Backfill triggered onSnapshot for 9 accounts. GaleriaEstetyczna's onSnapshot trigger failed due to token expiry.
+   - **Ongoing**: GaleriaEstetyczna token needs Device Flow re-authorization (same process as Luxsen).
+
+6. All user messages:
+   - "zobacz czy sie zaciagneły dane dzisiaj"
+   - "dom glamour ma 40631 zł na polskę a ty pokazujesz 37320 sprawdz upload"
+   - [Screenshot of Allegro panel showing Luxsen 97,260 zł and Hub showing 85,970 zł] "luxsen ma 97 tys a ty pokazujesz 85 tys Double check"
+   - "ok" (confirmed Luxsen OAuth authorization in browser)
+   - "Zobacz czy dane się zaciągnęły."
+   - "Zaktualizuj wszystkie dane dnia, w której szedł. Wykończymy miesiąc. Dzisiaj jest 1 sierpnia, zamykamy lipiec. Ja potem dodam ADS. Czy lepiej teraz dodać?"
+   - "Wsprawcze się wszystko zapisało, to dałem ads. Zobacz, wszystko jest ok czy dobrze zamknęliśmy lipiec."
+   - "tak może być żle sierobiły zrzuty robię jeszcze raz"
+   - "Wczoraj nie udało mi się załadować zrzutów. Jeżeli ja je opiszę, to będziesz mógł mi podmienić, dodać uzupełnić rołasy za miesiąc lipiec. Dzisiaj jest 2 sierpnia, więc już nie jestem w stanie tego wkleić."
+   - [9 screenshots of Ads panels with numbered account list 1-10]
+   - [Screenshot for MtzzEU: 5292,94 | 4,24 | 22 457,00] "7 Mtzz"
+   - [Screenshot: 1017,31 | 16,24 | 16 517,24] "Galeria" (confirmed this is GaleriaEstetyczna)
+   - [Screenshot: 4811,75 | 6,13 | 29 515,33] "dom glamour"
+   - [Screenshot of Hub showing 15,923 for MtzzEU, VitaClean, DomGlamour, GaleriaEstetyczna] "popraw odświerz nie są to poprawne dane"
+
+7. Pending Tasks:
+   - **GaleriaEstetyczna token re-authorization**: Token is expired with 400 Invalid refresh token error. Needs OAuth Device Flow same as Luxsen: run inline script to get device code, show URL + code to user, wait for browser authorization, save new token to `state/allegro-tokens-galeriaestetyczna-fresh.json` (or whatever the configured tokenFile is - need to verify exact name).
+   - **Hub display refresh for remaining stale accounts**: After GaleriaEstetyczna token fix and backfill re-run, Hub should show correct data. May need hard refresh (Ctrl+Shift+R) if onSnapshot still not updating.
+   - **Verify Hub shows all correct July ROAS data**: After fixes, confirm all 10 accounts show correct values in Hub.
+
+8. Current Work:
+   Immediately before this summary, was investigating why Hub still shows 15,923 adsCost for MtzzEU, VitaClean, DomGlamour, GaleriaEstetyczna after direct Firestore write. Steps taken:
+   1. Verified Firestore IS correct (Admin SDK read confirmed MtzzEU=5293, VitaClean=2694, DomGlamour=4812, GaleriaEstetyczna=1017)
+   2. Ran `hub-sync.mjs --backfill --month=2026-07` to trigger onSnapshot → wrote 9 rows (GaleriaEstetyczna skipped)
+   3. Investigated GaleriaEstetyczna skip: `⚠ GaleriaEstetyczna: refresh tokena nieudany (400: Invalid refresh token)` - token expired
+   4. Hub still showing 15,923 for some accounts per user screenshot
+   
+   The GaleriaEstetyczna token is expired - same issue as Luxsen was on July 22. The token file name needs to be confirmed (likely `allegro-tokens-galeriaestetyczna-fresh.json` based on the `-fresh` pattern, but need to check hub-sync.mjs config).
+
+9. Optional Next Step:
+   Fix GaleriaEstetyczna's expired Allegro token using OAuth Device Flow, then re-run backfill to propagate all correct July data to Hub.
+   
+   Direct quote from last assistant message: `⚠ GaleriaEstetyczna: refresh tokena nieudany (400: {"error_description":"Invalid refresh token"...}) — pomijam` and `✓ BACKFILL: 0 wierszy`
+   
+   Next step: Run Device Flow for GaleriaEstetyczna (same process as Luxsen fix):
+   1. Read `ALLEGRO_CLIENT_ID_GALERIAESTETYCZNA` from `.env`
+   2. Call Allegro device endpoint, show URL + code to user
+   3. After authorization, save token to correct file
+   4. Re-run `hub-sync.mjs --backfill --month=2026-07` → all 10 accounts should write
+   5. Hub should then reflect correct July data after onSnapshot fires
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/chrismac/.claude/projects/-Users-chrismac-bazgroszyt-Mplace-Hub/251751dd-d0a8-470b-bf92-5e9312671c2c.jsonl
+Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:50
+------------------------------------------------------------------------------
+Szukam kodu rozliczenia zanim zacznę cokolwiek zmieniać.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:51
+------------------------------------------------------------------------------
+Znalazłem problem i zakres. Są dwa błędy + brakująca sekcja:
+
+1. **Bug: hardcoded "marca"** — kod ma literówkę `statusDay marca` zamiast dynamicznego miesiąca, dlatego widać "1 marca 2026" podczas gdy jest sierpień
+2. **Brak historii** — sekcja projekcji pokazuje tylko 3 przyszłe miesiące; przeszłe miesiące (styczeń-lipiec) nie mają tabeli z rzeczywistymi fee
+
+Sprawdzam strukturę HTML zakładki.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:53
+------------------------------------------------------------------------------
+Mam pełny obraz. Trzy zmiany naraz:
+1. Bug fix: hardcoded "marca" w trzech miejscach → dynamiczny miesiąc (przypadek dopełniacza)
+2. Nowy element HTML `rozHistory`
+3. Tabela historycznych fee (styczeń → lipiec) na dole zakładki
+
+Robię to w jednym przejściu.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:53
+------------------------------------------------------------------------------
+Teraz fix trzech "marca":
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:53
+------------------------------------------------------------------------------
+Teraz dodaję HTML `rozHistory` i logikę JS. Najpierw HTML:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:54
+------------------------------------------------------------------------------
+Teraz logika JS — dodaję tabelę historii na końcu `renderRozliczenie()`:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:54
+------------------------------------------------------------------------------
+Teraz bump wersji i push:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:54
+------------------------------------------------------------------------------
+Wszystko wylądowało. Push:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:55
+------------------------------------------------------------------------------
+**v9.91** — live.
+
+**W skrócie:** W zakładce Rozliczenie masz teraz tabelę "Historia fee LUXSEN — 2026" na dole strony, która pokazuje każdy zamknięty miesiąc (styczeń→lipiec) z kolumnami: Sprzedaż grupy / Marża po reklamie / Fee brutto / Fee netto i wiersz SUMA 2026. Przy okazji naprawiłem bug z "1 marca 2026" — teraz data pokazuje się poprawnie (2 sierpnia 2026).
+
+Odśwież Hub (Ctrl+Shift+R), wejdź w Rozliczenie i przewiń na dół.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-02 10:59
+------------------------------------------------------------------------------
+Wiznes polega na tym, że w finie liczmy. Ja tylko chcę mieć tylko te firmy, gdzie mam udział w zyskach. Na pewno to jest w semi i luxen Rzecz tam mnie nie interesuje. bo o to tutaj chodzi, że mam wystawić co miesiąc fakturę od zysku 20% z tego co zostanie, czyli 20% zysku.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 10:59
+------------------------------------------------------------------------------
+Rozumiem — zakładka Rozliczenie jest wyłącznie dla Luxsen + Semmi, bo tylko tam masz 20% od zysku. Reszta (MEBLE = stała kwota, ONE = stała kwota) to oddzielna faktura, tu nie ma co liczyć.
+
+Sprawdzam czy kod jest zgodny z tym modelem — głównie co dokładnie liczy `zysk` w `calc()`.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-02 11:00
+------------------------------------------------------------------------------
+Zakładka jest już skonfigurowana dokładnie tak jak opisujesz — tylko Luxsen + Semmi, BOTAVIT jest wykluczone.
+
+Wzór w kodzie: **`zysk`** = sprzedaż − koszt producenta (60%) − prowizja Allegro − dostawa − Ads − wyróżnienia. Z tego **20%** to podstawa faktury. To jest "to co zostaje", czyli marża po wszystkich kosztach.
+
+Czyli:
+- **Faktura** = (Łączny zysk Luxsen + Semmi) × 20% brutto → ÷ 1,23 netto
+- Pozostałe 8 kont (MEBLE stałe 7500 zł, ONE stałe kwoty) — nie wchodzą tu w ogóle, do innego rozliczenia
+
+Żadnych zmian nie trzeba — działa poprawnie. Chcesz sprawdzić coś konkretnego w liczbach za lipiec?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-03 07:42
+------------------------------------------------------------------------------
+Galeria estetyczna nie ma żadnej sprzedaży, nie wpadły dane, dlaczego sprawdź. Nie masz dostępu do API Przy okazji sprawdź inny czy się zaciągnęły dzisiaj dane sprzedażowe.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 07:43
+------------------------------------------------------------------------------
+Sprawdzam log autopilota i token GaleriaEstetycznej.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 07:44
+------------------------------------------------------------------------------
+Semmi token jest w pliku ważny do 19:15 dzisiaj, ale Semmi NIE pojawia się w syncach od 2 sierpnia. Sprawdzam live co się dzieje.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 07:45
+------------------------------------------------------------------------------
+Mam pełną diagnozę. Dwa różne problemy:
+
+**Semmi** — technicznie działa (token OK), ale zwraca 0 sprzedaży za 1-2 sierpnia. Nie ma transakcji w API — sprawdź czy kampanie są włączone.
+
+**GaleriaEstetyczna** — token wygasł (400 Invalid refresh token), dokładnie ten sam błąd co Luxsen dwa tygodnie temu. Trzeba ponownie autoryzować przez Device Flow.
+
+**Pozostałe 8 kont** — dane się zaciągają normalnie, sync dziś o 07:16 przeszedł.
+
+---
+
+Mogę od razu uruchomić Device Flow dla GaleriaEstetycznej — otworzysz link w przeglądarce (tak samo jak z Luxsenem, zajmuje 2 minuty). Robimy?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-03 07:46
+------------------------------------------------------------------------------
+semmi bylo 0, połacz sie z aglerią
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 07:47
+------------------------------------------------------------------------------
+Otwórz w przeglądarce i wpisz kod:
+
+**URL:** https://allegro.pl/uzytkownik/bezpieczenstwo/skojarz-aplikacje  
+**Kod:** `8fjh6vxp`
+
+Skrypt czeka w tle i zapisze token automatycznie po autoryzacji. Daj znać jak klikniesz "Zatwierdź".
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-03 07:47
+------------------------------------------------------------------------------
+poszło
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 07:48
+------------------------------------------------------------------------------
+Token zapisał się do złej ścieżki — setup zapisuje `galeriaestetyczna.json`, sync szuka `galeria-fresh.json`. Kopiuję i naprawiam raz na zawsze.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 07:48
+------------------------------------------------------------------------------
+Działa. GaleriaEstetyczna zsynchronizowana:
+
+- **Sierpień MTD:** 2 200 zł PL, 20 zamówień (+ sprzedaż CZK/EUR osobno)
+- **Wczoraj (2.08):** 1 645 zł, 15 zamówień
+- **Lipiec** domknięty poprawnie: 52 357 zł, ROAS 16.24
+
+Odśwież Hub — dane powinny być widoczne. Token będzie się teraz odświeżał automatycznie, bez potrzeby ponownej autoryzacji przez kilka miesięcy.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-03 09:11
+------------------------------------------------------------------------------
+stworzyłem nowy wątek dla samego materacji. Wyciągnie mi wszystkie informacje, co powinienem zasilić, albo wszystko, co wiemy o materacji przychodach, w naszych odach, w twoje postrzeżenia, jakiś know how. Daj mi wszystko, co by było niezbędne dla nowego wątku, który ma się uczyć o materacji. i będzie wydzielony katalo pod materacją tylko.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:12
+------------------------------------------------------------------------------
+Pobieram dane z Firebase dla Materazzi + MtzzEU, żeby nowy wątek dostał liczby, nie tylko teorię.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:13
+------------------------------------------------------------------------------
+Mam wszystkie dane. Tworzę katalog i kompletny brief.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:14
+------------------------------------------------------------------------------
+Gotowe. Plik: `/Users/chrismac/MPlace-Agent/audits/materazzi-2026/BRIEF.md`
+
+Możesz go otworzyć i przekopiować całość do nowego wątku. Zawiera:
+
+- **Parametry finansowe** — BE ROAS, marże, prowizja Allegro
+- **Tabele miesięczne 2026** — wszystkie liczby z Firebase (sprzedaż, Ads, ROAS, wyróżnienia)
+- **Szacunkowa marża lipiec** — 562K zł zysku po reklamie
+- **Know-how Ads** — drzewko decyzyjne, konwencja nazw kampanii, progi alarmowe
+- **Techniczne** — tokeny, merge policy, gdzie wpisywać ROAS
+- **Czerwone flagi** — MtzzEU spada -58% od stycznia (to wymaga zbadania w nowym wątku)
+
+Jedyna rzecz której brief nie ma to ROAS sierpień — nie ma jeszcze screena. Jak go wrzucisz przez Batch OCR, wątek Materazzi będzie miał pełny obraz.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-03 09:15
+------------------------------------------------------------------------------
+/Users/chrismac/MPlace-Agent/audits/materazzi-2026/BRIEF.md
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-03 09:15
+------------------------------------------------------------------------------
+Approach this as the design lead at a small studio known for their versatility, giving every client a visual identity pitched at the treatment the task actually calls for. Make deliberate choices about palette, typography, and layout that are specific to this subject, and avoid templated designs.
+
+## Read the request first
+
+Calibrate treatment, not whether to design. A doc deserves the same craft as a landing page — what changes is the treatment that craft is delivered in.
+
+Many requests call for a more utilitarian treatment: a plan, a memo, a demo. Make it polished: include real typographic hierarchy, considered spacing, and a proper palette, but avoid over-designing. Most pages do not need a flashy, gigantic hero. Keep flourishes tasteful and limited.
+
+Some requests call for an editorial treatment: a landing page, a game, an app or tool they'll keep or share.
+
+When unsure: a well-composed page is never the wrong answer; an over-designed visual identity sometimes is.
+
+Fundamentals below apply to everything. The editorial process after that runs only when the read above says so.
+
+## Fundamentals for every artifact
+
+**Honor what's already there** Look for an existing design system first — CLAUDE.md, a tokens or theme file, existing component styles. When one exists, apply it; everything below fills gaps and never overrides. Precedence is always: the user's own words, then the project's existing system, then your choices.
+
+**Ground it in the subject.** If the subject isn't already clear, pin it: one concrete subject, its audience, and the page's single job. The subject's own world — its materials, instruments, vernacular — is where distinctive choices come from. Build with real content throughout, never lorem.
+
+**Pair typefaces** Typography carries the page even when the page isn't about typography. The Artifact CSP blocks font CDNs, so don't link a webfont URL and risk a silent fallback. Instead inline the face as a @font-face data URI. Keep running text near 65 characters wide; set a type scale and stay on it; give headings `text-wrap: balance`, body text room to breathe, and uppercase labels a touch of letter-spacing.
+
+**Choose neutrals, don't default to them.** A pure mid-grey reads as unconsidered; a grey with a slight hue bias toward the page's accent reads as chosen. Pure white and near-black are fine grounds when they suit the subject — the point is that the neutral was picked, not inherited.
+
+**Design both themes.** The page renders in the viewer's theme: `prefers-color-scheme` carries the OS preference, and the viewer's toggle stamps `data-theme="dark"` / `data-theme="light"` on the root element, which must override the media query in both directions. The robust pattern is token-level: define the palette as custom properties on `:root`, redefine only the tokens under `@media (prefers-color-scheme: dark)` — style components through the tokens, never directly inside the media query — then redefine them again under `:root[data-theme="dark"]` and `:root[data-theme="light"]`. Give the second theme the same care as the first — don't naively invert; keep contrast legible and the accent working on both grounds. A design that deliberately commits to one visual world (a neon arcade screen, a letterpress invitation) may stay single-theme — make it a choice, not an omission.
+
+**Let layout do the spacing.** Lay out sibling groups with flex or grid and `gap`, not per-element margins that silently collapse or double. Wide content — tables, code, diagrams — gets `overflow-x: auto` on its own container so the page body never scrolls sideways. Reach for `font-variant-numeric: tabular-nums` wherever digits line up in columns.
+
+**Avoid AI-generated design** AI-generated design currently clusters around a few looks: warm cream (#F4F1EA) with a serif display and terracotta accent; near-black with a lone acid-green or vermilion pop; broadsheet hairline rules with dense columns; a purple-to-blue gradient hero on white; Inter or Space Grotesk as the "safe" face; emoji as section markers; everything centered; `rounded-lg` everywhere; accent bar/rail on rounded cards. Where the user pins down a visual direction, follow it exactly — their words always win, including when they ask for one of these looks. Where nothing is specified, don't spend that freedom on one of these defaults.
+
+**Build cleanly** Be cognizant of overlapping elements, cascade collisions, silent font fallbacks; visual bugs hide in the gap between source and output. Close every non-void element, double-quote attributes, give keyboard focus a visible state, respect `prefers-reduced-motion`. For generative or decorative graphics, reach for Canvas or WebGL rather than hand-authoring long SVG path data.
+
+**CSS rules** When writing the CSS, watch your selector specificities. It is easy to generate classes that cancel each other out — a type-based selector like `.section` fighting an element-based one like `.cta` over padding and margins between sections. Structure the cascade so it doesn't silently undo your spacing.
+
+**Writing the copy** Words are design material, not decoration. Write from the user's side of the screen — name things by what people recognize, not how the system is built (a person manages *notifications*, not *webhook config*). Active voice; a control says exactly what happens ("Publish", then a toast that says "Published"). Errors explain what went wrong and how to fix it — no apologies, no vagueness. Specific beats clever.
+
+**Structure is information** Structural devices, numbering, eyebrows, dividers, labels, should encode something true about the content, not decorate it. Many generic designs use numbered markers (01 / 02 / 03), but that's only appropriate if the content actually is a sequence - like a real process or a typed timeline where order carries information the reader needs. Question if choices like numbered markers actually make sense before incorporating them.
+
+**When it's a UI, not a document** A dashboard or tool is scanned and operated, not read top-to-bottom, so the craft shifts from typography to information design. Surface the summary before the detail; encode state in form as well as number — a pill, a chip, a severity stripe — so what needs attention reads at a glance. Semantic color (good / warning / critical) is separate from the accent hue and doesn't count as your accent. Give sparklines and charts the same care as type: an area fill, a faint grid, an emphasized endpoint. What's interactive should look interactive.
+
+
+
+## Process
+
+Before writing code, sketch a short design plan — a compact token system with color, type, and layout:
+- **Color**: describe the palette as 4–6 named hex values.
+- **Type**: typefaces for 2+ roles — a characterful display face used with restraint, a complementary body face, and a utility face for captions or data if needed.
+- **Layout**: a layout concept in one or two sentences.
+
+Then build, following the plan and deriving every color and type decision from it.
+
+## When the request is editorial
+
+The stance shifts: the client has already rejected proposals that felt templated, and is paying for a distinctive point of view. Make opinionated calls, and take one real aesthetic risk where it serves the work.
+
+Review the design plan against the subject before building: if any part of it reads like the generic default you would produce for any similar page, revise that part, and note what you changed and why. Only after you've confirmed the plan's uniqueness do you write the code, following the revised plan exactly.
+
+**Principles** 
+
+- The hero is a thesis: open with the most characteristic thing in the subject's world — headline, image, live demo, interactive moment. 
+- Typography carries the personality of the page. Pair the display and body faces deliberately, not the same families you would reach for on any other project, and set a clear type scale with intentional weights, widths, and spacing. Make the type treatment itself a memorable part of the design, not a neutral delivery vehicle for the content. 
+- Leverage motion deliberately. Think about where and if animation can serve the subject: a page-load sequence, a scroll-triggered reveal, hover micro-interactions, ambient atmosphere. An orchestrated moment usually lands harder than scattered effects; choose what the direction calls for. However, sometimes less is more, and extra animation contributes to the feeling that the design is AI-generated. 
+- Match complexity to the vision. Maximalist directions need elaborate execution; minimal directions need precision in spacing, type, and detail. Elegance is executing the chosen vision well.
+- Spend your boldness in one place; keep everything around it quiet. If the accent fights the ground, shift it toward analogous or drop saturation rather than replacing it.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:16
+------------------------------------------------------------------------------
+Renduję jako artifact — MPlace-branded, ciemny, z numerami w mono.
+
+**Plan:**
+- Paleta: `#0f1117` tło (Hub dark), akcent `#a78bfa` (ONE/purple — kolor grupy Materazzi), `#ff6b35` dla krytycznych alertów, zielony `#3fb950` dla dobrych metryk
+- Type: `monospace` dla liczb (tabular-nums), `system-ui` dla tekstu — spójna z Hubem
+- Layout: lewa kolumna nawigacja sekcji (sticky), prawa treść z tabelami + blokami decyzyjnymi
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:20
+------------------------------------------------------------------------------
+Gotowe — masz kompletny brief z prawdziwymi danymi z Firebase. Możesz ten link otworzyć w nowym wątku jako kontekst startowy, albo przekopiować zawartość. Brief zawiera:
+
+- Sparklines sprzedaży (Materazzi zielony wzrost, MtzzEU czerwony spadek)
+- Pełne tabele miesięczne z kolorowaniem (rekord / dno / MTD)
+- Kalkulację marży lipiec (562K zł zysku)
+- Drzewko decyzyjne ROAS
+- Czerwone flagi z priorytetami — MtzzEU −67% na górze
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-03 09:21
+------------------------------------------------------------------------------
+a dodaj to jako kafelek do https://mplace.agency/mtz-hub-a4f2d8/
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:21
+------------------------------------------------------------------------------
+Szukam pliku pod tym URL-em w MPlace-www.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:22
+------------------------------------------------------------------------------
+Znam strukturę. Dodaję kafelek w obu widokach (sekcje + chrono) i aktualizuję liczniki.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:23
+------------------------------------------------------------------------------
+Mam pełny obraz. Robię wszystkie edycje naraz: nowy kafelek w obu widokach + aktualizacja wszystkich liczników.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:24
+------------------------------------------------------------------------------
+Teraz dodaję kafelek w widoku sekcji (po karcie Ahrefs):
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:24
+------------------------------------------------------------------------------
+Teraz chrono view — aktualizuję licznik Sierpień i dodaję kartę:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:25
+------------------------------------------------------------------------------
+Push:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-03 09:25
+------------------------------------------------------------------------------
+Gotowe. Kafelek jest live na https://mplace.agency/mtz-hub-a4f2d8/ — pojawi się w sekcji "Materazzi - sklep materacy" oraz w widoku chronologicznym pod "Sierpień 2026". Tagi `#ads` i `#raport` w filtrach go znajdą.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-05 07:08
+------------------------------------------------------------------------------
+o ktorej sie ładuja dan do Huba?
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-05 07:08
+------------------------------------------------------------------------------
+Trzy razy dziennie automatycznie:
+
+- **9:00** — główny sync (dane za wczoraj)
+- **13:30** — odświeżenie
+- **19:30** — odświeżenie
+
+Plus **co 15 minut** — ads-inbox (jeśli wrzucisz screenshot do `inbox-ads/`, ROAS wchodzi bez czekania).

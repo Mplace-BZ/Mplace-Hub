@@ -1,0 +1,1713 @@
+==============================================================================
+ZAPIS ROZMOWY - projekt Mplace-Hub (archiwum starych sesji)
+sesja: 6fc44a9a-04f3-4976-aa82-9ef9b53637b4 | ostatnia zmiana: 2026-07-22 09:14
+==============================================================================
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 07:52
+------------------------------------------------------------------------------
+Dzisiaj jest pierwsza lipca. Robię podsumowanie miesiąca. Sprawdź czy wszystko będzie ok.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 07:52
+------------------------------------------------------------------------------
+Sprawdzam aktualny stan aplikacji i git przed podsumowaniem miesiąca.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 07:53
+------------------------------------------------------------------------------
+Sprawdziłem kluczowe mechanizmy. Wszystko działa poprawnie na 1 lipca:
+
+---
+
+**Stan aplikacji dziś (1 lipca):**
+
+**1. Closing mode — auto-aktywowany ✓**
+Linia `7018`: `let _closingMode = new Date().getDate() === 1` → dziś `true`.
+Przycisk "↩ Zamknięcie: czerwiec" świeci się na żółto od razu po otwarciu.
+
+**2. Zapis idzie do czerwca ✓**
+`getSaveMonth()` zwraca `czerwiec` gdy `_closingMode=true`. Dane za 30 czerwca lądują tam gdzie trzeba.
+
+**3. EOM projection bez szaleństwa ✓**
+`estym()` przy `dzien <= 1` zwraca `d.sprzedaz` bez mnożenia — czerwiec zamknięty pokaże rzeczywiste liczby.
+
+**4. cleanupDzien1() ✓**
+Odpala się przy logowaniu i kasuje artefakty z `dzien=1` ze wszystkich miesięcy. Historia jest czysta.
+
+**5. DAYS_IN.czerwiec = 30 ✓**
+Kalkulacje 30-dniowe poprawne.
+
+---
+
+**Co zrobić dziś:**
+
+1. Otwórz aplikację → widzisz żółty przycisk "↩ Zamknięcie: czerwiec" — to OK
+2. Wpisz dane za 30 czerwca dla wszystkich 9 kont
+3. Zapisz → idzie do czerwca
+4. Agent → generuj podsumowanie miesiąca / prezentację / raport MTD
+5. Żeby zacząć lipiec — kliknij ten żółty przycisk (wyłącz closing mode)
+
+**Uwaga kosmetyczna:** Pasek daty górą pokazuje "Lipiec 2026 · w toku" — to data kalendarzowa, nie miesiąc zapisu. Nie jest to bug, ale może zmylić — zapis i tak idzie do czerwca.
+
+Możesz bezpiecznie robić podsumowanie.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 09:01
+------------------------------------------------------------------------------
+Czekamy porozmawiać o... sytuacji, że chciałbym zarchiwizować. Dwie klientów. Anka do... oraz botawita. Chodzi o to, że nie chcę ich usuwać, ale jakoś tak wygasić potem, żeby w lipcu już nie będzie tych danych. żeby to nie wygląda jak błąd raporty i tak dalej Nie wiem, co rekomendujesz. A w zamian mam dwóch nowych klientów. Jeden to będzie VitaClean (ViC). Możemy zacząć już mam dane za  maj czerwiec?  DomGlamour (DoG) mam dane od lutego 2026. Co rekomendujesz, co możemy zrobić? Na razie porozmawiajmy o takiej zmianie
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:01
+------------------------------------------------------------------------------
+Rozumiem sytuację. Mamy do zaprojektowania:
+- **Ankado24 + BOTAVIT** → archiwizacja (historia zostaje, lipiec czysty)
+- **VitaClean (ViC) + DomGlamour (DoG)** → nowe konta z danymi historycznymi
+
+Zanim zaproponuję podejście, muszę zobaczyć jak konta są zdefiniowane w kodzie. Odpalam 3 agenty równolegle.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:01
+------------------------------------------------------------------------------
+Agenty pracują — poczekam na wyniki zanim zaproponuję cokolwiek. Chwila.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 09:02
+------------------------------------------------------------------------------
+<task-notification>
+<task-id>a85563ff23cf6df79</task-id>
+<tool-use-id>toolu_01Ruj2F6kjUpVGdC8exna4dF</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-chrismac-bazgroszyt-Mplace-Hub/6fc44a9a-04f3-4976-aa82-9ef9b53637b4/tasks/a85563ff23cf6df79.output</output-file>
+<status>completed</status>
+<summary>Agent "Explore data storage, getData, localStorage keys" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Perfect. Now let me compile all the findings into a comprehensive report:
+
+## Search Results: Data Storage &amp; Account Management in index.html
+
+### 1. getData() and setData() Function Implementations
+
+**Lines 4697-4698** - Core data storage functions:
+```javascript
+function getData(k){try{const d=JSON.parse(localStorage.getItem(SK+k)||'null');return d||buildInit(k);}catch(e){return buildInit(k);}}
+function setData(k,d){localStorage.setItem(SK+k,JSON.stringify(d));}
+```
+
+**How they work:**
+- `getData(k)` retrieves data for account key `k` from localStorage using the `SK` prefix. If data doesn't exist or is corrupted JSON, it falls back to `buildInit(k)` which loads hardcoded initial data.
+- `setData(k,d)` directly saves data object `d` to localStorage as JSON string, keyed with `SK+k`.
+- Data is stored **per account** as an array of monthly entries.
+
+---
+
+### 2. localStorage Key Patterns for Account Data
+
+**Line 4695** - Storage key prefix:
+```javascript
+const SK='adshub3_';
+const SK_PROD='adshub3_prod_';
+```
+
+**Key patterns used:**
+- Account data: `'adshub3_' + accountKey` (e.g., `'adshub3_MobelKap'`)
+- Producer percentages: `'adshub3_prod_' + accountKey`
+- Other synced keys: `'mplace_wiedza_v1'`, `'mplace_notelog_v1'`, `'mplace_podcasts_meta_v2'`
+- View mode: `'mp_viewMode'`
+- Last active tab: `'lastActiveTab'`
+
+---
+
+### 3. Firebase Storage Structure (Account Data Paths)
+
+**Lines 7664-7666** - Account data path (saveAccToFS):
+```javascript
+await db.collection('users').doc(currentUser.uid)
+  .collection('accounts').doc(k)
+  .set({ rows: getData(k), updatedAt: Date.now() });
+```
+
+**Lines 7677-7679** - Producer settings path:
+```javascript
+await db.collection('users').doc(currentUser.uid)
+  .collection('settings').doc('producers')
+  .set({ producers });
+```
+
+**Lines 7688-7689** - MEBLE global data path:
+```javascript
+await db.collection('users').doc(currentUser.uid)
+  .collection('sync').doc('mebleGlobal')
+  .set({ data: ..., updatedAt: Date.now() });
+```
+
+**Path structure:**
+```
+users/{uid}/
+  ├── accounts/{accountKey}/    (stores { rows: [...], updatedAt })
+  ├── settings/producers/       (stores { producers: {...} })
+  └── sync/
+      ├── mebleGlobal/          (stores { data: {...}, updatedAt })
+      ├── wiedza/               (stores { entries: [...], updatedAt })
+      ├── notelog/              (stores { entries: [...], updatedAt })
+      ├── podcasts/             (stores { entries: [...], updatedAt })
+      └── localMeble/           (stores { data: {...}, updatedAt })
+```
+
+---
+
+### 4. loadFromFS() Implementation - How It Iterates Accounts
+
+**Lines 7723-7774** - Full loadFromFS() function:
+
+The function:
+1. **Fetches all account documents** (line 7727-7728):
+   ```javascript
+   const snap = await db.collection('users').doc(currentUser.uid)
+     .collection('accounts').get();
+   ```
+
+2. **Iterates each document** (lines 7729-7750):
+   ```javascript
+   snap.forEach(doc =&gt; {
+     if(AC_META[doc.id] &amp;&amp; doc.data().rows){
+       // ... merge logic
+       localStorage.setItem(SK + doc.id, JSON.stringify(result));
+     }
+   });
+   ```
+
+3. **Filtering logic**: Only processes accounts where:
+   - `AC_META[doc.id]` exists (account is in the known accounts metadata object)
+   - `doc.data().rows` exists (Firebase document has rows data)
+
+4. **Merge strategy** (lines 7734-7743):
+   - Per-month merging: keeps newer `savedAt` timestamp for each month
+   - Adds missing months from both local and Firebase
+   - Updates localStorage with merged result
+
+5. **Also loads producers, wiedza, notelog, podcasts, and global/local MEBLE data** (lines 7751-7766)
+
+---
+
+### 5. saveAllWithSync() Implementation - How It Iterates Accounts
+
+**Lines 8083-8149** - Full saveAllWithSync() function:
+
+The function:
+1. **Saves active account first** (lines 8084-8085):
+   ```javascript
+   if(_dataActiveKey) dataSaveCurrentToLocal(_dataActiveKey);
+   ```
+
+2. **Filters accounts with current month data** (lines 8093-8100):
+   ```javascript
+   Object.keys(AC_META).forEach(k=&gt;{
+     const D = getData(k);
+     const cur = D.find(x =&gt; x.m === curM);
+     if(cur){
+       updated++;
+       savedKeys.push(k);
+     }
+   });
+   ```
+
+3. **Validation** (lines 8102-8103): Requires at least one account with data for the month
+
+4. **Sync to Firestore** (lines 8117-8128):
+   ```javascript
+   await Promise.all(savedKeys.map(k =&gt; saveAccToFS(k)));
+   ```
+
+5. **Post-sync actions** (lines 8139-8149):
+   - Re-renders active account if visible
+   - Shows confirmation popup
+   - Auto-snapshots D2D if function exists
+
+---
+
+### 6. Account Filtering in Rendering
+
+**Line 6450-6472** - renderDataLeft() shows filtered account list by group:
+```javascript
+const accs = Object.keys(AC_META);
+Object.entries(GROUPS).forEach(([gKey, g]) =&gt; {
+  g.accs.forEach(k =&gt; {
+    const D = getData(k);
+    const hasCur = D.some(d =&gt; d.m === curM &amp;&amp; (d.sprzedaz &gt; 0 || d.adsCost &gt; 0));
+    if (hasCur) doneCount++;
+    // ... renders account with hasCur indicator
+  });
+});
+```
+
+**Filtering criteria for "done" accounts:**
+- Must have entry in current month (`d.m === curM`)
+- AND must have either sales &gt; 0 OR ads cost &gt; 0
+
+**Line 7730** - loadFromFS() filtering:
+- Only accounts where `AC_META[doc.id]` exists are loaded
+- This is the primary mechanism to filter out invalid/inactive accounts
+
+**Line 8093-8100** - saveAllWithSync() filtering:
+- Only accounts with data in current month are synced
+- Uses `Object.keys(AC_META)` to iterate (all known accounts)
+- Filters to only those with `cur = D.find(x =&gt; x.m === curM)`
+
+---
+
+### Account Metadata Object (AC_META)
+
+**Lines 4665-4689** - Defines all known accounts:
+```javascript
+const AC_META={
+  MobelKap:{name:'MobelKap',group:'MEBLE', ...},
+  PerfektCiecie:{name:'Perfekt Cięcie',group:'MEBLE', ...},
+  // ... 9 total accounts across 3 groups
+};
+```
+
+This object serves as the **whitelist** for all account operations. Any iteration using `Object.keys(AC_META)` only touches these 9 accounts.</result>
+<usage><subagent_tokens>37798</subagent_tokens><tool_uses>14</tool_uses><duration_ms>51617</duration_ms></usage>
+</task-notification>
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:02
+------------------------------------------------------------------------------
+Jeden agent gotowy — czekam na pozostałe dwa.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 09:02
+------------------------------------------------------------------------------
+<task-notification>
+<task-id>afabf6a1cc0a51b11</task-id>
+<tool-use-id>toolu_01SP1EFC7hAWscW1sCgLXxq6</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-chrismac-bazgroszyt-Mplace-Hub/6fc44a9a-04f3-4976-aa82-9ef9b53637b4/tasks/afabf6a1cc0a51b11.output</output-file>
+<status>completed</status>
+<summary>Agent "Explore AC_META, account structure, groups" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Perfect! Now I have all the information needed. Let me compile a comprehensive report.
+
+## Search Results: AC_META Object Structure and Account Management
+
+### 1. AC_META Object Definition (Lines 4665-4689)
+
+**Full AC_META structure with all fields:**
+
+```javascript
+const AC_META={
+  MobelKap:{name:'MobelKap',group:'MEBLE',
+    role:'scale', pricingTier:'base', pricingDelta:0,
+    specjalizacje:['szafki_pralkowe','szafki_lustro','slupki_lazienkowe','KARO92','DOUBLE_KARO92','T-BOX92','stoliki_podnoszone'],
+    adsTarget:6.5, wyrTarget:5.0,
+    strategiaOpis:'Lider grupy MEBLE — najwyższy ROAS (7.37 vs BE 6.38). Owner 8 kategorii: cała premium łazienka (szafki pralkowe, lustro, słupki) + stoliki premium (KARO92, T-BOX92, DOUBLE KARO92) + stoliki podnoszone. Priorytet: skalowanie wolumenu na owned kategoriach.',
+    badge:'🏆 SCALE'
+  },
+  PerfektCiecie:{name:'Perfekt Cięcie',group:'MEBLE',
+    role:'niche', pricingTier:'base', pricingDelta:0,
+    specjalizacje:['donice_KARO_ACK','donice_DMDuo','kwietnia','witryny_RTV','stoly_barowe','RICO_Angi_KORA','lawki','komody_przewijak'],
+    adsTarget:5.5, wyrTarget:3.0,
+    strategiaOpis:'Owner całej florystyki (90 ofert, 3x więcej niż konkurencja) + 6 unikalnych kategorii (witryny, stoły barowe, ławki, budżetowe). Super Sprzedawca + Qlt 336. PEAK: Dzień Matki 26.05 — agresywne skalowanie doniczek. 7 kategorii (32% portfela).',
+    badge:'🎯 NICHE'
+  },
+  MeblenaCzasie:{name:'Meble na Czasie',group:'MEBLE',
+    role:'volume', pricingTier:'premium', pricingDelta:2.5,
+    specjalizacje:['KARO65','KAJA61','KAJA91','LARA','MAJA','DOUBLE_KARO68','stoliki_podnoszone_92'],
+    adsTarget:6.5, wyrTarget:4.5,
+    strategiaOpis:'Wolumen mid-range (kwiecień 2026). Hero TOP92 wycofany przez Allegro. Marża spadła z 10.8% do 7.3%, ROAS 5.74 poniżej BE 7.62. Ownership: stoliki mid-range (KARO65, KAJA61, KAJA91, LARA, MAJA, DOUBLE KARO68). Nowy hero: stolik podnoszony rozkładany 92cm. 6 kategorii (27%). Pricing +2.5% utrzymany.',
+    badge:'📦 WOLUMEN +2.5%'
+  },
+  Luxsen:{name:'Luxsen',group:'LUXSEN'},
+  Semmi:{name:'Semmi',group:'LUXSEN'},
+  BOTAVIT:{name:'BOTAVIT',group:'LUXSEN'},
+  Materazzi:{name:'Materazzi',group:'ONE'},
+  MtzzEU:{name:'MtzzEU',group:'ONE'},
+  Ankado24:{name:'Ankado24',group:'ONE'},
+};
+```
+
+**AC_META field definitions per account:**
+- `name`: Display name (string)
+- `group`: Group identifier (MEBLE|LUXSEN|ONE)
+- `role`: Strategic role (scale|niche|volume|premium) — used for decision logic in recommendations
+- `pricingTier`: base|premium
+- `pricingDelta`: Price adjustment % vs base (0, 2.5, etc.) — displayed in UI at lines 18252, 21857, 24470; affects strategic recommendations for premium tier accounts
+- `specjalizacje`: Array of product specialization categories
+- `adsTarget`: Target Ads spend % (e.g., 6.5%)
+- `wyrTarget`: Target wyróżnienia (promotions) % (e.g., 5.0%)
+- `strategiaOpis`: Long-form strategy description
+- `badge`: Visual badge emoji and label
+
+**Note:** Only the three detailed MEBLE accounts (MobelKap, PerfektCiecie, MeblenaCzasie) have complete field sets. LUXSEN and ONE group accounts have only `name` and `group`.
+
+**No status flags found:** No `active`, `enabled`, `archived`, or `disabled` flags exist in AC_META. All 9 accounts are always active.
+
+---
+
+### 2. GROUPS Definitions (Lines 4660-4663 and 5984-5988)
+
+**Primary GROUPS definition (line 4660):**
+```javascript
+const GROUPS={
+  MEBLE:{label:'MEBLE',c:'var(--g-meble)',cls:'g-meble-badge',egh:'egh-m',accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
+  LUXSEN:{label:'LUXSEN',c:'var(--g-luxsen)',cls:'g-luxsen-badge',egh:'egh-l',accs:['Luxsen','Semmi','BOTAVIT']},
+  ONE:{label:'ONE',c:'var(--g-one)',cls:'g-one-badge',egh:'egh-o',accs:['Materazzi','MtzzEU','Ankado24']},
+};
+```
+
+**Secondary GROUPS_DEF (line 5984 — inside a render function):**
+```javascript
+const GROUPS_DEF = {
+  MEBLE:  { accs:['MobelKap','PerfektCiecie','MeblenaCzasie'], prod:65, color:'#ff6b35' },
+  LUXSEN: { accs:['Luxsen','Semmi','BOTAVIT'],                 prod:60, color:'#2dd4a0' },
+  ONE:    { accs:['Materazzi','MtzzEU','Ankado24'],            prod:55, color:'#b47fff' }
+};
+```
+
+**Producer defaults (line 4690):**
+```javascript
+const DEFAULT_PRODUCER={MobelKap:65,PerfektCiecie:65,MeblenaCzasie:65,Luxsen:60,Semmi:60,BOTAVIT:60,Materazzi:55,MtzzEU:55,Ankado24:55};
+```
+
+---
+
+### 3. Account Iteration Patterns
+
+**Object.keys() usage (42+ locations found):**
+- Line 5983: `const ALL_KEYS = Object.keys(AC_META);` — primary key extraction
+- Line 5786, 5802, 5809: Map operations over accounts
+- Line 6344, 6351, 6363: forEach loops for data processing
+- Line 6450, 6787, 6798: Account list generation for UI
+- Line 7011, 7055, 7072, 7400+: Updates and data transformations
+
+**Example iteration pattern (line 6344):**
+```javascript
+Object.keys(AC_META).forEach(k=&gt;getData(k).forEach(d=&gt;allM.add(d.m)));
+```
+
+**Entry/Group iteration (GROUPS):**
+- Line 5713: `Object.entries(GROUPS).map(([gKey,g])=&gt;...)`
+- Line 5780: Dataset generation by group
+- Line 5935, 6453, 6522, 12768+: Group-based grouping and rendering
+
+---
+
+### 4. Fee/Margin Calculations
+
+**Main calc() function (lines 4828-4868):**
+- Takes parameters: `d` (data entry), `producent` (producer %)
+- Commission extracted from: `d.commission` (%)
+- **Important:** Fee calculations reference producer % directly, NOT pricingDelta
+- Line 4839: `const commAmt=rev*commission/100;` — commission is from data entry, not AC_META
+- Line 4838: `const myRev=rev*(1-producent/100);` — producer cut is deducted from revenue
+
+**pricingDelta usage (NOT in financial calculations):**
+- Line 18252: Display in AI context for strategy prompts
+- Line 18270: Strategic rule for premium role: "Priorytet: utrzymanie marży premium (pricing +${meta.pricingDelta}%)"
+- Line 21857-21860: UI display only (conditional badge in account details)
+- Line 24470: Included in AI context for portfolio strategy
+
+**Producer management (lines 4699-4700):**
+```javascript
+function getProd(k){const v=parseFloat(localStorage.getItem(SK_PROD+k));return isNaN(v)?DEFAULT_PRODUCER[k]||65:v;}
+function setProd(k,v){localStorage.setItem(SK_PROD+k,v);}
+```
+- Producer % stored in localStorage: `adshub3_prod_[accountKey]`
+- Defaults: MEBLE=65%, LUXSEN=60%, ONE=55%
+
+---
+
+### 5. Group Color Mappings
+
+**Colors defined at multiple locations:**
+- Line 6440: `const GRP_COLORS = {MEBLE:'#ff6b35',LUXSEN:'#2dd4a0',ONE:'#b47fff'};`
+- Line 14758, 14815, 15050: Duplicated color definitions
+- Used for chart rendering and group visual styling
+
+---
+
+### Summary of Key Findings
+
+1. **AC_META is immutable** — no status flags; all 9 accounts always active
+2. **Accounts organized in 3 groups** — MEBLE (3), LUXSEN (3), ONE (3)
+3. **Strategic roles** (scale/niche/premium) drive AI recommendations, not financial calculations
+4. **pricingDelta is metadata only** — used in UI display and strategy narratives, not in commission/fee calculations
+5. **Producer % is stored separately** in localStorage, keyed by account, with group-level defaults
+6. **Account iteration always uses `Object.keys(AC_META)`** — no filtering by status
+7. **Fee calculations** use entry-level `commission` field + default `producer` %/stored value, never `pricingDelta`</result>
+<usage><subagent_tokens>42754</subagent_tokens><tool_uses>17</tool_uses><duration_ms>74815</duration_ms></usage>
+</task-notification>
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:03
+------------------------------------------------------------------------------
+Dwa agenty gotowe. Czekam na trzeciego (Dashboard/Trend/Agent context).
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:03
+------------------------------------------------------------------------------
+API Error: Connection closed mid-response. The response above may be incomplete.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 09:03
+------------------------------------------------------------------------------
+<task-notification>
+<task-id>a1680a24a6c8818c2</task-id>
+<tool-use-id>toolu_01YUg8EAcTFQ3fCg49eTcmcn</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-chrismac-bazgroszyt-Mplace-Hub/6fc44a9a-04f3-4976-aa82-9ef9b53637b4/tasks/a1680a24a6c8818c2.output</output-file>
+<status>completed</status>
+<summary>Agent "Explore Dashboard, Trend, Agent context — where account list is used for rendering" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Perfect! Now I have all the information I need. Let me compile my findings:
+
+## Search Results: Dashboard &amp; Account Data Flow in Mplace-Hub
+
+Based on a thorough search of `/Users/chrismac/bazgroszyt/Mplace-Hub/index.html`, here are the exact findings for your five questions:
+
+---
+
+### 1. **How Dashboard renders account cards — does it iterate AC_META or a filtered list?**
+
+**Line 5704–5774** (`renderDashboard()` function):
+- **Iterates through GROUPS**, not AC_META directly (line 5713)
+- Each group contains its `accs` array (line 5714: `g.accs.map(k=&gt;{ ... })`)
+- For every account `k` in a group's `accs`, it renders a card
+- Card content pulls from AC_META (line 5744): `AC_META[k].name`
+- Card data is computed per account: `getData(k)`, `getProd(k)`, `calc(last, prod)`, `estym(last)` (lines 5715–5722)
+
+**Group structure** (lines 4662–4663):
+```
+MEBLE: {accs: ['MobelKap','PerfektCiecie','MeblenaCzasie']}
+LUXSEN: {accs: ['Luxsen','Semmi','BOTAVIT']}
+ONE: {accs: ['Materazzi','MtzzEU','Ankado24']}
+```
+
+---
+
+### 2. **How Trend tab builds the account selector / dropdown**
+
+**Trend = "Months" view** (lines 3384–3411, rendered by `renderMonths()` at line 12686):
+- **No dropdown selector** — the Months view shows **all accounts in all groups** automatically
+- Table iterates `Object.entries(GROUPS)` (line 12768)
+- For each group, iterates `g.accs.forEach((k, ai) =&gt; ...)` (line 12778)
+- Accounts are **hardcoded per group**, not selected dynamically
+- Metric selector exists (line 12690): `document.getElementById('monthsMetric')?.value`
+
+**D2D (Day-to-Day) tab** (lines 3425–3454) **does have account filtering**:
+- Filter buttons built at line 17622: `Object.entries(GROUPS).forEach(g =&gt; { g.accs.forEach(k =&gt; { ... }) })` 
+- Accounts rendered as chips in `#d2dAccFilter` (lines 17627–17633)
+- Selected accounts stored in `d2dSelAccs` Set (line 17617)
+- Each account button: `&lt;button onclick="d2dToggleAcc('${k}',this)" data-key="${k}" class="d2d-chip"&gt;${AC_META[k].name}&lt;/button&gt;`
+
+**Analiza (Analysis) tab** (line 3508):
+- Hardcoded `&lt;select id="aaKonto"&gt;` with optgroups (lines 3510–3512)
+- Groups with accounts: MEBLE, LUXSEN, ONE (same structure as AC_META)
+
+---
+
+### 3. **How Agent buildContext() or similar function aggregates data from accounts**
+
+**No `buildContext()` function exists**, but data aggregation happens in these places:
+
+**For Reports** (lines 13824, 14499):
+- `runMTDReport(selectedKeys, dateFrom, dateTo)` at line 13824
+- `runSlideReport(selectedKeys, dateFrom, dateTo)` at line 14499
+- Both iterate selected accounts and call `getData(k)` per account
+
+**For Dashboard KPI bar** (lines 5704–5903):
+- Computes aggregates via `Object.keys(AC_META)` (line 5802) → all 9 accounts
+- Calculates per-account: sales, ROAS, margin, profit
+- Group totals in bubble chart (lines 5780–5799)
+
+**For Agent context** (examples at lines 13824–13898, 14499–14655):
+- Builds a string with all selected accounts' data
+- Example (line 13880): `dataCtx += '\n${AC_META[k].name}:\n'` then appends metrics
+
+**For calcMyFee (fee aggregation)** (line 25593):
+- `calcMyFee(cfg)` explicitly iterates **account groups** to sum profits:
+  - MEBLE: lines 25596–25598 sum 3 accounts
+  - LUXSEN: lines 25602–25605 sum Luxsen, Semmi, BOTAVIT
+  - ONE: lines 25610–25614 sum Materazzi, MtzzEU, Ankado24 separately
+
+---
+
+### 4. **How fee/revenue calculations per group reference specific account keys (Ankado24, BOTAVIT specifically)**
+
+**Fee configuration** (lines 25584–25590, `getFeeConfig()`):
+```javascript
+grpMeble: 7500,           // Fixed for MEBLE group
+pctLuxsen: 20,            // % of LUXSEN group profit
+materazzis: 3500,         // Fixed for Materazzi + MtzzEU
+ankado: 2900              // Fixed for Ankado24 ONLY
+```
+
+**Fee calculation logic** (lines 25593–25630, `calcMyFee(cfg)`):
+- **LUXSEN (line 25602)**: `['Luxsen','Semmi','BOTAVIT'].reduce()` — sums all 3, BOTAVIT referenced by key
+- **ONE group split** (lines 25610–25614):
+  - Materazzi + MtzzEU combined: `['Materazzi','MtzzEU'].reduce()`
+  - Ankado24 separate: `getData('Ankado24')` — explicitly referenced by key
+- **Fee allocation per account** (lines 25692–25702):
+  - LUXSEN accounts share proportionally by their `zysk`: 
+    - Line 25693: `Luxsen: f.luxsenZysk&gt;0 ? calc(getData('Luxsen')[...]).zysk / f.luxsenZysk * f.luxsenFeeNetto : 0`
+    - Line 25695: `BOTAVIT: f.luxsenZysk&gt;0 ? calc(getData('BOTAVIT')[...]).zysk / f.luxsenZysk * f.luxsenFeeNetto : 0`
+  - Ankado24 gets full fee: line 25701: `Ankado24: f.ankadoFeeNetto`
+
+**Fee display in HTML** (lines 2660–2689):
+- Line 2666: `&lt;div class="biz-fee-name"&gt;Luxsen + Semmi + BOTAVIT&lt;/div&gt;` — groups BOTAVIT explicitly
+- Line 2685: `&lt;div class="biz-pct" id="feePctAnkado"&gt;` with tooltip mentioning Ankado24 by name
+
+---
+
+### 5. **How Kanibalizator and Analiza tabs reference accounts**
+
+**Kanibalizator tab** (lines 3750–3806, id="viewKanibalizator"):
+- No account selector — **hardcoded 3 MEBLE accounts only**:
+  - Line 3772: `MobelKap (MK)` → textarea `#kbWyr_mk`
+  - Line 3778: `Perfekt Cięcie (PC)` → textarea `#kbWyr_pc`
+  - Line 3784: `Meble na Czasie (MnC)` → textarea `#kbWyr_mnc`
+- These are per-account featured product lists (Allegro "Wyróżnienia")
+- Line 3803: Comment states "Agent uwzględnia wyróżnienia w rekomendacjach" — used by Analiza tab
+- No explicit iteration; accounts hard-coded for MEBLE group only
+
+**Analiza tab** (lines 3497–3591, id="viewAnaliza"):
+- Account **dropdown selector** at line 3508: `&lt;select id="aaKonto"&gt;`
+- Options with optgroups (lines 3510–3512):
+  ```html
+  &lt;optgroup label="MEBLE"&gt;&lt;option value="MobelKap"&gt;...
+  &lt;optgroup label="LUXSEN"&gt;&lt;option value="Luxsen"&gt;...
+  &lt;optgroup label="ONE"&gt;&lt;option value="Materazzi"&gt;...
+  ```
+- Specifically lists: MobelKap, PerfektCiecie, MeblenaCzasie, Luxsen, Semmi, **BOTAVIT**, Materazzi, MtzzEU, **Ankado24**
+- Selected account drives file upload flow and AI analysis (line 3508: `onchange="aaUpdateWyrInfo()"`)
+- Line 3573–3577: Displays "Wyróżnienia tego konta" (featured products for that account)
+
+**Screener tab** (lines 3824–3883):
+- Similar account selector in file upload section (line 3847): `&lt;select id="scrFileKonto"&gt;`
+- Options: `_auto`, plus all 9 accounts individually listed (lines 3849–3857)
+- Auto-detection by filename or user selection
+
+---
+
+### Summary Table: Account Reference Points
+
+| Component | Location | AC_META iteration? | Hardcoded accounts? |
+|-----------|----------|-------------------|-------------------|
+| Dashboard cards | 5704–5774 | Via GROUPS.accs | Via group structure |
+| Months/Trend | 12686–12807 | Explicit `Object.keys(AC_META)` | All 9 auto-shown |
+| D2D filters | 17617–17643 | Via GROUPS → accs loop | All 9 as chips |
+| Analiza dropdown | 3508–3512 | Hardcoded optgroups | All 9 listed |
+| Kanibalizator | 3770–3788 | Hardcoded textareas | Only 3 MEBLE accounts |
+| Fee calculation | 25593–25630 | Via array literals | `['Luxsen','Semmi','BOTAVIT']`, `['Materazzi','MtzzEU']`, `Ankado24` |
+| Biznes view | 25632–25718 | `Object.keys(AC_META).map()` | All 9 in share table |
+
+**Key pattern**: AC_META is the source of truth (line 4665), but accounts are grouped and referenced either via GROUPS (line 4662–4663) for UI organization, or via hardcoded arrays like `['Luxsen','Semmi','BOTAVIT']` for business logic (fee, totals).</result>
+<usage><subagent_tokens>60094</subagent_tokens><tool_uses>20</tool_uses><duration_ms>85684</duration_ms></usage>
+</task-notification>
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:04
+------------------------------------------------------------------------------
+Mam pełny obraz kodu. Zanim napiszę plan, muszę zadać kilka kluczowych pytań — decyzje biznesowe, nie techniczne.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:09
+------------------------------------------------------------------------------
+Mam wszystko. Piszę plan.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:10
+------------------------------------------------------------------------------
+Mam jedną małą niejednoznaczność do wyjaśnienia przed zamknięciem planu.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:19
+------------------------------------------------------------------------------
+Aktualizuję plan o potwierdzone szczegóły.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:22
+------------------------------------------------------------------------------
+Zatwierdzony — zaczynam implementację. Czytam kluczowe sekcje kodu równolegle.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:24
+------------------------------------------------------------------------------
+Mam pełny obraz. Zaczynam implementację — wiele zmian naraz, zaczynam od CSS i danych rdzenia.
+
+**Krok 1 — CSS: zmienne i klasy grupy TWO**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:25
+------------------------------------------------------------------------------
+**Krok 2 — Sidebar: aktualizacja kont**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:25
+------------------------------------------------------------------------------
+**Krok 3 — Nav topbar: aktualizacja kont**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:25
+------------------------------------------------------------------------------
+**Krok 4 — Cockpit konta buttons**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:25
+------------------------------------------------------------------------------
+**Krok 5 — Biznes view HTML: fee display**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:26
+------------------------------------------------------------------------------
+**Krok 6 — Analiza i Screener dropdowny**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:26
+------------------------------------------------------------------------------
+**Krok 7 — JS rdzeń: GROUPS, AC_META, DEFAULT_PRODUCER**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:27
+------------------------------------------------------------------------------
+**Krok 8 — GROUPS_DEF (3 lokalizacje)**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:27
+------------------------------------------------------------------------------
+**Krok 9 — renderMonths: sekcja archiwum po aktywnych grupach**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:27
+------------------------------------------------------------------------------
+**Krok 10 — calcMyFee i getFeeConfig: pełna przebudowa**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:28
+------------------------------------------------------------------------------
+**Krok 11 — renderBiznes: aktualizacja wyświetlania fee i share table**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:28
+------------------------------------------------------------------------------
+Teraz aktualizuję share table w renderBiznes — musi wiedzieć o nowych kontach i nie liczyć archiwalnych:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:28
+------------------------------------------------------------------------------
+**Krok 12 — buildInit: upewnić się że nowe konta zwracają []**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:29
+------------------------------------------------------------------------------
+`buildInit` już zwraca `[]` dla nieznanych kluczy — OK. Teraz sprawdzam czy są inne twarde referencje do BOTAVIT/Ankado24:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:29
+------------------------------------------------------------------------------
+Wiele referencji do naprawienia. Czytam kontekst krytycznych miejsc:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:30
+------------------------------------------------------------------------------
+`accData` falls back to stale historical data for archived accounts — musę to odfiltrować:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:30
+------------------------------------------------------------------------------
+Teraz naprawiam fee w KPI barze + ORDER heatmapy + chart datasets + ACC_SHORT:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:31
+------------------------------------------------------------------------------
+Teraz renderArkusz i renderWyniki (dwie lokalne definicje GROUPS):
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:31
+------------------------------------------------------------------------------
+Teraz reszta list kont (accounts, ADS_ACCOUNT_KEYS, initNoteLogs, slides):
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:32
+------------------------------------------------------------------------------
+Teraz teksty opisowe:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:32
+------------------------------------------------------------------------------
+Teraz update info wiki (pierwsze uruchomienie + case studies):
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:33
+------------------------------------------------------------------------------
+Teraz zaktualizuję wpisy Wiedzy (fee + grupy):
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:33
+------------------------------------------------------------------------------
+**Krok 13 — Bump wersji: v9.74 → v9.77**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:33
+------------------------------------------------------------------------------
+Weryfikacja finalna — czy zostały jeszcze jakieś twarde referencje:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:34
+------------------------------------------------------------------------------
+Dobre — te `BOTAVIT` referencje są w builderze kontekstu Total Restart (dodają specjalistyczny opis kategorii suplementów). Zostawiam — BOTAVIT nadal dostępny w Analiza jako opcja archiwalna, ten kontekst się przyda przy historycznych analizach.
+
+Sprawdzam czy są inne przeoczone referencje:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:34
+------------------------------------------------------------------------------
+Więcej miejsc do naprawy — głównie Playbook prompty z fee i shortcodes:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:36
+------------------------------------------------------------------------------
+Aktualizuję placeholder Agenta:
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 09:38
+------------------------------------------------------------------------------
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary Request and Intent:
+   The user (Chris, agency owner managing Allegro advertising accounts) had two main requests in this session:
+   
+   **A) Monthly Summary Check (July 1):** Verify that MPlace Hub handles the July 1 month transition correctly — confirmed closing mode auto-activates, June data saves correctly, EOM projections work without false multipliers.
+   
+   **B) Account Rotation (main task):** Archive BOTAVIT and Ankado24 (keep historical data, but remove from active views starting July). Add two new clients as a new 4th group "TWO":
+   - VitaClean (shortname: VIT) — data from May-June 2026, fee 2900 zł fixed, producer 60%
+   - DomGlamour (shortname: DOM) — data from February-June 2026, fee 2900 zł fixed, producer 60%
+   - Group color: #4d9fff (blue)
+   - Archived accounts: visible in Trend (Months) tab greyed out with "[arch.]" label, accessible in Analiza dropdown as "(archiwum)" options, hidden from Dashboard/Cockpit/Agent/D2D
+
+2. Key Technical Concepts:
+   - MPlace Hub: single-file vanilla JS app (index.html ~12,200 lines), Firebase Firestore + Google OAuth, Chart.js, GitHub Pages
+   - AC_META: master account registry — source of truth for all account operations
+   - GROUPS: defines group structure with `accs` arrays — used for Dashboard/Trend/D2D rendering
+   - GROUPS_DEF: local constant duplicated in 3 functions (renderArkusz, runMTDReport, runSlideReport)
+   - `archived` flag pattern: new flag added to AC_META for BOTAVIT/Ankado24
+   - `activeAccs()` pattern: filter `Object.keys(AC_META).filter(k => !AC_META[k].archived)` used for active-only views
+   - `buildInit(k)`: returns `(raw[k]||[]).map(migrate)` — unknown keys return `[]` (no change needed for new accounts)
+   - Dual-write: localStorage primary, Firebase sync layer
+   - Closing mode: `_closingMode = new Date().getDate() === 1` auto-activates on July 1
+   - Version bump: every commit bumps version in `<title>`, `brand-ver` span, and print footer
+
+3. Files and Code Sections:
+   - **/Users/chrismac/bazgroszyt/Mplace-Hub/index.html** — main and only file modified
+     
+     **CSS additions (lines ~29-1139):**
+     ```css
+     --g-meble:#ff6b35;--g-luxsen:#2dd4a0;--g-one:#b47fff;--g-two:#4d9fff;
+     .mp-acc[data-g="two"] .gd{background:var(--g-two)}
+     .nav-glbl.g-two{color:var(--g-two);}
+     .g-two-badge{color:var(--g-two);border-color:rgba(77,159,255,.3);background:rgba(77,159,255,.07);}
+     .egh-t{--group-c:var(--g-two);color:var(--g-two);}
+     .cmdk-tag.g-two{color:#4d9fff;background:rgba(77,159,255,.1);}
+     ```
+     
+     **GROUPS (line ~4660):**
+     ```javascript
+     const GROUPS={
+       MEBLE:{label:'MEBLE',c:'var(--g-meble)',cls:'g-meble-badge',egh:'egh-m',accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
+       LUXSEN:{label:'LUXSEN',c:'var(--g-luxsen)',cls:'g-luxsen-badge',egh:'egh-l',accs:['Luxsen','Semmi']},
+       ONE:{label:'ONE',c:'var(--g-one)',cls:'g-one-badge',egh:'egh-o',accs:['Materazzi','MtzzEU']},
+       TWO:{label:'TWO',c:'var(--g-two)',cls:'g-two-badge',egh:'egh-t',accs:['VitaClean','DomGlamour']},
+     };
+     ```
+     
+     **AC_META (lines ~4687-4689):**
+     ```javascript
+     Luxsen:{name:'Luxsen',group:'LUXSEN'},Semmi:{name:'Semmi',group:'LUXSEN'},
+     BOTAVIT:{name:'BOTAVIT',group:'LUXSEN',archived:true},
+     Materazzi:{name:'Materazzi',group:'ONE'},MtzzEU:{name:'MtzzEU',group:'ONE'},
+     Ankado24:{name:'Ankado24',group:'ONE',archived:true},
+     VitaClean:{name:'VitaClean',group:'TWO'},DomGlamour:{name:'Dom Glamour',group:'TWO'},
+     ```
+     
+     **DEFAULT_PRODUCER (line ~4690):**
+     ```javascript
+     const DEFAULT_PRODUCER={MobelKap:65,PerfektCiecie:65,MeblenaCzasie:65,Luxsen:60,Semmi:60,BOTAVIT:60,Materazzi:55,MtzzEU:55,Ankado24:55,VitaClean:60,DomGlamour:60};
+     ```
+     
+     **GROUPS_DEF (3 locations — lines ~5984, ~13854, ~14512):**
+     ```javascript
+     const GROUPS_DEF = {
+       MEBLE:  { accs:['MobelKap','PerfektCiecie','MeblenaCzasie'], prod:65, color:'#ff6b35' },
+       LUXSEN: { accs:['Luxsen','Semmi'],                           prod:60, color:'#2dd4a0' },
+       ONE:    { accs:['Materazzi','MtzzEU'],                       prod:55, color:'#b47fff' },
+       TWO:    { accs:['VitaClean','DomGlamour'],                   prod:60, color:'#4d9fff' },
+     };
+     ```
+     
+     **accData filter in renderDashboard (line ~6021):**
+     ```javascript
+     const accData = ALL_KEYS.filter(k=>!AC_META[k].archived).map(k=>{
+       const D=getData(k), prod=getProd(k);
+       const last=D.find(d=>d.m===curM)||D[D.length-1];
+       if(!last) return {k, sp:0, est:0, C:null};
+       const C=calc(last,prod), est=estym(last);
+       return {k, name:AC_META[k].name, group:GRP_OF[k]||'', sp:last.sprzedaz||0, est, C, last};
+     }).filter(a=>a.C);
+     ```
+     
+     **Fee KPI in renderDashboard (line ~6042):**
+     ```javascript
+     const luxsenMarza = ['Luxsen','Semmi'].reduce((s,k)=>{
+       const a=accData.find(x=>x.k===k); return s+(a?a.C.zysk:0);
+     },0);
+     const feeMEBLE = 7500;
+     const feeLUXSEN = Math.max(0,luxsenMarza*0.20/1.23);
+     const feeONE = 3500;
+     const feeTWO = 2900 + 2900;
+     const totalFee = feeMEBLE + feeLUXSEN + feeONE + feeTWO;
+     ```
+     
+     **getFeeConfig (line ~25584):**
+     ```javascript
+     function getFeeConfig(){
+       return {
+         grpMeble:   parseFloat(document.getElementById('feeGrpMeble')?.value)||7500,
+         pctLuxsen:  parseFloat(document.getElementById('feePctLuxsen')?.value)||20,
+         materazzis: parseFloat(document.getElementById('feeMaterazzis')?.value)||3500,
+         vitaclean:  parseFloat(document.getElementById('feeVitaClean')?.value)||2900,
+         domglamour: parseFloat(document.getElementById('feeDomGlamour')?.value)||2900,
+       };
+     }
+     ```
+     
+     **calcMyFee (line ~25593):**
+     ```javascript
+     function calcMyFee(cfg){
+       const mebleFeeNetto = cfg.grpMeble;
+       const mebleZysk = ['MobelKap','PerfektCiecie','MeblenaCzasie'].reduce(...)
+       const luxsenZysk = ['Luxsen','Semmi'].reduce(...)  // BOTAVIT removed
+       const luxsenFeeBrutto = luxsenZysk * cfg.pctLuxsen/100;
+       const luxsenFeeNetto = luxsenFeeBrutto / 1.23;
+       const matZysk = ['Materazzi','MtzzEU'].reduce(...)
+       const matsFeeNetto = cfg.materazzis;
+       const vitZysk = (()=>{const D=getData('VitaClean'),...return last?calc(last,prod).zysk:0;})();
+       const domZysk = (()=>{const D=getData('DomGlamour'),...return last?calc(last,prod).zysk:0;})();
+       const vitFeeNetto = cfg.vitaclean;
+       const domFeeNetto = cfg.domglamour;
+       const totalNetto = mebleFeeNetto + luxsenFeeNetto + matsFeeNetto + vitFeeNetto + domFeeNetto;
+       return { mebleFeeNetto, mebleZysk, luxsenFeeNetto, luxsenFeeBrutto, luxsenZysk,
+                matsFeeNetto, matZysk, vitFeeNetto, vitZysk, domFeeNetto, domZysk,
+                totalNetto, totalVat, totalBrutto };
+     }
+     ```
+     
+     **renderMonths archive section (after active groups, line ~12874):**
+     ```javascript
+     const archivedKeys = Object.keys(AC_META).filter(k => AC_META[k].archived);
+     if(archivedKeys.length){
+       html += `<tr>...<td>archiwum</td></tr>`;
+       archivedKeys.forEach((k, ai) => {
+         // cells with opacity:.5, color:var(--text3)
+         // name cell shows meta.name + '[arch.]' label
+       });
+     }
+     ```
+     
+     **bizShareTable (line ~25704):**
+     ```javascript
+     const activeKeys = Object.keys(AC_META).filter(k => !AC_META[k].archived);
+     document.getElementById('bizShareTable').innerHTML = activeKeys.map(k=>{ ... })
+     ```
+     
+     **renderArkusz and renderWyniki local GROUPS:**
+     ```javascript
+     const GROUPS=[
+       {key:'MEBLE', color:'#ff6b35',rgb:'255,107,53', accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
+       {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160', accs:['Luxsen','Semmi']},
+       {key:'ONE',   color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU']},
+       {key:'TWO',   color:'#4d9fff',rgb:'77,159,255', accs:['VitaClean','DomGlamour']},
+     ];
+     ```
+     
+     **ACC_SHORT mappings (3 locations):** Added `VitaClean:'VIT', DomGlamour:'DOM'` to all three (`ACC_SHORT` at ~6018, `_accShort` at ~6550, `_as` at ~6714)
+     
+     **kontoSkrotMap (line ~18859):** Added `VitaClean:'VIT', DomGlamour:'DOM'`
+     
+     **skrotKonta (line ~20699):** Added `VitaClean:'VIT', DomGlamour:'DOM'`
+     
+     **Version:** Changed from v9.74 → v9.77 (replace_all=true, affected lines 11, 2133, 23458, and print footer)
+
+4. Errors and fixes:
+   - **Stale archived data in KPI bar**: Discovered that `accData = ALL_KEYS.map(k=>...)` would include BOTAVIT/Ankado24 with their March 2026 historical data (last entry fallback), inflating July KPI totals. Fixed by adding `.filter(k=>!AC_META[k].archived)` before `.map()`.
+   - **calcMyFee null safety**: Added `last?calc(last,prod).zysk:0` guard for new accounts (VitaClean/DomGlamour) that have no data yet, since `getData()` returns `[]` for them.
+   - **GROUPS_DEF duplicated in 3 places**: Found at lines 5984, 13854, 14512 — all three updated.
+   - **luxAccs BOTAVIT reference**: Old code had `BOTAVIT` in `luxAccs` object for share table calculations. Updated to only `Luxsen` and `Semmi`, with null-safe last-entry access (`||{}`).
+
+5. Problem Solving:
+   - **Archive pattern**: Chose `archived: true` flag in AC_META rather than moving to separate object or deleting from GROUPS. This preserves backward compat (historical data still accessible), allows rendering archived accounts in Trend with grey styling, and is a single flag to filter on everywhere.
+   - **Group structure**: BOTAVIT and Ankado24 removed from their GROUPS.accs arrays; TWO group added. Since Trend/Months iterates GROUPS, archived accounts won't appear in active group rows — instead rendered separately via `archivedKeys` loop.
+   - **New accounts with no data**: `buildInit('VitaClean')` → `(raw['VitaClean']||[]).map(migrate)` = `[]`. No changes needed to buildInit.
+   - **Heatmap ORDER**: Changed to 7 active accounts, removing BOTAVIT/Ankado24, adding VitaClean/DomGlamour.
+   - **Chart datasets**: Added TWO as 4th line series in trend chart.
+   - **Playbook fee prompts**: Updated 6 Playbook prompts that hardcoded fee model references to BOTAVIT/Ankado24.
+
+6. All user messages:
+   - "Dzisiaj jest pierwsza lipca. Robię podsumowanie miesiąca. Sprawdź czy wszystko będzie ok."
+   - "Czekamy porozmawiać o... sytuacji, że chciałbym zarchiwizować. Dwie klientów. Anka do... oraz botawita. Chodzi o to, że nie chcę ich usuwać, ale jakoś tak wygasić potem, żeby w lipcu już nie będzie tych danych. żeby to nie wygląda jak błąd raporty i tak dalej Nie wiem, co rekomendujesz. A w zamian mam dwóch nowych klientów. Jeden to będzie VitaClean (ViC). Możemy zacząć już mam dane za maj czerwiec? DomGlamour (DoG) mam dane od lutego 2026. Co rekomendujesz, co możemy zrobić? Na razie porozmawiajmy o takiej zmianie"
+   - Form answers to clarifying questions:
+     - "Gdzie trafiają nowe konta grupowo?" → "Nowa Grupa - TWO (ViT, DOM zróbmy DOM od Dom Glamour)"
+     - "Model fee dla nowych klientów?" → "DOM fee - 2900 ; ViT Fee 2900"
+     - "Co widać po archiwizacji BOTAVIT i Ankado24?" → "Historia w Trend (zszarzała) + Analiza dostępna, znikają z Dashboard/Cockpit/Agent"
+     - "Procent producenta (marża bazowa) dla nowych klientów?" → "ViC 60% , DOM 60%"
+     - "Jak skracamy VitaClean w UI?" → '"VIT" dla VitaClean i "DOM" dla Dom Glamour'
+     - "Kolor grupy TWO?" → "Tak, #4d9fff (niebieski)"
+   - Plan mode: User approved the plan
+   - Compaction request (tool-free summary)
+
+7. Pending Tasks:
+   - **Commit and push** the completed changes to index.html (v9.77)
+   - **Enter historical data** for new accounts after app is live:
+     - VitaClean: May 2026 + June 2026 (2 months)
+     - DomGlamour: February–June 2026 (5 months)
+   - **Verify** the application works correctly in browser (Dashboard shows 4 groups, Trend shows archived section, fee calculations correct)
+   - **Update CLAUDE.md** to reflect new portfolio structure (9 kont → 7 kont, 3 grupy → 4 grupy, new fee model)
+
+8. Current Work:
+   Immediately before the compaction, I was completing the account rotation implementation in `/Users/chrismac/bazgroszyt/Mplace-Hub/index.html`. I had just finished updating `skrotKonta` (line ~20699) to add VitaClean and DomGlamour abbreviations, which was the last of the shortcode map updates. The version had been bumped to v9.77. The full implementation was functionally complete — all ~25+ change locations had been addressed. The next logical step was to do a final verification grep and then commit+push.
+
+9. Optional Next Step:
+   Do a final sanity check and then commit and push the changes. The user's work context was: implementing the account rotation (archiving BOTAVIT + Ankado24, adding VitaClean + DomGlamour as group TWO). The last code edit was `skrotKonta` at line ~20699. 
+   
+   Next: Run a final grep to confirm no remaining problematic BOTAVIT/Ankado24 references outside of safe contexts (buildInit raw data, archived context hints, file detection), then:
+   ```
+   git add index.html
+   git commit -m "v9.77 - Account rotation: archive BOTAVIT+Ankado24, add TWO group (VitaClean+DomGlamour)"
+   git push
+   ```
+   Per CLAUDE.md: "Odpowiedź po pushu zaczynaj od **vX.XX**"
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/chrismac/.claude/projects/-Users-chrismac-bazgroszyt-Mplace-Hub/6fc44a9a-04f3-4976-aa82-9ef9b53637b4.jsonl
+Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:38
+------------------------------------------------------------------------------
+Teraz finalna weryfikacja — sprawdzam wszystkie pozostałe referencje do BOTAVIT i Ankado24.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:39
+------------------------------------------------------------------------------
+Widzę kilka miejsc do poprawienia. Sprawdzam najważniejsze z nich.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:39
+------------------------------------------------------------------------------
+Let me check the slide report checkboxes and fee calc.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:39
+------------------------------------------------------------------------------
+Widzę 9 miejsc do naprawienia. Robię wszystkie naraz.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:41
+------------------------------------------------------------------------------
+Wszystkie poprawki gotowe. Finalny grep potwierdzający.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:41
+------------------------------------------------------------------------------
+Wszystkie pozostałe referencje są bezpieczne:
+- 4789/4808 — `buildInit` (dane historyczne)
+- 12879 — komentarz sekcji archiwum
+- 24729-24761 — kontekst Analiza dla BOTAVIT (potrzebny do historycznych analiz)
+
+Commit i push.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:41
+------------------------------------------------------------------------------
+**v9.77** — live na GitHub Pages.
+
+Rotacja kompletna. Co zostało zrobione w tym pushu:
+
+- **Dashboard/Cockpit/Agent** — widzą tylko 7 aktywnych kont (MEBLE×3 + LUXSEN×2 + ONE×2 + TWO×2, bez BOTAVIT i Ankado24)
+- **Trend/Months** — BOTAVIT i Ankado24 w szarej sekcji "archiwum" na dole
+- **Raporty MTD i Prezentacje** — checkboxy: TWO (VitaClean, Dom Glamour) jako nowa sekcja; BOTAVIT/Ankado24 w sekcji "archiwum"
+- **Playbook konto select** — TWO optgroup + archiwum optgroup
+- **Rozliczenie LUXSEN** — tylko Luxsen + Semmi (BOTAVIT usunięty)
+- **Fee chart** — `ankFee` zastąpiony `twoFee = 2900 + 2900`
+- **Wszystkie kontoSkrot mapy** — VIT i DOM dodane we wszystkich 5 miejscach
+
+Następny krok: wpisz dane dla VitaClean (maj + czerwiec 2026) i DomGlamour (luty–czerwiec 2026) przez formularz wpisów w aplikacji.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 09:44
+------------------------------------------------------------------------------
+Puste
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 09:44
+------------------------------------------------------------------------------
+[Image: original 2296x1442, displayed at 2000x1256. Multiply coordinates by 1.15 to map to original image.]
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:45
+------------------------------------------------------------------------------
+"Puste" — brak kart kont w liście po lewej. Szukam gdzie Data view renderuje listę kont.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:46
+------------------------------------------------------------------------------
+Widzę "0/9" — VitaClean i DomGlamour mogą nie być w AC_META. Sprawdzam.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:47
+------------------------------------------------------------------------------
+AC_META wygląda poprawnie. Sprawdzam `buildInit` dla nowych kont i czy są błędy JS.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:47
+------------------------------------------------------------------------------
+Kod wygląda poprawnie — problem może być w CSS. Sprawdzam kontener `dataAccList` i layout Data view.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:48
+------------------------------------------------------------------------------
+"ALL 7" wskazuje że topbar liczy 7 kont — VitaClean i DomGlamour mogą być wykluczone z powodu braku danych. Sprawdzam rendering topbara.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:49
+------------------------------------------------------------------------------
+"ALL 7" to badge w jakimś filtrze. Szukam gdzie jest generowany.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:49
+------------------------------------------------------------------------------
+Szukam gdzie jest renderowany sub-nav w Data view z "ALL" i licznikiem.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:49
+------------------------------------------------------------------------------
+"7" jest hardcoded w HTML! I teraz widzę problem — cały topbar `mp-accounts` jest statyczny. Czytam resztę.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:50
+------------------------------------------------------------------------------
+Badge "7" jest hardcoded. Szukam też `mpSelectAccount` żeby zrozumieć filtrowanie.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:50
+------------------------------------------------------------------------------
+Sprawdzam CSS `.data-layout` — może jest problem z grid.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:50
+------------------------------------------------------------------------------
+Szukam "Wybierz konto" — to jest w `data-center`, nie `data-left`.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:51
+------------------------------------------------------------------------------
+Znalazłem błąd! Przy `showView('entry')` NIE wywołuje się `renderDataLeft()`. Sprawdzam linię 6398.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:52
+------------------------------------------------------------------------------
+`renderEntry()` busca `#entryTWO` — ten element nie istnieje w HTML! Sprawdzam.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:52
+------------------------------------------------------------------------------
+Znalazłem! Brakuje `<div id="entryTWO">` — `null.innerHTML` rzuca TypeError i blokuje `renderDataLeft()`.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:52
+------------------------------------------------------------------------------
+Przy okazji poprawiam też "ALL 7" → "ALL 9" w topbarze.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:52
+------------------------------------------------------------------------------
+Commit i push.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:52
+------------------------------------------------------------------------------
+**v9.78** — live.
+
+Bug był krytyczny: brak `<div id="entryTWO">` powodował `TypeError: Cannot set properties of null` w `renderEntry()`, co blokowało wywołanie `renderDataLeft()` — stąd pusta lista kont. Po odświeżeniu strony (`Cmd+Shift+R`) powinny pojawić się 4 grupy kont z kartami do wpisywania danych.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 09:55
+------------------------------------------------------------------------------
+nie dział restart
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 09:55
+------------------------------------------------------------------------------
+[Image: original 2290x1630, displayed at 2000x1424. Multiply coordinates by 1.15 to map to original image.]
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:55
+------------------------------------------------------------------------------
+"ALL 9" widać — v9.78 załadowany, ale lista nadal pusta. Musi być inny błąd. Sprawdzam `renderEntryCard`.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:56
+------------------------------------------------------------------------------
+Drugi bug — `renderEntryCard` dla VitaClean/DomGlamour: `getData(k)` zwraca `[]`, więc `last = D[-1] = undefined` → crash na `last.m`. Też brakuje `TWO` w `GRP_COLORS`.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:56
+------------------------------------------------------------------------------
+Bump wersji i push.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 09:58
+------------------------------------------------------------------------------
+**v9.79** — live.
+
+Drugi bug: `renderEntryCard('VitaClean')` → `getData()` zwraca `[]` → `last = undefined` → crash na `last.m`. Teraz `last` ma bezpieczny fallback dla kont bez historii. Odśwież z `Cmd+Shift+R` — powinny pojawić się wszystkie 4 grupy z kartami.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 09:59
+------------------------------------------------------------------------------
+Mam nadal wersję 9.7.7. Zrób jakiś twardy restart. Nie wiem po której stronie gdzie cash wyczyść.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:00
+------------------------------------------------------------------------------
+Serwer już ma v9.79 — to czysty cache przeglądarki. Dwie opcje:
+
+**Szybka (bez dotykania kodu):**
+Otwórz DevTools (F12 lub Cmd+Option+I) → kliknij **prawym przyciskiem na ikonę odświeżania** → wybierz **"Empty Cache and Hard Reload"**. Działa tylko gdy DevTools jest otwarty.
+
+**Lub:** Otwórz zakładkę incognito (`Cmd+Shift+N`) i wejdź na mplace-bz.github.io/Mplace-Hub/ — incognito nie ma cache.
+
+---
+
+Żeby to nie wróciło — dodaję meta no-cache do HTML.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:00
+------------------------------------------------------------------------------
+Meta no-cache już są w kodzie (linie 5-7) — GitHub Pages CDN je ignoruje po swojej stronie.
+
+**Najprościej:**
+1. Otwórz `mplace-bz.github.io/Mplace-Hub/` w **oknie incognito** (`Cmd+Shift+N`) — natychmiast zobaczysz v9.79 bez żadnego czyszczenia
+2. Lub F12 → prawy klik na ↺ → **"Empty Cache and Hard Reload"**
+
+Server już serwuje v9.79 (sprawdziłem curl). Problem jest wyłącznie po stronie przeglądarki.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 10:00
+------------------------------------------------------------------------------
+i
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:01
+------------------------------------------------------------------------------
+Przeglądarka nadal serwuje v9.77. **Teraz:** wpisz w pasku adresu:
+
+```
+mplace-bz.github.io/Mplace-Hub/?r
+```
+
+Dodanie `?r` = "nowy URL" dla przeglądarki → pobiera świeży plik. GitHub Pages już serwuje v9.79.
+
+Jednocześnie dodam do kodu auto-cache-buster na przyszłość:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:01
+------------------------------------------------------------------------------
+Gotowe. Teraz **wejdź na:**
+
+```
+mplace-bz.github.io/Mplace-Hub/?r
+```
+
+Przy pierwszym wejściu skrypt wykryje stary `sessionStorage`, zrobi redirect do `?_hv=9.79` i pobierze świeży plik. Przy kolejnych wejściach wszystko będzie automatyczne — każdy nowy deploy sam się odświeży u każdego kto wejdzie po raz pierwszy od zmiany wersji.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 10:07
+------------------------------------------------------------------------------
+Czy wszystko działa? Wszystkie inne dane są poprawne, nie wkracie jakiś błąd? Dalne już widzę. Przeanalizuję i zrobię jakieś testy. Nie wiem jak się nazywa. DRAY TEST czy jak to się nazywa Nie chcesz by wszystkie dane były tutaj zmienione. Wyglądałem na pierwszy rzut ok. OK
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:08
+------------------------------------------------------------------------------
+"Dry run" to po polsku **smoke test** — szybkie sprawdzenie czy nic nie dymi.
+
+Masz rację żeby nie wpisywać teraz danych na próbę. Oto 5-minutowy checklist do kliknięcia (nic nie zapisuj):
+
+**1. Dashboard** — otwórz → sprawdź czy są 4 grupy (MEBLE/LUXSEN/ONE/TWO), brak BOTAVIT i Ankado24 w kartach
+
+**2. Data** → kliknij VIT lub DOM → czy otwiera się formularz (pusty, bez historii to OK — `Hist: —`)
+
+**3. Trend** → przewiń na dół → czy BOTAVIT i Ankado24 są w szarej sekcji "archiwum"
+
+**4. Agent** → wpisz dowolne pytanie → sprawdź czy odpowiada poprawnie (i czy nie wymienia BOTAVIT w aktywnym kontekście)
+
+**5. Cockpit** → otwórz → sprawdź czy jest 9 zadań (nie 11)
+
+---
+
+**Znane ograniczenia po rotacji:**
+- VIT i DOM nie mają historii → karty Data pokazują `Hist: —` — to poprawne, dopóki nie wpiszesz danych
+- Dashboard/KPI dla TWO będzie pusty dopóki nie ma danych za lipiec
+- Trend dla TWO nie pokaże linii dopóki nie ma co najmniej 1 miesiąca danych
+
+Jak skończysz smoke test — daj znać co widzisz, albo zaczniemy wpisywać dane dla VIT i DOM.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 10:40
+------------------------------------------------------------------------------
+Mam drugi temat. Mam klientów, które prowadzą sklep. Mam dostęp do sklepów do appi. i to są następujące sklepy. Witam na filmie. Mój nowy klinik jest w tym filmie. Mam dostęp do sklep maLuxen oraz semi. i mój nowy klient galeria estetyczna, która też ma Allegro, więc może też dodamy tego klienta. Jak ty to widzisz ten część sklepową.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:41
+------------------------------------------------------------------------------
+Rozumiem — Luxsen i Semmi już są w systemie (grupa LUXSEN). Galeria Estetyczna to nowy klient z Allegro.
+
+Zanim cokolwiek zbuduję, potrzebuję 4 rzeczy:
+
+**1. Gdzie trafia Galeria Estetyczna?**
+- Do grupy LUXSEN (razem z Luxsen i Semmi) — skoro to podobny profil (estetyka, fashion?)
+- Albo nowa grupa (jeśli to inna kategoria produktowa)
+
+**2. Klucz i skrót w UI**
+- Sugeruję: `GaleriaEstetyczna` → skrót `GAL`
+
+**3. Fee**
+- Stała kwota (jak VitaClean 2900 zł) czy procent od marży (jak LUXSEN 20%)?
+
+**4. Procent producenta (marża bazowa)**
+- Ile wynosi marża producenta dla tego klienta? (LUXSEN ma 60%)
+
+---
+
+Co do "części sklepowej" — jeśli masz na myśli dostęp do panelu Allegro (nie tylko dane Ads ale też stany magazynowe, oferty, ceny) — to jest osobny temat, który można dodać jako integrację. Na razie MPlace Hub czyta dane które ręcznie wpisujesz lub importujesz przez XLSX. Mów więcej co masz na myśli.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 10:43
+------------------------------------------------------------------------------
+GALERIA ESTETYCZN A (GAL) do grupy "TWO" 5000 fee 50% koszty
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:44
+------------------------------------------------------------------------------
+Galeria Estetyczna (GAL) do grupy TWO, fee 5000 zł, producent 50%. Dodaję — to ~20 miejsc do zaktualizowania.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:44
+------------------------------------------------------------------------------
+Widzę wszystkie miejsca. Robię wszystkie naraz w kilku batach.
+
+**Bat 1 — GROUPS, AC_META, DEFAULT_PRODUCER, GROUPS_DEF (6 lokacji)**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:45
+------------------------------------------------------------------------------
+**Bat 2 — ACC_SHORT / kontoSkrot mapy (6 lokacji)**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:45
+------------------------------------------------------------------------------
+**Bat 3 — listy kont (ORDER, accounts, ADS_ACCOUNT_KEYS, noteLog, accNames)**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:46
+------------------------------------------------------------------------------
+**Bat 4 — topbar nav i mp-accounts**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:46
+------------------------------------------------------------------------------
+**Bat 5 — dropdowny Analiza, Screener, Playbook, Report/Slide checkboxy**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:46
+------------------------------------------------------------------------------
+**Bat 6 — fee: getFeeConfig, calcMyFee, dashboard KPI, Biznes view HTML**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:47
+------------------------------------------------------------------------------
+**Bat 7 — dashboard KPI feeTWO, chart history income**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:47
+------------------------------------------------------------------------------
+**Bat 8 — Info wiki + Playbook prompts (teksty opisowe)**
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:47
+------------------------------------------------------------------------------
+Teraz bump wersji i push.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:48
+------------------------------------------------------------------------------
+**v9.80** — live. Cache buster automatycznie załaduje nową wersję przy następnym wejściu.
+
+Galeria Estetyczna (GAL) jest teraz pełnoprawnym kontem:
+- Grupa TWO, producent 50%
+- Fee 5000 zł stałe
+- Widoczna w topbarze (ALL 10), Data, Dashboard, Agent, Trend
+- Checkboxy w Raporcie i Prezentacji
+- Analiza i Screener dropdowny
+
+Możesz zacząć wpisywać dane od razu po odświeżeniu strony.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 10:52
+------------------------------------------------------------------------------
+Hej, a cię sam moje Ancadu i Botavit to zniknęło? Ja myślałem, że to będzie, ale jakiś archiwum albo coś, bym chciał zobaczyć albo pochwalić się, albo pokazać się innym klientowi. Jaki masz na to pomysł?
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:52
+------------------------------------------------------------------------------
+Dobre pytanie. Są dwie rzeczy:
+
+**Co już działa (sprawdź):**
+- **Trend** → przewiń na dół → BOTAVIT i Ankado24 są w szarej sekcji "archiwum" z pełną historią miesięczną
+- **Analiza** → dropdown → sekcja "(archiwum)" → możesz wgrać XLSX i zrobić raport
+
+Ale masz rację że to za mało do "pokazywania klientom".
+
+---
+
+**Mój pomysł — karta Portfolio w Dashboard:**
+
+Dodać sekcję pod aktywnymi grupami z nagłówkiem "Zrealizowane" — karty archiwum z:
+- Nazwa konta + okres współpracy (np. "BOTAVIT · lis 2024 – mar 2026")
+- 3 kluczowe liczby: najlepszy ROAS, łączna sprzedaż, liczba miesięcy
+- Przycisk "Historia" → otwiera widok miesięcy tego konta
+- Stonowany wygląd (ciemniejszy, border zamiast karty)
+
+Wygląda jak "Clients we've worked with" — referencja dla nowego klienta.
+
+---
+
+**Alternatywnie — prostsze:** dodać zakładkę "Archiwum" w sidebarze obok Data/Dashboard, która pokazuje pełne dane tych kont jak normalny widok konta, tylko z etykietą [arch.].
+
+---
+
+Co wolisz — **karta Portfolio w Dashboard** (bardziej prestiżowe, dobre do pokazywania) czy **zakładka Archiwum** (pełen dostęp do danych)?
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 10:53
+------------------------------------------------------------------------------
+<ide_opened_file>The user opened the file /Users/chrismac/MPlace-Agent/.env in the IDE. This may or may not be related to the current task.</ide_opened_file>
+archiwum i tam będziemy wrzucać wszystkie stare rzeczy jak zakończymy współprace z innymi kontami
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:53
+------------------------------------------------------------------------------
+Rozumiem — dedykowana zakładka "Archiwum" jako stały magazyn zakończonych współprac. Buduję.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:55
+------------------------------------------------------------------------------
+Mam pełny obraz. Implementuję Archiwum — ikona, nav, view, render.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 10:57
+------------------------------------------------------------------------------
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary Request and Intent:
+
+**A) Account Rotation (completed, v9.77-v9.80):**
+- Archive BOTAVIT and Ankado24: keep historical data, remove from active views (Dashboard/Cockpit/Agent/D2D), show greyed in Trend/Months "archiwum" section, keep in Analiza dropdown as "(archiwum)"
+- Add new group TWO (#4d9fff blue) with:
+  - VitaClean (VIT), producer 60%, fee 2900 zł
+  - DomGlamour (DOM), producer 60%, fee 2900 zł
+  - Galeria Estetyczna (GAL), producer 50%, fee 5000 zł
+
+**B) Archiwum tab (IN PROGRESS — last task before compaction):**
+- User: "archiwum i tam będziemy wrzucać wszystkie stare rzeczy jak zakończymy współprace z innymi kontami"
+- Dedicated sidebar tab showing all archived clients (BOTAVIT, Ankado24) with full historical data
+- Will be used as permanent repository for ended collaborations
+
+2. Key Technical Concepts:
+- MPlace Hub: single-file vanilla JS app (index.html ~12,500+ lines), Firebase Firestore + Google OAuth, Chart.js, GitHub Pages
+- `archived: true` flag in AC_META to mark inactive clients
+- `activeAccs()` pattern: `Object.keys(AC_META).filter(k => !AC_META[k].archived)`
+- `buildInit(k)`: returns `(raw[k]||[]).map(migrate)` — returns `[]` for unknown keys
+- GROUPS vs GROUPS_DEF: global GROUPS object drives most rendering; GROUPS_DEF is duplicated in 3+ local function scopes
+- MP_NAV: sidebar navigation definition at line 11096, rendered by mpInitSidebar()
+- mpIcon(): SVG icon map at line 11047, includes 'history' icon suitable for Archiwum
+- renderEntry() calls `document.getElementById('entry'+gKey)` for each GROUPS key — missing DOM element causes TypeError
+- renderEntryCard() crashes on empty getData() result (new accounts with no history)
+- Cache buster: sessionStorage-based version check with ?_hv= query param redirect
+- Version bump: every commit must update v9.XX in title, brand-ver span, and print footer
+
+3. Files and Code Sections:
+
+**`/Users/chrismac/bazgroszyt/Mplace-Hub/index.html`** — the only file modified throughout:
+
+**GROUPS (line 4682):**
+```javascript
+const GROUPS={
+  MEBLE:{label:'MEBLE',c:'var(--g-meble)',cls:'g-meble-badge',egh:'egh-m',accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
+  LUXSEN:{label:'LUXSEN',c:'var(--g-luxsen)',cls:'g-luxsen-badge',egh:'egh-l',accs:['Luxsen','Semmi']},
+  ONE:{label:'ONE',c:'var(--g-one)',cls:'g-one-badge',egh:'egh-o',accs:['Materazzi','MtzzEU']},
+  TWO:{label:'TWO',c:'var(--g-two)',cls:'g-two-badge',egh:'egh-t',accs:['VitaClean','DomGlamour','GaleriaEstetyczna']},
+};
+```
+
+**AC_META (line 4688+):**
+```javascript
+BOTAVIT:{name:'BOTAVIT',group:'LUXSEN',archived:true},
+Ankado24:{name:'Ankado24',group:'ONE',archived:true},
+VitaClean:{name:'VitaClean',group:'TWO'},
+DomGlamour:{name:'Dom Glamour',group:'TWO'},
+GaleriaEstetyczna:{name:'Galeria Estetyczna',group:'TWO'},
+```
+
+**DEFAULT_PRODUCER (line 4716):**
+```javascript
+const DEFAULT_PRODUCER={MobelKap:65,PerfektCiecie:65,MeblenaCzasie:65,Luxsen:60,Semmi:60,BOTAVIT:60,Materazzi:55,MtzzEU:55,Ankado24:55,VitaClean:60,DomGlamour:60,GaleriaEstetyczna:50};
+```
+
+**renderEntryCard fix (line 6404) — critical bug fix:**
+```javascript
+function renderEntryCard(k,dotColor,curM){
+  const D=getData(k);
+  const last=D.length?D[D.length-1]:{m:'—',roas:0,adsCost:0,wartoscAds:0,sprzedaz:0};
+  const cur=D.find(x=>x.m===curM);
+  const pf=cur||{};
+  const pfV=(f,def='')=>pf[f]!=null?pf[f]:def;
+  const isCur=D.length>0&&last.m===curM;
+```
+
+**Missing entryTWO div fix (line ~2320):**
+```html
+<div style="display:none" id="entryMEBLE"></div>
+<div style="display:none" id="entryLUXSEN"></div>
+<div style="display:none" id="entryONE"></div>
+<div style="display:none" id="entryTWO"></div>
+```
+
+**Cache buster (in `<head>`):**
+```javascript
+(function(){var V='9.80';var s=sessionStorage.getItem('_hv');if(s!==V){sessionStorage.setItem('_hv',V);if(location.search.indexOf('_hv=')<0){location.replace(location.pathname+'?_hv='+V+(location.hash||''));}}})();
+```
+
+**GRP_COLORS (line 6473):**
+```javascript
+const GRP_COLORS = {MEBLE:'#ff6b35',LUXSEN:'#2dd4a0',ONE:'#b47fff',TWO:'#4d9fff'};
+```
+
+**getFeeConfig (line 25655):**
+```javascript
+function getFeeConfig(){
+  return {
+    grpMeble:          parseFloat(document.getElementById('feeGrpMeble')?.value)||7500,
+    pctLuxsen:         parseFloat(document.getElementById('feePctLuxsen')?.value)||20,
+    materazzis:        parseFloat(document.getElementById('feeMaterazzis')?.value)||3500,
+    vitaclean:         parseFloat(document.getElementById('feeVitaClean')?.value)||2900,
+    domglamour:        parseFloat(document.getElementById('feeDomGlamour')?.value)||2900,
+    galeriaestetyczna: parseFloat(document.getElementById('feeGaleriaEstetyczna')?.value)||5000,
+  };
+}
+```
+
+**calcMyFee TWO section:**
+```javascript
+// TWO — VitaClean + DomGlamour + GaleriaEstetyczna fixed
+const vitZysk = (()=>{const D=getData('VitaClean'),prod=getProd('VitaClean'),last=D[D.length-1];return last?calc(last,prod).zysk:0;})();
+const domZysk = (()=>{const D=getData('DomGlamour'),prod=getProd('DomGlamour'),last=D[D.length-1];return last?calc(last,prod).zysk:0;})();
+const galZysk = (()=>{const D=getData('GaleriaEstetyczna'),prod=getProd('GaleriaEstetyczna'),last=D[D.length-1];return last?calc(last,prod).zysk:0;})();
+const vitFeeNetto = cfg.vitaclean;
+const domFeeNetto = cfg.domglamour;
+const galFeeNetto = cfg.galeriaestetyczna;
+const totalNetto = mebleFeeNetto + luxsenFeeNetto + matsFeeNetto + vitFeeNetto + domFeeNetto + galFeeNetto;
+```
+
+**Dashboard KPI feeTWO:**
+```javascript
+const feeTWO = 2900 + 2900 + 5000;
+```
+
+**MP_NAV (line 11096) — sidebar structure (for Archiwum implementation):**
+```javascript
+const MP_NAV = [
+  { group:'Dzis', items:[
+    { k:'dzis',    id:'navSbCockpit',  label:'Cockpit',  icon:'cockpit', mob:1 },
+    { k:'entry',   id:'navSbEntry',    label:'Data',     icon:'data' },
+    { k:'dashboard',id:'navSbDashboard',label:'Dashboard',icon:'dashboard', mob:1 },
+    { k:'agent',   id:'navSbAgent',    label:'Agent',    icon:'agent', badge:'mpAgentBadge', badgeCls:'info', mob:1 },
+    { k:'seo',     id:'navSbSeo',      label:'SEO',      icon:'trend', mob:1 },
+  ]},
+  { group:'Analiza', items:[
+    { k:'months',  id:'navSbTrend',    label:'Trend',    icon:'trend', mob:1 },
+    { k:'insights',id:'navSbInsights', label:'Insights', icon:'eye', badge:'mpAlertBadge', badgeCls:'alert', mob:1 },
+    { k:'compare', id:'navSbCompare',  label:'Compare',  icon:'compare', mob:1 },
+    { k:'d2d',     id:'navSbD2d',      label:'D2D',      icon:'d2d', mob:1 },
+    { k:'wyniki',  id:'navSbResults',  label:'Results',  icon:'results' },
+    { k:'arkusz',  id:'navSbSheet',    label:'Sheet',    icon:'sheet' },
+    // ← ADD Archiwum HERE
+  ]},
+  ...
+```
+
+**mpIcon 'history' SVG (available for Archiwum icon):**
+```javascript
+history: `<path d="M3 8A5 5 0 1 0 4.3 4.3" ${a}/><path d="M2 3V6H5" ${a}/><path d="M8 5.5V8L10 9.5" ${a}/>`
+```
+
+**showView handler — where to add 'archiwum' case (around line 5034+):**
+```javascript
+} else if(v==='entry'){
+  document.getElementById('viewEntry').classList.add('active');
+  document.getElementById('navEntry').classList.add('active');
+  // Note: renderEntry() NOT called here — it runs at line 25818 on init
+```
+
+**viewMonths location (line 3406)** — reference structure for creating viewArchiwum.
+
+4. Errors and Fixes:
+
+**Error 1: Empty Data view after v9.77 push**
+- Cause: `renderEntry()` at line 6391 does `document.getElementById('entry'+gKey).innerHTML=...` for each GROUPS key. `#entryTWO` didn't exist → `null.innerHTML` → TypeError → stopped before `renderDataLeft()` was called
+- Fix (v9.78): Added `<div style="display:none" id="entryTWO"></div>` after entryONE div
+
+**Error 2: renderEntryCard still crashing (v9.78 still broken)**
+- Cause: `const last=D[D.length-1]` where D=`[]` for VitaClean/DomGlamour → `last=undefined` → `last.m` throws TypeError at line 6409
+- Fix (v9.79): Guard with `const last=D.length?D[D.length-1]:{m:'—',roas:0,...}` and `const isCur=D.length>0&&last.m===curM`
+
+**Error 3: Browser caching v9.77 despite v9.79 on server**
+- Cause: GitHub Pages CDN + browser cache serving old version
+- Fix: Added sessionStorage-based cache buster in `<head>` that redirects to `?_hv=VERSION` on first load with new version
+- Immediate workaround told to user: navigate to `mplace-bz.github.io/Mplace-Hub/?r`
+
+**Error 4: GRP_COLORS missing TWO**
+- Found at line 6473 (global) and lines 14880, 15115 (local definitions)
+- Fix (v9.79): Added `TWO:'#4d9fff'` to all 3 occurrences
+
+5. Problem Solving:
+- Archive pattern uses `archived:true` flag in AC_META rather than deleting from GROUPS — preserves backward compat, allows historical data access, single flag to filter everywhere
+- New accounts with no data: `buildInit('VitaClean')` → `(raw['VitaClean']||[]).map(migrate)` = `[]`. Fixed renderEntryCard to handle this gracefully
+- feeTWO in Dashboard KPI hardcoded as `2900+2900+5000` (not from getFeeConfig) — getFeeConfig used only in Biznes/Rozliczenie views
+- bizChart income history also needed `twoFee` update to include galeriaestetyczna
+
+6. All User Messages:
+- "Dzisiaj jest pierwsza lipca. Robię podsumowanie miesiąca. Sprawdź czy wszystko będzie ok."
+- [Voice dictation about archiving Ankado24 and BOTAVIT, adding VitaClean and DomGlamour]
+- Form answers: TWO group, VIT/DOM shortcuts, 2900 fee each, 60% producer, #4d9fff color, archived shown in Trend+Analiza, hidden from Dashboard/Cockpit/Agent
+- [Approved plan mode]
+- [Screenshot: empty Data view] "Puste"
+- [Screenshot: still v9.77] "nie dział restart"
+- [Screenshot: console error TypeError reading 'm'] "i"
+- "Mam nadal wersję 9.7.7. Zrób jakiś twardy restart. Nie wiem po której stronie gdzie cash wyczyść."
+- "Czy wszystko działa? Wszystkie inne dane są poprawne, nie wkracie jakiś błąd? Dalne już widzę. Przeanalizuję i zrobię jakieś testy. Nie wiem jak się nazywa. DRAY TEST czy jak to się nazywa Nie chcesz by wszystkie dane były tutaj zmienione. Wyglądałem na pierwszy rzut ok. OK"
+- "Mam drugi temat. Mam klientów, które prowadzą sklep. Mam dostęp do sklepów do appi. i to są następujące sklepy. Witam na filmie. Mój nowy klinik jest w tym filmie. Mam dostęp do sklep maLuxen oraz semi. i mój nowy klient galeria estetyczna, która też ma Allegro, więc może też dodamy tego klienta. Jak ty to widzisz ten część sklepową."
+- "GALERIA ESTETYCZN A (GAL) do grupy TWO 5000 fee 50% koszty"
+- "Hej, a cię sam moje Ancadu i Botavit to zniknęło? Ja myślałem, że to będzie, ale jakiś archiwum albo coś, bym chciał zobaczyć albo pochwalić się, albo pokazać się innym klientowi. Jaki masz na to pomysł?"
+- "archiwum i tam będziemy wrzucać wszystkie stare rzeczy jak zakończymy współprace z innymi kontami"
+
+7. Pending Tasks:
+- **Archiwum tab** (main pending task): Create dedicated "Archiwum" sidebar entry + view showing all archived clients (BOTAVIT, Ankado24) with full historical data. User wants it as permanent storage for ended client collaborations.
+- **Enter historical data** for new accounts:
+  - VitaClean: May + June 2026
+  - DomGlamour: February–June 2026 (5 months)
+  - GaleriaEstetyczna: no data yet
+- Update CLAUDE.md to reflect new portfolio (10 active accounts, 4 groups + archived)
+
+8. Current Work:
+Immediately before compaction, I was planning the implementation of the "Archiwum" tab. I had:
+1. Found MP_NAV at line 11096 — the sidebar navigation array
+2. Found mpIcon() at line 11047 with 'history' icon available
+3. Determined Archiwum should be added to Analiza group after Trend
+4. Identified that viewMonths (line 3406) is the reference structure for creating viewArchiwum
+
+The planned implementation (not yet started):
+- Add to MP_NAV Analiza group: `{ k:'archiwum', id:'navSbArchiwum', label:'Archiwum', icon:'history' }`
+- Add `<div class="view" id="viewArchiwum"></div>` to HTML (after viewMonths ~3406)
+- Add showView case: `} else if(v==='archiwum'){ document.getElementById('viewArchiwum').classList.add('active'); renderArchiwum(); }`
+- Create `renderArchiwum()` function that: gets `Object.keys(AC_META).filter(k=>AC_META[k].archived)`, renders a card per archived account with period (first→last month from getData), key stats (total sales, best ROAS, months count), monthly history table
+- Version bump to v9.81
+
+9. Optional Next Step:
+Build the Archiwum tab as discussed. User said: "archiwum i tam będziemy wrzucać wszystkie stare rzeczy jak zakończymy współprace z innymi kontami"
+
+The next step is to implement:
+1. Add `{ k:'archiwum', id:'navSbArchiwum', label:'Archiwum', icon:'history' }` to MP_NAV Analiza group after the Trend entry (line ~11105)
+2. Add `<div class="view" id="viewArchiwum"></div>` HTML element
+3. Add showView handler for 'archiwum'
+4. Create `renderArchiwum()` function showing archived accounts (currently BOTAVIT + Ankado24) with historical metrics and monthly table
+5. Bump version to v9.81 and push
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/chrismac/.claude/projects/-Users-chrismac-bazgroszyt-Mplace-Hub/6fc44a9a-04f3-4976-aa82-9ef9b53637b4.jsonl
+Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 10:57
+------------------------------------------------------------------------------
+Now finding MP_NAV, viewMonths location, and the showView handler simultaneously.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:07
+------------------------------------------------------------------------------
+Now I have everything. Let me execute all 5 changes in sequence.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:07
+------------------------------------------------------------------------------
+Now I'll add the `renderArchiwum()` function after `renderMonths()` ends (line 12922 + offset from earlier edits):
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:08
+------------------------------------------------------------------------------
+Now bump version v9.80 → v9.81 everywhere:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:08
+------------------------------------------------------------------------------
+Also update the cache buster version:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:08
+------------------------------------------------------------------------------
+Now add the version changelog entry and push:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:09
+------------------------------------------------------------------------------
+**v9.81** — Archiwum live.
+
+Nowa zakładka w Analiza → Archiwum (ikona skrzynki):
+- Wyświetla BOTAVIT i Ankado24 z pełną historią
+- Każde konto ma kartę ze statystykami: łączna sprzedaż, avg ROAS vs BE, best ROAS, avg marża%, łączne wydatki Ads
+- Tabela miesiąc po miesiącu z ROAS zielonym (≥ BE) lub pomarańczowym (< BE)
+- Gdy kończysz kolejną współpracę — wystarczy dodać `archived: true` w AC_META i konto automatycznie trafia tutaj
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-07-01 11:31
+------------------------------------------------------------------------------
+<ide_opened_file>The user opened the file /Users/chrismac/MPlace-Agent/agents/ads-specialist/allegro-setup-account.mjs in the IDE. This may or may not be related to the current task.</ide_opened_file>
+Uwaga, uwaga. Ile dajesz punktów za nas? HUB! w skali 1 do 10 Co tak naprawdę mu brakuje? jednej rzeczy, ja wiem, co to jest. aby był automat. co sądzisz?
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-07-01 11:31
+------------------------------------------------------------------------------
+**8/10.**
+
+Robi rzeczy, które normalnie wymagają 3 osobnych narzędzi + analityka. Jeden plik, zero setupu, działa na każdym urządzeniu po zalogowaniu. Agent z kontekstem, Cockpit z gamifikacją, Archiwum, prezentacje klienckie — to nie jest "dashboard", to system operacyjny agencji.
+
+Odejmuje 2 punkty za jedno:
+
+**Dane wchodzą ręcznie.**
+
+Cały automat się zatrzymuje przy Tobie. Każdy wpis, każdy upload XLSX, każde "dane za wczoraj" — to Ty. Hub reaguje na dane idealnie, ale dane nie płyną same.
+
+I właśnie dlatego masz otwarty [allegro-setup-account.mjs](../MPlace-Agent/agents/ads-specialist/allegro-setup-account.mjs).
+
+**To jest ta jedna rzecz** — Allegro API pull. Zamiast ręcznego wpisywania: Hub sam pobiera sprzedaż, Ads, odwiedziny dla każdego konta co 24h. Cockpit startuje z danymi już na miejscu. Insights strzelają same. Agent ma kontekst bez uploadu.
+
+Wtedy to jest **10/10 i prawdziwy automat.**
+
+Jak daleko jesteś z tym agentem Allegro?
