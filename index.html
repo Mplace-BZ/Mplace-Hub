@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.92</title>
+<title>MPlace Hub v9.93</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" integrity="sha384-en/ztfPSRkGfME4KIm05joYXynqzUgbsG5nMrj/xEFAHXkeZfO3yMK8QQ+mP7p1/" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -2136,7 +2136,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.92</span>
+    <span class="brand-ver">v9.93</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5334,7 +5334,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
-    {name:'v9.92 — Batch Ads OCR: wklej screeny wszystkich kont naraz (zakładka Data)', desc:'Nowa sekcja nad formularzem Data: grid slotów per aktywne konto (10), Ctrl+V screen Panelu Ads w każdy slot, jeden przycisk ODCZYTAJ WSZYSTKIE I ZAPISZ. Vision (claude-sonnet-4-6, 1 obraz = 1 call, współbieżność 2) czyta Koszt/ROAS/Wartość sprzedaży, zapis do wierszy bieżącego miesiąca wg polityki ads-inbox (roas/wartoscAds ze screena, adsCost=max), potem saveAllWithSync (Firestore+D2D). Błędny screen = badge na slocie + retry tylko błędnych; częściowy batch OK. Link "batch (wszystkie naraz)" w banerze Autopilota. Stary OCR per konto bez zmian. (10.07.2026)'},
+    {name:'v9.93 — Batch Ads OCR: wklej screeny wszystkich kont naraz (zakładka Data)', desc:'Nowa sekcja nad formularzem Data: grid slotów per aktywne konto (10), Ctrl+V screen Panelu Ads w każdy slot, jeden przycisk ODCZYTAJ WSZYSTKIE I ZAPISZ. Vision (claude-sonnet-4-6, 1 obraz = 1 call, współbieżność 2) czyta Koszt/ROAS/Wartość sprzedaży, zapis do wierszy bieżącego miesiąca wg polityki ads-inbox (roas/wartoscAds ze screena, adsCost=max), potem saveAllWithSync (Firestore+D2D). Błędny screen = badge na slocie + retry tylko błędnych; częściowy batch OK. Link "batch (wszystkie naraz)" w banerze Autopilota. Stary OCR per konto bez zmian. (10.07.2026)'},
     {name:'v9.89 — Security Runda 2: esc() na danych z XLSX i err.message (25 miejsc)', desc:'Audyt data-flow do sinków innerHTML. Naprawione: 13 interpolacji pól tekstowych z plików Allegro XLSX (oferta/kampania/grupa/title) w 5 blokach — raport print Ads, hierarchia kampanii, eksport grup, tabela Kanibalizatora, tabele Centrum Analitycznego; 11 komunikatów błędów ${err.message}→esc(); lista wyróżnień z textarea. Zweryfikowane jako bezpieczne bez zmian: output AI (mdSafe), alerty/KPI Account Card (tylko liczby), konteksty promptów AI (tekst, nie DOM). (05.07.2026)'},
     {name:'v9.88 — sharePodcast ustawia ownerUid (wymóg nowych reguł Firestore)', desc:'Pre-flight przed deployem reguł wykrył: sharePodcast() nie zapisywał ownerUid ani na dokumencie publicPodcasts, ani na chunkach audio — po zaostrzeniu reguł (create wymaga ownerUid==auth.uid) publikacja padłaby z permission-denied. Dodano ownerUid (wzorzec z sharePresentation) do dokumentu i każdego chunka. Bonus: delete podcastów przez właściciela zacznie działać dla nowych publikacji (stare, bez ownerUid, wymagają czyszczenia service-account — jak prezentacje sprzed v9.84). (05.07.2026)'},
     {name:'v9.87 — Cache-buster sync, SRI viewery, worker/ w repo, firestore publicPodcasts', desc:'Cache-buster zsynchronizowany z wersją aplikacji (był 9.83, app była 9.86 — mechanizm wymuszonego odświeżenia był martwy). view.html + listen.html: SRI sha384 + DOMPurify 3.4.8 + Firebase 11.10 (zrównano z index.html). worker/ dodany do repo (proxy AI + auth; sekrety w CF dashboard). publicPodcasts Firestore: create wymaga teraz ownerUid==auth.uid (analogicznie do publicPresentations). (05.07.2026)'},
@@ -7229,20 +7229,60 @@ async function batchOcrReadAll(){
   if(s2){ s2.textContent = `✓ ${ok} kont zapisanych (${curM})${fail?` · ${fail} błędów — klik ponownie = retry`:''}`; s2.style.color = fail?'#f5a623':'#2dd4a0'; }
 }
 
-// ── Auto-fill z Allegro API (hubPending) — silnik hub-sync pisze o 9:00 ─────────
+// ── Auto-fill z Allegro API (hubPending) — silnik hub-sync pisze o 9:15 ─────────
 // Propozycja NIE ląduje na twardo: wpisuje pola bieżącego miesiąca, użytkownik sprawdza i Zapisuje.
 // ROAS + wartość Ads zostają ręczne (adsPending — brak campaigns API).
 window._hubPending = window._hubPending || null;
 let _hubPendingUnsub = null;
+let _hubPendingLastGenAt = null; // śledzi kiedy ostatnio przeładowaliśmy dane
+
+// Pola pisane przez hub-sync (API). Pola ręczne (roas/wartoscAds/ss/qlt/notatki/savedAt) NIETYKALNE.
+const _API_FIELDS = ['sprzedaz','commission','delivery','promoC','coinsC','adsCost','orders_PL','dzien'];
+
+// Gdy onSnapshot wykryje nowe dane z autopilota → pobierz rows z Firestore i zaktualizuj localStorage.
+// Merge: tylko _API_FIELDS nadpisywane z FS; pola ręczne zostają lokalne.
+async function _refreshAccountsFromAutopilot(){
+  if(!currentUser) return;
+  try{
+    const snap = await db.collection('users').doc(currentUser.uid).collection('accounts').get();
+    snap.forEach(doc => {
+      if(!AC_META[doc.id] || !doc.data().rows) return;
+      const fsRows = doc.data().rows;
+      const localRows = getData(doc.id);
+      const local = {};
+      localRows.forEach(r => { if(r.m) local[r.m] = r; });
+      fsRows.forEach(r => {
+        if(!r.m) return;
+        if(!local[r.m]){
+          local[r.m] = r; // nowy miesiąc — dodaj w całości
+        } else {
+          // Nadpisz tylko pola API; pola ręczne zostaną lokalne
+          _API_FIELDS.forEach(f => { if(r[f] != null) local[r.m][f] = r[f]; });
+        }
+      });
+      localStorage.setItem(SK + doc.id, JSON.stringify(Object.values(local)));
+    });
+    if(typeof renderEntry === 'function') renderEntry();
+    console.log('[autopilot] dane z Firestore załadowane do localStorage');
+  } catch(e){ console.warn('_refreshAccountsFromAutopilot', e); }
+}
 
 function loadHubPending(){
   if(!currentUser || typeof db==='undefined') return;
-  if(_hubPendingUnsub) _hubPendingUnsub(); // odsubskrybuj poprzednią (np. po ponownym logowaniu)
+  if(_hubPendingUnsub) _hubPendingUnsub();
   _hubPendingUnsub = db.collection('users').doc(currentUser.uid)
     .collection('sync').doc('hubPending')
     .onSnapshot(snap => {
       window._hubPending = snap.exists ? snap.data() : null;
-      // Odśwież baner Data automatycznie gdy autopilot zapisze nowe dane
+      const genAt = window._hubPending?.generatedAt ?? null;
+      // Pierwsze załadowanie — tylko baner, bez przeładowania (dane świeże z loadFromFS)
+      if(_hubPendingLastGenAt === null){ _hubPendingLastGenAt = genAt; }
+      // Nowy zapis autopilota → przeładuj dane z Firestore
+      else if(genAt && genAt !== _hubPendingLastGenAt){
+        _hubPendingLastGenAt = genAt;
+        _refreshAccountsFromAutopilot(); // async, rerenderuje po zakończeniu
+        return; // renderEntry() woła _refreshAccountsFromAutopilot po załadowaniu
+      }
       try{ if(typeof renderEntry === 'function') renderEntry(); }catch(e){}
     }, e => console.warn('hubPending onSnapshot', e));
 }
@@ -24036,7 +24076,7 @@ function caPrintGroupsList() {
     html += `</div>`;
   });
 
-  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.92</div></body></html>`;
+  html += `<div class="footer">Mplace Hub · wydruk ${new Date().toLocaleString('pl-PL')} · v9.93</div></body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
