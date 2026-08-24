@@ -1,0 +1,31 @@
+==============================================================================
+ZAPIS ROZMOWY - projekt Mplace-Hub (archiwum starych sesji)
+sesja: 748c6470-67a7-467f-93f3-c2d24c2c3384 | ostatnia zmiana: 2026-08-24 08:31
+==============================================================================
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-24 08:27
+------------------------------------------------------------------------------
+czy dizisjsze dane zostały pobrane dla wszystkich kąt i sa aktualne?
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-24 08:27
+------------------------------------------------------------------------------
+Sprawdzam status autopilota — odpowiedź za chwilę.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-24 08:28
+------------------------------------------------------------------------------
+Sprawdzam bezpośrednio — szybciej niż przez agenta.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-24 08:28
+------------------------------------------------------------------------------
+**W skrócie:** MPlace-Hub — sync dziś zadziałał, ale MtzzEU ma problem z billingiem.
+
+✅ **Sync uruchomiony:** 09:17 CEST (com.mplace.director żyje, PID 78559)
+✅ **9/10 kont:** billingOk = OK (MobelKap, PerfektCięcie, MeblenaCzasie, Luxsen, Semmi, Materazzi, VitaClean, DomGlamour, GaleriaEstetyczna)
+⚠️ **MtzzEU:** `billingOk = False` — dane billingowe dzisiaj niedostępne
+⚠️ **rows = 0** we wszystkich kontach w pliku — to plik `hub-sync-preview`, który trzyma metadane synca, nie same wiersze Huba (wiersze są w Firestore)
+
+**Do zrobienia:** Czy MtzzEU to znany problem (np. opóźnienie API Allegro), czy powinienem głębiej sprawdzić co konkretnie pada dla tego konta?
