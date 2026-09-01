@@ -1,0 +1,212 @@
+==============================================================================
+ZAPIS ROZMOWY - projekt Mplace-Hub (archiwum starych sesji)
+sesja: 20abebe7-dd08-4e4b-8181-33ba62007971 | ostatnia zmiana: 2026-09-01 06:22
+==============================================================================
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-18 09:29
+------------------------------------------------------------------------------
+MobelKap ma 78 tys a nie 83k  sprawdz reszte kont bo jak tu jest problem to może w innych też?????
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-18 09:29
+------------------------------------------------------------------------------
+Sprawdzam hub-sync.mjs żeby zobaczyć jak mapuje wartość sprzedaży z API Allegro.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-18 09:29
+------------------------------------------------------------------------------
+Kluczowy fragment - sprawdzam pełny kontekst mapowania `sprzedaz` i skąd pochodzi `pl.rev`:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-18 09:30
+------------------------------------------------------------------------------
+Sprawdzam jak hub-sync filtruje zamówienia w Orders API - to może być źródło różnicy:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-18 09:31
+------------------------------------------------------------------------------
+Znalazłem kluczowy fragment. Sprawdzam logi z ostatniego hub-sync żeby zobaczyć wartości per konto:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-18 09:31
+------------------------------------------------------------------------------
+Logi nie mają wartości per konto w szczegółach. Sprawdzam czy hub-sync ma tryb dry-run/preview:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-18 09:31
+------------------------------------------------------------------------------
+Hub-sync ma tryb DRY-RUN - uruchamiam go dla wszystkich kont żeby zobaczyć aktualne wartości sprzedaży z API:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-18 09:33
+------------------------------------------------------------------------------
+Mam komplet danych. Puść mnie przez analizę - różnica jest systemowa.
+
+Widzę dokładnie co się dzieje. Z dry-run wynika, że MobelKap: Orders API daje 83,479 zł, ale Allegro billing panel pokazuje 78,354 zł — **różnica 5,125 zł**.
+
+Sprawdzam szybko jakie statusy zamówień hub-sync uwzględnia:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-18 09:33
+------------------------------------------------------------------------------
+Hub-sync wyklucza tylko CANCELLED. Sprawdzam rozkład statusów MobelKap żeby znaleźć co zalicza Orders API a co nie trafia do billing:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-18 09:35
+------------------------------------------------------------------------------
+Mam pełny obraz. Zrobiłem dry-run i sprawdziłem kod - wyniki dla wszystkich kont:
+
+**W skrócie:** MPlace-Hub — Hub systematycznie zawyża sprzedaż na wszystkich kontach vs Allegro billing panel.
+
+---
+
+**Przyczyna główna — dwa różne źródła danych:**
+
+- Hub `sprzedaz` = Orders API (`checkout-forms`, data złożenia)
+- Allegro "Wartość sprzedaży i dostawy" = Billing API (data rozliczenia, typowo 1-2 dni później)
+
+Efekt: zamówienia z ostatnich 2-3 dni są w Orders API, ale jeszcze nie mają wpisu billing — Hub zawsze będzie wyżej o tę kwotę.
+
+**Dodatkowy bug:** `aggregate()` wyklucza tylko CANCELLED - zamówienia ze statusem `RETURNED` (zwroty) są liczone jako przychód, choć billing je odpisuje.
+
+---
+
+**Dane dzisiejsze z dry-run (sierpień 1-17, PL):**
+
+| Konto | Hub `sprzedaz+delivery` |
+|-------|------------------------|
+| MobelKap | 83 479 zł |
+| PerfektCiecie | 41 077 zł |
+| MeblenaCzasie | 117 190 zł |
+| Luxsen | 52 151 zł |
+| Semmi | 3 019 zł |
+| Materazzi | 1 218 441 zł |
+| MtzzEU | 13 076 zł |
+| VitaClean | 4 327 zł |
+| DomGlamour | 33 201 zł |
+| GaleriaEstetyczna | 32 359 zł |
+
+MK w Allegro billing panel = 78 354 zł → różnica **5 125 zł** (~6%).
+
+Dostawy kurierskia zgadza się co do grosza (3 417 zł), więc billing API działa poprawnie - problem jest wyłącznie w `sprzedaz` z Orders API.
+
+---
+
+🎯 **Rekomendacja:** Naprawiam `aggregate()` - dodaję wykluczenie RETURNED. To zamknie przynajmniej część różnicy (zwroty). Lag rozliczeniowy 1-2 dni zostanie, ale to normalne - każde konto będzie o te kilka% wyżej niż billing panel do momentu pełnego rozliczenia. Robię?
+
+**Do zrobienia:** daj OK na fix RETURNED, albo napisz czy zostawiamy jak jest (różnica ~6% to mieści się w szumie dla ROAS, ale dla raportów finansowych boli).
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-18 09:41
+------------------------------------------------------------------------------
+a jak idą Meble od stycznia sumarycznie miesiac po miesiacu
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-18 09:41
+------------------------------------------------------------------------------
+Pobieram dane miesięczne MEBLE z Firestore dla wszystkich 3 kont od stycznia.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-18 09:42
+------------------------------------------------------------------------------
+Mam komplet danych z Firestore dla wszystkich 3 kont. Składam tabelę sumaryczną:
+
+**W skrócie:** MEBLE — sprzedaż od stycznia miesiąc po miesiącu, 3 konta + suma grupy.
+
+---
+
+**Miesiąc** | **MK** | **PC** | **MnC** | **Suma MEBLE** | **Ads łącznie** | **ROAS grupy**
+---|---|---|---|---|---|---
+Styczeń *(do d.13)* | 41 699 | 41 186 | 34 143 | **117 028** | 17 048 | 6.9
+Luty | 104 125 | 92 610 | 100 495 | **297 230** | 19 602 | 15.2
+Marzec | 79 175 | 65 123 | 92 321 | **236 619** | 15 117 | 15.7
+Kwiecień | 142 455 | 89 051 | 96 315 | **327 821** | 22 402 | 14.6
+Maj | 115 902 | 116 180 | 99 740 | **331 822** | 30 312 | 10.9
+Czerwiec | 142 474 | 67 508 | 121 352 | **331 334** | 31 000 | 10.7
+Lipiec | 183 460 | 105 063 | 160 211 | **448 734** | 43 962 | 10.2
+Sierpień *(MTD d.18)* | 83 479 | 41 077 | 117 190 | **241 746** | 24 714 | 9.8
+
+---
+
+**Trend:**
+
+✅ Sprzedaż rośnie miesiąc do miesiąca - lipiec rekordowy (448k)
+⚠️ ROAS spada od wiosny (15+) do lata (10-11) - efekt skalowania Ads (więcej wydajesz, mniejsza efektywność na zł), ale nadal zdrowo powyżej BE
+
+🎯 Sierpień pace: 241k w 18 dniach → **EOM projekcja ~416k** (241 746 / 18 × 31). Jeśli lipiec i sierpień utrzymają tempo, MEBLE zrobi 4-4.5M w roku tylko na PL.
+
+⚠️ PC wyraźnie słabszy od MK i MnC - czerwiec 67k przy 140-120k reszty grupy to wyróżnia się bardzo nisko. ROAS PC lipiec też odskoczył (10 519 Ads na 105k = 10x), ale czerwiec był słaby (67k / 6 297 = 10.7). Warto sprawdzić czy PC ma problem z kanibalizacją albo ofertą.
+
+**Do zrobienia:** nic - to tylko odczyt. Jeśli chcesz wykres lub porównanie z rokiem poprzednim - powiedz.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-19 08:55
+------------------------------------------------------------------------------
+czy dane sire dzisiaj zaciagneły?
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-19 08:55
+------------------------------------------------------------------------------
+**W skrócie:** MPlace-Hub — tak, dane za dziś zaciągnęły się.
+
+✅ Hub-sync uruchomił się dziś o 08:20 — 10 kont, wszystkie obecne.
+
+Dane w Hubie = stan na wczoraj (18.08), zgodnie z konwencją dzień N = dane za N-1.
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-08-19 09:13
+------------------------------------------------------------------------------
+Przeanalizuj nasz hub i zobacz co według ciebie jest zbędne . nic nei rób tylko analizę - bo zauważyłem ż enie wszystko kożystam
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-19 09:13
+------------------------------------------------------------------------------
+Przeglądam strukturę Huba - jakie zakładki i moduły istnieją. Duży plik, więc grep po kluczowych elementach:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-19 09:14
+------------------------------------------------------------------------------
+Teraz sprawdzam co konkretnie robią mniej oczywiste zakładki - szczególnie te, które wyglądają na niezywane:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-08-19 09:16
+------------------------------------------------------------------------------
+Mam pełny obraz. Przeszedłem przez wszystkie 25 zakładek + ukryte widoki.
+
+**W skrócie:** MPlace-Hub — analiza zbędnych modułów: 7 pewnych kandydatów do usunięcia + 4 borderline.
+
+---
+
+**PEWNE "ZBĘDNE" — usunąć bez żalu:**
+
+⚠️ **Sheet** (`arkusz`, 413 linii) - tabela ze wszystkimi kolumnami finansowymi. Duplikuje Trend + Dashboard. Jeśli wiesz kiedy ostatnio tam wchodziłeś - to rzadko.
+
+⚠️ **Results** (`wyniki`, 140 linii) - tabela przychód/zysk/marża. Duplikuje Dashboard. Osobna zakładka bez wyraźnej wartości ponad to co widać w Dashboardzie.
+
+⚠️ **4 widoki ukryte** - są w kodzie, mają HTML, ale NIE mają przycisku w nav - czyli nie możesz ich otworzyć z UI. Martwy kod:
+- `decisions` - Decision Log (linia 2848) - był w nawigacji, potem usunięty
+- `centrum` - stary CA v2 (linia 2890)
+- `seo` - zakładka SEO (linia 3225) - nigdy nie wydana
+- `archiwum` - archiwum starych danych (linia 3411)
+
+---
+
+**BORDERLINE - zależy jak często używasz:**
+
+🎯 **Import Ads** (`importads`, 894 linii) - autopilot od v9.83 wciąga Ads automatycznie przez inbox-ads. To może być dead code od kiedy autopilot działa.
+
+🎯 **Podcasts** - eksperyment sprzed kilku miesięcy. Używasz?
+
+🎯 **Calc** vs **Simulator** - oba liczą BE/budżet, tylko Simulator bardziej wizualny. Jeden z nich jest nadmiarowy.
+
+🎯 **Biznes** (2185 linii!) vs **Rozliczenie** (306 linii) - oba liczą fee agencji. Biznes jest dużo większy, ale czy obie zakładki są Ci potrzebne?
+
+---
+
+🎯 **Rekomendacja priorytetów do usunięcia:**
+1. Najpierw 4 ukryte widoki (zero ryzyka - nie możesz ich otworzyć)
+2. Sheet + Results (duplikaty Dashboardu)
+3. Zapytaj mnie o Import Ads - jeśli autopilot robi to za Ciebie, to 894 linii odpadnie
+
+**Do zrobienia:** Potwierdź które z borderline używasz (Podcasts / Import Ads / oba kalkulatory / oba moduły fee) - wtedy wiem co zostaje, a co leci.
