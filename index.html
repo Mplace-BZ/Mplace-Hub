@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<script>(function(){var V='9.94';var s=sessionStorage.getItem('_hv');if(s!==V){sessionStorage.setItem('_hv',V);if(location.search.indexOf('_hv=')<0){location.replace(location.pathname+'?_hv='+V+(location.hash||''));}}})();</script>
+<script>(function(){var V='9.95';var s=sessionStorage.getItem('_hv');if(s!==V){sessionStorage.setItem('_hv',V);if(location.search.indexOf('_hv=')<0){location.replace(location.pathname+'?_hv='+V+(location.hash||''));}}})();</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
@@ -5334,6 +5334,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.95 — Ścieżka danych: 3 fixy po audycie Fable (autopilot + Import Ads)', desc:'1) dataSaveCurrentToLocal merguje wiersz miesiąca zamiast podmieniać w całości — ręczny Zapisz nie gubi już meta-pól autopilota (_src, _apiFilledAt), baner "Autopilot: N kont" nie gaśnie po edycji. 2) hubApplyToRow ustawia savedAt — świeżo wypełniony z API wiersz nie był już nadpisywany starszą kopią z Firestore przy loadFromFS. 3) Historia Import Ads czytana przez adsHistGet() z try/catch — jeden uszkodzony wpis w localStorage nie wywala całej zakładki. Zero zmian w wyglądzie i API. (02.09.2026)'},
     {name:'v9.94 — Sidebar: 10 nieużywanych zakładek zwinięte w grupę "Więcej"', desc:'Decyzja Chrisa 2026-09-02: SEO, Insights, Przegląd ofert, Ads Hub, Analysis, Promos, Titles, Simulator, Zespół i Decyzje schowane w rozwijanej grupie Więcej na dole sidebara (flaga arch:1 w MP_NAV). Kod widoków nietknięty — jeden klik w nagłówek Więcej przywraca dostęp; stan zapamiętany w localStorage. Wyszukiwarka Cmd+K nadal znajduje wszystkie widoki. (02.09.2026)'},
     {name:'v9.93 — Batch Ads OCR: wklej screeny wszystkich kont naraz (zakładka Data)', desc:'Nowa sekcja nad formularzem Data: grid slotów per aktywne konto (10), Ctrl+V screen Panelu Ads w każdy slot, jeden przycisk ODCZYTAJ WSZYSTKIE I ZAPISZ. Vision (claude-sonnet-4-6, 1 obraz = 1 call, współbieżność 2) czyta Koszt/ROAS/Wartość sprzedaży, zapis do wierszy bieżącego miesiąca wg polityki ads-inbox (roas/wartoscAds ze screena, adsCost=max), potem saveAllWithSync (Firestore+D2D). Błędny screen = badge na slocie + retry tylko błędnych; częściowy batch OK. Link "batch (wszystkie naraz)" w banerze Autopilota. Stary OCR per konto bez zmian. (10.07.2026)'},
     {name:'v9.89 — Security Runda 2: esc() na danych z XLSX i err.message (25 miejsc)', desc:'Audyt data-flow do sinków innerHTML. Naprawione: 13 interpolacji pól tekstowych z plików Allegro XLSX (oferta/kampania/grupa/title) w 5 blokach — raport print Ads, hierarchia kampanii, eksport grup, tabela Kanibalizatora, tabele Centrum Analitycznego; 11 komunikatów błędów ${err.message}→esc(); lista wyróżnień z textarea. Zweryfikowane jako bezpieczne bez zmian: output AI (mdSafe), alerty/KPI Account Card (tylko liczby), konteksty promptów AI (tekst, nie DOM). (05.07.2026)'},
@@ -6584,7 +6585,10 @@ function dataSaveCurrentToLocal(k){
   };
   const D = getData(k);
   const idx = D.findIndex(x => x.m === curM);
-  if(idx >= 0) D[idx] = entry; else D.push(entry);
+  // Merge zamiast pełnej podmiany: formularz nadpisuje swoje pola, ale meta-pola
+  // spoza formularza (_src, _apiFilledAt z autopilota) przeżywają ręczny zapis —
+  // pełna podmiana gubiła _src i baner "Autopilot: N kont" gasł po edycji.
+  if(idx >= 0) D[idx] = Object.assign({}, D[idx], entry); else D.push(entry);
   setData(k, D);
 }
 
@@ -7307,6 +7311,9 @@ function hubApplyToRow(k, curM, e){
   if(e.adsCost    != null) row.adsCost    = Math.round(e.adsCost);
   if(e.dzien      != null) row.dzien      = e.dzien;
   row._apiFilledAt = Date.now();
+  // savedAt = teraz: bez tego merge w loadFromFS uznawał świeżo wypełniony wiersz
+  // za starszy od kopii z Firestore i nadpisywał go stęchłymi danymi.
+  row.savedAt = Date.now();
   // roas / wartoscAds NIE ruszamy — adsPending (ręczny screen)
   setData(k, D);
 }
@@ -17078,6 +17085,9 @@ function decVerify(id,status){
 }
 
 const SK_ADS_HISTORY = 'mplace_ads_history_v1';
+// Odczyt historii Ads odporny na uszkodzony JSON (przerwany zapis / quota) —
+// goły JSON.parse wywalał całą zakładkę Import przy jednym zepsutym wpisie.
+function adsHistGet(){ try{ const h=JSON.parse(localStorage.getItem(SK_ADS_HISTORY)||'[]'); return Array.isArray(h)?h:[]; }catch(e){ console.error('adsHistGet: uszkodzona historia',e); return []; } }
 const ADS_ACCOUNT_KEYS = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','MtzzEU','VitaClean','DomGlamour','GaleriaEstetyczna'];
 const ADS_ACCOUNT_NAMES = {
   MobelKap:'MobelKap',PerfektCiecie:'PerfektCięcie',MeblenaCzasie:'MeblenaCzasie',
@@ -17343,7 +17353,7 @@ async function adsRunAnalysis() {
       aiText: text,
       rawResults: results
     };
-    const hist = JSON.parse(localStorage.getItem(SK_ADS_HISTORY)||'[]');
+    const hist = adsHistGet();
     hist.unshift(entry);
     if(hist.length>15) hist.length=15;
     localStorage.setItem(SK_ADS_HISTORY, JSON.stringify(hist));
@@ -17368,7 +17378,7 @@ function adsClearAll() {
 }
 
 function renderImportAdsList() {
-  const hist = JSON.parse(localStorage.getItem(SK_ADS_HISTORY)||'[]');
+  const hist = adsHistGet();
   const list = document.getElementById('adsHistoryList');
   const empty = document.getElementById('adsHistoryEmpty');
   if(!hist.length){ list.innerHTML=''; empty.style.display='block'; return; }
@@ -17386,12 +17396,12 @@ function renderImportAdsList() {
 }
 
 function openAdsReportFromHistory(i) {
-  const hist = JSON.parse(localStorage.getItem(SK_ADS_HISTORY)||'[]');
+  const hist = adsHistGet();
   if(hist[i]) openAdsReportWindow(hist[i]);
 }
 
 function adsDeleteHistory(i) {
-  const hist = JSON.parse(localStorage.getItem(SK_ADS_HISTORY)||'[]');
+  const hist = adsHistGet();
   hist.splice(i,1);
   localStorage.setItem(SK_ADS_HISTORY, JSON.stringify(hist));
   _syncPush('adsHistory').catch(e=>console.error(e));
