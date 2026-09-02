@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<script>(function(){var V='9.89';var s=sessionStorage.getItem('_hv');if(s!==V){sessionStorage.setItem('_hv',V);if(location.search.indexOf('_hv=')<0){location.replace(location.pathname+'?_hv='+V+(location.hash||''));}}})();</script>
+<script>(function(){var V='9.94';var s=sessionStorage.getItem('_hv');if(s!==V){sessionStorage.setItem('_hv',V);if(location.search.indexOf('_hv=')<0){location.replace(location.pathname+'?_hv='+V+(location.hash||''));}}})();</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
@@ -5334,6 +5334,7 @@ const INFO_SECTIONS = [
     {name:'Tytuly ofert', desc:'<strong>Struktura:</strong> [Produkt] [Material/Kolor] [Wymiar] [Cecha]<br><strong>Przyklad:</strong> "Szafka lazienkowa pod umywalke wotan 60x40 wiszaca"<br>Max 75 znakow. Najwazniejsze na poczatku. Bez CAPS. Roznicuj miedzy kontami. Wymiar = must dla mebli.'},
   ]},
   { id:'changelog', label:'Co nowego', items:[
+    {name:'v9.94 — Sidebar: 10 nieużywanych zakładek zwinięte w grupę "Więcej"', desc:'Decyzja Chrisa 2026-09-02: SEO, Insights, Przegląd ofert, Ads Hub, Analysis, Promos, Titles, Simulator, Zespół i Decyzje schowane w rozwijanej grupie Więcej na dole sidebara (flaga arch:1 w MP_NAV). Kod widoków nietknięty — jeden klik w nagłówek Więcej przywraca dostęp; stan zapamiętany w localStorage. Wyszukiwarka Cmd+K nadal znajduje wszystkie widoki. (02.09.2026)'},
     {name:'v9.93 — Batch Ads OCR: wklej screeny wszystkich kont naraz (zakładka Data)', desc:'Nowa sekcja nad formularzem Data: grid slotów per aktywne konto (10), Ctrl+V screen Panelu Ads w każdy slot, jeden przycisk ODCZYTAJ WSZYSTKIE I ZAPISZ. Vision (claude-sonnet-4-6, 1 obraz = 1 call, współbieżność 2) czyta Koszt/ROAS/Wartość sprzedaży, zapis do wierszy bieżącego miesiąca wg polityki ads-inbox (roas/wartoscAds ze screena, adsCost=max), potem saveAllWithSync (Firestore+D2D). Błędny screen = badge na slocie + retry tylko błędnych; częściowy batch OK. Link "batch (wszystkie naraz)" w banerze Autopilota. Stary OCR per konto bez zmian. (10.07.2026)'},
     {name:'v9.89 — Security Runda 2: esc() na danych z XLSX i err.message (25 miejsc)', desc:'Audyt data-flow do sinków innerHTML. Naprawione: 13 interpolacji pól tekstowych z plików Allegro XLSX (oferta/kampania/grupa/title) w 5 blokach — raport print Ads, hierarchia kampanii, eksport grup, tabela Kanibalizatora, tabele Centrum Analitycznego; 11 komunikatów błędów ${err.message}→esc(); lista wyróżnień z textarea. Zweryfikowane jako bezpieczne bez zmian: output AI (mdSafe), alerty/KPI Account Card (tylko liczby), konteksty promptów AI (tekst, nie DOM). (05.07.2026)'},
     {name:'v9.88 — sharePodcast ustawia ownerUid (wymóg nowych reguł Firestore)', desc:'Pre-flight przed deployem reguł wykrył: sharePodcast() nie zapisywał ownerUid ani na dokumencie publicPodcasts, ani na chunkach audio — po zaostrzeniu reguł (create wymaga ownerUid==auth.uid) publikacja padłaby z permission-denied. Dodano ownerUid (wzorzec z sharePresentation) do dokumentu i każdego chunka. Bonus: delete podcastów przez właściciela zacznie działać dla nowych publikacji (stare, bez ownerUid, wymagają czyszczenia service-account — jak prezentacje sprzed v9.84). (05.07.2026)'},
@@ -11498,11 +11499,11 @@ const MP_NAV = [
     { k:'entry',         id:'navSbEntry',     label:'Data',      icon:'data' },
     { k:'dashboard',     id:'navSbDashboard', label:'Dashboard', icon:'dashboard', mob:1 },
     { k:'agent',         id:'navSbAgent',     label:'Agent',     icon:'agent', badge:'mpAgentBadge', badgeCls:'info', mob:1 },
-    { k:'seo',           id:'navSbSeo',       label:'SEO',       icon:'trend', mob:1 },
+    { k:'seo',           id:'navSbSeo',       label:'SEO',       icon:'trend', mob:1, arch:1 },
   ]},
   { group:'Analiza', items:[
     { k:'months',        id:'navSbTrend',     label:'Trend',     icon:'trend', mob:1 },
-    { k:'insights',      id:'navSbInsights',  label:'Insights',  icon:'eye', badge:'mpAlertBadge', badgeCls:'alert', mob:1 },
+    { k:'insights',      id:'navSbInsights',  label:'Insights',  icon:'eye', badge:'mpAlertBadge', badgeCls:'alert', mob:1, arch:1 },
     { k:'compare',       id:'navSbCompare',   label:'Compare',   icon:'compare', mob:1 },
     { k:'d2d',           id:'navSbD2d',       label:'D2D',       icon:'d2d', mob:1 },
     { k:'wyniki',        id:'navSbResults',   label:'Results',   icon:'results' },
@@ -11510,24 +11511,24 @@ const MP_NAV = [
     { k:'archiwum',     id:'navSbArchiwum',  label:'Archiwum',  icon:'archive' },
   ]},
   { group:'Operacyjne', items:[
-    { k:'centrum',       id:'navSbCentrum',   label:'Przeglad ofert', icon:'eye' },
-    { k:'centrumads',    id:'navSbAds',       label:'Ads Hub',   icon:'ads' },
-    { k:'analiza',       id:'navSbAnaliza',   label:'Analysis',  icon:'screener' },
-    { k:'kanibalizator', id:'navSbPromos',    label:'Promos',    icon:'spark' },
+    { k:'centrum',       id:'navSbCentrum',   label:'Przeglad ofert', icon:'eye', arch:1 },
+    { k:'centrumads',    id:'navSbAds',       label:'Ads Hub',   icon:'ads', arch:1 },
+    { k:'analiza',       id:'navSbAnaliza',   label:'Analysis',  icon:'screener', arch:1 },
+    { k:'kanibalizator', id:'navSbPromos',    label:'Promos',    icon:'spark', arch:1 },
     { k:'strategia',     id:'navSbStrategy',  label:'Strategy',  icon:'pie' },
     { k:'screener',      id:'navSbScreener',  label:'Screener',  icon:'screener', mob:1 },
-    { k:'titleanalyzer', id:'navSbTitles',    label:'Titles',    icon:'titles' },
+    { k:'titleanalyzer', id:'navSbTitles',    label:'Titles',    icon:'titles', arch:1 },
     { k:'importads',     id:'navSbImport',    label:'Import',    icon:'import_' },
   ]},
   { group:'Narzedzia', items:[
     { k:'kalkulator',    id:'navSbCalc',      label:'Calc',      icon:'calc' },
-    { k:'sim',           id:'navSbSim',       label:'Simulator', icon:'sim' },
+    { k:'sim',           id:'navSbSim',       label:'Simulator', icon:'sim', arch:1 },
     { k:'wiedza',        id:'navSbKnowledge', label:'Knowledge', icon:'knowledge', mob:1 },
     { k:'podcasts',      id:'navSbPodcasts',  label:'Podcasts',  icon:'podcasts', mob:1 },
   ]},
   { group:'Zespol', items:[
-    { k:'zespol',        id:'navSbTeam',      label:'Zespol',    icon:'team', badge:'mpTeamBadge', badgeCls:'alert' },
-    { k:'decisions',     id:'navSbDecisions', label:'Decyzje',   icon:'knowledge' },
+    { k:'zespol',        id:'navSbTeam',      label:'Zespol',    icon:'team', badge:'mpTeamBadge', badgeCls:'alert', arch:1 },
+    { k:'decisions',     id:'navSbDecisions', label:'Decyzje',   icon:'knowledge', arch:1 },
     { k:'kalendarz',     id:'navSbCalendar',  label:'Kalendarz', icon:'calendar' },
     { k:'biznes',        id:'navSbBiz',       label:'Biznes',    icon:'biz' },
     { k:'rozliczenie',   id:'navSbSettle',    label:'Rozliczenie', icon:'settle' },
@@ -11541,21 +11542,46 @@ const MP_NAV = [
 const MP_CRUMB = { entry: ['Dzis','Data'], crossborder: ['Operacyjne','Cross-Border'] };
 MP_NAV.forEach(g => g.items.forEach(it => { MP_CRUMB[it.k] = [g.group, it.label]; }));
 
+// Nieużywane zakładki (decyzja Chrisa 2026-09-02, flaga arch:1) zwinięte w grupę
+// "Więcej" na dole sidebara — kod widoków zostaje nietknięty, jeden klik przywraca.
+function mpNavItemHtml(it) {
+  return `
+        <div class="mp-nav-item nav-btn${it.mob ? '' : ' mp-desk'}" id="${it.id}" onclick="showView('${it.k}')">
+          <span class="ico">${mpIcon(it.icon, 16)}</span>${it.label}${it.badge ? `<span class="badge ${it.badgeCls||''}" id="${it.badge}" style="display:none"></span>` : ''}
+        </div>`;
+}
+
 function mpInitSidebar() {
   const nav = document.getElementById('mpSidebarNav');
   if (!nav) return;
+  const archItems = MP_NAV.flatMap(g => g.items.filter(i => i.arch));
   nav.innerHTML = MP_NAV.map(g => {
-    const hasMob = g.items.some(i => i.mob);
+    const items = g.items.filter(i => !i.arch);
+    if (!items.length) return '';
+    const hasMob = items.some(i => i.mob);
     return `
     <div class="mp-nav-group${hasMob ? '' : ' mp-desk'}">
       <div class="mp-nav-group-h">${g.group}</div>
-      ${g.items.map(it => `
-        <div class="mp-nav-item nav-btn${it.mob ? '' : ' mp-desk'}" id="${it.id}" onclick="showView('${it.k}')">
-          <span class="ico">${mpIcon(it.icon, 16)}</span>${it.label}${it.badge ? `<span class="badge ${it.badgeCls||''}" id="${it.badge}" style="display:none"></span>` : ''}
-        </div>
-      `).join('')}
+      ${items.map(mpNavItemHtml).join('')}
     </div>`;
-  }).join('');
+  }).join('') + (archItems.length ? `
+    <div class="mp-nav-group">
+      <div class="mp-nav-group-h" onclick="mpToggleWiecej()" style="cursor:pointer;user-select:none">Wiecej <span id="mpWiecejArrow">▸</span></div>
+      <div id="mpNavWiecej" style="display:none">${archItems.map(mpNavItemHtml).join('')}</div>
+    </div>` : '');
+  let open = false;
+  try { open = localStorage.getItem('mpWiecejOpen') === '1'; } catch {}
+  if (open) mpToggleWiecej(true);
+}
+
+function mpToggleWiecej(forceOpen) {
+  const box = document.getElementById('mpNavWiecej');
+  const arrow = document.getElementById('mpWiecejArrow');
+  if (!box) return;
+  const show = forceOpen === true || box.style.display === 'none';
+  box.style.display = show ? '' : 'none';
+  if (arrow) arrow.textContent = show ? '▾' : '▸';
+  try { localStorage.setItem('mpWiecejOpen', show ? '1' : '0'); } catch {}
 }
 
 function mpUpdateCrumb(viewKey) {
