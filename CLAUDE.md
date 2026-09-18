@@ -182,8 +182,10 @@ Historia wpadki: parser nie znajdował ID oferty, Agent "zgadywał" numerki i ra
 
 ### Konta i fee
 - MEBLE (65%): MobelKap (MK), PerfektCięcie (PC), MeblenaCzasie (MnC = benchmark efektywności grupy) — fee 7500 zł netto stałe.
-- LUXSEN (60%): Luxsen, Semmi, BOTAVIT — fee 20% od marży grupy (brutto→netto /1.23).
-- ONE (55%): Materazzi + MtzzEU (3500 zł stałe), Ankado24 (2900 zł stałe).
+- LUXSEN (60%): Luxsen, Semmi — fee 20% od marży grupy (brutto→netto /1.23).
+- ONE (55%): Materazzi + MtzzEU — fee 3500 zł stałe.
+- TWO: VitaClean, DomGlamour, GaleriaEstetyczna — koszt w cenie i fee: BRAK, do potwierdzenia.
+- Archiwum (NIE obsługujemy, nie zgłaszaj jako brakujące): Ankado24, BOTAVIT — potwierdzone 2026-09-18.
 
 ### Konwencje danych
 - Dane wpisywane brutto; dzień N = dane za dzień N-1.
