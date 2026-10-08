@@ -1,0 +1,75 @@
+==============================================================================
+ZAPIS ROZMOWY - projekt Mplace-Hub (archiwum starych sesji)
+sesja: cb2f74af-eb8d-4dac-a7da-f33ed0c10bf9 | ostatnia zmiana: 2026-10-08 15:57
+==============================================================================
+
+------------------------------------------------------------------------------
+[CHRIS] 2026-10-08 15:47
+------------------------------------------------------------------------------
+Zerknij szybciutko dlaczego nie mamy października i skończył się, jesteśmy na wrześniu, coś mi brakuje https://mplace-bz.github.io/Mplace-Hub/
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-10-08 15:47
+------------------------------------------------------------------------------
+Sprawdzam kod odpowiedzialny za miesiące w Hubie.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-10-08 15:49
+------------------------------------------------------------------------------
+Sprawdzam czy autopilot faktycznie pisze październik do Firestore.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-10-08 15:54
+------------------------------------------------------------------------------
+Sprawdzam jak Dashboard wyznacza "bieżący miesiąc" i co może powodować pozostanie na wrześniu.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-10-08 15:56
+------------------------------------------------------------------------------
+Znalazłem przyczynę. Sprawdzam jeszcze jedno:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-10-08 15:56
+------------------------------------------------------------------------------
+Mam przyczynę. Wdrożam fix.
+
+**Diagnoza:** `buildInit` dla MobelKap/PerfektCiecie zaczyna od `m:'październik'` (Oct 2025) — ta pozycja jest na indeksie 0. Autopilot dołącza kolejne miesiące na koniec: kwiecień→wrzesień 2026. Gdy przychodzi październik 2026, `upsertMonth` AKTUALIZUJE istniejący wiersz na indeksie 0 zamiast dołączać nowy. Efekt: `D[D.length-1]` (używane ~20× w kodzie) zwraca wrzesień, nie październik. Dashboard, karty, obliczenia trendów — wszystko bazuje na wrześniu.
+
+Fix: `getData()` sortuje wiersze w oknie kroczącym — bieżący miesiąc zawsze na końcu.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-10-08 15:56
+------------------------------------------------------------------------------
+Implementuję fix. Dodaję `sortByRollingWindow` do `getData` i bumbuję wersję do v9.96.
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-10-08 15:57
+------------------------------------------------------------------------------
+Teraz bump wersji — title, topbar i session cache:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-10-08 15:57
+------------------------------------------------------------------------------
+Dodaję wpis do changelog:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-10-08 15:57
+------------------------------------------------------------------------------
+Teraz commit i push:
+
+------------------------------------------------------------------------------
+[CLAUDE] 2026-10-08 15:57
+------------------------------------------------------------------------------
+**v9.96** — na żywo.
+
+---
+
+**W skrócie:** MPlace Hub — fix październik nie wyświetla się w Dashboardzie.
+
+**Przyczyna:** `buildInit` dla MobelKap i PerfektCiecie zaczyna od `m:'październik'` (Oct 2025) na **indeksie 0** tablicy. Gdy autopilot wpisał październik 2026, `upsertMonth` znalazł istniejący wiersz "październik" i zaktualizował go w miejscu (indeks 0 nadal). Efekt: `D[D.length-1]` — używane w ~20 miejscach (Dashboard, karty, trendy, Health Score) — wskazywał na **wrzesień** (ostatni push do tablicy), nie październik.
+
+Danych brakowało tylko w widokach używających "ostatniego elementu". Zakładka Trend (Miesiące) działała poprawnie, bo szuka po nazwie miesiąca wprost.
+
+✅ **Fix:** `getData()` wywołuje nową `sortByRollingWindow()` — sortuje tablicę tak, żeby bieżący miesiąc był **zawsze ostatni** (kolejność: listopad rok-1 → październik bieżącego). Automatycznie poprawia wszystkie 20+ wywołań `D[D.length-1]`.
+
+**Do zrobienia:** odśwież Hub — zobaczysz v9.96 i październik jako bieżący miesiąc.
