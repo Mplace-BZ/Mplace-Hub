@@ -5,11 +5,11 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<script>(function(){var V='9.96';var s=sessionStorage.getItem('_hv');if(s!==V){sessionStorage.setItem('_hv',V);if(location.search.indexOf('_hv=')<0){location.replace(location.pathname+'?_hv='+V+(location.hash||''));}}})();</script>
+<script>(function(){var V='9.97';var s=sessionStorage.getItem('_hv');if(s!==V){sessionStorage.setItem('_hv',V);if(location.search.indexOf('_hv=')<0){location.replace(location.pathname+'?_hv='+V+(location.hash||''));}}})();</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzBmMTExNyIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9IkRNIE1vbm8sIG1vbm9zcGFjZSIgZm9udC13ZWlnaHQ9IjUwMCIgCiAgICBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmY2YjM1Ij5NPC90ZXh0Pgo8L3N2Zz4=">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <!-- CSP wyłączone tymczasowo — wymaga dokładnego audytu kompatybilności z blob: i inline handlers -->
-<title>MPlace Hub v9.96</title>
+<title>MPlace Hub v9.97</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" integrity="sha384-en/ztfPSRkGfME4KIm05joYXynqzUgbsG5nMrj/xEFAHXkeZfO3yMK8QQ+mP7p1/" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -2136,7 +2136,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div>
       <div class="brand-name">MPlace<em> Hub</em></div>
     </div>
-    <span class="brand-ver">v9.96</span>
+    <span class="brand-ver">v9.97</span>
   </div>
   <div class="mp-sidebar-search" onclick="document.dispatchEvent(new CustomEvent('open-cmdk'))">
     <svg width="13" height="13" viewBox="0 0 16 16" style="display:block;flex-shrink:0"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -2182,11 +2182,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="mp-acc-sep"></div>
     <div class="mp-acc" data-g="one" data-acc="ONE" onclick="mpSelectAccount('ONE')"><span class="gd"></span><span style="color:var(--text)">ONE</span></div>
     <div class="mp-acc" data-g="one" data-acc="Materazzi" onclick="showView('Materazzi')"><span>Mtz</span></div>
-    <div class="mp-acc" data-g="one" data-acc="MtzzEU" onclick="showView('MtzzEU')"><span>mEU</span></div>
     <div class="mp-acc-sep"></div>
     <div class="mp-acc" data-g="two" data-acc="TWO" onclick="mpSelectAccount('TWO')"><span class="gd"></span><span style="color:var(--text)">TWO</span></div>
     <div class="mp-acc" data-g="two" data-acc="VitaClean" onclick="showView('VitaClean')"><span>VIT</span></div>
-    <div class="mp-acc" data-g="two" data-acc="DomGlamour" onclick="showView('DomGlamour')"><span>DOM</span></div>
     <div class="mp-acc" data-g="two" data-acc="GaleriaEstetyczna" onclick="showView('GaleriaEstetyczna')"><span>GAL</span></div>
   </div>
   <div class="mp-topbar-right">
@@ -2252,11 +2250,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
     <div class="nav-sep"></div>
     <span class="nav-glbl g-one">ONE</span>
     <button class="nav-btn" onclick="showView('Materazzi')" id="navMaterazzi">Mtz</button>
-    <button class="nav-btn" onclick="showView('MtzzEU')" id="navMtzzEU">mEU</button>
     <div class="nav-sep"></div>
     <span class="nav-glbl g-two">TWO</span>
     <button class="nav-btn" onclick="showView('VitaClean')" id="navVitaClean">VIT</button>
-    <button class="nav-btn" onclick="showView('DomGlamour')" id="navDomGlamour">DOM</button>
     <button class="nav-btn" onclick="showView('GaleriaEstetyczna')" id="navGaleriaEstetyczna">GAL</button>
   </div>
 </div>
@@ -2415,10 +2411,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
       <button class="dzis-konto-btn" onclick="dzisToggleKonto('Semmi',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#2dd4a0;cursor:pointer">Sem</button>
       <span style="width:1px;height:14px;background:var(--border);margin:0 4px"></span>
       <button class="dzis-konto-btn" onclick="dzisToggleKonto('Materazzi',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#b47fff;cursor:pointer">Mtz</button>
-      <button class="dzis-konto-btn" onclick="dzisToggleKonto('MtzzEU',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#b47fff;cursor:pointer">mEU</button>
       <span style="width:1px;height:14px;background:var(--border);margin:0 4px"></span>
       <button class="dzis-konto-btn" onclick="dzisToggleKonto('VitaClean',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#4d9fff;cursor:pointer">VIT</button>
-      <button class="dzis-konto-btn" onclick="dzisToggleKonto('DomGlamour',this)" style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:#4d9fff;cursor:pointer">DOM</button>
     </div>
     <div id="dzisUploadSlots" style="display:none;margin-top:8px"></div>
   </div>
@@ -2687,11 +2681,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
         </div>
         <div style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-one);margin:.7rem 0 .4rem">ONE</div>
         <div class="biz-fee-row">
-          <div class="biz-fee-name">Materazzi + MtzzEU</div>
+          <div class="biz-fee-name">Materazzi</div>
           <div class="biz-fee-type">stałe netto</div>
           <input class="biz-fee-input" id="feeMaterazzis" type="number" value="3500" oninput="renderBiznes()">
           <div class="biz-result" id="feeResMaterazzis">—</div>
-          <div class="biz-pct" id="feePctMaterazzis"><span class="tip" data-tip="Twoje stałe fee 3 500 zł netto jako % marży po reklamie Materazzi + MtzzEU.">?</span></div>
+          <div class="biz-pct" id="feePctMaterazzis"><span class="tip" data-tip="Twoje stałe fee 3 500 zł netto jako % marży po reklamie Materazzi.">?</span></div>
         </div>
         <div style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-two);margin:.7rem 0 .4rem">TWO</div>
         <div class="biz-fee-row">
@@ -2700,13 +2694,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
           <input class="biz-fee-input" id="feeVitaClean" type="number" value="2900" oninput="renderBiznes()">
           <div class="biz-result" id="feeResVitaClean">—</div>
           <div class="biz-pct" id="feePctVitaClean"><span class="tip" data-tip="Twoje stałe fee 2 900 zł netto jako % marży po reklamie VitaClean.">?</span></div>
-        </div>
-        <div class="biz-fee-row">
-          <div class="biz-fee-name">Dom Glamour (DOM)</div>
-          <div class="biz-fee-type">stałe netto</div>
-          <input class="biz-fee-input" id="feeDomGlamour" type="number" value="2900" oninput="renderBiznes()">
-          <div class="biz-result" id="feeResDomGlamour">—</div>
-          <div class="biz-pct" id="feePctDomGlamour"><span class="tip" data-tip="Twoje stałe fee 2 900 zł netto jako % marży po reklamie Dom Glamour.">?</span></div>
         </div>
       </div>
     </div>
@@ -3548,9 +3535,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
         <option value="">— wybierz konto —</option>
         <optgroup label="MEBLE"><option value="MobelKap">MobelKap</option><option value="PerfektCiecie">Perfekt Cięcie</option><option value="MeblenaCzasie">Meble na Czasie</option></optgroup>
         <optgroup label="LUXSEN"><option value="Luxsen">Luxsen</option><option value="Semmi">Semmi</option></optgroup>
-        <optgroup label="ONE"><option value="Materazzi">Materazzi</option><option value="MtzzEU">MtzzEU</option></optgroup>
-        <optgroup label="TWO"><option value="VitaClean">VitaClean (VIT)</option><option value="DomGlamour">Dom Glamour (DOM)</option><option value="GaleriaEstetyczna">Galeria Estetyczna (GAL)</option></optgroup>
-        <optgroup label="— archiwum —"><option value="BOTAVIT">BOTAVIT (archiwum)</option><option value="Ankado24">Ankado24 (archiwum)</option></optgroup>
+        <optgroup label="ONE"><option value="Materazzi">Materazzi</option></optgroup>
+        <optgroup label="TWO"><option value="VitaClean">VitaClean (VIT)</option><option value="GaleriaEstetyczna">Galeria Estetyczna (GAL)</option></optgroup>
+        <optgroup label="— archiwum —"><option value="BOTAVIT">BOTAVIT (archiwum)</option><option value="Ankado24">Ankado24 (archiwum)</option><option value="MtzzEU">MtzzEU (archiwum)</option><option value="DomGlamour">Dom Glamour (archiwum)</option></optgroup>
       </select>
     </div>
     <div>
@@ -3893,12 +3880,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
             <option value="Luxsen">Luxsen</option>
             <option value="Semmi">Semmi</option>
             <option value="Materazzi">Materazzi</option>
-            <option value="MtzzEU">MtzzEU</option>
             <option value="VitaClean">VitaClean (VIT)</option>
-            <option value="DomGlamour">Dom Glamour (DOM)</option>
             <option value="GaleriaEstetyczna">Galeria Estetyczna (GAL)</option>
             <option value="BOTAVIT">BOTAVIT (archiwum)</option>
             <option value="Ankado24">Ankado24 (archiwum)</option>
+            <option value="MtzzEU">MtzzEU (archiwum)</option>
+            <option value="DomGlamour">Dom Glamour (archiwum)</option>
           </select>
         </div>
         <div>
@@ -4704,8 +4691,8 @@ const DAYS_IN={styczeń:31,luty:28,marzec:31,kwiecień:30,maj:31,czerwiec:30,lip
 const GROUPS={
   MEBLE:{label:'MEBLE',c:'var(--g-meble)',cls:'g-meble-badge',egh:'egh-m',accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
   LUXSEN:{label:'LUXSEN',c:'var(--g-luxsen)',cls:'g-luxsen-badge',egh:'egh-l',accs:['Luxsen','Semmi']},
-  ONE:{label:'ONE',c:'var(--g-one)',cls:'g-one-badge',egh:'egh-o',accs:['Materazzi','MtzzEU']},
-  TWO:{label:'TWO',c:'var(--g-two)',cls:'g-two-badge',egh:'egh-t',accs:['VitaClean','DomGlamour','GaleriaEstetyczna']},
+  ONE:{label:'ONE',c:'var(--g-one)',cls:'g-one-badge',egh:'egh-o',accs:['Materazzi']},
+  TWO:{label:'TWO',c:'var(--g-two)',cls:'g-two-badge',egh:'egh-t',accs:['VitaClean','GaleriaEstetyczna']},
 };
 const AC_META={
   MobelKap:{name:'MobelKap',group:'MEBLE',
@@ -4731,9 +4718,9 @@ const AC_META={
   },
   Luxsen:{name:'Luxsen',group:'LUXSEN'},Semmi:{name:'Semmi',group:'LUXSEN'},
   BOTAVIT:{name:'BOTAVIT',group:'LUXSEN',archived:true},
-  Materazzi:{name:'Materazzi',group:'ONE'},MtzzEU:{name:'MtzzEU',group:'ONE'},
+  Materazzi:{name:'Materazzi',group:'ONE'},MtzzEU:{name:'MtzzEU',group:'ONE',archived:true},
   Ankado24:{name:'Ankado24',group:'ONE',archived:true},
-  VitaClean:{name:'VitaClean',group:'TWO'},DomGlamour:{name:'Dom Glamour',group:'TWO'},GaleriaEstetyczna:{name:'Galeria Estetyczna',group:'TWO'},
+  VitaClean:{name:'VitaClean',group:'TWO'},DomGlamour:{name:'Dom Glamour',group:'TWO',archived:true},GaleriaEstetyczna:{name:'Galeria Estetyczna',group:'TWO'},
 };
 const DEFAULT_PRODUCER={MobelKap:65,PerfektCiecie:65,MeblenaCzasie:65,Luxsen:60,Semmi:60,BOTAVIT:60,Materazzi:55,MtzzEU:55,Ankado24:55,VitaClean:60,DomGlamour:60,GaleriaEstetyczna:50};
 
@@ -5222,8 +5209,8 @@ function renderArkusz(){
   const GROUPS=[
     {key:'MEBLE', color:'#ff6b35',rgb:'255,107,53', accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
     {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160', accs:['Luxsen','Semmi']},
-    {key:'ONE',   color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU']},
-    {key:'TWO',   color:'#4d9fff',rgb:'77,159,255', accs:['VitaClean','DomGlamour','GaleriaEstetyczna']},
+    {key:'ONE',   color:'#b47fff',rgb:'180,127,255',accs:['Materazzi']},
+    {key:'TWO',   color:'#4d9fff',rgb:'77,159,255', accs:['VitaClean','GaleriaEstetyczna']},
   ];
   // v9.71: render toggle PL/Global + note above table
   const tg = document.getElementById('arkuszViewModeToggle');
@@ -5639,8 +5626,8 @@ function renderWyniki(){
   const GROUPS=[
     {key:'MEBLE', color:'#ff6b35',rgb:'255,107,53', accs:['MobelKap','PerfektCiecie','MeblenaCzasie']},
     {key:'LUXSEN',color:'#2dd4a0',rgb:'45,212,160', accs:['Luxsen','Semmi']},
-    {key:'ONE',   color:'#b47fff',rgb:'180,127,255',accs:['Materazzi','MtzzEU']},
-    {key:'TWO',   color:'#4d9fff',rgb:'77,159,255', accs:['VitaClean','DomGlamour','GaleriaEstetyczna']},
+    {key:'ONE',   color:'#b47fff',rgb:'180,127,255',accs:['Materazzi']},
+    {key:'TWO',   color:'#4d9fff',rgb:'77,159,255', accs:['VitaClean','GaleriaEstetyczna']},
   ];
   // v9.71: render toggle + note
   const tg = document.getElementById('wynikiViewModeToggle');
@@ -6066,8 +6053,8 @@ function initDashboardExtras(){
   const GROUPS_DEF = {
     MEBLE:  { accs:['MobelKap','PerfektCiecie','MeblenaCzasie'], prod:65, color:'#ff6b35' },
     LUXSEN: { accs:['Luxsen','Semmi'],                           prod:60, color:'#2dd4a0' },
-    ONE:    { accs:['Materazzi','MtzzEU'],                       prod:55, color:'#b47fff' },
-    TWO:    { accs:['VitaClean','DomGlamour','GaleriaEstetyczna'], prod:60, color:'#4d9fff' },
+    ONE:    { accs:['Materazzi'],                                   prod:55, color:'#b47fff' },
+    TWO:    { accs:['VitaClean','GaleriaEstetyczna'],               prod:60, color:'#4d9fff' },
   };
   const GRP_OF = {};
   Object.entries(GROUPS_DEF).forEach(([g,def])=>def.accs.forEach(k=>{GRP_OF[k]=g;}));
@@ -6161,7 +6148,7 @@ function initDashboardExtras(){
   }
 
   // ── HEATMAP ────────────────────────────────────────────
-  const ORDER=['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','MtzzEU','VitaClean','DomGlamour','GaleriaEstetyczna'];
+  const ORDER=['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','VitaClean','GaleriaEstetyczna'];
   const hGrid=document.getElementById('heatmapGrid');
   if(hGrid){
     hGrid.innerHTML=ORDER.map(k=>{
@@ -6206,8 +6193,8 @@ function initDashboardExtras(){
         datasets:[
           {label:'MEBLE',  data:months6.map(m=>grpSales(['MobelKap','PerfektCiecie','MeblenaCzasie'],m)), borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,.1)',tension:.4,fill:true,pointRadius:4},
           {label:'LUXSEN', data:months6.map(m=>grpSales(['Luxsen','Semmi'],m)),                            borderColor:'#2dd4a0',backgroundColor:'rgba(45,212,160,.1)',tension:.4,fill:true,pointRadius:4},
-          {label:'ONE',    data:months6.map(m=>grpSales(['Materazzi','MtzzEU'],m)),                        borderColor:'#b47fff',backgroundColor:'rgba(180,127,255,.1)',tension:.4,fill:true,pointRadius:4},
-          {label:'TWO',    data:months6.map(m=>grpSales(['VitaClean','DomGlamour','GaleriaEstetyczna'],m)), borderColor:'#4d9fff',backgroundColor:'rgba(77,159,255,.1)',tension:.4,fill:true,pointRadius:4}
+          {label:'ONE',    data:months6.map(m=>grpSales(['Materazzi'],m)),                                  borderColor:'#b47fff',backgroundColor:'rgba(180,127,255,.1)',tension:.4,fill:true,pointRadius:4},
+          {label:'TWO',    data:months6.map(m=>grpSales(['VitaClean','GaleriaEstetyczna'],m)),              borderColor:'#4d9fff',backgroundColor:'rgba(77,159,255,.1)',tension:.4,fill:true,pointRadius:4}
         ]
       },
       options:{
@@ -8467,7 +8454,7 @@ async function _syncPullAll() {
 // Also sync catalog per account (dynamic keys)
 async function _syncCatalogs() {
   if (!currentUser) return;
-  const accounts = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','MtzzEU','VitaClean','DomGlamour','GaleriaEstetyczna'];
+  const accounts = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','VitaClean','GaleriaEstetyczna'];
   for (const k of accounts) {
     const lsKey = 'catalog_' + k;
     const docName = 'catalog_' + k;
@@ -14476,8 +14463,8 @@ async function runMTDReport(selectedKeys, dateFrom, dateTo, batchMode=false) {
   const groups = {
     MEBLE: { accs:['MobelKap','PerfektCiecie','MeblenaCzasie'], prod:65 },
     LUXSEN:{ accs:['Luxsen','Semmi'], prod:60 },
-    ONE:   { accs:['Materazzi','MtzzEU'], prod:55 },
-    TWO:   { accs:['VitaClean','DomGlamour','GaleriaEstetyczna'], prod:60 }
+    ONE:   { accs:['Materazzi'], prod:55 },
+    TWO:   { accs:['VitaClean','GaleriaEstetyczna'], prod:60 }
   };
 
   // Filter groups to only include selected accounts
@@ -15137,8 +15124,8 @@ async function runSlideReport(selectedKeys, dateFrom, dateTo) {
   const groups = {
     MEBLE: { accs:['MobelKap','PerfektCiecie','MeblenaCzasie'], prod:65 },
     LUXSEN:{ accs:['Luxsen','Semmi'], prod:60 },
-    ONE:   { accs:['Materazzi','MtzzEU'], prod:55 },
-    TWO:   { accs:['VitaClean','DomGlamour','GaleriaEstetyczna'], prod:60 }
+    ONE:   { accs:['Materazzi'], prod:55 },
+    TWO:   { accs:['VitaClean','GaleriaEstetyczna'], prod:60 }
   };
   const filteredGroups = {};
   Object.entries(groups).forEach(([gKey, g]) => {
@@ -16903,7 +16890,7 @@ function addNoteFromInput(konto) {
 
 // Render all note logs on page load
 function initNoteLogs() {
-  ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','MtzzEU','VitaClean','DomGlamour','GaleriaEstetyczna'].forEach(k => renderNoteLog(k));
+  ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','VitaClean','GaleriaEstetyczna'].forEach(k => renderNoteLog(k));
 }
 document.addEventListener('DOMContentLoaded', initNoteLogs);
 
@@ -17098,12 +17085,12 @@ const SK_ADS_HISTORY = 'mplace_ads_history_v1';
 // Odczyt historii Ads odporny na uszkodzony JSON (przerwany zapis / quota) —
 // goły JSON.parse wywalał całą zakładkę Import przy jednym zepsutym wpisie.
 function adsHistGet(){ try{ const h=JSON.parse(localStorage.getItem(SK_ADS_HISTORY)||'[]'); return Array.isArray(h)?h:[]; }catch(e){ console.error('adsHistGet: uszkodzona historia',e); return []; } }
-const ADS_ACCOUNT_KEYS = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','MtzzEU','VitaClean','DomGlamour','GaleriaEstetyczna'];
+const ADS_ACCOUNT_KEYS = ['MobelKap','PerfektCiecie','MeblenaCzasie','Luxsen','Semmi','Materazzi','VitaClean','GaleriaEstetyczna'];
 const ADS_ACCOUNT_NAMES = {
   MobelKap:'MobelKap',PerfektCiecie:'PerfektCięcie',MeblenaCzasie:'MeblenaCzasie',
   Luxsen:'Luxsen',Semmi:'Semmi',
-  Materazzi:'Materazzi',MtzzEU:'MtzzEU',
-  VitaClean:'VitaClean',DomGlamour:'Dom Glamour',GaleriaEstetyczna:'Galeria Estetyczna'
+  Materazzi:'Materazzi',
+  VitaClean:'VitaClean',GaleriaEstetyczna:'Galeria Estetyczna'
 };
 
 // Detect account from filename
@@ -26306,7 +26293,6 @@ function getFeeConfig(){
     pctLuxsen:  parseFloat(document.getElementById('feePctLuxsen')?.value)||20,
     materazzis: parseFloat(document.getElementById('feeMaterazzis')?.value)||3500,
     vitaclean:         parseFloat(document.getElementById('feeVitaClean')?.value)||2900,
-    domglamour:        parseFloat(document.getElementById('feeDomGlamour')?.value)||2900,
     galeriaestetyczna: parseFloat(document.getElementById('feeGaleriaEstetyczna')?.value)||5000,
   };
 }
@@ -26327,22 +26313,17 @@ function calcMyFee(cfg){
   const luxsenFeeBrutto = luxsenZysk * cfg.pctLuxsen/100;
   const luxsenFeeNetto = luxsenFeeBrutto / 1.23;
 
-  // ONE — Materazzi+MtzzEU fixed
-  const matZysk = ['Materazzi','MtzzEU'].reduce((s,k)=>{
-    const D=getData(k),prod=getProd(k),last=D[D.length-1];
-    return s+calc(last,prod).zysk;
-  },0);
+  // ONE — Materazzi fixed
+  const matZysk = (()=>{const D=getData('Materazzi'),prod=getProd('Materazzi'),last=D[D.length-1];return last?calc(last,prod).zysk:0;})();
   const matsFeeNetto = cfg.materazzis;
 
-  // TWO — VitaClean + DomGlamour + GaleriaEstetyczna fixed
+  // TWO — VitaClean + GaleriaEstetyczna fixed
   const vitZysk = (()=>{const D=getData('VitaClean'),prod=getProd('VitaClean'),last=D[D.length-1];return last?calc(last,prod).zysk:0;})();
-  const domZysk = (()=>{const D=getData('DomGlamour'),prod=getProd('DomGlamour'),last=D[D.length-1];return last?calc(last,prod).zysk:0;})();
   const galZysk = (()=>{const D=getData('GaleriaEstetyczna'),prod=getProd('GaleriaEstetyczna'),last=D[D.length-1];return last?calc(last,prod).zysk:0;})();
   const vitFeeNetto = cfg.vitaclean;
-  const domFeeNetto = cfg.domglamour;
   const galFeeNetto = cfg.galeriaestetyczna;
 
-  const totalNetto = mebleFeeNetto + luxsenFeeNetto + matsFeeNetto + vitFeeNetto + domFeeNetto + galFeeNetto;
+  const totalNetto = mebleFeeNetto + luxsenFeeNetto + matsFeeNetto + vitFeeNetto + galFeeNetto;
   const totalVat = totalNetto * 0.23;
   const totalBrutto = totalNetto * 1.23;
 
@@ -26351,7 +26332,6 @@ function calcMyFee(cfg){
     luxsenFeeNetto, luxsenFeeBrutto, luxsenZysk,
     matsFeeNetto, matZysk,
     vitFeeNetto, vitZysk,
-    domFeeNetto, domZysk,
     galFeeNetto, galZysk,
     totalNetto, totalVat, totalBrutto
   };
@@ -26391,8 +26371,6 @@ function renderBiznes(){
   setR('feePctMaterazzis', f.matZysk>0?pct(f.matsFeeNetto/f.matZysk*100):'—');
   setR('feeResVitaClean', pln(f.vitFeeNetto));
   setR('feePctVitaClean', f.vitZysk>0?pct(f.vitFeeNetto/f.vitZysk*100):'—');
-  setR('feeResDomGlamour', pln(f.domFeeNetto));
-  setR('feePctDomGlamour', f.domZysk>0?pct(f.domFeeNetto/f.domZysk*100):'—');
   setR('feeResGaleriaEstetyczna', pln(f.galFeeNetto));
   setR('feePctGaleriaEstetyczna', f.galZysk>0?pct(f.galFeeNetto/f.galZysk*100):'—');
 
@@ -26401,9 +26379,8 @@ function renderBiznes(){
     <div style="margin-top:auto">
       <div class="biz-total-row"><span>MEBLE (stałe)</span><span class="biz-total-val green">${pln(f.mebleFeeNetto)}</span></div>
       <div class="biz-total-row"><span>LUXSEN (${cfg.pctLuxsen}% zysku)</span><span class="biz-total-val green">${pln(f.luxsenFeeNetto)}</span></div>
-      <div class="biz-total-row"><span>Materazzi + MtzzEU (stałe)</span><span class="biz-total-val green">${pln(f.matsFeeNetto)}</span></div>
+      <div class="biz-total-row"><span>Materazzi (stałe)</span><span class="biz-total-val green">${pln(f.matsFeeNetto)}</span></div>
       <div class="biz-total-row"><span>VitaClean (stałe)</span><span class="biz-total-val green">${pln(f.vitFeeNetto)}</span></div>
-      <div class="biz-total-row"><span>Dom Glamour (stałe)</span><span class="biz-total-val green">${pln(f.domFeeNetto)}</span></div>
       <div class="biz-total-row"><span>Galeria Estetyczna (stałe)</span><span class="biz-total-val green">${pln(f.galFeeNetto)}</span></div>
       <div class="biz-total-row big"><span>Razem netto</span><span class="biz-total-val accent">${pln(f.totalNetto)}</span></div>
       <div class="biz-total-row"><span>VAT 23%</span><span class="biz-total-val">${pln(f.totalVat)}</span></div>
@@ -26419,8 +26396,8 @@ function renderBiznes(){
   const accFees = {
     MobelKap:f.mebleFeeNetto/3, PerfektCiecie:f.mebleFeeNetto/3, MeblenaCzasie:f.mebleFeeNetto/3,
     Luxsen:luxAccs.Luxsen, Semmi:luxAccs.Semmi,
-    Materazzi:f.matsFeeNetto/2, MtzzEU:f.matsFeeNetto/2,
-    VitaClean:f.vitFeeNetto, DomGlamour:f.domFeeNetto, GaleriaEstetyczna:f.galFeeNetto
+    Materazzi:f.matsFeeNetto,
+    VitaClean:f.vitFeeNetto, GaleriaEstetyczna:f.galFeeNetto
   };
 
   const activeKeys = Object.keys(AC_META).filter(k => !AC_META[k].archived);
@@ -29645,13 +29622,11 @@ function renderSeoCard(p) {
     <div class="report-group-label" style="color:var(--g-one)">· ONE</div>
     <div class="report-checks">
       <div class="report-check" data-key="Materazzi" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>Materazzi</div>
-      <div class="report-check" data-key="MtzzEU" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>MtzzEU</div>
     </div>
 
     <div class="report-group-label" style="color:var(--g-two)">· TWO</div>
     <div class="report-checks">
       <div class="report-check" data-key="VitaClean" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>VitaClean</div>
-      <div class="report-check" data-key="DomGlamour" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>Dom Glamour</div>
       <div class="report-check" data-key="GaleriaEstetyczna" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>Galeria Estetyczna</div>
     </div>
 
@@ -29659,6 +29634,8 @@ function renderSeoCard(p) {
     <div class="report-checks">
       <div class="report-check" data-key="BOTAVIT" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>BOTAVIT</div>
       <div class="report-check" data-key="Ankado24" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>Ankado24</div>
+      <div class="report-check" data-key="MtzzEU" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>MtzzEU</div>
+      <div class="report-check" data-key="DomGlamour" onclick="toggleReportCheck(this)"><div class="report-check-dot"></div>Dom Glamour</div>
     </div>
 
     <div style="display:flex;align-items:center;margin-top:.9rem;gap:.6rem">
@@ -29688,7 +29665,7 @@ function renderSeoCard(p) {
     <div class="report-modal-actions">
       <button class="report-modal-cancel" onclick="closeReportModal()">Anuluj</button>
       <button class="report-modal-go" id="reportGoBtn" onclick="runSelectedReport()" disabled>▸ Generuj raport</button>
-      <button class="report-modal-go" onclick="runBatchReports()" style="background:var(--accent,#ff6b35);border-color:var(--accent,#ff6b35);color:#fff;opacity:.9">▸ Batch — 9 kont</button>
+      <button class="report-modal-go" onclick="runBatchReports()" style="background:var(--accent,#ff6b35);border-color:var(--accent,#ff6b35);color:#fff;opacity:.9">▸ Batch — 8 kont</button>
     </div>
   </div>
 </div>
@@ -29715,13 +29692,11 @@ function renderSeoCard(p) {
     <div class="report-group-label" style="color:var(--g-one)">· ONE</div>
     <div class="report-checks">
       <div class="report-check" data-key="Materazzi" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Materazzi</div>
-      <div class="report-check" data-key="MtzzEU" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>MtzzEU</div>
     </div>
 
     <div class="report-group-label" style="color:var(--g-two)">· TWO</div>
     <div class="report-checks">
       <div class="report-check" data-key="VitaClean" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>VitaClean</div>
-      <div class="report-check" data-key="DomGlamour" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Dom Glamour</div>
       <div class="report-check" data-key="GaleriaEstetyczna" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Galeria Estetyczna</div>
     </div>
 
@@ -29729,6 +29704,8 @@ function renderSeoCard(p) {
     <div class="report-checks">
       <div class="report-check" data-key="BOTAVIT" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>BOTAVIT</div>
       <div class="report-check" data-key="Ankado24" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Ankado24</div>
+      <div class="report-check" data-key="MtzzEU" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>MtzzEU</div>
+      <div class="report-check" data-key="DomGlamour" onclick="toggleSlideCheck(this)"><div class="report-check-dot"></div>Dom Glamour</div>
     </div>
 
     <div style="display:flex;align-items:center;margin-top:.9rem;gap:.6rem">
